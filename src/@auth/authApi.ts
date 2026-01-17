@@ -2,6 +2,7 @@ import { User } from '@auth/user';
 import UserModel from '@auth/user/models/UserModel';
 import { PartialDeep } from 'type-fest';
 import api from '@/utils/api';
+import axiosInstance from '@/lib/@axios';
 
 type AuthResponse = {
 	user: User;
@@ -30,11 +31,16 @@ export async function authSignInWithToken(accessToken: string): Promise<Response
  * Sign in
  */
 export async function authSignIn(credentials: { email: string; password: string }): Promise<AuthResponse> {
-	return api
-		.post('mock/auth/sign-in', {
-			json: credentials
-		})
-		.json();
+	const { data: { user, token } } = await axiosInstance.post(`auth/login`, credentials);
+
+	// Backend now returns roles as array: roles: ["superadmin"]
+	// Frontend expects role as array, so we just assign it directly
+	const transformedUser = {
+		...user,
+		role: user.roles || []
+	};
+
+	return { user: transformedUser, access_token: token };
 }
 
 /**

@@ -21,7 +21,7 @@ const settingsConfig: FuseSettingsConfigType = {
 		 */
 		config: {
 			navbar: {
-				style: 'style-1'
+				style: 'style-2'
 			}
 		} // checkout default layout configs at src/components/theme-layouts for example  src/components/theme-layouts/layout1/Layout1Config.js
 	},
@@ -51,7 +51,11 @@ const settingsConfig: FuseSettingsConfigType = {
 	 * To make the whole app accessible without authorization by default set defaultAuth: null
 	 * The individual route configs which have auth option won't be overridden.
 	 */
-	defaultAuth: ['admin'],
+
+	/**
+	 *  defaultAuth: ['superadmin', 'admin', 'user'], arrays de roles permitidos para acceder a la app
+	 */
+	defaultAuth: ['superadmin', 'admin', 'user'],
 
 	/**
 	 * The loginRedirectUrl property defines the default redirect URL for the logged-in user.

@@ -100,15 +100,15 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 	const signIn: JwtAuthContextType['signIn'] = useCallback(
 		async (credentials) => {
 			try {
-				const session = await authSignIn(credentials);
+				const { user, access_token } = await authSignIn(credentials);
 				setAuthState({
 					authStatus: 'authenticated',
 					isAuthenticated: true,
-					user: session.user
+					user: user
 				});
-				setTokenStorageValue(session.access_token);
-				setGlobalHeaders({ Authorization: `Bearer ${session.access_token}` });
-				return session;
+				setTokenStorageValue(access_token);
+				setGlobalHeaders({ Authorization: `Bearer ${access_token}` });
+				return { user, access_token };
 			} catch (error) {
 				if (error instanceof HTTPError) {
 					console.error('Sign in failed:', error.response.status);
