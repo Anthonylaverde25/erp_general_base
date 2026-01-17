@@ -5,6 +5,7 @@ import useFuseSettings from '@fuse/core/FuseSettings/hooks/useFuseSettings';
 import i18n from './i18n';
 import I18nContext from './I18nContext';
 import { LanguageType } from './I18nContext';
+import { useLanguageStore } from 'src/zustand/languageStore';
 
 type I18nProviderProps = {
 	children: React.ReactNode;
@@ -12,18 +13,19 @@ type I18nProviderProps = {
 
 const languages: LanguageType[] = [
 	{ id: 'en', title: 'English', flag: 'US' },
-	{ id: 'tr', title: 'Turkish', flag: 'TR' },
-	{ id: 'ar', title: 'Arabic', flag: 'SA' }
+	{ id: 'es', title: 'Español', flag: 'ES' }
 ];
 
 export function I18nProvider(props: I18nProviderProps) {
 	const { children } = props;
 	const { data: settings, setSettings } = useFuseSettings();
 	const settingsThemeDirection = useMemo(() => settings.direction, [settings]);
-	const [languageId, setLanguageId] = useState(i18n.options.lng);
+	const { languageId: persistedLanguageId, setLanguage } = useLanguageStore();
+	const [languageId, setLanguageId] = useState(persistedLanguageId || i18n.options.lng);
 
 	const changeLanguage = async (languageId: string) => {
 		setLanguageId(languageId);
+		setLanguage(languageId); // Persist to store
 		await i18n.changeLanguage(languageId);
 	};
 

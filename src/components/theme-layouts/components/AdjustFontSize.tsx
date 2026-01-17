@@ -1,10 +1,11 @@
 'use client';
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useState, useEffect } from 'react';
 import Slider from '@mui/material/Slider';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
+import { useFontSizeStore } from 'src/zustand/fontSizeStore';
 
 const marks = [
 	{ value: 16 * 0.7, label: '70%' },
@@ -27,12 +28,12 @@ function AdjustFontSize(props: AdjustFontSizeProps) {
 	const { className = '' } = props;
 
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-	const [fontSize, setFontSize] = useState(16);
+	const { fontSize, setFontSize, applyFontSize } = useFontSizeStore();
 
-	function changeHtmlFontSize() {
-		const html = document.getElementsByTagName('html')[0];
-		html.style.fontSize = `${fontSize}px`;
-	}
+	// Apply persisted font size on mount
+	useEffect(() => {
+		applyFontSize();
+	}, [applyFontSize]);
 
 	const handleClick = (event: MouseEvent<HTMLElement>) => {
 		setAnchorEl(event.currentTarget);
@@ -87,7 +88,6 @@ function AdjustFontSize(props: AdjustFontSizeProps) {
 						step={null}
 						valueLabelDisplay="off"
 						onChange={(ev, value) => setFontSize(value as number)}
-						onChangeCommitted={changeHtmlFontSize}
 					/>
 				</div>
 			</Menu>
