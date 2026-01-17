@@ -13,7 +13,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import MainThemeProvider from '../contexts/MainThemeProvider';
 import routes from '@/configs/routesConfig';
 import AppContext from '@/contexts/AppContext';
-import { NotificationPanelContextProvider } from '@/app/(control-panel)/apps/notifications/contexts/NotificationPanelContext/NotificationPanelContextProvider';
 import { FuseDialogContextProvider } from '@fuse/core/FuseDialog/contexts/FuseDialogContext/FuseDialogContextProvider';
 import { NavbarContextProvider } from '@/components/theme-layouts/components/navbar/contexts/NavbarContext/NavbarContextProvider';
 import { QuickPanelProvider } from '@/components/theme-layouts/components/quickPanel/contexts/QuickPanelContext/QuickPanelContextProvider';
@@ -67,11 +66,9 @@ function App() {
 																	'bottom-0 right-0 mb-13 md:mb-17 mr-2 lg:mr-20 z-99'
 															}}
 														>
-															<NotificationPanelContextProvider>
-																<QuickPanelProvider>
-																	<FuseLayout layouts={themeLayouts} />
-																</QuickPanelProvider>
-															</NotificationPanelContextProvider>
+															<QuickPanelProvider>
+																<FuseLayout layouts={themeLayouts} />
+															</QuickPanelProvider>
 														</SnackbarProvider>
 													</FuseDialogContextProvider>
 												</NavigationContextProvider>

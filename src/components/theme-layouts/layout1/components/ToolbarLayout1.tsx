@@ -6,7 +6,6 @@ import themeOptions from 'src/configs/themeOptions';
 import _ from 'lodash';
 import LightDarkModeToggle from 'src/components/LightDarkModeToggle';
 import useFuseLayoutSettings from '@fuse/core/FuseLayout/useFuseLayoutSettings';
-import NotificationPanelToggleButton from '@/app/(control-panel)/apps/notifications/components/ui/notification-panel/NotificationPanelToggleButton';
 import AdjustFontSize from '../../components/AdjustFontSize';
 import FullScreenToggle from '../../components/FullScreenToggle';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
@@ -69,7 +68,6 @@ function ToolbarLayout1(props: ToolbarLayout1Props) {
 						/>
 						<NavigationSearch />
 						<QuickPanelToggleButton />
-						<NotificationPanelToggleButton />
 					</div>
 
 					{config.navbar.display && config.navbar.position === 'right' && (

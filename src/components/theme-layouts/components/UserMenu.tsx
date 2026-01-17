@@ -160,28 +160,6 @@ function UserMenu(props: UserMenuProps) {
 				) : (
 					<>
 						<MenuItem
-							component={Link}
-							to="/apps/profile"
-							onClick={userMenuClose}
-							role="button"
-						>
-							<ListItemIcon>
-								<FuseSvgIcon>lucide:circle-user</FuseSvgIcon>
-							</ListItemIcon>
-							<ListItemText primary="My Profile" />
-						</MenuItem>
-						<MenuItem
-							component={Link}
-							to="/apps/mailbox"
-							onClick={userMenuClose}
-							role="button"
-						>
-							<ListItemIcon>
-								<FuseSvgIcon>lucide:mail</FuseSvgIcon>
-							</ListItemIcon>
-							<ListItemText primary="Inbox" />
-						</MenuItem>
-						<MenuItem
 							onClick={() => {
 								signOut();
 							}}

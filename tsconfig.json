@@ -51,8 +51,6 @@
     "incremental": true
   },
   "exclude": [
-    "src/app/(public)/documentation/components/views/material-ui-components/**/*",
-    "src/app/(public)/documentation/components/ui/material-ui-components/**/*",
     "node_modules"
   ],
   "include": [

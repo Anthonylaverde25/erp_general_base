@@ -2,7 +2,6 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { memo } from 'react';
 import clsx from 'clsx';
-import DemoLayoutFooterContent from 'src/components/theme-layouts/components/DemoLayoutFooterContent';
 import FooterTheme from '@/contexts/FooterTheme';
 
 type FooterLayout1Props = { className?: string };
@@ -26,7 +25,7 @@ function FooterLayout1(props: FooterLayout1Props) {
 				elevation={0}
 			>
 				<Toolbar className="flex min-h-12 items-center overflow-x-auto px-2 py-0 sm:px-3 md:min-h-16">
-					<DemoLayoutFooterContent />
+					Footer
 				</Toolbar>
 			</AppBar>
 		</FooterTheme>
