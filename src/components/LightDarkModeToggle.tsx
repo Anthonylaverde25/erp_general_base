@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
@@ -9,6 +9,7 @@ import useFuseSettings from '@fuse/core/FuseSettings/hooks/useFuseSettings';
 import { FuseSettingsConfigType } from '@fuse/core/FuseSettings/FuseSettings';
 import useUser from '@auth/useUser';
 import { useSnackbar } from 'notistack';
+import { useThemeStore } from '../zustand/themeStore';
 
 type LightDarkModeToggleProps = {
 	className?: string;
@@ -23,6 +24,15 @@ function LightDarkModeToggle(props: LightDarkModeToggleProps) {
 	const { isGuest, updateUserSettings } = useUser();
 	const { enqueueSnackbar } = useSnackbar();
 	const mainTheme = useMainTheme();
+	const { mode: persistedMode, setThemeMode } = useThemeStore();
+
+	// Initialize theme from persisted state on mount
+	useEffect(() => {
+		if (persistedMode && mainTheme.palette.mode !== persistedMode) {
+			const themeToApply = persistedMode === 'light' ? lightTheme : darkTheme;
+			handleThemeSelect(themeToApply);
+		}
+	}, []); // Run only on mount
 
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 		setAnchorEl(event.currentTarget);
@@ -44,6 +54,12 @@ function LightDarkModeToggle(props: LightDarkModeToggleProps) {
 
 	async function handleThemeSelect(_theme: FuseThemeOption) {
 		const _newSettings = setSettings({ theme: { ..._theme?.section } } as Partial<FuseSettingsConfigType>);
+
+		// Persist theme mode to Zustand store
+		const newMode = _theme?.section?.main?.palette?.mode as 'light' | 'dark';
+		if (newMode) {
+			setThemeMode(newMode);
+		}
 
 		if (!isGuest) {
 			const updatedUserData = await updateUserSettings(_newSettings);
