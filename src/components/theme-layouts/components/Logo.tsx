@@ -29,7 +29,7 @@ function Logo(props: LogoProps) {
 	const { className = '' } = props;
 	return (
 		<Root className={clsx('flex flex-shrink-0 flex-grow items-center gap-3', className)}>
-			<div className="flex flex-1 items-center gap-2">
+			<div className="flex flex-1 items-center gap-2 bg-amber-600">
 				<img
 					className="logo-icon h-6 w-6"
 					src="/assets/images/logo/logo.svg"
@@ -45,7 +45,7 @@ function Logo(props: LogoProps) {
 					</Typography>
 				</div>
 			</div>
-			<MainProjectSelection />
+			{/* <MainProjectSelection /> */}
 		</Root>
 	);
 }
