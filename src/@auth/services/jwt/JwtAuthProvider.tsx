@@ -8,6 +8,7 @@ import { isTokenValid } from './utils/jwtUtils';
 import JwtAuthContext from '@auth/services/jwt/JwtAuthContext';
 import { JwtAuthContextType } from '@auth/services/jwt/JwtAuthContext';
 import { HTTPError } from 'ky';
+import { UserTypes } from '@/types/user.types';
 
 export type JwtSignInPayload = {
 	email: string;
@@ -32,7 +33,7 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 	/**
 	 * Fuse Auth Provider State
 	 */
-	const [authState, setAuthState] = useState<FuseAuthProviderState<User>>({
+	const [authState, setAuthState] = useState<FuseAuthProviderState<UserTypes>>({
 		authStatus: 'configuring',
 		isAuthenticated: false,
 		user: null
@@ -102,10 +103,12 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 			try {
 				const { user, access_token } = await authSignIn(credentials);
 
+
+
 				setAuthState({
 					authStatus: 'authenticated',
 					isAuthenticated: true,
-					user: user
+					user: { ...user, role: user.role.code }
 				});
 
 				setTokenStorageValue(access_token);

@@ -2,10 +2,11 @@ import { FuseAuthProviderState } from '@fuse/core/FuseAuthProvider/types/FuseAut
 import { User } from '@auth/user';
 import { createContext } from 'react';
 import { JwtSignInPayload, JwtSignUpPayload } from '@auth/services/jwt/JwtAuthProvider';
+import { UserTypes } from '@/types/user.types';
 
 export type JwtAuthContextType = FuseAuthProviderState<User> & {
 	updateUser: (U: User) => Promise<Response>;
-	signIn?: (credentials: JwtSignInPayload) => Promise<{ user: User; access_token: string } | null>;
+	signIn?: (credentials: JwtSignInPayload) => Promise<{ user: UserTypes; access_token: string } | null>;
 	signUp?: (U: JwtSignUpPayload) => Promise<{ user: User; access_token: string } | null>;
 	signOut?: () => void;
 	refreshToken?: () => Promise<string | Response>;

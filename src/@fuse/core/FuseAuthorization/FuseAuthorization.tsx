@@ -72,10 +72,13 @@ class FuseAuthorization extends Component<FuseAuthorizationProps, State> {
 		const isGuest = isUserGuest(userRole);
 
 		const userHasPermission = FuseUtils.hasPermission(auth, userRole);
+		console.log('auth', auth);
 
 		if (auth && !userHasPermission && !ignoredPaths.includes(pathname)) {
 			setSessionRedirectUrl(pathname);
 		}
+
+		console.log('userRole', userRole);
 
 		/**
 		 * If user is member but don't have permission to view the route

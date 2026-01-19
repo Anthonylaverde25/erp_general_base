@@ -4,9 +4,10 @@ import { PartialDeep } from 'type-fest';
 import api from '@/utils/api';
 import axiosInstance from '@/lib/@axios';
 import { LoginSuccesResponse } from '@/types/auth.types';
+import { UserTypes } from '@/types/user.types';
 
 type AuthResponse = {
-	user: User;
+	user: UserTypes;
 	access_token: string;
 };
 
@@ -32,17 +33,7 @@ export async function authSignInWithToken(accessToken: string): Promise<Response
  * Sign in
  */
 export async function authSignIn(credentials: { email: string; password: string }): Promise<AuthResponse> {
-	const { data: { auth: { user: backendUser, token } } } = await axiosInstance.post<LoginSuccesResponse>(`auth/login`, credentials);
-
-	console.log('Login response - Backend User:', backendUser, 'Token:', token);
-
-	// Map backend UserTypes to Fuse's User type
-	const user: User = {
-		id: backendUser.id,
-		displayName: backendUser.name,
-		email: backendUser.email,
-		role: Array.isArray(backendUser.role) ? backendUser.role.code : [backendUser.role.code]
-	};
+	const { data: { auth: { user, token } } } = await axiosInstance.post<LoginSuccesResponse>(`auth/login`, credentials);
 
 	return {
 		user,
