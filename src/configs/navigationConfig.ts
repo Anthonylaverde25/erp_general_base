@@ -324,7 +324,7 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Company',
 						translate: 'COMPANY',
 						type: 'item',
-						url: '/settings/company',
+						url: '/apps/settings',
 						icon: 'lucide:building'
 					},
 					{
