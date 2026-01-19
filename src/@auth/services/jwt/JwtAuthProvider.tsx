@@ -101,13 +101,16 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 		async (credentials) => {
 			try {
 				const { user, access_token } = await authSignIn(credentials);
+
 				setAuthState({
 					authStatus: 'authenticated',
 					isAuthenticated: true,
 					user: user
 				});
+
 				setTokenStorageValue(access_token);
 				setGlobalHeaders({ Authorization: `Bearer ${access_token}` });
+
 				return { user, access_token };
 			} catch (error) {
 				if (error instanceof HTTPError) {

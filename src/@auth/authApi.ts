@@ -3,6 +3,7 @@ import UserModel from '@auth/user/models/UserModel';
 import { PartialDeep } from 'type-fest';
 import api from '@/utils/api';
 import axiosInstance from '@/lib/@axios';
+import { LoginSuccesResponse } from '@/types/auth.types';
 
 type AuthResponse = {
 	user: User;
@@ -27,20 +28,26 @@ export async function authSignInWithToken(accessToken: string): Promise<Response
 	});
 }
 
-/**
+/**`
  * Sign in
  */
 export async function authSignIn(credentials: { email: string; password: string }): Promise<AuthResponse> {
-	const { data: { user, token } } = await axiosInstance.post(`auth/login`, credentials);
+	const { data: { auth: { user: backendUser, token } } } = await axiosInstance.post<LoginSuccesResponse>(`auth/login`, credentials);
 
-	// Backend now returns roles as array: roles: ["superadmin"]
-	// Frontend expects role as array, so we just assign it directly
-	const transformedUser = {
-		...user,
-		role: user.roles || []
+	console.log('Login response - Backend User:', backendUser, 'Token:', token);
+
+	// Map backend UserTypes to Fuse's User type
+	const user: User = {
+		id: backendUser.id,
+		displayName: backendUser.name,
+		email: backendUser.email,
+		role: Array.isArray(backendUser.role) ? backendUser.role.code : [backendUser.role.code]
 	};
 
-	return { user: transformedUser, access_token: token };
+	return {
+		user,
+		access_token: token
+	};
 }
 
 /**

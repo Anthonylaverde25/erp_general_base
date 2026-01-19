@@ -55,7 +55,7 @@ const settingsConfig: FuseSettingsConfigType = {
 	/**
 	 *  defaultAuth: ['superadmin', 'admin', 'user'], arrays de roles permitidos para acceder a la app
 	 */
-	defaultAuth: ['superadmin', 'admin', 'user'],
+	defaultAuth: ['super_admin', 'admin', 'user'],
 
 	/**
 	 * The loginRedirectUrl property defines the default redirect URL for the logged-in user.
