@@ -11,7 +11,9 @@
       "@i18n/*": [
         "./src/@i18n/*"
       ],
-      "@fuse/*": ["./src/@fuse/*"],
+      "@fuse/*": [
+        "./src/@fuse/*"
+      ],
       "@history*": [
         "./src/@history"
       ],
@@ -21,9 +23,9 @@
       "@schema": [
         "./src/@schema"
       ],
-    "@/*": [
-      "./src/*"
-    ]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "declaration": true,
     "target": "esnext",
@@ -33,7 +35,11 @@
       "es2020",
       "scripthost"
     ],
-    "plugins": [{ "name": "typescript-plugin-css-modules" }],
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
@@ -48,7 +54,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "exclude": [
     "node_modules"

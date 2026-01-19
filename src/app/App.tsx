@@ -8,8 +8,6 @@ import { enUS } from 'date-fns/locale/en-US';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import ErrorBoundary from '@fuse/utils/ErrorBoundary';
 import Authentication from '@auth/Authentication';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import MainThemeProvider from '../contexts/MainThemeProvider';
 import routes from '@/configs/routesConfig';
 import AppContext from '@/contexts/AppContext';
@@ -18,15 +16,7 @@ import { NavbarContextProvider } from '@/components/theme-layouts/components/nav
 import { QuickPanelProvider } from '@/components/theme-layouts/components/quickPanel/contexts/QuickPanelContext/QuickPanelContextProvider';
 import RootThemeProvider from '@/contexts/RootThemeProvider';
 import { NavigationContextProvider } from '@/components/theme-layouts/components/navigation/contexts/NavigationContextProvider';
-
-const queryClient = new QueryClient({
-	defaultOptions: {
-		queries: {
-			staleTime: 5 * 60 * 1000, // 5 minutes
-			retry: 1
-		}
-	}
-});
+import ReactQueryProvider from '@/providers/ReactQueryProvider';
 
 /**
  * The main App component.
@@ -44,7 +34,7 @@ function App() {
 					dateAdapter={AdapterDateFns}
 					adapterLocale={enUS}
 				>
-					<QueryClientProvider client={queryClient}>
+					<ReactQueryProvider>
 						<Authentication>
 							<FuseSettingsProvider>
 								<I18nProvider>
@@ -78,11 +68,10 @@ function App() {
 								</I18nProvider>
 							</FuseSettingsProvider>
 						</Authentication>
-						<ReactQueryDevtools initialIsOpen={false} />
-					</QueryClientProvider>
+					</ReactQueryProvider>
 				</LocalizationProvider>
 			</AppContext>
-		</ErrorBoundary>
+		</ErrorBoundary >
 	);
 }
 
