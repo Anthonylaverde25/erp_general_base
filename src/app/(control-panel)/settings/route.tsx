@@ -8,6 +8,7 @@ const SecurityTabView = lazy(() => import('./components/views/SecurityTabView'))
 const PlanBillingTabView = lazy(() => import('./components/views/PlanBillingTabView'));
 const NotificationsTabView = lazy(() => import('./components/views/NotificationsTabView'));
 const TeamTabView = lazy(() => import('./components/views/TeamTabView'));
+const RolesTabView = lazy(() => import('./components/views/RolesTabView'));
 
 /**
  * The Settings App Route.
@@ -43,6 +44,10 @@ const Route: FuseRouteItemType = {
 		{
 			path: 'team',
 			element: <TeamTabView />
+		},
+		{
+			path: 'roles',
+			element: <RolesTabView />
 		},
 		{
 			path: '',

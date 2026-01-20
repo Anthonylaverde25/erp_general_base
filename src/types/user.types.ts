@@ -9,7 +9,7 @@ export interface UserType {
     name: string;
     email: string;
     role: Role | null;
-    role_ids?: number[];
+    role_id?: number;
 
     // Campos adicionales del backend
     full_name?: string;
@@ -36,7 +36,7 @@ export interface CreateUserType {
     email: string
     password: string
     password_confirmation: string
-    role_ids: number[],
+    role_id: number,
     department_ids: number[]
     phone: string
 }

@@ -46,6 +46,14 @@ const SettingsAppNavigation: FuseNavItemType = {
 			type: 'item',
 			url: '/apps/settings/team',
 			subtitle: 'Manage your existing team and change roles/permissions'
+		},
+		{
+			id: 'apps.settings.roles',
+			icon: 'lucide:users',
+			title: 'Roles',
+			type: 'item',
+			url: '/apps/settings/roles',
+			subtitle: 'Manage your existing team and change roles/permissions'
 		}
 	]
 };

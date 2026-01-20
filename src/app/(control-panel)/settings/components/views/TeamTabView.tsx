@@ -1,15 +1,8 @@
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
+
 import IconButton from '@mui/material/IconButton';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemText from '@mui/material/ListItemText';
-import Avatar from '@mui/material/Avatar';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Select from '@mui/material/Select';
+
 import MenuItem from '@mui/material/MenuItem';
-import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import { useState } from 'react';
@@ -18,10 +11,16 @@ import { useUpdateTeamMembers } from '../../api/hooks/team/useUpdateTeamMembers'
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import useIndexUser from '@/features/users/hooks/useIndexUsers';
-import UserDataTable from '@/ui/users/components/users/UserDataTable';
+import UserDataTable from '@/ui/users/component/UserDataTable';
 import Tooltip from '@mui/material/Tooltip';
-import { UserColumns } from '@/ui/users/components/users/Columns';
+import { UserColumns } from '@/ui/users/component/Columns';
 import { Button, Divider, Stack } from '@mui/material';
+import CreateUserModal from '@/ui/users/component/modals/CreateUserModal';
+import useCreateUser from '@/features/users/hooks/useCreateUser';
+import useRoles from '@/features/users/hooks/useRoles';
+import useDepartments from '@/features/users/hooks/useDepartments';
+import { CreateUserType } from '@/types/user.types';
+import CreateUserButton from '@/ui/users/component/CreateUserButton';
 
 const roles = [
 	{
@@ -44,22 +43,10 @@ const roles = [
 
 function TeamTabView() {
 	const { users, isLoading, isError } = useIndexUser();
-	const { data: teamMembers } = useTeamMembers();
-	const { mutate: updateTeamMembers } = useUpdateTeamMembers();
+	const { data: roles } = useRoles();
+	const { data: departments } = useDepartments();
 
-	function handleRemoveMember(email: string) {
-		updateTeamMembers(teamMembers?.filter((member) => member.email !== email));
-	}
 
-	const handleCreateUser = () => {
-		console.log('Crear usuario');
-		// Aquí iría la lógica para abrir el modal/formulario de crear usuario
-	};
-
-	const handleInviteUser = () => {
-		console.log('Invitar usuario');
-		// Aquí iría la lógica para abrir el modal/formulario de invitar usuario
-	};
 
 	return (
 		<div className="flex flex-col gap-4 w-full">
@@ -74,25 +61,14 @@ function TeamTabView() {
 					variant="outlined"
 					color="secondary"
 					size="large"
-					startIcon={<FuseSvgIcon size={16}>heroicons-outline:mail</FuseSvgIcon>}
-					onClick={handleInviteUser}
+					startIcon={<FuseSvgIcon size={16}>heroicons-outline:arrow-down</FuseSvgIcon>}
+				// onClick={handleInviteUser}
 
 				>
 					Invitar usuario
 				</Button>
-				<Button
-					variant="contained"
-					color="primary"
-					size="large"
-					startIcon={<FuseSvgIcon size={16}>heroicons-outline:user-plus</FuseSvgIcon>}
-					onClick={handleCreateUser}
+				<CreateUserButton />
 
-				>
-					Crear usuario
-				</Button>
-				<Button variant="text">Text</Button>
-				<Button variant="contained">Contained</Button>
-				<Button variant="outlined">Outlined</Button>
 			</Stack>
 
 			<UserDataTable
@@ -119,6 +95,8 @@ function TeamTabView() {
 					}
 				}}
 			/>
+
+
 		</div>
 	);
 }

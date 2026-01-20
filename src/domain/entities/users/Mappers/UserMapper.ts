@@ -1,4 +1,4 @@
-import { UserListDTO } from "../DTOs/userListDTO";
+import { UserListDTO } from "../DTOs/UserListDTO";
 import { User } from "../User";
 
 export class UserMapper {
@@ -10,7 +10,7 @@ export class UserMapper {
             email: dto.email,
             phone: dto.phone || '',
             role: dto.role,
-            ...(dto.role_ids && { role_ids: dto.role_ids })
+            role_id: dto.role?.id || (dto.role_ids?.[0] ?? 0)
         }
         return new User(data)
     }
