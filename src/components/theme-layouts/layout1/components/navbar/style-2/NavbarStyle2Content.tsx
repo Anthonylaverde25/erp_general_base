@@ -110,6 +110,7 @@ function NavbarStyle2Content(props: NavbarStyle2ContentProps) {
 				<div
 					id="fuse-navbar-side-panel"
 					className="flex h-full shrink-0 flex-col items-center"
+					style={{ backgroundColor: '#1f2937', color: 'white' }}
 				>
 					<img
 						className="my-4 w-6"

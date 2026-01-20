@@ -1,0 +1,56 @@
+// =============================================
+// Archivo Principal SCSS
+// Importa todos los parciales en el orden correcto
+// =============================================
+
+// 1. Abstracts - Variables, mixins, y funciones primero
+@import 'abstracts/variables';
+@import 'abstracts/mixins';
+@import 'abstracts/functions';
+
+// 2. Base - Reset y estilos fundamentales
+@import 'base/reset';
+@import 'base/typography';
+@import 'base/utilities';
+
+// 3. Layout - Estructura principal de la aplicación
+@import 'layout/header';
+@import 'layout/sidebar';
+@import 'layout/footer';
+@import 'layout/grid';
+
+// 4. Components - Componentes reutilizables
+@import 'components/buttons';
+@import 'components/forms';
+@import 'components/cards';
+@import 'components/modals';
+@import 'components/tables';
+@import 'components/loading';
+
+// 5. Modules - Estilos específicos por módulo/dominio
+// Users
+@import 'modules/users/user-list';
+@import 'modules/users/user-form';
+@import 'modules/users/user-card';
+
+// Roles
+@import 'modules/roles/role-list';
+@import 'modules/roles/role-form';
+
+// Auth
+@import 'modules/auth/login';
+@import 'modules/auth/register';
+
+// Sales
+@import 'modules/sales/sales-dashboard';
+
+// 6. Themes - Temas de la aplicación
+@import 'themes/default';
+
+// =============================================
+// Notas de uso:
+// - Importa este archivo en tu index.tsx o App.tsx principal
+// - Para agregar nuevos estilos, crea archivos parciales (con _ al inicio)
+//   en las carpetas correspondientes e impórtalos aquí
+// - Mantén el orden de importación para evitar problemas de cascada
+// =============================================

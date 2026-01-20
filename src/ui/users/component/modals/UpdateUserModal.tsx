@@ -2,6 +2,7 @@ import { Dialog, DialogContent, CircularProgress, Box, Typography } from '@mui/m
 import UpdateUserForm from '../forms/UpdateUserForm';
 import { UserType } from '@/types/user.types';
 import useShowUser from '@/features/users/hooks/useShowUser';
+import LoadingProgress from '@/components/LoadingProgress';
 
 interface UpdateUserDialogProps {
     open: boolean;
@@ -16,9 +17,7 @@ export default function UpdateUserDialog({ open, onClose, userId }: UpdateUserDi
         <Dialog open={open} onClose={onClose}>
             <DialogContent>
                 {isLoading && (
-                    <Box display="flex" justifyContent="center" alignItems="center" minHeight={400}>
-                        <CircularProgress />
-                    </Box>
+                    <LoadingProgress message="Cargando usuario..." />
                 )}
 
                 {isError && (

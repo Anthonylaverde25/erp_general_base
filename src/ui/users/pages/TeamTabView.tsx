@@ -32,6 +32,7 @@ export default function TeamTabView() {
                 <div></div>
                 <Stack direction="row" spacing={1.5} alignItems="center">
                     <Button
+                        className='btn-secondary'
                         variant="outlined"
                         color="secondary"
                         size="large"
