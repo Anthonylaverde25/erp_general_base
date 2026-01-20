@@ -18,7 +18,6 @@ import { Button, Divider, Stack } from '@mui/material';
 import CreateUserModal from '@/ui/users/component/modals/CreateUserModal';
 import useCreateUser from '@/features/users/hooks/useCreateUser';
 import useRoles from '@/features/users/hooks/useRoles';
-import useDepartments from '@/features/users/hooks/useDepartments';
 import { CreateUserType } from '@/types/user.types';
 import CreateUserButton from '@/ui/users/component/CreateUserButton';
 
@@ -44,7 +43,6 @@ const roles = [
 function TeamTabView() {
 	const { users, isLoading, isError } = useIndexUser();
 	const { data: roles } = useRoles();
-	const { data: departments } = useDepartments();
 
 
 

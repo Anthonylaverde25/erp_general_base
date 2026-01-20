@@ -22,15 +22,12 @@ export class UserRepositoryCrud implements IUserCrudRepository {
   async create(data: User): Promise<{ user: User, message: string }> {
     try {
       const payload = data.toPlainObject();
-      const response = await axiosInstance.post('/users', payload);
-      // Backend might return wrapped data (Laravel Resource) or specific keys
-      const userData = response.data.data || response.data.user || response.data;
-
-      console.log("usuario creado desde el repo", response.data, userData);
+      const { data: { user, message } } = await axiosInstance.post('/users', payload);
+      console.log("usuario creado desde el repo", user);
 
       return {
-        user: UserMapper.fromDetailDTO(userData),
-        message: response.data.message || 'Usuario creado correctamente'
+        user: UserMapper.fromDetailDTO(user),
+        message: message || 'Usuario creado correctamente'
       };
     } catch (error) {
       throw error;
