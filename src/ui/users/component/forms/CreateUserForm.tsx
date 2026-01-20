@@ -11,22 +11,13 @@ import {
     Stack,
     Fade,
     Alert,
-    Paper,
     MenuItem
 } from '@mui/material';
-import {
-    Visibility,
-    VisibilityOff,
-    Person,
-    Lock,
-    Shield,
-    Save,
-    Close
-} from '@mui/icons-material';
+import { Visibility, VisibilityOff, Person, Lock, Shield, Save, Close } from '@mui/icons-material';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import useIndexRoles from "@/features/roles/hooks/useIndexRoles";
-import useCreateUser from "@/features/users/hooks/useCreateUser";
+import useIndexRoles from '@/features/roles/hooks/useIndexRoles';
+import useCreateUser from '@/features/users/hooks/useCreateUser';
 import { CreateUserFormType, createUserSchema, defaultCreateUserValues } from '@/schemas/user/user.schema';
 import { CreateUserType } from '@/types/user.types';
 
@@ -70,28 +61,48 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
         }
     };
 
-    const SectionTitle = ({ icon: Icon, title }: { icon: any; title: string }) => (
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-            <Icon fontSize="small" color="primary" />
-            <Typography variant="subtitle1" fontWeight={600} color="text.primary">
+    const SectionTitle = ({ icon: Icon, title }: { icon: React.ElementType; title: string }) => (
+        <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{ mb: 2 }}
+        >
+            <Icon
+                fontSize="small"
+                color="primary"
+            />
+            <Typography
+                variant="subtitle1"
+                fontWeight={600}
+                color="text.primary"
+            >
                 {title}
             </Typography>
         </Stack>
     );
 
     return (
-        <Fade in timeout={400}>
-            <Box
-
-            >
+        <Fade
+            in
+            timeout={400}
+        >
+            <Box>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Stack spacing={4}>
                         {/* Header */}
                         <Box>
-                            <Typography variant="h5" fontWeight={700} gutterBottom>
+                            <Typography
+                                variant="h5"
+                                fontWeight={700}
+                                gutterBottom
+                            >
                                 Crear nuevo usuario
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                            >
                                 Complete la información para registrar un nuevo usuario en el sistema
                             </Typography>
                         </Box>
@@ -100,7 +111,10 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
 
                         {/* Información Personal */}
                         <Box>
-                            <SectionTitle icon={Person} title="Información personal" />
+                            <SectionTitle
+                                icon={Person}
+                                title="Información personal"
+                            />
 
                             <Stack spacing={3}>
                                 <Controller
@@ -119,7 +133,10 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
                                     )}
                                 />
 
-                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                                <Stack
+                                    direction={{ xs: 'column', sm: 'row' }}
+                                    spacing={2}
+                                >
                                     <Controller
                                         name="email"
                                         control={control}
@@ -159,10 +176,16 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
 
                         {/* Seguridad */}
                         <Box>
-                            <SectionTitle icon={Lock} title="Seguridad de la cuenta" />
+                            <SectionTitle
+                                icon={Lock}
+                                title="Seguridad de la cuenta"
+                            />
 
                             <Stack spacing={3}>
-                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                                <Stack
+                                    direction={{ xs: 'column', sm: 'row' }}
+                                    spacing={2}
+                                >
                                     <Controller
                                         name="password"
                                         control={control}
@@ -181,7 +204,7 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
                                                         <InputAdornment position="end">
                                                             <IconButton
                                                                 size="small"
-                                                                onClick={() => setShowPassword(v => !v)}
+                                                                onClick={() => setShowPassword((v) => !v)}
                                                                 edge="end"
                                                                 tabIndex={-1}
                                                             >
@@ -192,7 +215,7 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
                                                                 )}
                                                             </IconButton>
                                                         </InputAdornment>
-                                                    ),
+                                                    )
                                                 }}
                                             />
                                         )}
@@ -203,7 +226,6 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
                                         control={control}
                                         render={({ field }) => (
                                             <TextField
-
                                                 {...field}
                                                 label="Confirmar contraseña"
                                                 placeholder="Repita la contraseña"
@@ -212,13 +234,13 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
                                                 helperText={errors.password_confirmation?.message}
                                                 fullWidth
                                                 variant="outlined"
-                                                size='small'
+                                                size="small"
                                                 InputProps={{
                                                     endAdornment: (
                                                         <InputAdornment position="end">
                                                             <IconButton
                                                                 size="small"
-                                                                onClick={() => setShowConfirmPassword(v => !v)}
+                                                                onClick={() => setShowConfirmPassword((v) => !v)}
                                                                 edge="end"
                                                                 tabIndex={-1}
                                                             >
@@ -229,7 +251,7 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
                                                                 )}
                                                             </IconButton>
                                                         </InputAdornment>
-                                                    ),
+                                                    )
                                                 }}
                                             />
                                         )}
@@ -242,14 +264,18 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
                                     icon={<Lock fontSize="small" />}
                                     sx={{ borderRadius: 1.5 }}
                                 >
-                                    Use una contraseña segura de al menos 8 caracteres. Se recomienda incluir mayúsculas, minúsculas, números y símbolos.
+                                    Use una contraseña segura de al menos 8 caracteres. Se recomienda incluir
+                                    mayúsculas, minúsculas, números y símbolos.
                                 </Alert>
                             </Stack>
                         </Box>
 
                         {/* Roles */}
                         <Box>
-                            <SectionTitle icon={Shield} title="Roles y permisos" />
+                            <SectionTitle
+                                icon={Shield}
+                                title="Roles y permisos"
+                            />
 
                             <Controller
                                 name="role_id"
@@ -260,19 +286,30 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
                                         select
                                         label="Seleccionar rol"
                                         error={!!errors.role_id}
-                                        helperText={errors.role_id?.message || 'Asigne el rol correspondiente al usuario'}
+                                        helperText={
+                                            errors.role_id?.message || 'Asigne el rol correspondiente al usuario'
+                                        }
                                         fullWidth
                                         variant="filled"
                                         value={field.value || ''}
                                     >
-                                        {roles?.map(role => (
-                                            <MenuItem key={role.id} value={role.id}>
+                                        {roles?.map((role) => (
+                                            <MenuItem
+                                                key={role.id}
+                                                value={role.id}
+                                            >
                                                 <Stack>
-                                                    <Typography variant="body2" fontWeight={500}>
+                                                    <Typography
+                                                        variant="body2"
+                                                        fontWeight={500}
+                                                    >
                                                         {role.name}
                                                     </Typography>
                                                     {role.description && (
-                                                        <Typography variant="caption" color="text.secondary">
+                                                        <Typography
+                                                            variant="caption"
+                                                            color="text.secondary"
+                                                        >
                                                             {role.description}
                                                         </Typography>
                                                     )}

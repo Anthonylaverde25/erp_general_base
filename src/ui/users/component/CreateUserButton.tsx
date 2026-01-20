@@ -4,24 +4,24 @@ import { useState } from 'react';
 import CreateUserModal from '@/ui/users/component/modals/CreateUserModal';
 
 export default function CreateUserButton() {
-    const [open, setOpen] = useState(false);
+	const [open, setOpen] = useState(false);
 
-    return (
-        <>
-            <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                startIcon={<FuseSvgIcon size={16}>heroicons-outline:user-plus</FuseSvgIcon>}
-                onClick={() => setOpen(true)}
-            >
-                Crear usuario
-            </Button>
+	return (
+		<>
+			<Button
+				variant="contained"
+				color="primary"
+				size="large"
+				startIcon={<FuseSvgIcon size={16}>heroicons-outline:user-plus</FuseSvgIcon>}
+				onClick={() => setOpen(true)}
+			>
+				Crear usuario
+			</Button>
 
-            <CreateUserModal
-                open={open}
-                onClose={() => setOpen(false)}
-            />
-        </>
-    );
+			<CreateUserModal
+				open={open}
+				onClose={() => setOpen(false)}
+			/>
+		</>
+	);
 }

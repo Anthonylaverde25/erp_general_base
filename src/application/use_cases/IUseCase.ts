@@ -9,7 +9,7 @@
  * @template TOutput - Tipo del resultado
  */
 export interface IUseCase<TInput, TOutput> {
-  execute(input: TInput): Promise<TOutput>;
+	execute(input: TInput): Promise<TOutput>;
 }
 
 /**
@@ -17,7 +17,7 @@ export interface IUseCase<TInput, TOutput> {
  * @template TOutput - Tipo del resultado
  */
 export interface IUseCaseNoInput<TOutput> {
-  execute(): Promise<TOutput>;
+	execute(): Promise<TOutput>;
 }
 
 /**
@@ -25,12 +25,12 @@ export interface IUseCaseNoInput<TOutput> {
  * @template TInput - Tipo del parámetro de entrada
  */
 export interface IUseCaseVoid<TInput> {
-  execute(input: TInput): Promise<void>;
+	execute(input: TInput): Promise<void>;
 }
 
 /**
  * Interface base para casos de uso sin input ni output (void)
  */
 export interface IUseCaseNoInputVoid {
-  execute(): Promise<void>;
+	execute(): Promise<void>;
 }

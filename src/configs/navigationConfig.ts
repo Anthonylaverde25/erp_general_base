@@ -358,4 +358,3 @@ const navigationConfig: FuseNavItemType[] = [
 ];
 
 export default navigationConfig;
-

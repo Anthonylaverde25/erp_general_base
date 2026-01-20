@@ -57,6 +57,7 @@ function LightDarkModeToggle(props: LightDarkModeToggleProps) {
 
 		// Persist theme mode to Zustand store
 		const newMode = _theme?.section?.main?.palette?.mode as 'light' | 'dark';
+
 		if (newMode) {
 			setThemeMode(newMode);
 		}

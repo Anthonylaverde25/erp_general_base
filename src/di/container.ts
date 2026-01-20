@@ -5,8 +5,7 @@ import { registerRoleModule } from './modules/role.module';
 const container = new Container();
 
 // Registrar módulos
-registerUserModule(container)
-registerRoleModule(container)
+registerUserModule(container);
+registerRoleModule(container);
 
-export { container }
-
+export { container };

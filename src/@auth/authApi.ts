@@ -33,7 +33,11 @@ export async function authSignInWithToken(accessToken: string): Promise<Response
  * Sign in
  */
 export async function authSignIn(credentials: { email: string; password: string }): Promise<AuthResponse> {
-	const { data: { auth: { user, token } } } = await axiosInstance.post<LoginSuccesResponse>(`auth/login`, credentials);
+	const {
+		data: {
+			auth: { user, token }
+		}
+	} = await axiosInstance.post<LoginSuccesResponse>(`auth/login`, credentials);
 
 	return {
 		user,

@@ -55,7 +55,7 @@ function SettingsAppView(props: SettingsAppProps) {
 	return (
 		<Root
 			content={
-				<div className=" flex-auto p-4 md:p-6">
+				<div className="flex-auto p-4 md:p-6">
 					<SettingsAppHeader
 						className="mb-4"
 						onSetSidebarOpen={setLeftSidebarOpen}

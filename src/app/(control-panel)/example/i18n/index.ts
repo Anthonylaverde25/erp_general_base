@@ -4,4 +4,3 @@ import es from './es';
 
 i18n.addResourceBundle('en', 'examplePage', en);
 i18n.addResourceBundle('es', 'examplePage', es);
-

@@ -1,4 +1,3 @@
-
 import IconButton from '@mui/material/IconButton';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 
@@ -6,67 +5,41 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import { useState } from 'react';
-import { useTeamMembers } from '../../api/hooks/team/useTeamMembers';
-import { useUpdateTeamMembers } from '../../api/hooks/team/useUpdateTeamMembers';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
 import useIndexUser from '@/features/users/hooks/useIndexUsers';
 import UserDataTable from '@/ui/users/component/UserDataTable';
-import Tooltip from '@mui/material/Tooltip';
 import { UserColumns } from '@/ui/users/component/Columns';
-import { Button, Divider, Stack } from '@mui/material';
-import CreateUserModal from '@/ui/users/component/modals/CreateUserModal';
-import useCreateUser from '@/features/users/hooks/useCreateUser';
-import useRoles from '@/features/users/hooks/useRoles';
-import { CreateUserType } from '@/types/user.types';
+import { Button, Stack } from '@mui/material';
 import CreateUserButton from '@/ui/users/component/CreateUserButton';
-
-const roles = [
-	{
-		label: 'Read',
-		value: 'read',
-		description: 'Can read and clone this repository. Can also open and comment on issues and pull requests.'
-	},
-	{
-		label: 'Write',
-		value: 'write',
-		description: 'Can read, clone, and push to this repository. Can also manage issues and pull requests.'
-	},
-	{
-		label: 'Admin',
-		value: 'admin',
-		description:
-			'Can read, clone, and push to this repository. Can also manage issues, pull requests, and repository settings, including adding collaborators.'
-	}
-];
 
 function TeamTabView() {
 	const { users, isLoading, isError } = useIndexUser();
-	const { data: roles } = useRoles();
-
-
 
 	return (
-		<div className="flex flex-col gap-4 w-full">
-			<Stack className='border p-2 mb-5'
+		<div className="flex w-full flex-col gap-4">
+			<Stack
+				className="mb-5 border-b p-4 bg-gray-50/50"
 				direction="row"
-				justifyContent="flex-end"
+				justifyContent="space-between"
 				alignItems="center"
 				spacing={1.5}
 			>
-				<Button
-
-					variant="outlined"
-					color="secondary"
-					size="large"
-					startIcon={<FuseSvgIcon size={16}>heroicons-outline:arrow-down</FuseSvgIcon>}
-				// onClick={handleInviteUser}
-
+				<div></div>
+				<Stack
+					direction="row"
+					spacing={1.5}
+					alignItems="center"
 				>
-					Invitar usuario
-				</Button>
-				<CreateUserButton />
-
+					<Button
+						variant="outlined"
+						color="secondary"
+						size="large"
+						startIcon={<FuseSvgIcon size={16}>heroicons-outline:arrow-down</FuseSvgIcon>}
+					// onClick={handleInviteUser}
+					>
+						Invitar usuario
+					</Button>
+					<CreateUserButton />
+				</Stack>
 			</Stack>
 
 			<UserDataTable
@@ -78,23 +51,21 @@ function TeamTabView() {
 				enableRowSelection={true}
 				initialState={{
 					density: 'comfortable',
-					pagination: { pageSize: 10, pageIndex: 0 },
+					pagination: { pageSize: 10, pageIndex: 0 }
 				}}
 				muiTablePaperProps={{
 					elevation: 0,
 					sx: {
-						borderRadius: 0,
+						borderRadius: 0
 					}
 				}}
 				displayColumnDefOptions={{
 					'mrt-row-actions': {
 						size: 60,
-						header: '',
+						header: ''
 					}
 				}}
 			/>
-
-
 		</div>
 	);
 }
@@ -153,20 +124,33 @@ function UserActionMenu({ row }: { row: any }) {
 					}
 				}}
 			>
-				<MenuItem onClick={(e) => { handleClose(e); console.log('Ver:', row.original.id); }}>
+				<MenuItem
+					onClick={(e) => {
+						handleClose(e);
+						console.log('Ver:', row.original.id);
+					}}
+				>
 					<ListItemIcon>
 						<FuseSvgIcon size={16}>heroicons-outline:eye</FuseSvgIcon>
 					</ListItemIcon>
 					Ver detalles
 				</MenuItem>
-				<MenuItem onClick={(e) => { handleClose(e); console.log('Editar:', row.original.id); }}>
+				<MenuItem
+					onClick={(e) => {
+						handleClose(e);
+						console.log('Editar:', row.original.id);
+					}}
+				>
 					<ListItemIcon>
 						<FuseSvgIcon size={16}>heroicons-outline:pencil</FuseSvgIcon>
 					</ListItemIcon>
 					Editar
 				</MenuItem>
 				<MenuItem
-					onClick={(e) => { handleClose(e); console.log('Eliminar:', row.original.id); }}
+					onClick={(e) => {
+						handleClose(e);
+						console.log('Eliminar:', row.original.id);
+					}}
 					sx={{ color: 'error.main', '& .MuiListItemIcon-root': { color: 'error.main !important' } }}
 				>
 					<ListItemIcon>

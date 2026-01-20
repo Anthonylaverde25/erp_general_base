@@ -7,7 +7,7 @@ import PageBreadcrumb from 'src/components/PageBreadcrumb';
 import usePathname from '@fuse/hooks/usePathname';
 import SettingsAppNavigation from '../../lib/constants/SettingsAppNavigation';
 import useThemeMediaQuery from '@fuse/hooks/useThemeMediaQuery';
-import { Button } from '@mui/material';
+import { Box } from '@mui/system';
 
 type SettingsAppHeaderProps = {
 	className?: string;
@@ -23,7 +23,7 @@ function SettingsAppHeader(props: SettingsAppHeaderProps) {
 	return (
 		<div className={clsx('flex flex-col', className)}>
 			<PageBreadcrumb className="mb-2" />
-			<div className="flex items-center gap-2  mt-5 mb-4">
+			<div className="mt-5 mb-4 flex items-center gap-2">
 				{isMobile && (
 					<IconButton
 						className="border-divider border"
@@ -33,9 +33,23 @@ function SettingsAppHeader(props: SettingsAppHeaderProps) {
 						<FuseSvgIcon>lucide:menu</FuseSvgIcon>
 					</IconButton>
 				)}
-				<Typography className="text-3xl leading-none font-bold tracking-tight lg:ml-0">
-					{currentNavigation?.title}
-				</Typography>
+
+
+				<Box>
+					<Typography className="text-3xl leading-none font-bold tracking-tight lg:ml-0">
+						{currentNavigation?.title}
+					</Typography>
+
+					{currentNavigation?.subtitle && (
+						<Typography
+							variant="body2"
+							color="text.secondary"
+							className="mt-1"
+						>
+							{currentNavigation.subtitle}
+						</Typography>
+					)}
+				</Box>
 			</div>
 		</div>
 	);

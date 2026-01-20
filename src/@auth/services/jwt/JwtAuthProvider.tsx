@@ -103,8 +103,6 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 			try {
 				const { user, access_token } = await authSignIn(credentials);
 
-
-
 				setAuthState({
 					authStatus: 'authenticated',
 					isAuthenticated: true,

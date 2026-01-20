@@ -6,7 +6,6 @@ import { Layout1ConfigDefaultsType } from 'src/components/theme-layouts/layout1/
 import Configurator from 'src/components/theme-layouts/components/configurator/Configurator';
 import useFuseLayoutSettings from '@fuse/core/FuseLayout/useFuseLayoutSettings';
 import FuseSuspense from '@fuse/core/FuseSuspense';
-import FooterLayout1 from './components/FooterLayout1';
 import LeftSideLayout1 from './components/LeftSideLayout1';
 import NavbarWrapperLayout1 from './components/NavbarWrapperLayout1';
 import RightSideLayout1 from './components/RightSideLayout1';
@@ -78,7 +77,6 @@ function Layout1(props: Layout1Props) {
 						</FuseSuspense>
 						{children}
 					</div>
-
 				</main>
 
 				{config.navbar.display && config.navbar.position === 'right' && <NavbarWrapperLayout1 />}

@@ -8,7 +8,7 @@ const SecurityTabView = lazy(() => import('./components/views/SecurityTabView'))
 const PlanBillingTabView = lazy(() => import('./components/views/PlanBillingTabView'));
 const NotificationsTabView = lazy(() => import('./components/views/NotificationsTabView'));
 const TeamTabView = lazy(() => import('./components/views/TeamTabView'));
-const RolesTabView = lazy(() => import('./components/views/RolesTabView'));
+const RolesTabView = lazy(() => import('@/ui/roles/pages/RoleTabView'));
 
 /**
  * The Settings App Route.

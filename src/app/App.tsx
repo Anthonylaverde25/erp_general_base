@@ -71,7 +71,7 @@ function App() {
 					</ReactQueryProvider>
 				</LocalizationProvider>
 			</AppContext>
-		</ErrorBoundary >
+		</ErrorBoundary>
 	);
 }
 

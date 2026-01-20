@@ -7,7 +7,6 @@ import i18n from '@i18n/i18n';
  * The settingsConfig object is a configuration object for the Fuse application's settings.
  */
 
-
 const settingsConfig: FuseSettingsConfigType = {
 	/**
 	 * The layout object defines the layout style and configuration for the application.
@@ -23,7 +22,7 @@ const settingsConfig: FuseSettingsConfigType = {
 		 */
 		config: {
 			navbar: {
-				style: 'style-2',
+				style: 'style-2'
 			}
 		} // checkout default layout configs at src/components/theme-layouts for example  src/components/theme-layouts/layout1/Layout1Config.js
 	},

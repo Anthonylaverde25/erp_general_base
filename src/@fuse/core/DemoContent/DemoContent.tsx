@@ -7,8 +7,8 @@ import { memo } from 'react';
  * It also renders a quote and some content about a person being transformed into a vermin.
  */
 function DemoContent() {
-	const { users } = useIndexUser()
-	console.log(users)
+	const { users } = useIndexUser();
+	console.log(users);
 	return (
 		<div>
 			<img
