@@ -1,5 +1,6 @@
 import { UserListDTO } from '../DTOs/UserListDTO';
 import { User } from '../User';
+import { UserType } from '@/types/user.types';
 
 export class UserMapper {
 	static fromDetailDTO(dto: UserListDTO): User {
@@ -16,5 +17,20 @@ export class UserMapper {
 
 	static fromDetailDTOList(dto: UserListDTO[]): User[] {
 		return dto.map((dto) => this.fromDetailDTO(dto));
+	}
+
+	/**
+	 * Converts a User domain entity to a plain UserType object
+	 * for use in UI components and forms
+	 */
+	static toUserType(user: User): UserType {
+		return {
+			id: user.id,
+			name: user.name,
+			email: user.email,
+			phone: user.phone,
+			role: user.role,
+			role_id: user.role_id
+		};
 	}
 }

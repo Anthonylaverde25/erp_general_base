@@ -12,11 +12,11 @@ import { UserType } from '@/types/user.types';
 
 export default function TeamTabView() {
     const { users, isLoading, isError } = useIndexUser();
-    const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
+    const [selectedId, setSelectedId] = useState<UserType['id'] | null>(null);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
 
-    const handleEditUser = (user: UserType) => {
-        setSelectedUser(user);
+    const handleEditUser = (id: UserType['id']) => {
+        setSelectedId(id);
         setUpdateModalOpen(true);
     };
 
@@ -30,17 +30,12 @@ export default function TeamTabView() {
                 spacing={1.5}
             >
                 <div></div>
-                <Stack
-                    direction="row"
-                    spacing={1.5}
-                    alignItems="center"
-                >
+                <Stack direction="row" spacing={1.5} alignItems="center">
                     <Button
                         variant="outlined"
                         color="secondary"
                         size="large"
                         startIcon={<FuseSvgIcon size={16}>heroicons-outline:arrow-down</FuseSvgIcon>}
-                    // onClick={handleInviteUser}
                     >
                         Invitar usuario
                     </Button>
@@ -53,17 +48,20 @@ export default function TeamTabView() {
                 data={users}
                 enableRowActions
                 positionActionsColumn="last"
-                renderRowActions={({ row }) => <UserActionMenu row={row} onEdit={handleEditUser} />}
-                enableRowSelection={true}
+                renderRowActions={({ row }) => (
+                    <UserActionMenu
+                        row={row}
+                        onEdit={() => handleEditUser(row.original.id)}
+                    />
+                )}
+                enableRowSelection
                 initialState={{
                     density: 'comfortable',
                     pagination: { pageSize: 10, pageIndex: 0 }
                 }}
                 muiTablePaperProps={{
                     elevation: 0,
-                    sx: {
-                        borderRadius: 0
-                    }
+                    sx: { borderRadius: 0 }
                 }}
                 displayColumnDefOptions={{
                     'mrt-row-actions': {
@@ -73,14 +71,14 @@ export default function TeamTabView() {
                 }}
             />
 
-            {selectedUser && (
+            {selectedId && (
                 <UpdateUserModal
                     open={updateModalOpen}
                     onClose={() => {
                         setUpdateModalOpen(false);
-                        setSelectedUser(null);
+                        setSelectedId(null);
                     }}
-                    user={selectedUser}
+                    userId={selectedId}
                 />
             )}
         </div>

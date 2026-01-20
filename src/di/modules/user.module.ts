@@ -5,6 +5,7 @@ import { UserRepositoryCrud } from '@/infrastructure/repositories/users/user.rep
 import { IndexUserUseCase } from '@/application/use_cases/user/IndexUserUseCase';
 import { CreateUserUseCase } from '@/application/use_cases/user/CreateUserUseCase';
 import { UpdateUserUseCase } from '@/application/use_cases/user/UpdateUserUseCase';
+import { ShowUserUseCase } from '@/application/use_cases/user/ShowUserUseCase';
 
 export const registerUserModule = (container: Container) => {
 	// //Repositories
@@ -15,5 +16,5 @@ export const registerUserModule = (container: Container) => {
 	container.bind<IndexUserUseCase>(TYPES.IndexUserUseCase).to(IndexUserUseCase);
 	container.bind<CreateUserUseCase>(TYPES.CreateUserUseCase).to(CreateUserUseCase);
 	container.bind<UpdateUserUseCase>(TYPES.UpdateUserUseCase).to(UpdateUserUseCase);
-	// container.bind<ShowUserUseCase>(TYPES.ShowUserUseCase).to(ShowUserUseCase)
+	container.bind<ShowUserUseCase>(TYPES.ShowUserUseCase).to(ShowUserUseCase)
 };

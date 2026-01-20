@@ -47,6 +47,8 @@ export default function UpdateUserForm({ user, onCancel, onSuccess }: UpdateUser
 
     const { errors, isValid } = formState;
 
+    console.log('user entidad desde el form', user)
+
     const onSubmit = async (data: UpdateUserFormType) => {
         try {
             const payload: UpdateUserType = {

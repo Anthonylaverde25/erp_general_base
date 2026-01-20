@@ -5,7 +5,7 @@ import { UserType } from '@/types/user.types';
 
 interface UserActionMenuProps {
     row: any;
-    onEdit: (user: UserType) => void;
+    onEdit: () => void;
 }
 
 export default function UserActionMenu({ row, onEdit }: UserActionMenuProps) {
@@ -76,7 +76,7 @@ export default function UserActionMenu({ row, onEdit }: UserActionMenuProps) {
                 <MenuItem
                     onClick={(e) => {
                         handleClose(e);
-                        onEdit(row.original);
+                        onEdit();
                     }}
                 >
                     <ListItemIcon>

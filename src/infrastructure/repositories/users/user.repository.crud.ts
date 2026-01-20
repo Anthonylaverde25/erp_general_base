@@ -2,6 +2,7 @@ import { UserMapper } from '@/domain/entities/users/Mappers/UserMapper';
 import { IUserCrudRepository } from '@/domain/entities/users/repositories/user.interface.crud';
 import { User } from '@/domain/entities/users/User';
 import axiosInstance from '@/lib/@axios';
+import { UserType } from '@/types/user.types';
 import { injectable } from 'inversify';
 
 @injectable()
@@ -11,6 +12,14 @@ export class UserRepositoryCrud implements IUserCrudRepository {
       data: { users }
     } = await axiosInstance.get(`/users`);
     return UserMapper.fromDetailDTOList(users);
+  }
+
+
+  async show(id: UserType['id']): Promise<User> {
+    const {
+      data: { user }
+    } = await axiosInstance.get(`/users/${id}`);
+    return UserMapper.fromDetailDTO(user);
   }
 
   async create(data: User): Promise<{ user: User; message: string }> {

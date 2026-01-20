@@ -1,26 +1,35 @@
-import { Dialog, DialogContent } from '@mui/material';
+import { Dialog, DialogContent, CircularProgress, Box, Typography } from '@mui/material';
 import UpdateUserForm from '../forms/UpdateUserForm';
 import { UserType } from '@/types/user.types';
+import useShowUser from '@/features/users/hooks/useShowUser';
 
 interface UpdateUserDialogProps {
     open: boolean;
     onClose: () => void;
-    user: UserType;
+    userId: UserType['id'];
 }
 
-export default function UpdateUserDialog({ open, onClose, user }: UpdateUserDialogProps) {
-    return (
-        <Dialog
-            open={open}
-            onClose={onClose}
+export default function UpdateUserDialog({ open, onClose, userId }: UpdateUserDialogProps) {
+    const { user, isLoading, isError } = useShowUser(userId);
 
-        >
+    return (
+        <Dialog open={open} onClose={onClose}>
             <DialogContent>
-                <UpdateUserForm
-                    user={user}
-                    onCancel={onClose}
-                    onSuccess={onClose}
-                />
+                {isLoading && (
+                    <Box display="flex" justifyContent="center" alignItems="center" minHeight={400}>
+                        <CircularProgress />
+                    </Box>
+                )}
+
+                {isError && (
+                    <Box display="flex" justifyContent="center" alignItems="center" minHeight={400}>
+                        <Typography color="error">Error al cargar el usuario</Typography>
+                    </Box>
+                )}
+
+                {!isLoading && !isError && (
+                    <UpdateUserForm user={user} onCancel={onClose} onSuccess={onClose} />
+                )}
             </DialogContent>
         </Dialog>
     );
