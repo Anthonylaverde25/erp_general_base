@@ -16,9 +16,21 @@ import {
     Button
 } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
+import { useState } from 'react';
+import CreateRoleModal from '../components/modals/CreateRoleModal';
+import UpdateRoleModal from '../components/modals/UpdateRoleModal';
+import { Role } from '@/types/role.types';
 
 export default function RolesTabView() {
     const { roles, isLoading, isError } = useIndexRoles();
+    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [updateModalOpen, setUpdateModalOpen] = useState(false);
+    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+
+    const handleEditRole = (role: Role) => {
+        setSelectedRole(role);
+        setUpdateModalOpen(true);
+    };
 
     if (isLoading)
         return (
@@ -50,6 +62,7 @@ export default function RolesTabView() {
                     variant="contained"
                     color="primary"
                     startIcon={<FuseSvgIcon size={20}>heroicons-outline:plus</FuseSvgIcon>}
+                    onClick={() => setCreateModalOpen(true)}
                 >
                     Crear rol
                 </Button>
@@ -108,7 +121,7 @@ export default function RolesTabView() {
                                 {/* Acciones */}
                                 <TableCell align="right" className="pr-6">
                                     <Tooltip title="Editar rol">
-                                        <IconButton size="small">
+                                        <IconButton size="small" onClick={() => handleEditRole(role)}>
                                             <FuseSvgIcon size={20}>
                                                 heroicons-outline:pencil-square
                                             </FuseSvgIcon>
@@ -130,6 +143,23 @@ export default function RolesTabView() {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            {/* Modals */}
+            <CreateRoleModal
+                open={createModalOpen}
+                onClose={() => setCreateModalOpen(false)}
+            />
+
+            {selectedRole && (
+                <UpdateRoleModal
+                    open={updateModalOpen}
+                    onClose={() => {
+                        setUpdateModalOpen(false);
+                        setSelectedRole(null);
+                    }}
+                    role={selectedRole}
+                />
+            )}
         </Box >
     );
 }

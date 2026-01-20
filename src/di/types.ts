@@ -12,5 +12,7 @@ export const TYPES = {
 
 	// Roles
 	IRoleCrudRepository: Symbol.for('IRoleCrudRepository'),
-	IndexRoleUseCase: Symbol.for('IndexRoleUseCase')
+	IndexRoleUseCase: Symbol.for('IndexRoleUseCase'),
+	CreateRoleUseCase: Symbol.for('CreateRoleUseCase'),
+	UpdateRoleUseCase: Symbol.for('UpdateRoleUseCase')
 };

@@ -37,3 +37,18 @@ export interface CreateUserType {
 	department_ids: number[];
 	phone: string;
 }
+
+/**
+ * UpdateUserType - Tipo para actualizar un usuario existente
+ * Los campos de password son opcionales (solo si se desea cambiar la contraseña)
+ */
+export interface UpdateUserType {
+	id: number;
+	name: string;
+	email: string;
+	password?: string;
+	password_confirmation?: string;
+	role_id: number;
+	department_ids: number[];
+	phone: string;
+}

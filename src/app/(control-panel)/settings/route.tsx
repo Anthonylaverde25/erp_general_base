@@ -7,7 +7,7 @@ const AccountTabView = lazy(() => import('./components/views/AccountTabView'));
 const SecurityTabView = lazy(() => import('./components/views/SecurityTabView'));
 const PlanBillingTabView = lazy(() => import('./components/views/PlanBillingTabView'));
 const NotificationsTabView = lazy(() => import('./components/views/NotificationsTabView'));
-const TeamTabView = lazy(() => import('./components/views/TeamTabView'));
+const TeamTabView = lazy(() => import('@/ui/users/pages/TeamTabView'));
 const RolesTabView = lazy(() => import('@/ui/roles/pages/RoleTabView'));
 
 /**

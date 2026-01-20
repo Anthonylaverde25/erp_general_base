@@ -6,8 +6,7 @@ import { UserTableIcons } from './utils/UserTableIcons';
 
 export default function UserDataTable(props: MaterialReactTableProps) {
 	const { columns, data, ...rest } = props;
-	console.log('columns', columns);
-	console.log('data', data);
+
 
 	if (!data || (Array.isArray(data) && data.length === 0)) {
 		return (

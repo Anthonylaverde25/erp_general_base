@@ -24,4 +24,16 @@ export class UserRepositoryCrud implements IUserCrudRepository {
       message: message || 'Usuario creado correctamente'
     };
   }
+
+  async update(id: number, data: User): Promise<{ user: User; message: string }> {
+    const payload = data.toPlainObject();
+    const {
+      data: { user, message }
+    } = await axiosInstance.put(`/users/${id}`, payload);
+
+    return {
+      user: UserMapper.fromDetailDTO(user),
+      message: message || 'Usuario actualizado correctamente'
+    };
+  }
 }

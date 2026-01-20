@@ -1,5 +1,6 @@
 import { Role } from '@/types/role.types';
-import { CreateUserType, UserType } from '@/types/user.types';
+import { CreateUserType, UpdateUserType, UserType } from '@/types/user.types';
+
 
 export class User implements UserType {
 	private _id: number | null;
@@ -69,6 +70,21 @@ export class User implements UserType {
 		const { name, email, password, password_confirmation, role_id, phone } = data;
 		return new User({
 			id: null,
+			name,
+			email,
+			role_id,
+			password,
+			password_confirmation,
+			phone
+		});
+	}
+
+	static update(id: number, data: UpdateUserType): User {
+		if (!data) return null;
+
+		const { name, email, password, password_confirmation, role_id, phone } = data;
+		return new User({
+			id,
 			name,
 			email,
 			role_id,
