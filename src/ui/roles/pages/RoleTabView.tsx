@@ -59,9 +59,11 @@ export default function RolesTabView() {
                     {/* Left side content if any, e.g. search or filter */}
                 </div>
                 <Button
+                    className="btn-primary"
                     variant="contained"
                     color="primary"
-                    startIcon={<FuseSvgIcon size={20}>heroicons-outline:plus</FuseSvgIcon>}
+                    size="large"
+                    startIcon={<FuseSvgIcon size={20}>heroicons-outline:shield-check</FuseSvgIcon>}
                     onClick={() => setCreateModalOpen(true)}
                 >
                     Crear rol
@@ -70,11 +72,11 @@ export default function RolesTabView() {
             <TableContainer>
                 <Table sx={{ minWidth: 650 }}>
                     <TableHead>
-                        <TableRow className="bg-gray-50">
-                            <TableCell className="pl-6 font-semibold text-gray-600">Nombre</TableCell>
-                            <TableCell className="font-semibold text-gray-600">Código</TableCell>
-                            <TableCell className="font-semibold text-gray-600">Descripción</TableCell>
-                            <TableCell align="right" className="pr-6 font-semibold text-gray-600">
+                        <TableRow className="role-table-header">
+                            <TableCell className="pl-6 role-table-cell">Nombre</TableCell>
+                            <TableCell className="role-table-cell">Código</TableCell>
+                            <TableCell className="role-table-cell">Descripción</TableCell>
+                            <TableCell align="right" className="pr-6 role-table-cell">
                                 Acciones
                             </TableCell>
                         </TableRow>

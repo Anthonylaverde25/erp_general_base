@@ -3,3 +3,35 @@
 // =============================================
 
 // Agrega tus estilos de tablas aquí
+
+// Estilos específicos para la tabla de Roles (y otras tablas manuales)
+// Usamos selectores más específicos para sobrescribir los estilos por defecto de MUI
+.role-table-header {
+
+    // Apuntamos específicamente a la celda de MUI dentro de nuestro header
+    .role-table-cell.MuiTableCell-root {
+        background-color: $gray-50 !important; // Claro por defecto
+        color: $gray-600 !important;
+        font-weight: $font-weight-semibold;
+    }
+
+    // Selectores de modo oscuro con alta especificidad
+    :global(.dark) &,
+    :global([data-theme="dark"]) & {
+        .role-table-cell.MuiTableCell-root {
+            background-color: $gray-800 !important; // #1f2937 - Oscuro
+            color: red !important; // Blanco para máximo contraste
+            border-bottom-color: $gray-700 !important;
+        }
+    }
+}
+
+
+.role-table-header .role-table-cell.MuiTableCell-root {
+    background-color: transparent !important;
+}
+
+
+.muiltr-11d923o-MuiTable-root .MuiTableHead-root .MuiTableCell-root {
+    background-color: transparent !important;
+}

@@ -331,9 +331,8 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
                             sx={{ pt: 1 }}
                         >
                             <Button
+                                className='btn-secondary'
                                 onClick={onCancel}
-                                color="inherit"
-                                variant="outlined"
                                 disabled={isLoading}
                                 startIcon={<Close />}
                                 sx={{
@@ -347,6 +346,7 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
                             </Button>
 
                             <Button
+                                className='btn-primary'
                                 type="submit"
                                 variant="contained"
                                 disabled={!isValid || isLoading}
