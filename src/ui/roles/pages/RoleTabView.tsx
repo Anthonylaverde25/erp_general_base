@@ -25,12 +25,20 @@ export default function RolesTabView() {
   const { roles, isLoading, isError } = useIndexRoles();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [assignPermissionsModalOpen, setAssignPermissionsModalOpen] =
+    useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleType["id"] | null>(null);
 
   const handleEditRole = (roleId: RoleType["id"]) => {
     console.log("Editing role with ID:", roleId);
     setSelectedRole(roleId);
     setUpdateModalOpen(true);
+  };
+
+  const handleAssignPermissions = (roleId: RoleType["id"]) => {
+    console.log("Assigning permissions to role with ID:", roleId);
+    setSelectedRole(roleId);
+    setAssignPermissionsModalOpen(true);
   };
 
   if (isLoading)
@@ -131,6 +139,14 @@ export default function RolesTabView() {
                       <FuseSvgIcon size={20}>
                         heroicons-outline:pencil-square
                       </FuseSvgIcon>
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Asignar permisos">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleAssignPermissions(role.id)}
+                    >
+                      <FuseSvgIcon size={20}>heroicons-outline:key</FuseSvgIcon>
                     </IconButton>
                   </Tooltip>
                 </TableCell>

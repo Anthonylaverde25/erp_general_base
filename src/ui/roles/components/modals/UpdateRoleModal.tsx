@@ -9,14 +9,6 @@ interface UpdateRoleDialogProps {
   roleId?: RoleType["id"];
 }
 
-const emptyRole: RoleType = {
-  id: 0,
-  name: "",
-  code: "",
-  description: "",
-  active: true,
-};
-
 export default function UpdateRoleDialog({
   open,
   onClose,
@@ -31,11 +23,7 @@ export default function UpdateRoleDialog({
         {isLoading ? (
           <div>Cargando...</div>
         ) : (
-          <UpdateRoleForm
-            role={role || emptyRole}
-            onCancel={onClose}
-            onSuccess={onClose}
-          />
+          <UpdateRoleForm role={role} onCancel={onClose} onSuccess={onClose} />
         )}
       </DialogContent>
     </Dialog>
