@@ -11,9 +11,10 @@ import {
   Chip,
   IconButton,
   Tooltip,
-  Divider,
   Stack,
   Button,
+  useTheme,
+  alpha,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import { useState } from "react";
@@ -22,6 +23,7 @@ import UpdateRoleModal from "../components/modals/UpdateRoleModal";
 import { RoleType } from "@/types/role.types";
 
 export default function RolesTabView() {
+  const theme = useTheme();
   const { roles, isLoading, isError } = useIndexRoles();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
@@ -57,14 +59,18 @@ export default function RolesTabView() {
 
   return (
     <Box className="w-full overflow-hidden">
+      {/* Header Section */}
       <Stack
-        className="mb-5 border-b p-4 bg-gray-50/50"
         direction="row"
         justifyContent="space-between"
         alignItems="center"
-        spacing={1.5}
+        spacing={2}
+        sx={{
+          p: 3,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        }}
       >
-        <div>{/* Left side content if any, e.g. search or filter */}</div>
+        <div />
         <Button
           className="btn-primary"
           variant="contained"
@@ -78,14 +84,18 @@ export default function RolesTabView() {
           Crear rol
         </Button>
       </Stack>
+
+      {/* Table Section */}
       <TableContainer>
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
-            <TableRow className="role-table-header">
-              <TableCell className="pl-6 role-table-cell">Nombre</TableCell>
-              <TableCell className="role-table-cell">Código</TableCell>
-              <TableCell className="role-table-cell">Descripción</TableCell>
-              <TableCell align="right" className="pr-6 role-table-cell">
+            <TableRow
+              sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.05) }}
+            >
+              <TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
+              <TableCell sx={{ fontWeight: 700 }}>Código</TableCell>
+              <TableCell sx={{ fontWeight: 700 }}>Descripción</TableCell>
+              <TableCell align="right" sx={{ pr: 3, fontWeight: 700 }}>
                 Acciones
               </TableCell>
             </TableRow>
@@ -96,25 +106,21 @@ export default function RolesTabView() {
               <TableRow
                 key={role.id}
                 hover
-                className="transition-colors"
-                sx={{ "&:last-child td": { borderBottom: 0 } }}
+                sx={{
+                  transition: "all 0.2s ease",
+                  "&:last-child td": { borderBottom: 0 },
+                }}
               >
                 {/* Nombre */}
-                <TableCell className="pl-6">
-                  <Typography variant="subtitle2" className="font-medium">
+                <TableCell sx={{ pl: 3 }}>
+                  <Typography variant="subtitle2" fontWeight={600}>
                     {role.name}
                   </Typography>
                 </TableCell>
 
-                {/* Código como Chip */}
+                {/* Código */}
                 <TableCell>
-                  <Chip
-                    className="font-mono uppercase text-xs"
-                    label={role.code}
-                    // size="small"
-                    // variant="outlined"
-                    // color="primary"
-                  />
+                  <Chip label={role.code} size="small" variant="outlined" />
                 </TableCell>
 
                 {/* Descripción */}
@@ -122,7 +128,12 @@ export default function RolesTabView() {
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    className="max-w-sm truncate"
+                    sx={{
+                      maxWidth: "400px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
                     title={role.description}
                   >
                     {role.description || "Sin descripción"}
@@ -130,7 +141,7 @@ export default function RolesTabView() {
                 </TableCell>
 
                 {/* Acciones */}
-                <TableCell align="right" className="pr-6">
+                <TableCell align="right" sx={{ pr: 3 }}>
                   <Tooltip title="Editar rol">
                     <IconButton
                       size="small"
@@ -156,7 +167,7 @@ export default function RolesTabView() {
             {(!roles || roles.length === 0) && (
               <TableRow>
                 <TableCell colSpan={4} align="center" sx={{ py: 8 }}>
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary">
                     No hay roles disponibles
                   </Typography>
                 </TableCell>
