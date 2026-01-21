@@ -16,4 +16,11 @@ export const TYPES = {
   CreateRoleUseCase: Symbol.for("CreateRoleUseCase"),
   UpdateRoleUseCase: Symbol.for("UpdateRoleUseCase"),
   ShowRoleUseCase: Symbol.for("ShowRoleUseCase"),
+
+  // Bank Accounts
+  IBankAccountCrudRepository: Symbol.for("IBankAccountCrudRepository"),
+  IndexBankAccountUseCase: Symbol.for("IndexBankAccountUseCase"),
+  CreateBankAccountUseCase: Symbol.for("CreateBankAccountUseCase"),
+  UpdateBankAccountUseCase: Symbol.for("UpdateBankAccountUseCase"),
+  ShowBankAccountUseCase: Symbol.for("ShowBankAccountUseCase"),
 };
