@@ -21,10 +21,10 @@ import {
   defaultUpdateRoleValues,
 } from "@/schemas/role/role.schema";
 import { UpdateRoleType } from "@/types/role.types";
-import { Role } from "@/types/role.types";
+import { RoleType } from "@/types/role.types";
 
 interface UpdateRoleFormProps {
-  role: Role;
+  role: RoleType;
   onCancel: () => void;
   onSuccess?: () => void;
 }

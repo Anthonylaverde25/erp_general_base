@@ -1,7 +1,7 @@
 /**
  * Role Entity Types
  */
-export interface Role {
+export interface RoleType {
   id: number;
   name: string;
   code: string;

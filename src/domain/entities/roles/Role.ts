@@ -1,6 +1,6 @@
-import { Role, CreateRoleType, UpdateRoleType } from "@/types/role.types";
+import { CreateRoleType, UpdateRoleType, RoleType } from "@/types/role.types";
 
-export class RoleEntity implements Role {
+export class RoleEntity implements RoleType {
   constructor(
     public id: number,
     public name: string,
@@ -11,7 +11,7 @@ export class RoleEntity implements Role {
     public updated_at?: string,
   ) {}
 
-  static fromPrimitives(data: Role): RoleEntity {
+  static fromPrimitives(data: RoleType): RoleEntity {
     return new RoleEntity(
       data.id,
       data.name,

@@ -1,26 +1,43 @@
-import { Dialog, DialogContent } from '@mui/material';
-import UpdateRoleForm from '../forms/UpdateRoleForm';
-import { Role } from '@/types/role.types';
+import { Dialog, DialogContent } from "@mui/material";
+import UpdateRoleForm from "../forms/UpdateRoleForm";
+import useShowRole from "@/features/roles/hooks/useShowRole";
+import { RoleType } from "@/types/role.types";
 
 interface UpdateRoleDialogProps {
-    open: boolean;
-    onClose: () => void;
-    role: Role;
+  open: boolean;
+  onClose: () => void;
+  roleId?: RoleType["id"];
 }
 
-export default function UpdateRoleDialog({ open, onClose, role }: UpdateRoleDialogProps) {
-    return (
-        <Dialog
-            open={open}
-            onClose={onClose}
-        >
-            <DialogContent>
-                <UpdateRoleForm
-                    role={role}
-                    onCancel={onClose}
-                    onSuccess={onClose}
-                />
-            </DialogContent>
-        </Dialog>
-    );
+const emptyRole: RoleType = {
+  id: 0,
+  name: "",
+  code: "",
+  description: "",
+  active: true,
+};
+
+export default function UpdateRoleDialog({
+  open,
+  onClose,
+  roleId,
+}: UpdateRoleDialogProps) {
+  if (!roleId) return null;
+  const { role, isLoading } = useShowRole(roleId);
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogContent>
+        {isLoading ? (
+          <div>Cargando...</div>
+        ) : (
+          <UpdateRoleForm
+            role={role || emptyRole}
+            onCancel={onClose}
+            onSuccess={onClose}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 }

@@ -1,9 +1,9 @@
 export interface RoleListDTO {
-	id: number;
-	name: string;
-	code: string;
-	description: string;
-	status: boolean;
-	created_at?: string;
-	updated_at?: string;
+  id: number;
+  name: string;
+  code: string;
+  description: string;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
