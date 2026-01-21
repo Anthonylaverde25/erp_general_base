@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   TextField,
@@ -36,13 +36,19 @@ export default function UpdateRoleForm({
 }: UpdateRoleFormProps) {
   const { handleUpdateRole, isLoading } = useUpdateRole();
 
-  const { control, formState, handleSubmit } = useForm<UpdateRoleFormType>({
+  const { control, formState, handleSubmit, reset } = useForm<UpdateRoleFormType>({
     mode: "onChange",
     resolver: zodResolver(updateRoleSchema),
     defaultValues: defaultUpdateRoleValues(role),
   });
 
   const { errors, isValid } = formState;
+
+  useEffect(() => {
+    if (role) {
+      reset(defaultUpdateRoleValues(role));
+    }
+  }, [role, reset]);
 
   const onSubmit = async (data: UpdateRoleFormType) => {
     try {

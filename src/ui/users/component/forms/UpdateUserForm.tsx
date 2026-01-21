@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
     TextField,
@@ -39,13 +39,19 @@ export default function UpdateUserForm({ user, onCancel, onSuccess }: UpdateUser
     const [showPassword, setShowPassword] = React.useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-    const { control, formState, handleSubmit } = useForm<UpdateUserFormType>({
+    const { control, formState, handleSubmit, reset } = useForm<UpdateUserFormType>({
         mode: 'onChange',
         resolver: zodResolver(updateUserSchema),
         defaultValues: defaultUpdateUserValues(user)
     });
 
     const { errors, isValid } = formState;
+
+    useEffect(() => {
+        if (user) {
+            reset(defaultUpdateUserValues(user));
+        }
+    }, [user, reset]);
 
     console.log('user entidad desde el form', user)
 
@@ -100,7 +106,7 @@ export default function UpdateUserForm({ user, onCancel, onSuccess }: UpdateUser
             in
             timeout={400}
         >
-            <Box>
+            <Box >
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Stack spacing={4}>
                         {/* Header */}

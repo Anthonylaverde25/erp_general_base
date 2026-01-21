@@ -18,9 +18,13 @@ export default function UpdateRoleDialog({
   const { role, isLoading } = useShowRole(roleId);
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      key={roleId}
+    >
       <DialogContent>
-        {isLoading ? (
+        {isLoading || !role ? (
           <div>Cargando...</div>
         ) : (
           <UpdateRoleForm role={role} onCancel={onClose} onSuccess={onClose} />

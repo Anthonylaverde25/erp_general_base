@@ -12,8 +12,9 @@ export default function useUpdateUser() {
 
     const mutation = useMutation({
         mutationFn: ({ id, data }: { id: number; data: UpdateUserType }) => use_case.execute(id, data),
-        onSuccess: () => {
+        onSuccess: (_, { id }) => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
+            queryClient.invalidateQueries({ queryKey: ['user', id] });
             enqueueSnackbar('Usuario actualizado exitosamente', { variant: 'success' });
         },
         onError: (error: any) => {

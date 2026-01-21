@@ -7,15 +7,11 @@ import { useQuery } from "@tanstack/react-query";
 export default function useShowRole(id: RoleType["id"]) {
   const use_case = container.get<ShowRoleUseCase>(TYPES.ShowRoleUseCase);
 
-  console.log("id del rol desde el hook", id);
-
   const query = useQuery({
     queryKey: ["role", id],
     queryFn: () => use_case.execute(id),
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
   });
-
-  console.log("query data del rol desde el hook", query.data);
 
   return {
     role: query.data,

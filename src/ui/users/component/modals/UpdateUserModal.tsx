@@ -14,7 +14,11 @@ export default function UpdateUserDialog({ open, onClose, userId }: UpdateUserDi
     const { user, isLoading, isError } = useShowUser(userId);
 
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog
+            open={open}
+            onClose={onClose}
+            key={userId}
+        >
             <DialogContent>
                 {isLoading && (
                     <LoadingProgress message="Cargando usuario..." />
