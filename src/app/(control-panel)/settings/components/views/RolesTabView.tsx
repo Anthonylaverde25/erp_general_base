@@ -45,7 +45,7 @@ export default function RolesTabView() {
 					aria-label="roles table"
 				>
 					<TableHead>
-						<TableRow className="bg-gray-50">
+						<TableRow className="bg-white">
 							<TableCell className="pl-6 font-semibold text-gray-600">ID</TableCell>
 							<TableCell className="font-semibold text-gray-600">Nombre</TableCell>
 							<TableCell className="font-semibold text-gray-600">Código</TableCell>

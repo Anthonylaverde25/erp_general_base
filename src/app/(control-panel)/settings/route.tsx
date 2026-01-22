@@ -5,7 +5,9 @@ import { FuseRouteItemType } from "@fuse/utils/FuseUtils";
 const SettingsAppView = lazy(
   () => import("./components/views/SettingsAppView"),
 );
-const AccountTabView = lazy(() => import("./components/views/AccountTabView"));
+const AccountDesignPage = lazy(
+  () => import("./components/views/AccountDesignPage"),
+);
 const SecurityTabView = lazy(
   () => import("./components/views/SecurityTabView"),
 );
@@ -34,7 +36,7 @@ const Route: FuseRouteItemType = {
   children: [
     {
       path: "account",
-      element: <AccountTabView />,
+      element: <AccountDesignPage />,
     },
     {
       path: "security",
