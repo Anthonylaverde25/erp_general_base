@@ -59,7 +59,8 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 			if (isTokenValid(accessToken)) {
 				try {
 					const response = await authSignInWithToken(accessToken);
-					const userData = (await response.json()) as User;
+					const userDataRaw = (await response.json()) as UserTypes;
+					const userData = { ...userDataRaw, role: userDataRaw.role?.code } as unknown as UserTypes;
 					return userData;
 				} catch (error) {
 					if (error instanceof HTTPError) {
@@ -101,18 +102,18 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 	const signIn: JwtAuthContextType['signIn'] = useCallback(
 		async (credentials) => {
 			try {
-				const { user, access_token } = await authSignIn(credentials);
+				const { user, access_token, activeCompany } = await authSignIn(credentials);
 
 				setAuthState({
 					authStatus: 'authenticated',
 					isAuthenticated: true,
-					user: { ...user, role: user.role.code }
+					user: { ...user, role: user.role?.code } as unknown as UserTypes
 				});
 
 				setTokenStorageValue(access_token);
 				setGlobalHeaders({ Authorization: `Bearer ${access_token}` });
 
-				return { user, access_token };
+				return { user, access_token, activeCompany };
 			} catch (error) {
 				if (error instanceof HTTPError) {
 					console.error('Sign in failed:', error.response.status);
@@ -168,7 +169,7 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 	 */
 	const updateUser: JwtAuthContextType['updateUser'] = useCallback(async (_user) => {
 		try {
-			const response = await authUpdateDbUser(_user);
+			const response = await authUpdateDbUser(_user as unknown as User);
 			return response;
 		} catch (error) {
 			if (error instanceof HTTPError) {

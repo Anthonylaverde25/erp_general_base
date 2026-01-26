@@ -1,4 +1,5 @@
 import { Role } from './role.types';
+import { ActiveCompany } from './company.types';
 
 /**
  * Tipado general de la entidad user
@@ -21,7 +22,11 @@ export interface UserType {
 	is_active?: boolean;
 	needs_password_change?: boolean;
 	observations?: string;
+	activeCompany?: ActiveCompany;
+	[key: string]: unknown;
 }
+
+export type UserTypes = UserType;
 
 /**
  * CreateUserType - Tipo para crear un nuevo usuario

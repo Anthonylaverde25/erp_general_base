@@ -5,9 +5,11 @@ import api from '@/utils/api';
 import axiosInstance from '@/lib/@axios';
 import { LoginSuccesResponse } from '@/types/auth.types';
 import { UserTypes } from '@/types/user.types';
+import { ActiveCompany } from '@/types/company.types';
 
 type AuthResponse = {
 	user: UserTypes;
+	activeCompany: ActiveCompany;
 	access_token: string;
 };
 
@@ -39,8 +41,11 @@ export async function authSignIn(credentials: { email: string; password: string 
 		}
 	} = await axiosInstance.post<LoginSuccesResponse>(`auth/login`, credentials);
 
+	console.log('usuario desde el login:', user)
+
 	return {
 		user,
+		activeCompany: user?.activeCompany,
 		access_token: token
 	};
 }

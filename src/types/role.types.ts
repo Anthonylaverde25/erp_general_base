@@ -11,6 +11,8 @@ export interface RoleType {
   updated_at?: string;
 }
 
+export type Role = RoleType;
+
 /**
  * CreateRoleType - Type for creating a new role
  */
