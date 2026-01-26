@@ -1,6 +1,7 @@
 import { FuseSettingsConfigType } from '@fuse/core/FuseSettings/FuseSettings';
 import { FuseAuthUser } from '@fuse/core/FuseAuthProvider/types/FuseAuthUser';
 import { PartialDeep } from 'type-fest';
+import { Company } from '@/types/company.types';
 
 /**
  * The type definition for a user object.
@@ -14,4 +15,6 @@ export type User = FuseAuthUser & {
 	shortcuts?: string[];
 	settings?: PartialDeep<FuseSettingsConfigType>;
 	loginRedirectUrl?: string; // The URL to redirect to after login.
+	active_company?: Company;
+	companies?: Company[];
 };

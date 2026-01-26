@@ -3,7 +3,7 @@ import { FuseAuthProviderState, FuseAuthProviderType } from './types/FuseAuthTyp
 import { PartialDeep } from 'type-fest';
 import { User } from '@auth/user';
 
-export type AuthState = FuseAuthProviderState & {
+export type AuthState = FuseAuthProviderState<User> & {
 	provider: string | null;
 };
 
@@ -18,7 +18,7 @@ export const initialAuthState: AuthState = {
 export type FuseAuthContextType = {
 	updateUser?: (U: PartialDeep<User>) => Promise<Response>;
 	signOut?: () => void;
-	authState: FuseAuthProviderState | null;
+	authState: FuseAuthProviderState<User> | null;
 	providers: FuseAuthProviderType[];
 };
 
