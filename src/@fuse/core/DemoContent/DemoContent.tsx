@@ -1,7 +1,9 @@
 import useIndexUser from '@/features/users/hooks/useIndexUsers';
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import useAuth from '../FuseAuthProvider/useAuth';
 import useActiveCompany from '@/features/companies/useActiveCompany';
+import useIndexCompanies from '@/features/companies/hooks/useIndexCompanies';
+import axiosInstance from '@/lib/@axios';
 
 /**
  * DemoContent is a React component used to render a demo content on the page.
@@ -10,8 +12,16 @@ import useActiveCompany from '@/features/companies/useActiveCompany';
  */
 function DemoContent() {
 	const { id, name } = useActiveCompany()
+	const { companies, isLoading, isError, error } = useIndexCompanies()
+	console.log('companies', companies)
 	// const { users } = useIndexUser();
 	// const { authState: { user, authStatus, isAuthenticated }, } = useAuth();
+
+	// useEffect(() => {
+	// 	const fetch = async () => await axiosInstance.get('companies')
+
+	// 	fetch()
+	// }, [])
 
 
 	// console.log('User:', user, authStatus, isAuthenticated);

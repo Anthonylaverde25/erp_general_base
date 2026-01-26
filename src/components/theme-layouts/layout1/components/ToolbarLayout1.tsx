@@ -16,6 +16,7 @@ import { Layout1ConfigDefaultsType } from '@/components/theme-layouts/layout1/La
 import useThemeMediaQuery from '../../../../@fuse/hooks/useThemeMediaQuery';
 import { AppBar, Divider } from '@mui/material';
 import ToolbarTheme from 'src/contexts/ToolbarTheme';
+import CompanySwitcher from '@/components/CompanySwitcher';
 
 type ToolbarLayout1Props = {
 	className?: string;
@@ -59,14 +60,15 @@ function ToolbarLayout1(props: ToolbarLayout1Props) {
 					</div>
 
 					<div className="flex items-center overflow-x-auto px-2 py-2 md:px-4">
-						<LanguageSwitcher />
-						<AdjustFontSize />
+						<CompanySwitcher />
+						{/* <LanguageSwitcher /> */}
+						{/* <AdjustFontSize /> */}
 						<FullScreenToggle />
 						<LightDarkModeToggle
 							lightTheme={_.find(themeOptions, { id: 'Default' })}
 							darkTheme={_.find(themeOptions, { id: 'Default Dark' })}
 						/>
-						<NavigationSearch />
+						{/* <NavigationSearch /> */}
 						<QuickPanelToggleButton />
 					</div>
 
