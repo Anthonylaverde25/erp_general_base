@@ -1,6 +1,7 @@
 import useIndexUser from '@/features/users/hooks/useIndexUsers';
 import { memo } from 'react';
 import useAuth from '../FuseAuthProvider/useAuth';
+import useActiveCompany from '@/features/companies/useActiveCompany';
 
 /**
  * DemoContent is a React component used to render a demo content on the page.
@@ -8,12 +9,13 @@ import useAuth from '../FuseAuthProvider/useAuth';
  * It also renders a quote and some content about a person being transformed into a vermin.
  */
 function DemoContent() {
+	const { id, name } = useActiveCompany()
 	// const { users } = useIndexUser();
-	const { authState } = useAuth();
-	const user = authState?.user;
+	// const { authState: { user, authStatus, isAuthenticated }, } = useAuth();
 
-	console.log('User:', user);
-	console.log('Active Company:', user?.active_company);
+
+	// console.log('User:', user, authStatus, isAuthenticated);
+	console.log('Active Company:', id, name)
 	return (
 		<div>
 			<img
