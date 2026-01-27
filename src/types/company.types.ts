@@ -1,11 +1,29 @@
+export interface Address {
+    id?: number;
+    street: string;
+    street_2?: string | null;
+    city: string;
+    state: string;
+    postal_code: string;
+    country: string;
+}
+
+export interface Contact {
+    id?: number;
+    email: string;
+    phone?: string;
+}
+
 export interface Company {
     id: number;
     name: string;
-    address: string;
-    phone?: string;
-    email?: string;
+    cif?: string; // Added field from payload
+    addresses?: Address[]; // Changed from address string to Address array
+    contacts?: Contact[]; // Added contacts array
     website?: string;
     logo_url?: string;
+    // Legacy fields - keeping optional just in case, or removing if strictly following new structure. 
+    // Given the request is to refactor for relations, I will prioritize the new structure.
 }
 
 export type ActiveCompany = Company;

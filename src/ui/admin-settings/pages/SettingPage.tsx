@@ -74,11 +74,11 @@ export default function SettingPage() {
                 logo: null, // Files can't be set from URL directly without fetching, usually kept null or handled differently
                 favicon: null,
                 billing_address: {
-                    street: activeCompany.address || "", // Mapping simple address to street for now
-                    city: "",
-                    state: "",
-                    zip: "",
-                    country: "",
+                    street: activeCompany.addresses?.[0]?.street || "",
+                    city: activeCompany.addresses?.[0]?.city || "",
+                    state: activeCompany.addresses?.[0]?.state || "",
+                    zip: activeCompany.addresses?.[0]?.postal_code || "",
+                    country: activeCompany.addresses?.[0]?.country || "",
                 },
                 preferences: {
                     language: "Español",
