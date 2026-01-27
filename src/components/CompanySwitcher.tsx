@@ -12,9 +12,11 @@ import { Company } from '@/types/company.types';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
 import useChangeCompany from '@/features/companies/hooks/useChangeCompany';
+import useActiveCompany from '@/features/companies/useActiveCompany';
 
 function CompanySwitcher() {
     const { authState: { user: { active_company, companies } = {} } = {} } = useAuth();
+    const { id, name } = useActiveCompany()
     const { changeCompanyAsync } = useChangeCompany()
 
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -69,6 +71,10 @@ function CompanySwitcher() {
         // navigate('/companies');
         handleCloseMenu();
     }, [handleCloseMenu]);
+
+
+    console.log('empresa activa desde el auth', active_company)
+    console.log('empresa activa desde el hook', id, name)
 
     return (
         <>

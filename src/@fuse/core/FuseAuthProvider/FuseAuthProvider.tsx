@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
+import _ from 'lodash';
 import { PartialDeep } from 'type-fest';
 import FuseLoading from '@fuse/core/FuseLoading';
 import { User } from '@auth/user';
@@ -68,6 +69,13 @@ function FuseAuthProvider(props: FuseAuthenticationProviderProps) {
 					return { ...providerAuthState, provider: name };
 				}
 
+				// Scenario 4: Update state if already authenticated and provider matches
+				if (prev.isAuthenticated && providerAuthState.isAuthenticated && prev.provider === name) {
+					if (!_.isEqual(prev.user, providerAuthState.user)) {
+						return { ...providerAuthState, provider: name };
+					}
+				}
+
 				return prev;
 			});
 		},
@@ -97,9 +105,9 @@ function FuseAuthProvider(props: FuseAuthenticationProviderProps) {
 	}, [currentProvider, resetAuthProvider]);
 
 	const updateUser = useCallback(
-		async (_userData: PartialDeep<User>) => {
+		async (_userData: PartialDeep<User>, options?: { onlyLocal?: boolean }) => {
 			if (currentProvider?.updateUser) {
-				return currentProvider?.updateUser(_userData);
+				return currentProvider?.updateUser(_userData, options);
 			}
 
 			throw new Error('No current auth provider to updateUser from');

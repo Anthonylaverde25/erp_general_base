@@ -16,7 +16,7 @@ export const initialAuthState: AuthState = {
 };
 
 export type FuseAuthContextType = {
-	updateUser?: (U: PartialDeep<User>) => Promise<Response>;
+	updateUser?: (U: PartialDeep<User>, options?: { onlyLocal?: boolean }) => Promise<Response>;
 	signOut?: () => void;
 	authState: FuseAuthProviderState<User> | null;
 	providers: FuseAuthProviderType[];

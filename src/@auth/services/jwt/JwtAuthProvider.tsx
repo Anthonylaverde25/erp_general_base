@@ -167,9 +167,26 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 	/**
 	 * Update user
 	 */
-	const updateUser: JwtAuthContextType['updateUser'] = useCallback(async (_user) => {
+	const updateUser: JwtAuthContextType['updateUser'] = useCallback(async (_user, options) => {
 		try {
-			const response = await authUpdateDbUser(_user as unknown as User);
+			let response: Response;
+
+			if (!options?.onlyLocal) {
+				// Merge current user with updates to ensure ID is present for the API call
+				const userToUpdate = { ...authState.user, ..._user } as unknown as User;
+				response = await authUpdateDbUser(userToUpdate);
+			} else {
+				response = new Response(JSON.stringify({ message: 'Local update success' }), { status: 200 });
+			}
+
+			setAuthState((prev) => ({
+				...prev,
+				user: {
+					...prev.user,
+					..._user
+				} as UserTypes
+			}));
+
 			return response;
 		} catch (error) {
 			if (error instanceof HTTPError) {
@@ -178,7 +195,7 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 
 			throw error;
 		}
-	}, []);
+	}, [authState.user]);
 
 	/**
 	 * Refresh access token

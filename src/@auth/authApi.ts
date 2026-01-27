@@ -41,7 +41,6 @@ export async function authSignIn(credentials: { email: string; password: string 
 		}
 	} = await axiosInstance.post<LoginSuccesResponse>(`auth/login`, credentials);
 
-	console.log('usuario desde el login:', user)
 
 	return {
 		user,
@@ -82,10 +81,8 @@ export async function authGetDbUserByEmail(email: string): Promise<User> {
 /**
  * Update user
  */
-export function authUpdateDbUser(user: PartialDeep<User>): Promise<Response> {
-	return api.put(`mock/auth/user/${user.id}`, {
-		json: UserModel(user)
-	});
+export async function authUpdateDbUser(user: PartialDeep<User>): Promise<Response> {
+	return axiosInstance.put(`users/${user.id}`, user);
 }
 
 /**

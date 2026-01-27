@@ -2,7 +2,7 @@ import { ChangeCompanyUseCase } from '@/application/use_cases/company/ChangeComp
 import { ShowCompanyUseCase } from '@/application/use_cases/company/ShowCompanyUseCase';
 import { container } from '@/di/container';
 import { TYPES } from '@/di/types';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Company } from '@/types/company.types';
 import { toast } from 'sonner';
 import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
@@ -12,6 +12,7 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 
 
 export default function useChangeCompany() {
+    const queryClient = useQueryClient();
     const { updateUser, authState } = useAuth();
     const use_case = container.get<ChangeCompanyUseCase>(TYPES.ChangeCompanyUseCase);
     const show_company_use_case = container.get<ShowCompanyUseCase>(TYPES.ShowCompanyUseCase);
@@ -24,8 +25,11 @@ export default function useChangeCompany() {
                 const selectedCompany = await show_company_use_case.execute(companyId);
 
                 if (selectedCompany && updateUser) {
-                    await updateUser({ active_company: selectedCompany });
+                    await updateUser({ active_company: selectedCompany }, { onlyLocal: true });
+                    queryClient.invalidateQueries({ queryKey: ['activeCompany'] });
                 }
+
+                console.log('Company changed successfully', selectedCompany);
             } catch (error) {
                 console.error('Error fetching company details', error);
             }

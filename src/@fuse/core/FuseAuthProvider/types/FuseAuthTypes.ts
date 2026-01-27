@@ -4,7 +4,7 @@ import { FuseAuthUser } from './FuseAuthUser';
 
 export type FuseAuthProviderMethods = {
 	signOut: () => void;
-	updateUser: (U: PartialDeep<FuseAuthUser>) => Promise<Response>;
+	updateUser: (U: PartialDeep<FuseAuthUser>, options?: { onlyLocal?: boolean }) => Promise<Response>;
 };
 
 export type FuseAuthProviderComponentProps = React.PropsWithChildren<{
@@ -23,6 +23,6 @@ export type FuseAuthProviderState<T = Record<string, unknown>> = {
 export type FuseAuthProviderType = {
 	name: string;
 	Provider:
-		| React.ComponentType<FuseAuthProviderComponentProps>
-		| React.ForwardRefExoticComponent<FuseAuthProviderComponentProps>;
+	| React.ComponentType<FuseAuthProviderComponentProps>
+	| React.ForwardRefExoticComponent<FuseAuthProviderComponentProps>;
 };
