@@ -7,7 +7,7 @@ import { ActiveCompany } from '@/types/company.types';
 
 export type JwtAuthContextType = FuseAuthProviderState<UserTypes> & {
 	updateUser: (U: UserTypes, options?: { onlyLocal?: boolean }) => Promise<Response>;
-	signIn?: (credentials: JwtSignInPayload) => Promise<{ user: UserTypes; access_token: string, activeCompany: ActiveCompany } | null>;
+	signIn?: (credentials: JwtSignInPayload) => Promise<{ user: UserTypes; access_token: string } | null>;
 	signUp?: (U: JwtSignUpPayload) => Promise<{ user: UserTypes; access_token: string } | null>;
 	signOut?: () => void;
 	refreshToken?: () => Promise<string | Response>;

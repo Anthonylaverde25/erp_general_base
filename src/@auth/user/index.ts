@@ -15,6 +15,6 @@ export type User = FuseAuthUser & {
 	shortcuts?: string[];
 	settings?: PartialDeep<FuseSettingsConfigType>;
 	loginRedirectUrl?: string; // The URL to redirect to after login.
-	active_company?: Company;
+	active_company_id?: number;
 	companies?: Company[];
 };

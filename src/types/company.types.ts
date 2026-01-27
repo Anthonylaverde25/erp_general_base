@@ -6,6 +6,7 @@ export interface Address {
     state: string;
     postal_code: string;
     country: string;
+    default: boolean;
 }
 
 export interface Contact {

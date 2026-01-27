@@ -21,17 +21,9 @@ export default function useChangeCompany() {
         mutationFn: (companyId: Company['id']) => use_case.execute(companyId),
 
         onSuccess: async (message, companyId) => {
-            try {
-                const selectedCompany = await show_company_use_case.execute(companyId);
-
-                if (selectedCompany && updateUser) {
-                    await updateUser({ active_company: selectedCompany }, { onlyLocal: true });
-                    queryClient.invalidateQueries({ queryKey: ['activeCompany'] });
-                }
-
-                console.log('Company changed successfully', selectedCompany);
-            } catch (error) {
-                console.error('Error fetching company details', error);
+            if (updateUser) {
+                await updateUser({ active_company_id: companyId }, { onlyLocal: true });
+                queryClient.invalidateQueries({ queryKey: ['activeCompany'] });
             }
 
             toast('Empresa cambiada', {

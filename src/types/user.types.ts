@@ -22,7 +22,7 @@ export interface UserType {
 	is_active?: boolean;
 	needs_password_change?: boolean;
 	observations?: string;
-	activeCompany?: ActiveCompany;
+	active_company_id?: number;
 	[key: string]: unknown;
 }
 

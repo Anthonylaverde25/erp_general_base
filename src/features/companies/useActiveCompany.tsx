@@ -7,17 +7,16 @@ import { Company } from "@/domain/entities/companies/Company";
 
 
 export default function useActiveCompany(): Company | undefined {
-    const { authState: { user: { active_company } = {} } = {} } = useAuth();
+    const { authState: { user: { active_company_id } = {} } = {} } = useAuth();
     const show_company_use_case = container.get<ShowCompanyUseCase>(TYPES.ShowCompanyUseCase);
 
     const { data: activeCompany } = useQuery<Company>({
-        queryKey: ['activeCompany', { id: active_company?.id }],
+        queryKey: ['activeCompany', { id: active_company_id }],
         queryFn: () => {
-            if (!active_company?.id) return null;
-            return show_company_use_case.execute(active_company.id);
+            if (!active_company_id) return null;
+            return show_company_use_case.execute(active_company_id);
         },
-        enabled: !!active_company?.id,
-        initialData: active_company as any, // Use context data as initial placeholder
+        enabled: !!active_company_id,
         staleTime: 1000 * 60 * 5, // 5 minutes
     });
 

@@ -9,7 +9,6 @@ import { ActiveCompany } from '@/types/company.types';
 
 type AuthResponse = {
 	user: UserTypes;
-	activeCompany: ActiveCompany;
 	access_token: string;
 };
 
@@ -44,7 +43,6 @@ export async function authSignIn(credentials: { email: string; password: string 
 
 	return {
 		user,
-		activeCompany: user?.activeCompany,
 		access_token: token
 	};
 }

@@ -11,10 +11,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 import ProfileCompany from '../tabs/ProfileCompany';
-import BillingAddressTab from '../tabs/BillingAddressTab';
+import AddressesTab from '../tabs/AddressesTab';
+import ContactsTab from '../tabs/ContactsTab';
 import PreferencesTab from '../tabs/PreferencesTab';
 import DangerZoneTab from '../tabs/DangerZoneTab';
 import useActiveCompany from "@/features/companies/useActiveCompany";
+
+const addressSchema = z.object({
+    id: z.number().optional(),
+    street: z.string().min(1, "La calle es requerida"),
+    city: z.string().min(1, "La ciudad es requerida"),
+    state: z.string().min(1, "La provincia es requerida"),
+    postal_code: z.string().min(1, "El código postal es requerido"),
+    country: z.string().min(1, "El país es requerido"),
+    default: z.boolean().default(false),
+});
+
+const contactSchema = z.object({
+    id: z.number().optional(),
+    email: z.string().email("Email inválido"),
+    phone: z.string().optional(),
+});
 
 const companySettingsSchema = z.object({
     name: z.string().min(1, "El nombre es requerido"),
@@ -22,13 +39,8 @@ const companySettingsSchema = z.object({
     logo: z.custom<File>((v) => v instanceof File).nullable().optional(),
     favicon: z.custom<File>((v) => v instanceof File).nullable().optional(),
     design_type: z.string().default("standard"),
-    billing_address: z.object({
-        street: z.string().optional(),
-        city: z.string().optional(),
-        state: z.string().optional(),
-        zip: z.string().optional(),
-        country: z.string().optional(),
-    }).optional(),
+    addresses: z.array(addressSchema).default([]),
+    contacts: z.array(contactSchema).default([]),
     preferences: z.object({
         language: z.string().optional(),
         number_format: z.string().optional(),
@@ -49,13 +61,8 @@ export default function SettingPage() {
             design_type: "standard",
             logo: null,
             favicon: null,
-            billing_address: {
-                street: "",
-                city: "",
-                state: "",
-                zip: "",
-                country: "",
-            },
+            addresses: [],
+            contacts: [],
             preferences: {
                 language: "Español",
                 number_format: "1,234.56",
@@ -66,27 +73,34 @@ export default function SettingPage() {
     const { reset, handleSubmit, formState: { isSubmitting } } = methods;
 
     useEffect(() => {
-        if (activeCompany) {
+        if (activeCompany?.id) {
             reset({
                 name: activeCompany.name || "",
                 website: activeCompany.website || "",
-                design_type: "standard", // Assuming default as it's not in Company type yet
-                logo: null, // Files can't be set from URL directly without fetching, usually kept null or handled differently
+                design_type: "standard",
+                logo: null,
                 favicon: null,
-                billing_address: {
-                    street: activeCompany.addresses?.[0]?.street || "",
-                    city: activeCompany.addresses?.[0]?.city || "",
-                    state: activeCompany.addresses?.[0]?.state || "",
-                    zip: activeCompany.addresses?.[0]?.postal_code || "",
-                    country: activeCompany.addresses?.[0]?.country || "",
-                },
+                addresses: activeCompany.addresses?.map(addr => ({
+                    id: addr.id,
+                    street: addr.street || "",
+                    city: addr.city || "",
+                    state: addr.state || "",
+                    postal_code: addr.postal_code || "",
+                    country: addr.country || "",
+                    default: addr.default || false,
+                })) || [],
+                contacts: activeCompany.contacts?.map(contact => ({
+                    id: contact.id,
+                    email: contact.email || "",
+                    phone: contact.phone || "",
+                })) || [],
                 preferences: {
                     language: "Español",
                     number_format: "1,234.56",
                 }
             });
         }
-    }, [activeCompany, reset]);
+    }, [activeCompany?.id, activeCompany, reset]);
 
     const onSubmit = (data: CompanySettingsForm) => {
         console.log("Form data valid. Preparing submission...", data);
@@ -96,27 +110,29 @@ export default function SettingPage() {
         formData.append("website", data.website || "");
         formData.append("design_type", data.design_type);
 
-        // Handle files
-        if (data.logo) {
-            formData.append("logo", data.logo);
-        }
-        if (data.favicon) {
-            formData.append("favicon", data.favicon);
-        }
+        if (data.logo) formData.append("logo", data.logo);
+        if (data.favicon) formData.append("favicon", data.favicon);
 
-        // Handle nested objects (depending on backend expectation, usually flattened or JSON stringified)
-        // Here we assume backend expects keys like 'billing_address[street]' or similar, 
-        // OR we can just send the JSON if the backend accepts JSON body. 
-        // For file uploads, we must use FormData. 
-        // Common pattern for Laravel/modern backends with FormData:
-        Object.keys(data.billing_address).forEach(key => {
-            const k = key as keyof typeof data.billing_address;
-            formData.append(`billing_address[${k}]`, data.billing_address[k] || "");
+        data.addresses.forEach((addr, index) => {
+            if (addr.id) formData.append(`addresses[${index}][id]`, String(addr.id));
+            formData.append(`addresses[${index}][street]`, addr.street);
+            formData.append(`addresses[${index}][city]`, addr.city);
+            formData.append(`addresses[${index}][state]`, addr.state);
+            formData.append(`addresses[${index}][postal_code]`, addr.postal_code);
+            formData.append(`addresses[${index}][country]`, addr.country);
+            formData.append(`addresses[${index}][default]`, addr.default ? "1" : "0");
         });
 
-        Object.keys(data.preferences).forEach(key => {
-            const k = key as keyof typeof data.preferences;
-            formData.append(`preferences[${k}]`, data.preferences[k] || "");
+        data.contacts.forEach((contact, index) => {
+            if (contact.id) formData.append(`contacts[${index}][id]`, String(contact.id));
+            formData.append(`contacts[${index}][email]`, contact.email);
+            if (contact.phone) formData.append(`contacts[${index}][phone]`, contact.phone);
+        });
+
+        Object.keys(data.preferences || {}).forEach(key => {
+            // @ts-ignore
+            const value = data.preferences?.[key];
+            if (value) formData.append(`preferences[${key}]`, value);
         });
 
         // Debug output
@@ -126,7 +142,6 @@ export default function SettingPage() {
         }
 
         // TODO: Call API endpoint
-        // updateCompanyMutation.mutate(formData);
     };
 
     return (
@@ -156,8 +171,12 @@ export default function SettingPage() {
                             label="Perfil de Empresa"
                         />
                         <Tab
-                            icon={<FuseSvgIcon>heroicons:arrows-pointing-in</FuseSvgIcon>}
-                            label="Dirección de Facturación"
+                            icon={<FuseSvgIcon>heroicons:map-pin</FuseSvgIcon>}
+                            label="Direcciones"
+                        />
+                        <Tab
+                            icon={<FuseSvgIcon>heroicons:phone</FuseSvgIcon>}
+                            label="Contactos"
                         />
                         <Tab
                             icon={<FuseSvgIcon>lucide:tune</FuseSvgIcon>}
@@ -186,9 +205,10 @@ export default function SettingPage() {
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                         {/* Main content per tab */}
                         {tab === 0 && <ProfileCompany />}
-                        {tab === 1 && <BillingAddressTab />}
-                        {tab === 2 && <PreferencesTab />}
-                        {tab === 3 && <DangerZoneTab />}
+                        {tab === 1 && <AddressesTab />}
+                        {tab === 2 && <ContactsTab />}
+                        {tab === 3 && <PreferencesTab />}
+                        {tab === 4 && <DangerZoneTab />}
                     </Box>
                 </Box>
             </Box>
