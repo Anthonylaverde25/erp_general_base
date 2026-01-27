@@ -119,7 +119,7 @@ export default function AccountDesignPage() {
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box className='bg-amber-700' sx={{ width: "100%" }}>
       <Box
         sx={{
           display: "flex",

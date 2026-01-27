@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import {
     Button,
     Menu,
@@ -6,7 +6,8 @@ import {
     Typography,
     ListItemText,
     ListItemIcon,
-    Divider
+    Divider,
+    CircularProgress
 } from '@mui/material';
 import { Company } from '@/types/company.types';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
@@ -15,30 +16,19 @@ import useChangeCompany from '@/features/companies/hooks/useChangeCompany';
 import useActiveCompany from '@/features/companies/useActiveCompany';
 
 function CompanySwitcher() {
-    const { authState: { user: { active_company, companies } = {} } = {} } = useAuth();
-    const { id, name } = useActiveCompany()
-    const { changeCompanyAsync } = useChangeCompany()
+    // Read available companies from Auth Context (Source of Truth for "What companies can I access?")
+    const { authState: { user: { companies } = {} } = {} } = useAuth();
+
+    // Read Active Company from our React Query Hook (Source of Truth for "Where am I?")
+    const activeCompany = useActiveCompany();
+    const { changeCompanyAsync, isLoading } = useChangeCompany();
 
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-    const [selectedCompanyId, setSelectedCompanyId] = useState<Company['id'] | null>(
-        active_company?.id ?? null
-    );
-
-    /**
-     * Sincroniza estado local con backend/session
-     */
-    useEffect(() => {
-        if (active_company?.id && active_company.id !== selectedCompanyId) {
-            setSelectedCompanyId(active_company.id);
-        }
-    }, [active_company?.id, selectedCompanyId]);
-
     const isOpen = Boolean(anchorEl);
 
-    const activeCompanyName = useMemo(
-        () => active_company?.name ?? 'Seleccionar empresa',
-        [active_company?.name]
-    );
+    // Derived state directly from the hook, no useEffect needed
+    const activeCompanyName = activeCompany?.name ?? 'Seleccionar empresa';
+    const selectedCompanyId = activeCompany?.id ?? null;
 
     const handleOpenMenu = useCallback((event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -55,31 +45,22 @@ function CompanySwitcher() {
                 return;
             }
 
-            setSelectedCompanyId(companyId);
             changeCompanyAsync(companyId);
-
-            // TODO: acción real de cambio de empresa
-            // switchCompany(companyId);
-
             handleCloseMenu();
         },
-        [selectedCompanyId, handleCloseMenu]
+        [selectedCompanyId, handleCloseMenu, changeCompanyAsync]
     );
 
     const handleManageCompanies = useCallback(() => {
-        // TODO: navegar a gestión de empresas
-        // navigate('/companies');
+        // Future implementation: Navigate to company management
         handleCloseMenu();
     }, [handleCloseMenu]);
-
-
-    console.log('empresa activa desde el auth', active_company)
-    console.log('empresa activa desde el hook', id, name)
 
     return (
         <>
             <Button
                 color="inherit"
+                disabled={isLoading}
                 aria-controls={isOpen ? 'company-menu' : undefined}
                 aria-haspopup="true"
                 aria-expanded={isOpen ? 'true' : undefined}
@@ -105,9 +86,13 @@ function CompanySwitcher() {
                     </Typography>
                 </div>
 
-                <FuseSvgIcon size={16} color="action">
-                    heroicons-outline:chevron-down
-                </FuseSvgIcon>
+                {isLoading ? (
+                    <CircularProgress size={20} color="inherit" />
+                ) : (
+                    <FuseSvgIcon size={16} color="action">
+                        heroicons-outline:chevron-down
+                    </FuseSvgIcon>
+                )}
             </Button>
 
             <Menu
