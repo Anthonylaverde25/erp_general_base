@@ -1,60 +1,44 @@
-
 import React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import { useFormContext } from 'react-hook-form';
+import { CompanySettingsForm } from '../pages/SettingPage';
 
 export default function PreferencesTab() {
+    const { register, watch } = useFormContext<CompanySettingsForm>();
+    const language = watch("preferences.language");
+    const numberFormat = watch("preferences.number_format");
+
     return (
         <Box sx={{ display: "grid", gap: 2 }}>
             <Box>
-                <Typography variant="caption" color="text.secondary">
-                    Idioma
-                </Typography>
-                <select
-                    style={{
-                        width: "100%",
-                        padding: 10,
-                        border: "1px solid #e0e0e0",
-                    }}
+                <TextField
+                    {...register("preferences.language")}
+                    select
+                    label="Idioma"
+                    value={language || "Español"}
+                    fullWidth
+                    size="small"
+                    defaultValue="Español"
                 >
-                    <option>Español</option>
-                    <option>Inglés</option>
-                </select>
+                    <MenuItem value="Español">Español</MenuItem>
+                    <MenuItem value="Inglés">Inglés</MenuItem>
+                </TextField>
             </Box>
             <Box>
-                <Typography variant="caption" color="text.secondary">
-                    Formato de número
-                </Typography>
-                <select
-                    style={{
-                        width: "100%",
-                        padding: 10,
-                        border: "1px solid #e0e0e0",
-                    }}
+                <TextField
+                    {...register("preferences.number_format")}
+                    select
+                    label="Formato de número"
+                    value={numberFormat || "1,234.56"}
+                    fullWidth
+                    size="small"
+                    defaultValue="1,234.56"
                 >
-                    <option>1,234.56</option>
-                    <option>1.234,56</option>
-                </select>
-            </Box>
-            <Box
-                sx={{
-                    display: "flex",
-                    gap: 1,
-                    justifyContent: "flex-end",
-                    mt: 1,
-                }}
-            >
-                <Button className="btn-secondary" variant="outlined">
-                    Cancelar
-                </Button>
-                <Button
-                    className="btn-primary"
-                    variant="contained"
-                    color="primary"
-                >
-                    Guardar Preferencias
-                </Button>
+                    <MenuItem value="1,234.56">1,234.56</MenuItem>
+                    <MenuItem value="1.234,56">1.234,56</MenuItem>
+                </TextField>
             </Box>
         </Box>
     );

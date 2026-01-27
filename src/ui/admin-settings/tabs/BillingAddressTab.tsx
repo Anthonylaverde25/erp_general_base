@@ -1,50 +1,49 @@
-
 import React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import { useFormContext } from 'react-hook-form';
+import { CompanySettingsForm } from '../pages/SettingPage';
 
 export default function BillingAddressTab() {
+    const { register } = useFormContext<CompanySettingsForm>();
+
     return (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <input
+            <TextField
+                {...register("billing_address.street")}
+                label="Calle y número"
                 placeholder="Calle y número"
-                style={{ padding: 10, border: "1px solid #e0e0e0" }}
+                fullWidth
+                size="small"
             />
-            <input
+            <TextField
+                {...register("billing_address.city")}
+                label="Ciudad"
                 placeholder="Ciudad"
-                style={{ padding: 10, border: "1px solid #e0e0e0" }}
+                fullWidth
+                size="small"
             />
-            <input
+            <TextField
+                {...register("billing_address.state")}
+                label="Provincia / Estado"
                 placeholder="Provincia / Estado"
-                style={{ padding: 10, border: "1px solid #e0e0e0" }}
+                fullWidth
+                size="small"
             />
-            <input
+            <TextField
+                {...register("billing_address.zip")}
+                label="Código Postal"
                 placeholder="Código Postal"
-                style={{ padding: 10, border: "1px solid #e0e0e0" }}
+                fullWidth
+                size="small"
             />
-            <input
+            <TextField
+                {...register("billing_address.country")}
+                label="País"
                 placeholder="País"
-                style={{ padding: 10, border: "1px solid #e0e0e0" }}
+                fullWidth
+                size="small"
             />
-            <Box
-                sx={{
-                    display: "flex",
-                    gap: 1,
-                    justifyContent: "flex-end",
-                    mt: 1,
-                }}
-            >
-                <Button className="btn-secondary" variant="outlined">
-                    Cancelar
-                </Button>
-                <Button
-                    className="btn-primary"
-                    variant="contained"
-                    color="primary"
-                >
-                    Guardar Dirección
-                </Button>
-            </Box>
         </Box>
     );
 }

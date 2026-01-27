@@ -11,7 +11,8 @@ import axiosInstance from '@/lib/@axios';
  * It also renders a quote and some content about a person being transformed into a vermin.
  */
 function DemoContent() {
-	const { id, name } = useActiveCompany()
+	const activeCompany = useActiveCompany()
+	const { id, name } = activeCompany || {}
 	const { companies, isLoading, isError, error } = useIndexCompanies()
 	console.log('companies', companies)
 	// const { users } = useIndexUser();

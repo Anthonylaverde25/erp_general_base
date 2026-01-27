@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -6,34 +5,25 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useDropzone } from 'react-dropzone';
+import { useFormContext } from 'react-hook-form';
+import { CompanySettingsForm } from '../pages/SettingPage';
+import useActiveCompany from '@/features/companies/useActiveCompany';
 
-interface ProfileCompanyProps {
-    companyName: string;
-    setCompanyName: (value: string) => void;
-    companyUrl: string;
-    setCompanyUrl: (value: string) => void;
-    logoFile: File | null;
-    setLogoFile: (file: File | null) => void;
-    faviconFile: File | null;
-    setFaviconFile: (file: File | null) => void;
-    designType: string;
-    setDesignType: (value: string) => void;
-}
+export default function ProfileCompany() {
+    const { register, setValue, watch } = useFormContext<CompanySettingsForm>();
+    const activeCompany = useActiveCompany();
 
-export default function ProfileCompany({
-    companyName,
-    setCompanyName,
-    companyUrl,
-    setCompanyUrl,
-    logoFile,
-    setLogoFile,
-    faviconFile,
-    setFaviconFile,
-    designType,
-    setDesignType
-}: ProfileCompanyProps) {
+    // Watch fields for logic and previews
+    const logoFile = watch("logo");
+    const faviconFile = watch("favicon");
+    const designType = watch("design_type");
+
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
     const [faviconPreview, setFaviconPreview] = useState<string | null>(null);
+
+    const currentLogo = logoPreview || activeCompany?.logo_url;
+    // Favicon might not exist on Company entity yet, so we just use preview
+    const currentFavicon = faviconPreview;
 
     useEffect(() => {
         if (!logoFile) {
@@ -61,13 +51,13 @@ export default function ProfileCompany({
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const file = acceptedFiles && acceptedFiles[0];
-        if (file) setLogoFile(file);
-    }, [setLogoFile]);
+        if (file) setValue("logo", file, { shouldDirty: true });
+    }, [setValue]);
 
     const onFaviconDrop = useCallback((acceptedFiles: File[]) => {
         const file = acceptedFiles && acceptedFiles[0];
-        if (file) setFaviconFile(file);
-    }, [setFaviconFile]);
+        if (file) setValue("favicon", file, { shouldDirty: true });
+    }, [setValue]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -104,8 +94,7 @@ export default function ProfileCompany({
                         Nombre de la Empresa
                     </Typography>
                     <TextField
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
+                        {...register("name")}
                         fullWidth
                         size="small"
                         sx={{ mt: 1 }}
@@ -120,8 +109,7 @@ export default function ProfileCompany({
                         URL de la Empresa
                     </Typography>
                     <TextField
-                        value={companyUrl}
-                        onChange={(e) => setCompanyUrl(e.target.value)}
+                        {...register("website")}
                         fullWidth
                         size="small"
                         sx={{ mt: 1 }}
@@ -181,7 +169,7 @@ export default function ProfileCompany({
                         ].map((design) => (
                             <Box
                                 key={design.id}
-                                onClick={() => setDesignType(design.id)}
+                                onClick={() => setValue("design_type", design.id, { shouldDirty: true })}
                                 sx={{
                                     p: 2.5,
                                     border: "2px solid",
@@ -291,7 +279,7 @@ export default function ProfileCompany({
                             },
                         }}
                     >
-                        {logoPreview ? (
+                        {currentLogo ? (
                             <Box
                                 sx={{
                                     display: "flex",
@@ -301,7 +289,7 @@ export default function ProfileCompany({
                                 }}
                             >
                                 <img
-                                    src={logoPreview}
+                                    src={currentLogo}
                                     alt="Logo"
                                     style={{
                                         maxWidth: "90%",
@@ -314,11 +302,11 @@ export default function ProfileCompany({
                                     color="error"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setLogoFile(null);
+                                        setValue("logo", null, { shouldDirty: true });
                                         setLogoPreview(null);
                                     }}
                                 >
-                                    Eliminar
+                                    {logoFile ? "Eliminar Nuevo" : "Eliminar Actual (No implementado)"}
                                 </Button>
                             </Box>
                         ) : (
@@ -373,7 +361,7 @@ export default function ProfileCompany({
                             },
                         }}
                     >
-                        {faviconPreview ? (
+                        {currentFavicon ? (
                             <Box
                                 sx={{
                                     display: "flex",
@@ -383,7 +371,7 @@ export default function ProfileCompany({
                                 }}
                             >
                                 <img
-                                    src={faviconPreview}
+                                    src={currentFavicon}
                                     alt="Favicon"
                                     style={{
                                         width: "60px",
@@ -396,7 +384,7 @@ export default function ProfileCompany({
                                     color="error"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setFaviconFile(null);
+                                        setValue("favicon", null, { shouldDirty: true });
                                         setFaviconPreview(null);
                                     }}
                                 >
