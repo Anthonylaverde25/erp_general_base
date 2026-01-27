@@ -5,8 +5,8 @@ import { Company } from '@/types/company.types';
 
 @injectable()
 export class CompanyRepositoryAction implements ICompanyActionRepository {
-    async changeCompany(id: Company['id']): Promise<void> {
-        const response = await axiosInstance.post('companies/active', { company_id: id });
-        console.log('respuesta al cambiar de empresa', response);
+    async changeCompany(id: Company['id']): Promise<string> {
+        const { data: { message } } = await axiosInstance.post('companies/change-active-company', { companyId: id });
+        return message;
     }
 }

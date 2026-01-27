@@ -10,7 +10,13 @@ export class CompanyRepositoryCrud implements ICompanyCrudRepository {
         const {
             data: { companies }
         } = await axiosInstance.get(`companies`);
-        console.log('listado de empresas', companies);
         return CompanyMapper.fromDetailDTOList(companies);
+    }
+
+    async show(id: number): Promise<Company> {
+        const {
+            data: { company }
+        } = await axiosInstance.get(`companies/${id}`);
+        return CompanyMapper.fromDetailDTO(company);
     }
 }

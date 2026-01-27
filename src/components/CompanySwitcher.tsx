@@ -11,9 +11,11 @@ import {
 import { Company } from '@/types/company.types';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
+import useChangeCompany from '@/features/companies/hooks/useChangeCompany';
 
 function CompanySwitcher() {
     const { authState: { user: { active_company, companies } = {} } = {} } = useAuth();
+    const { changeCompanyAsync } = useChangeCompany()
 
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const [selectedCompanyId, setSelectedCompanyId] = useState<Company['id'] | null>(
@@ -52,6 +54,7 @@ function CompanySwitcher() {
             }
 
             setSelectedCompanyId(companyId);
+            changeCompanyAsync(companyId);
 
             // TODO: acción real de cambio de empresa
             // switchCompany(companyId);
@@ -82,7 +85,8 @@ function CompanySwitcher() {
                     textTransform: 'none',
                     border: '1px solid',
                     borderColor: 'divider',
-                    '&:hover': { backgroundColor: 'action.hover' }
+                    backgroundColor: 'action.hover',
+                    '&:hover': { backgroundColor: 'action.selected' }
                 }}
             >
                 <div className="mx-4 flex flex-1 flex-col items-start overflow-hidden">

@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import 'reflect-metadata';
 import '@i18n/i18n';
 import './styles/index.css';
 import './styles/scss/main.scss';
@@ -41,5 +42,10 @@ mockSetup().then(() => {
 
 	const router = createBrowserRouter(routes);
 
-	root.render(<RouterProvider router={router} />);
+	root.render(
+		<>
+			<RouterProvider router={router} />
+
+		</>
+	);
 });

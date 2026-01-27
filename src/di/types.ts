@@ -28,5 +28,6 @@ export const TYPES = {
   ICompanyCrudRepository: Symbol.for("ICompanyCrudRepository"),
   ICompanyActionRepository: Symbol.for("ICompanyActionRepository"),
   IndexCompanyUseCase: Symbol.for("IndexCompanyUseCase"),
+  ShowCompanyUseCase: Symbol.for("ShowCompanyUseCase"),
   ChangeCompanyUseCase: Symbol.for("ChangeCompanyUseCase"),
 };

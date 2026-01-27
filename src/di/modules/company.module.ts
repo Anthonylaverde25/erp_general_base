@@ -3,6 +3,7 @@ import { TYPES } from '../types';
 import { ICompanyCrudRepository } from '@/domain/entities/companies/repositories/company.interface.crud';
 import { CompanyRepositoryCrud } from '@/infrastructure/repositories/companies/company.repository.crud';
 import { IndexCompanyUseCase } from '@/application/use_cases/company/IndexCompanyUseCase';
+import { ShowCompanyUseCase } from '@/application/use_cases/company/ShowCompanyUseCase';
 import { ChangeCompanyUseCase } from '@/application/use_cases/company/ChangeCompanyUseCase';
 
 import { ICompanyActionRepository } from '@/domain/entities/companies/repositories/company.interface.action';
@@ -15,5 +16,6 @@ export const registerCompanyModule = (container: Container) => {
 
     // Use Cases
     container.bind<IndexCompanyUseCase>(TYPES.IndexCompanyUseCase).to(IndexCompanyUseCase);
+    container.bind<ShowCompanyUseCase>(TYPES.ShowCompanyUseCase).to(ShowCompanyUseCase);
     container.bind<ChangeCompanyUseCase>(TYPES.ChangeCompanyUseCase).to(ChangeCompanyUseCase);
 };

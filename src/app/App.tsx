@@ -17,6 +17,7 @@ import { QuickPanelProvider } from '@/components/theme-layouts/components/quickP
 import RootThemeProvider from '@/contexts/RootThemeProvider';
 import { NavigationContextProvider } from '@/components/theme-layouts/components/navigation/contexts/NavigationContextProvider';
 import ReactQueryProvider from '@/providers/ReactQueryProvider';
+import { Toaster } from 'sonner';
 
 /**
  * The main App component.
@@ -63,6 +64,7 @@ function App() {
 													</FuseDialogContextProvider>
 												</NavigationContextProvider>
 											</NavbarContextProvider>
+											<Toaster richColors position="bottom-right" />
 										</MainThemeProvider>
 									</RootThemeProvider>
 								</I18nProvider>
