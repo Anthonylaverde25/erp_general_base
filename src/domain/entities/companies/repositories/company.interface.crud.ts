@@ -1,7 +1,7 @@
-import { Company } from '../Company';
+import { UpdateCompanyDTO } from '../DTOs/UpdateCompanyDTO';
 
 export interface ICompanyCrudRepository {
     index(): Promise<Company[]>;
     show(id: number): Promise<Company>;
-    update(id: number, data: Company): Promise<{ company: Company; message: string }>;
+    update(id: number, data: UpdateCompanyDTO): Promise<{ company: Company; message: string }>;
 }

@@ -36,6 +36,7 @@ const companySettingsSchema = z.object({
     name: z.string().min(1, "El nombre es requerido"),
     cif: z.string().optional(),
     website: z.string().url("URL inválida").optional().or(z.literal("")),
+    corporate_color: z.string().optional(),
     logo: z.custom<File>((v) => v instanceof File).nullable().optional(),
     favicon: z.custom<File>((v) => v instanceof File).nullable().optional(),
     design_type: z.string().default("standard"),
@@ -44,6 +45,7 @@ const companySettingsSchema = z.object({
     preferences: z.object({
         language: z.string().optional(),
         number_format: z.string().optional(),
+        max_users: z.number().int().positive().optional(),
     }).optional(),
 });
 
@@ -59,6 +61,7 @@ export default function SettingPage() {
             name: "",
             cif: "",
             website: "",
+            corporate_color: "#1976d2",
             design_type: "standard",
             logo: null,
             favicon: null,
@@ -67,6 +70,7 @@ export default function SettingPage() {
             preferences: {
                 language: "Español",
                 number_format: "1,234.56",
+                max_users: undefined,
             }
         },
     });
@@ -79,6 +83,7 @@ export default function SettingPage() {
                 name: activeCompany.name || "",
                 cif: activeCompany.cif || "",
                 website: activeCompany.website || "",
+                corporate_color: activeCompany.corporate_color || "#1976d2",
                 design_type: "standard",
                 logo: null,
                 favicon: null,

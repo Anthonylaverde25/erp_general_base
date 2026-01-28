@@ -3,7 +3,8 @@ import { useSnackbar } from 'notistack';
 import { container } from '@/di/container';
 import { TYPES } from '@/di/types';
 import { UpdateCompanyUseCase } from '@/application/use_cases/company/UpdateCompanyUseCase';
-import { Company, UpdateCompanyType } from '@/domain/entities/companies/Company';
+import { Company } from '@/domain/entities/companies/Company';
+import { UpdateCompanyDTO } from '@/domain/entities/companies/DTOs/UpdateCompanyDTO';
 
 export default function useUpdateCompany() {
     const queryClient = useQueryClient();
@@ -11,9 +12,9 @@ export default function useUpdateCompany() {
     const use_case = container.get<UpdateCompanyUseCase>(TYPES.UpdateCompanyUseCase);
 
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: UpdateCompanyType }) => {
-            const companyEntity = Company.update(id, data);
-            return await use_case.execute({ id, data: companyEntity });
+        mutationFn: async ({ id, data }: { id: number; data: UpdateCompanyDTO }) => {
+            // Pass DTO direclty to use case, repository handles FormData conversion
+            return await use_case.execute({ id, data });
         },
         onSuccess: (response) => {
             // Invalidate company queries to refetch updated data

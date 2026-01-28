@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useDropzone } from 'react-dropzone';
 import { useFormContext } from 'react-hook-form';
@@ -11,7 +12,7 @@ import useActiveCompany from '@/features/companies/useActiveCompany';
 import useUpdateCompany from '@/features/companies/hooks/useUpdateCompany';
 
 export default function ProfileCompany() {
-    const { register, setValue, watch, reset, formState: { isSubmitting } } = useFormContext<CompanySettingsForm>();
+    const { register, setValue, watch, reset, formState: { isSubmitting, isDirty } } = useFormContext<CompanySettingsForm>();
     const activeCompany = useActiveCompany();
     const { mutateAsync: updateCompany, isPending } = useUpdateCompany();
     const [isEditing, setIsEditing] = React.useState(false);
@@ -20,6 +21,7 @@ export default function ProfileCompany() {
     // Watch fields for logic and previews
     const logoFile = watch("logo");
     const faviconFile = watch("favicon");
+    const designType = watch("design_type");
 
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
     const [faviconPreview, setFaviconPreview] = useState<string | null>(null);
@@ -52,15 +54,45 @@ export default function ProfileCompany() {
         return () => URL.revokeObjectURL(objectUrl);
     }, [faviconFile]);
 
-    const onDrop = useCallback((acceptedFiles: File[]) => {
+    const onDrop = useCallback(async (acceptedFiles: File[]) => {
         const file = acceptedFiles && acceptedFiles[0];
-        if (file) setValue("logo", file, { shouldDirty: true });
-    }, [setValue]);
+        if (file && activeCompany) {
+            // Optimistic update
+            const objectUrl = URL.createObjectURL(file);
+            setLogoPreview(objectUrl);
+            setValue("logo", file); // Keep form sync just in case
 
-    const onFaviconDrop = useCallback((acceptedFiles: File[]) => {
+            try {
+                await updateCompany({
+                    id: activeCompany.id,
+                    data: { logo: file }
+                });
+            } catch (error) {
+                console.error("Failed to upload logo", error);
+                setLogoPreview(null); // Revert on error
+            }
+        }
+    }, [activeCompany, updateCompany, setValue]);
+
+    const onFaviconDrop = useCallback(async (acceptedFiles: File[]) => {
         const file = acceptedFiles && acceptedFiles[0];
-        if (file) setValue("favicon", file, { shouldDirty: true });
-    }, [setValue]);
+        if (file && activeCompany) {
+            // Optimistic update
+            const objectUrl = URL.createObjectURL(file);
+            setFaviconPreview(objectUrl);
+            setValue("favicon", file);
+
+            try {
+                await updateCompany({
+                    id: activeCompany.id,
+                    data: { favicon: file }
+                });
+            } catch (error) {
+                console.error("Failed to upload favicon", error);
+                setFaviconPreview(null);
+            }
+        }
+    }, [activeCompany, updateCompany, setValue]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -90,6 +122,7 @@ export default function ProfileCompany() {
                 name: activeCompany.name || "",
                 cif: activeCompany.cif || "",
                 website: activeCompany.website || "",
+                corporate_color: activeCompany.corporate_color || "#1976d2",
                 design_type: "standard",
                 logo: null,
                 favicon: null,
@@ -108,6 +141,11 @@ export default function ProfileCompany() {
             const formData = {
                 name: watch("name"),
                 cif: watch("cif"),
+                website: watch("website"),
+                corporate_color: watch("corporate_color"),
+                design_type: watch("design_type"),
+                logo: watch("logo"), // File or null
+                favicon: watch("favicon"), // File or null
             };
 
             console.log("Profile data to save:", formData);
@@ -127,38 +165,29 @@ export default function ProfileCompany() {
     return (
         <Box>
             {/* Section Header with Edit Controls */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
                 <Box>
                     <Typography variant="h6" fontWeight={600}>
                         Perfil de Empresa
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Información básica e identidad visual
+                        Gestiona la información fiscal y apariencia de tu empresa
                     </Typography>
                 </Box>
-                {!isEditing ? (
-                    <Button
-                        className="btn-primary"
-                        variant="outlined"
-                        size="large"
-                        startIcon={<FuseSvgIcon size={16}>heroicons-outline:pencil</FuseSvgIcon>}
-                        onClick={handleEdit}
-                    >
-                        Editar
-                    </Button>
-                ) : (
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    {!isEditing && (
                         <Button
-                            className="btn-secondary"
+                            className="btn-primary"
                             variant="outlined"
-                            color="secondary"
                             size="large"
-                            startIcon={<FuseSvgIcon size={16}>heroicons-outline:x-mark</FuseSvgIcon>}
-                            onClick={handleCancel}
-                            disabled={isSubmitting}
+                            startIcon={<FuseSvgIcon size={16}>heroicons-outline:pencil</FuseSvgIcon>}
+                            onClick={handleEdit}
                         >
-                            Cancelar
+                            Editar
                         </Button>
+                    )}
+
+                    {!isEditing && isDirty && (
                         <Button
                             className="btn-primary"
                             variant="contained"
@@ -170,244 +199,323 @@ export default function ProfileCompany() {
                         >
                             Guardar
                         </Button>
-                    </Box>
-                )}
+                    )}
+
+                    {isEditing && (
+                        <>
+                            <Button
+                                className="btn-secondary"
+                                variant="outlined"
+                                color="secondary"
+                                size="large"
+                                startIcon={<FuseSvgIcon size={16}>heroicons-outline:x-mark</FuseSvgIcon>}
+                                onClick={handleCancel}
+                                disabled={isSubmitting}
+                            >
+                                Cancelar
+                            </Button>
+                            <Button
+                                className="btn-primary"
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                startIcon={<FuseSvgIcon size={16}>heroicons-outline:check</FuseSvgIcon>}
+                                onClick={handleSave}
+                                disabled={isSubmitting}
+                            >
+                                Guardar
+                            </Button>
+                        </>
+                    )}
+                </Box>
             </Box>
 
-            <Box sx={{ display: "flex", gap: 3 }}>
-                {/* Left: Form */}
-                <Box
-                    sx={{
-                        flex: 1,
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 2,
-                    }}
-                >
-                    <Box>
-                        <Typography
-                            variant="caption"
-                            sx={{ fontWeight: 700, color: "text.secondary" }}
-                        >
-                            Nombre de la Empresa
-                        </Typography>
-                        <TextField
-                            {...register("name")}
-                            fullWidth
-                            size="small"
-                            sx={{ mt: 1 }}
-                            disabled={!isEditing}
-                        />
-                    </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
 
-                    <Box>
-                        <Typography
-                            variant="caption"
-                            sx={{ fontWeight: 700, color: "text.secondary" }}
-                        >
-                            CIF / NIF
-                        </Typography>
-                        <TextField
-                            {...register("cif")}
-                            placeholder="Ej: A12345678"
-                            fullWidth
-                            size="small"
-                            sx={{ mt: 1 }}
-                            disabled={!isEditing}
-                        />
-                    </Box>
+                {/* 1. SECTION: DETALLES DE LA EMPRESA */}
+                <Box>
 
-                    <Box>
-                        <Typography
-                            variant="caption"
-                            sx={{ fontWeight: 700, color: "text.secondary" }}
-                        >
-                            URL de la Empresa
-                        </Typography>
-                        <TextField
-                            {...register("website")}
-                            fullWidth
-                            size="small"
-                            sx={{ mt: 1 }}
-                            disabled={!isEditing}
-                        />
+                    <Box sx={{
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                        gap: 3
+                    }}>
+                        <Box>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary", mb: 0.5, display: 'block' }}>
+                                Nombre de la Empresa
+                            </Typography>
+                            <TextField
+                                {...register("name")}
+                                fullWidth
+                                size="small"
+                                variant="filled"
+                                InputProps={{ readOnly: !isEditing }}
+                            />
+                        </Box>
+                        <Box>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary", mb: 0.5, display: 'block' }}>
+                                CIF / NIF
+                            </Typography>
+                            <TextField
+                                {...register("cif")}
+                                placeholder="Ej: A12345678"
+                                fullWidth
+                                size="small"
+                                variant="filled"
+                                InputProps={{ readOnly: !isEditing }}
+                            />
+                        </Box>
+                        <Box sx={{ gridColumn: { sm: '1 / -1' } }}>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary", mb: 0.5, display: 'block' }}>
+                                URL de la Empresa
+                            </Typography>
+                            <TextField
+                                {...register("website")}
+                                fullWidth
+                                size="small"
+                                variant="filled"
+                                InputProps={{ readOnly: !isEditing }}
+                            />
+                        </Box>
                     </Box>
                 </Box>
 
-                {/* Right: Dropzones */}
-                <Box
-                    sx={{
-                        flex: 1,
-                        display: "flex",
-                        flexDirection: "row",
-                        gap: 2,
-                    }}
-                >
-                    {/* Logo Dropzone */}
-                    <Box
-                        {...getRootProps()}
-                        sx={{
-                            flex: 1,
-                        }}
-                    >
-                        <input {...getInputProps()} />
+                {/* 2. SECTION: IMAGEN CORPORATIVA */}
+                <Box>
+                    <Box sx={{ mb: 3 }}>
+                        <Typography variant="h6" fontWeight={600} sx={{ color: 'text.primary' }}>
+                            Imagen Corporativa
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Define los elementos visuales y logos de tu marca
+                        </Typography>
+                    </Box>
+
+                    {/* Sub-section: LOGOS */}
+                    <Box sx={{
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                        gap: 3,
+                        mb: 4
+                    }}>
+                        {/* Logo Dropzone */}
                         <Box
+                            {...getRootProps()}
                             sx={{
-                                border: "2px dashed #1976d2",
-                                borderRadius: 1,
-                                p: 2,
+                                border: "2px dashed",
+                                borderColor: isDragActive ? "primary.main" : "divider",
+                                borderRadius: 2,
+                                p: 3,
                                 textAlign: "center",
                                 cursor: "pointer",
-                                bgcolor: isDragActive ? "#f5f5f5" : "white",
-                                transition: "all 0.3s ease",
-                                minHeight: "140px",
+                                bgcolor: isDragActive ? "action.hover" : "background.paper",
+                                transition: "all 0.2s ease",
+                                minHeight: "160px",
                                 display: "flex",
                                 flexDirection: "column",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                opacity: 1,
-                                pointerEvents: "auto",
-                                "&:hover": {
-                                    bgcolor: "primary.50",
-                                    borderColor: "primary.dark",
-                                },
+                                position: 'relative',
+                                "&:hover": { borderColor: "primary.main", bgcolor: "action.hover" }
                             }}
                         >
+                            <input {...getInputProps()} />
                             {currentLogo ? (
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "center",
-                                        gap: 1,
-                                    }}
-                                >
-                                    <img
-                                        src={currentLogo}
-                                        alt="Logo"
-                                        style={{
-                                            maxWidth: "90%",
-                                            maxHeight: "80px",
-                                            objectFit: "contain",
-                                        }}
-                                    />
-                                    <Button
-                                        size="small"
-                                        color="error"
-                                        onClick={(e) => {
+                                <>
+                                    <Box sx={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                                        <img src={currentLogo} alt="Logo" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+                                    </Box>
+                                    <IconButton
+                                        onClick={async (e) => {
                                             e.stopPropagation();
-                                            setValue("logo", null, { shouldDirty: true });
-                                            setLogoPreview(null);
+                                            if (activeCompany) {
+                                                setLogoPreview(null);
+                                                setValue("logo", null);
+                                                try {
+                                                    await updateCompany({
+                                                        id: activeCompany.id,
+                                                        data: { logo: null }
+                                                    });
+                                                } catch (error) {
+                                                    console.error("Failed to delete logo", error);
+                                                }
+                                            }
                                         }}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            bgcolor: 'background.paper',
+                                            boxShadow: 1,
+                                            "&:hover": { bgcolor: 'action.hover' }
+                                        }}
+                                        size="small"
                                     >
-                                        {logoFile ? "Eliminar Nuevo" : "Eliminar Actual (No implementado)"}
-                                    </Button>
-                                </Box>
+                                        <FuseSvgIcon size={18}>heroicons-outline:x-mark</FuseSvgIcon>
+                                    </IconButton>
+                                </>
                             ) : (
                                 <>
-                                    <FuseSvgIcon
-                                        sx={{ fontSize: 40, color: "primary.main", mb: 1 }}
+                                    <FuseSvgIcon sx={{ fontSize: 40, color: "text.secondary", mb: 1 }}>lucide:upload-cloud</FuseSvgIcon>
+                                    <Typography variant="body2" fontWeight={600} color="text.primary">Logo Principal</Typography>
+                                    <Typography variant="caption" color="text.secondary">Arrastra o haz clic</Typography>
+                                </>
+                            )}
+                        </Box>
+
+                        {/* Favicon Dropzone */}
+                        <Box
+                            {...getRootPropsIcon()}
+                            sx={{
+                                border: "2px dashed",
+                                borderColor: isDragActiveIcon ? "primary.main" : "divider",
+                                borderRadius: 2,
+                                p: 3,
+                                textAlign: "center",
+                                cursor: "pointer",
+                                bgcolor: isDragActiveIcon ? "action.hover" : "background.paper",
+                                transition: "all 0.2s ease",
+                                minHeight: "160px",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                position: 'relative',
+                                "&:hover": { borderColor: "primary.main", bgcolor: "action.hover" }
+                            }}
+                        >
+                            <input {...getInputPropsIcon()} />
+                            {currentFavicon ? (
+                                <>
+                                    <Box sx={{ height: 64, width: 64, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <img src={currentFavicon} alt="Favicon" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                                    </Box>
+                                    <IconButton
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+                                            if (activeCompany) {
+                                                setFaviconPreview(null);
+                                                setValue("favicon", null);
+                                                try {
+                                                    await updateCompany({
+                                                        id: activeCompany.id,
+                                                        data: { favicon: null }
+                                                    });
+                                                } catch (error) {
+                                                    console.error("Failed to delete favicon", error);
+                                                }
+                                            }
+                                        }}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            bgcolor: 'background.paper',
+                                            boxShadow: 1,
+                                            "&:hover": { bgcolor: 'action.hover' }
+                                        }}
+                                        size="small"
                                     >
-                                        lucide:upload-cloud
-                                    </FuseSvgIcon>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{ fontWeight: 600, color: "text.primary" }}
-                                    >
-                                        Logo Principal
-                                    </Typography>
-                                    <Typography
-                                        variant="caption"
-                                        sx={{ color: "text.secondary" }}
-                                    >
-                                        Arrastra o haz clic
-                                    </Typography>
+                                        <FuseSvgIcon size={18}>heroicons-outline:x-mark</FuseSvgIcon>
+                                    </IconButton>
+                                </>
+                            ) : (
+                                <>
+                                    <FuseSvgIcon sx={{ fontSize: 40, color: "text.secondary", mb: 1 }}>lucide:image</FuseSvgIcon>
+                                    <Typography variant="body2" fontWeight={600} color="text.primary">Favicon</Typography>
+                                    <Typography variant="caption" color="text.secondary">Arrastra o haz clic</Typography>
                                 </>
                             )}
                         </Box>
                     </Box>
 
-                    {/* Favicon Dropzone */}
-                    <Box
-                        {...getRootPropsIcon()}
-                        sx={{
-                            flex: 1,
-                        }}
-                    >
-                        <input {...getInputPropsIcon()} />
-                        <Box
-                            sx={{
-                                border: "2px dashed #1976d2",
-                                borderRadius: 1,
-                                p: 2,
-                                textAlign: "center",
-                                cursor: "pointer",
-                                bgcolor: isDragActiveIcon ? "#f5f5f5" : "white",
-                                transition: "all 0.3s ease",
-                                minHeight: "140px",
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                opacity: 1,
-                                pointerEvents: "auto",
-                                "&:hover": {
-                                    bgcolor: "primary.50",
-                                    borderColor: "primary.dark",
-                                },
-                            }}
-                        >
-                            {currentFavicon ? (
+                    {/* Sub-section: ESTILO Y PLANTILLA */}
+                    <Box sx={{ display: "grid", gap: 4 }}>
+                        <Box>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary", mb: 1, display: 'block' }}>
+                                Color Corporativo
+                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                 <Box
                                     sx={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "center",
-                                        gap: 1,
+                                        width: 48,
+                                        height: 48,
+                                        borderRadius: 1,
+                                        bgcolor: watch('corporate_color') || "#1976d2",
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                        boxShadow: 1
                                     }}
-                                >
-                                    <img
-                                        src={currentFavicon}
-                                        alt="Favicon"
-                                        style={{
-                                            width: "60px",
-                                            height: "60px",
-                                            objectFit: "contain",
-                                        }}
-                                    />
-                                    <Button
+                                />
+                                <Box sx={{ flex: 1, maxWidth: 200 }}>
+                                    <TextField
+                                        {...register("corporate_color")}
+                                        type="color"
+                                        fullWidth
                                         size="small"
-                                        color="error"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setValue("favicon", null, { shouldDirty: true });
-                                            setFaviconPreview(null);
+                                        sx={{
+                                            "& input[type='color']": {
+                                                height: "48px",
+                                                cursor: "pointer",
+                                                p: 0,
+                                                border: 'none'
+                                            },
+                                            "& .MuiOutlinedInput-root": { p: 0.5 }
+                                        }}
+                                        variant="outlined"
+                                    />
+                                </Box>
+                            </Box>
+                        </Box>
+
+                        <Box>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary", mb: 1.5, display: 'block' }}>
+                                Plantilla de Factura
+                            </Typography>
+                            <Box sx={{
+                                display: "grid",
+                                gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
+                                gap: 2
+                            }}>
+                                {[
+                                    { id: "standard", label: "Estándar", description: "Clásico y profesional", icon: "lucide:file-text" },
+                                    { id: "minimal", label: "Minimalista", description: "Limpio y simple", icon: "lucide:layout-template" },
+                                    { id: "large", label: "Logo Grande", description: "Énfasis en marca", icon: "lucide:image" },
+                                ].map((design) => (
+                                    <Box
+                                        key={design.id}
+                                        onClick={() => setValue("design_type", design.id, { shouldDirty: true })}
+                                        sx={{
+                                            p: 2,
+                                            border: "2px solid",
+                                            borderColor: designType === design.id ? "primary.main" : "divider",
+                                            bgcolor: designType === design.id ? "primary.50" : "background.paper",
+                                            cursor: "pointer",
+                                            borderRadius: 2,
+                                            opacity: 1,
+                                            transition: "all 0.2s ease",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "center",
+                                            gap: 1,
+                                            textAlign: "center",
+                                            "&:hover": { borderColor: "primary.main", transform: 'translateY(-2px)' }
                                         }}
                                     >
-                                        Eliminar
-                                    </Button>
-                                </Box>
-                            ) : (
-                                <>
-                                    <FuseSvgIcon
-                                        sx={{ fontSize: 40, color: "primary.main", mb: 1 }}
-                                    >
-                                        lucide:favicon
-                                    </FuseSvgIcon>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{ fontWeight: 600, color: "text.primary" }}
-                                    >
-                                        Favicon
-                                    </Typography>
-                                    <Typography
-                                        variant="caption"
-                                        sx={{ color: "text.secondary" }}
-                                    >
-                                        Arrastra o haz clic
-                                    </Typography>
-                                </>
-                            )}
+                                        <FuseSvgIcon sx={{ fontSize: 28, color: designType === design.id ? "primary.main" : "text.secondary" }}>
+                                            {design.icon}
+                                        </FuseSvgIcon>
+                                        <Box>
+                                            <Typography variant="body2" fontWeight={designType === design.id ? 700 : 600} color={designType === design.id ? "primary.dark" : "text.primary"}>
+                                                {design.label}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                                                {design.description}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                ))}
+                            </Box>
                         </Box>
                     </Box>
                 </Box>

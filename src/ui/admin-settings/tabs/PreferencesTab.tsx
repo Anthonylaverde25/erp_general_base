@@ -113,6 +113,25 @@ export default function PreferencesTab() {
                     </TextField>
                 </Box>
 
+                <Box>
+                    <Typography
+                        variant="caption"
+                        sx={{ fontWeight: 700, color: "text.secondary", display: "block", mb: 0.5 }}
+                    >
+                        Cantidad Máxima de Usuarios
+                    </Typography>
+                    <TextField
+                        {...register("preferences.max_users", { valueAsNumber: true })}
+                        type="number"
+                        placeholder="Ej: 3"
+                        fullWidth
+                        size="small"
+                        variant="filled"
+                        InputProps={{ readOnly: !isEditing }}
+                    />
+                </Box>
+
+
                 {/* Invoice Template Section */}
                 <Box sx={{ mt: 2 }}>
                     <Typography

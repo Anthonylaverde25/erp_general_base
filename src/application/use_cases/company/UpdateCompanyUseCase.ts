@@ -1,12 +1,11 @@
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/di/types';
 import { IUseCase } from '../IUseCase';
-import { Company } from '@/domain/entities/companies/Company';
-import type { ICompanyCrudRepository } from '@/domain/entities/companies/repositories/company.interface.crud';
+import { UpdateCompanyDTO } from '@/domain/entities/companies/DTOs/UpdateCompanyDTO';
 
 export interface UpdateCompanyParams {
     id: number;
-    data: Company;
+    data: UpdateCompanyDTO;
 }
 
 @injectable()

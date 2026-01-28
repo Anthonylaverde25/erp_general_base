@@ -1,16 +1,12 @@
 import { Company as ICompany, Address, Contact } from '@/types/company.types';
-
-
-export interface UpdateCompanyType {
-    name?: string;
-    cif?: string;
-
-}
+import { UpdateCompanyDTO } from './DTOs/UpdateCompanyDTO';
 
 export class Company implements ICompany {
     private _id: number;
     private _name: string;
     private _cif?: string;
+    private _max_users?: number;
+    private _corporate_color?: string;
     private _addresses?: Address[];
     private _contacts?: Contact[];
     private _website?: string;
@@ -20,6 +16,8 @@ export class Company implements ICompany {
         this._id = props.id;
         this._name = props.name;
         this._cif = props.cif;
+        this._max_users = props.max_users;
+        this._corporate_color = props.corporate_color;
         this._addresses = props.addresses;
         this._contacts = props.contacts;
         this._website = props.website;
@@ -36,6 +34,14 @@ export class Company implements ICompany {
 
     get cif(): string | undefined {
         return this._cif;
+    }
+
+    get max_users(): number | undefined {
+        return this._max_users;
+    }
+
+    get corporate_color(): string | undefined {
+        return this._corporate_color;
     }
 
     get addresses(): Address[] | undefined {
@@ -59,7 +65,13 @@ export class Company implements ICompany {
         return this._addresses?.[0]?.street; // Approximate mapping
     }
 
-    static update(id: number, data: UpdateCompanyType) {
+    static update(id: number, data: UpdateCompanyDTO) {
+        if (!id) {
+            throw new Error("No se proporciono un id");
+        }
+        if (!data) {
+            throw new Error("No se proporciono datos");
+        }
         return new Company({
             id: id,
             name: data.name,
@@ -73,6 +85,8 @@ export class Company implements ICompany {
             id: this._id,
             name: this._name,
             cif: this._cif,
+            max_users: this._max_users,
+            corporate_color: this._corporate_color,
             addresses: this._addresses,
             contacts: this._contacts,
             website: this._website,
