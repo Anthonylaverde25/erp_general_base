@@ -8,10 +8,12 @@ import { useDropzone } from 'react-dropzone';
 import { useFormContext } from 'react-hook-form';
 import { CompanySettingsForm } from '../pages/SettingPage';
 import useActiveCompany from '@/features/companies/useActiveCompany';
+import useUpdateCompany from '@/features/companies/hooks/useUpdateCompany';
 
 export default function ProfileCompany() {
     const { register, setValue, watch, reset, formState: { isSubmitting } } = useFormContext<CompanySettingsForm>();
     const activeCompany = useActiveCompany();
+    const { mutateAsync: updateCompany, isPending } = useUpdateCompany();
     const [isEditing, setIsEditing] = React.useState(false);
 
 
@@ -86,6 +88,7 @@ export default function ProfileCompany() {
         if (activeCompany) {
             reset({
                 name: activeCompany.name || "",
+                cif: activeCompany.cif || "",
                 website: activeCompany.website || "",
                 design_type: "standard",
                 logo: null,
@@ -95,9 +98,30 @@ export default function ProfileCompany() {
     };
 
     const handleSave = async () => {
-        // TODO: Implement API call to save profile data
-        console.log("Saving profile...");
-        setIsEditing(false);
+        try {
+            if (!activeCompany?.id) {
+                console.error("No active company");
+                return;
+            }
+
+            // Get current form values for profile fields
+            const formData = {
+                name: watch("name"),
+                cif: watch("cif"),
+            };
+
+            console.log("Profile data to save:", formData);
+
+            // Call update company mutation
+            await updateCompany({
+                id: activeCompany.id,
+                data: formData,
+            });
+
+            setIsEditing(false);
+        } catch (error) {
+            console.error("Error saving profile:", error);
+        }
     };
 
     return (
@@ -169,6 +193,23 @@ export default function ProfileCompany() {
                         </Typography>
                         <TextField
                             {...register("name")}
+                            fullWidth
+                            size="small"
+                            sx={{ mt: 1 }}
+                            disabled={!isEditing}
+                        />
+                    </Box>
+
+                    <Box>
+                        <Typography
+                            variant="caption"
+                            sx={{ fontWeight: 700, color: "text.secondary" }}
+                        >
+                            CIF / NIF
+                        </Typography>
+                        <TextField
+                            {...register("cif")}
+                            placeholder="Ej: A12345678"
                             fullWidth
                             size="small"
                             sx={{ mt: 1 }}

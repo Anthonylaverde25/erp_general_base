@@ -34,6 +34,7 @@ const contactSchema = z.object({
 
 const companySettingsSchema = z.object({
     name: z.string().min(1, "El nombre es requerido"),
+    cif: z.string().optional(),
     website: z.string().url("URL inválida").optional().or(z.literal("")),
     logo: z.custom<File>((v) => v instanceof File).nullable().optional(),
     favicon: z.custom<File>((v) => v instanceof File).nullable().optional(),
@@ -56,6 +57,7 @@ export default function SettingPage() {
         resolver: zodResolver(companySettingsSchema),
         defaultValues: {
             name: "",
+            cif: "",
             website: "",
             design_type: "standard",
             logo: null,
@@ -75,6 +77,7 @@ export default function SettingPage() {
         if (activeCompany?.id) {
             reset({
                 name: activeCompany.name || "",
+                cif: activeCompany.cif || "",
                 website: activeCompany.website || "",
                 design_type: "standard",
                 logo: null,

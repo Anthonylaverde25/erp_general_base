@@ -30,4 +30,5 @@ export const TYPES = {
   IndexCompanyUseCase: Symbol.for("IndexCompanyUseCase"),
   ShowCompanyUseCase: Symbol.for("ShowCompanyUseCase"),
   ChangeCompanyUseCase: Symbol.for("ChangeCompanyUseCase"),
+  UpdateCompanyUseCase: Symbol.for("UpdateCompanyUseCase"),
 };

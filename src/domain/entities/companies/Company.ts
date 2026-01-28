@@ -1,5 +1,12 @@
 import { Company as ICompany, Address, Contact } from '@/types/company.types';
 
+
+export interface UpdateCompanyType {
+    name?: string;
+    cif?: string;
+
+}
+
 export class Company implements ICompany {
     private _id: number;
     private _name: string;
@@ -50,6 +57,15 @@ export class Company implements ICompany {
     // Legacy getters if needed for compatibility, returning first element or undefined
     get address(): string | undefined {
         return this._addresses?.[0]?.street; // Approximate mapping
+    }
+
+    static update(id: number, data: UpdateCompanyType) {
+        return new Company({
+            id: id,
+            name: data.name,
+            cif: data.cif,
+
+        });
     }
 
     toPlainObject(): ICompany {
