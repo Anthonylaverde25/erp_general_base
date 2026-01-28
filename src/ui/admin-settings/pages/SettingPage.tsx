@@ -11,8 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 import ProfileCompany from '../tabs/ProfileCompany';
-import AddressesTab from '../tabs/AddressesTab';
-import ContactsTab from '../tabs/ContactsTab';
+import LocationContactTab from '../tabs/LocationContactTab';
 import PreferencesTab from '../tabs/PreferencesTab';
 import DangerZoneTab from '../tabs/DangerZoneTab';
 import useActiveCompany from "@/features/companies/useActiveCompany";
@@ -70,7 +69,7 @@ export default function SettingPage() {
         },
     });
 
-    const { reset, handleSubmit, formState: { isSubmitting } } = methods;
+    const { reset } = methods;
 
     useEffect(() => {
         if (activeCompany?.id) {
@@ -102,57 +101,11 @@ export default function SettingPage() {
         }
     }, [activeCompany?.id, activeCompany, reset]);
 
-    const onSubmit = (data: CompanySettingsForm) => {
-        console.log("Form data valid. Preparing submission...", data);
-
-        const formData = new FormData();
-        formData.append("name", data.name);
-        formData.append("website", data.website || "");
-        formData.append("design_type", data.design_type);
-
-        if (data.logo) formData.append("logo", data.logo);
-        if (data.favicon) formData.append("favicon", data.favicon);
-
-        data.addresses.forEach((addr, index) => {
-            if (addr.id) formData.append(`addresses[${index}][id]`, String(addr.id));
-            formData.append(`addresses[${index}][street]`, addr.street);
-            formData.append(`addresses[${index}][city]`, addr.city);
-            formData.append(`addresses[${index}][state]`, addr.state);
-            formData.append(`addresses[${index}][postal_code]`, addr.postal_code);
-            formData.append(`addresses[${index}][country]`, addr.country);
-            formData.append(`addresses[${index}][default]`, addr.default ? "1" : "0");
-        });
-
-        data.contacts.forEach((contact, index) => {
-            if (contact.id) formData.append(`contacts[${index}][id]`, String(contact.id));
-            formData.append(`contacts[${index}][email]`, contact.email);
-            if (contact.phone) formData.append(`contacts[${index}][phone]`, contact.phone);
-        });
-
-        Object.keys(data.preferences || {}).forEach(key => {
-            // @ts-ignore
-            const value = data.preferences?.[key];
-            if (value) formData.append(`preferences[${key}]`, value);
-        });
-
-        // Debug output
-        console.log(" FormData entries:");
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-
-        // TODO: Call API endpoint
-    };
-
     return (
         <FormProvider {...methods}>
             <Box className='' sx={{ width: "100%" }}>
                 <Box
                     sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: 2,
                         mb: 3,
                         pb: 2.5,
                         borderBottom: 1,
@@ -172,11 +125,7 @@ export default function SettingPage() {
                         />
                         <Tab
                             icon={<FuseSvgIcon>heroicons:map-pin</FuseSvgIcon>}
-                            label="Direcciones"
-                        />
-                        <Tab
-                            icon={<FuseSvgIcon>heroicons:phone</FuseSvgIcon>}
-                            label="Contactos"
+                            label="Ubicación y Contacto"
                         />
                         <Tab
                             icon={<FuseSvgIcon>lucide:tune</FuseSvgIcon>}
@@ -187,28 +136,15 @@ export default function SettingPage() {
                             label="Danger"
                         />
                     </Tabs>
-
-                    <Button
-                        className="btn-primary"
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        startIcon={<FuseSvgIcon size={16}>heroicons-outline:check</FuseSvgIcon>}
-                        onClick={handleSubmit(onSubmit)}
-                        disabled={isSubmitting}
-                    >
-                        Guardar Configuración
-                    </Button>
                 </Box>
 
                 <Box>
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                         {/* Main content per tab */}
                         {tab === 0 && <ProfileCompany />}
-                        {tab === 1 && <AddressesTab />}
-                        {tab === 2 && <ContactsTab />}
-                        {tab === 3 && <PreferencesTab />}
-                        {tab === 4 && <DangerZoneTab />}
+                        {tab === 1 && <LocationContactTab />}
+                        {tab === 2 && <PreferencesTab />}
+                        {tab === 3 && <DangerZoneTab />}
                     </Box>
                 </Box>
             </Box>

@@ -57,7 +57,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
     borderTop: '1px solid rgba(0, 0, 0, .125)',
 }));
 
-export default function AddressesTab() {
+export default function AddressesTab({ isEditing }: { isEditing: boolean }) {
     const { control, formState: { errors } } = useFormContext<CompanySettingsForm>();
     const { fields, append, remove } = useFieldArray({
         control,
@@ -90,6 +90,7 @@ export default function AddressesTab() {
                         setExpanded(fields.length);
                     }}
                     size="small"
+                    disabled={!isEditing}
                 >
                     Agregar Dirección
                 </Button>
@@ -157,6 +158,7 @@ export default function AddressesTab() {
                                                 helperText={errors.addresses?.[index]?.street?.message}
                                                 fullWidth
                                                 variant="filled"
+                                                disabled={!isEditing}
                                             />
                                         )}
                                     />
@@ -174,6 +176,7 @@ export default function AddressesTab() {
                                                     helperText={errors.addresses?.[index]?.city?.message}
                                                     fullWidth
                                                     variant="filled"
+                                                    disabled={!isEditing}
                                                 />
                                             )}
                                         />
@@ -189,6 +192,7 @@ export default function AddressesTab() {
                                                     helperText={errors.addresses?.[index]?.state?.message}
                                                     fullWidth
                                                     variant="filled"
+                                                    disabled={!isEditing}
                                                 />
                                             )}
                                         />
@@ -207,6 +211,7 @@ export default function AddressesTab() {
                                                     helperText={errors.addresses?.[index]?.postal_code?.message}
                                                     fullWidth
                                                     variant="filled"
+                                                    disabled={!isEditing}
                                                 />
                                             )}
                                         />
@@ -222,6 +227,7 @@ export default function AddressesTab() {
                                                     helperText={errors.addresses?.[index]?.country?.message}
                                                     fullWidth
                                                     variant="filled"
+                                                    disabled={!isEditing}
                                                 />
                                             )}
                                         />
@@ -237,6 +243,7 @@ export default function AddressesTab() {
                                                         checked={field.value}
                                                         onChange={(e) => field.onChange(e.target.checked)}
                                                         color="primary"
+                                                        disabled={!isEditing}
                                                     />
                                                 }
                                                 label="Marcar como dirección principal"

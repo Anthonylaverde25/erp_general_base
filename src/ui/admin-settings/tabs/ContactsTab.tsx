@@ -54,7 +54,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
     borderTop: '1px solid rgba(0, 0, 0, .125)',
 }));
 
-export default function ContactsTab() {
+export default function ContactsTab({ isEditing }: { isEditing: boolean }) {
     const { control, formState: { errors } } = useFormContext<CompanySettingsForm>();
     const { fields, append, remove } = useFieldArray({
         control,
@@ -87,6 +87,7 @@ export default function ContactsTab() {
                         setExpanded(fields.length);
                     }}
                     size="small"
+                    disabled={!isEditing}
                 >
                     Agregar Contacto
                 </Button>
@@ -159,6 +160,7 @@ export default function ContactsTab() {
                                                     helperText={errors.contacts?.[index]?.email?.message}
                                                     fullWidth
                                                     variant="filled"
+                                                    disabled={!isEditing}
                                                 />
                                             )}
                                         />
@@ -175,6 +177,7 @@ export default function ContactsTab() {
                                                     helperText={errors.contacts?.[index]?.phone?.message}
                                                     fullWidth
                                                     variant="filled"
+                                                    disabled={!isEditing}
                                                 />
                                             )}
                                         />
