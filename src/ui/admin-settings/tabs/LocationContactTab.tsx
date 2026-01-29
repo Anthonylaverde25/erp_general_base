@@ -25,7 +25,9 @@ import { ArrowForwardIosSharp, Add, LocationOn, ContactPhone, Email, Phone } fro
 import { CompanySettingsForm } from '../pages/SettingPage';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import CreateAddressModal from '../../address/components/modals/CreateAddressModal';
+import UpdateAddressModal from '../../address/components/modals/UpdateAddressModal';
 import HeaderDefaultAddress from '@/ui/address/components/HeaderDefaultAddress';
+import HeaderDefaultContact from '../components/HeaderDefaultContact';
 
 // Styled Accordion Components
 const Accordion = styled((props: AccordionProps) => (
@@ -65,7 +67,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 }));
 
 export default function LocationContactTab() {
-    const { control, formState: { errors } } = useFormContext<CompanySettingsForm>();
+    const { control, formState: { errors }, getValues } = useFormContext<CompanySettingsForm>();
 
     const { fields: addressFields, append: appendAddress } = useFieldArray({
         control,
@@ -88,14 +90,24 @@ export default function LocationContactTab() {
             });
     }, [addressFields]);
 
-    const [expandedAddress, setExpandedAddress] = React.useState<number | false>(0);
+    const [expandedAddress, setExpandedAddress] = React.useState<number | false>(false);
 
-    const [expandedContact, setExpandedContact] = React.useState<number | false>(() => {
-        const defaultIndex = contactFields.findIndex(contact => (contact as any).default);
-        return defaultIndex !== -1 ? defaultIndex : 0;
-    });
+    const [expandedContact, setExpandedContact] = React.useState<number | false>(false);
 
     const [openAddressModal, setOpenAddressModal] = React.useState(false);
+    const [openUpdateAddressModal, setOpenUpdateAddressModal] = React.useState(false);
+    const [selectedAddressId, setSelectedAddressId] = React.useState<number | null>(null);
+
+    const handleEditAddress = (id: number) => {
+        console.log('Edit address ID', id);
+        setSelectedAddressId(id);
+        setOpenUpdateAddressModal(true);
+    };
+
+    const handleCloseUpdateModal = () => {
+        setOpenUpdateAddressModal(false);
+        setSelectedAddressId(null);
+    };
 
     const handleAddressChange = (panel: number) => (_event: React.SyntheticEvent, newExpanded: boolean) => {
         setExpandedAddress(newExpanded ? panel : false);
@@ -104,6 +116,8 @@ export default function LocationContactTab() {
     const handleContactChange = (panel: number) => (_event: React.SyntheticEvent, newExpanded: boolean) => {
         setExpandedContact(newExpanded ? panel : false);
     };
+
+    console.log('addressFields', addressFields);
 
     return (
         <Box>
@@ -130,7 +144,7 @@ export default function LocationContactTab() {
             </Stack>
 
             {addressFields.length > 0 ? (
-                <Box mb={4}>
+                <Box>
                     <div className='border p-4 mb-4'>
                         <HeaderDefaultAddress address={addressFields as any} />
                     </div>
@@ -164,8 +178,8 @@ export default function LocationContactTab() {
                                         size="small"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            // TODO: Open edit modal for address
-                                            console.log('Edit address', originalIndex);
+                                            const realId = getValues(`addresses.${originalIndex}.id`);
+                                            handleEditAddress(realId);
                                         }}
                                         sx={{ ml: 1 }}
                                     >
@@ -283,7 +297,6 @@ export default function LocationContactTab() {
                         borderColor: 'divider',
                         borderRadius: 2,
                         bgcolor: 'background.paper',
-                        mb: 4
                     }}
                 >
                     <LocationOn sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
@@ -322,6 +335,15 @@ export default function LocationContactTab() {
 
             {contactFields.length > 0 ? (
                 <Box>
+                    <div className='border p-4 mb-4'>
+                        <HeaderDefaultContact
+                            contacts={contactFields as any}
+                            onChangeContact={() => {
+                                appendContact({ email: '', phone: '' });
+                                setExpandedContact(contactFields.length);
+                            }}
+                        />
+                    </div>
                     {contactFields.map((field, index) => (
                         <Accordion
                             key={field.id}
@@ -442,6 +464,16 @@ export default function LocationContactTab() {
                     setTimeout(() => {
                         setExpandedAddress(addressFields.length); // length is updated in next render, but using current length works because we are appending 1 item
                     }, 0);
+                }}
+            />
+            <UpdateAddressModal
+                open={openUpdateAddressModal}
+                onClose={handleCloseUpdateModal}
+                addressId={selectedAddressId}
+                onSubmit={(data) => {
+                    console.log('Update address data:', data, 'for ID:', selectedAddressId);
+                    // Update logic to be implemented later
+                    handleCloseUpdateModal();
                 }}
             />
         </Box>

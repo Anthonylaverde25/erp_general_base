@@ -225,7 +225,7 @@ export default function ProfileCompany() {
                 </Box>
             </Box>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
 
                 {/* 1. SECTION: GENERAL & BRANDING */}
                 <Box sx={{

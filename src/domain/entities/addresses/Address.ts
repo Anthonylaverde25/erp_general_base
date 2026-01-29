@@ -44,6 +44,19 @@ export class AddressEntity implements Address {
         );
     }
 
+    static update(id: number, data: Partial<AddressEntity>): AddressEntity {
+        return new AddressEntity(
+            id,
+            data.street!,
+            data.city!,
+            data.state!,
+            data.postal_code!,
+            data.country!,
+            data.default_address!,
+            data.street_2
+        );
+    }
+
     toPlainObject(): Address {
         return {
             id: this.id,

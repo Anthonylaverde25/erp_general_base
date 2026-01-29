@@ -21,5 +21,5 @@ export const registerCompanyModule = (container: Container) => {
     container.bind<ShowCompanyUseCase>(TYPES.ShowCompanyUseCase).to(ShowCompanyUseCase);
     container.bind<ChangeCompanyUseCase>(TYPES.ChangeCompanyUseCase).to(ChangeCompanyUseCase);
     container.bind<UpdateCompanyUseCase>(TYPES.UpdateCompanyUseCase).to(UpdateCompanyUseCase);
-    container.bind<CreateAddressUseCase>(TYPES.CreateAddressUseCase).to(CreateAddressUseCase);
+    // container.bind<CreateAddressUseCase>(TYPES.CreateAddressUseCase).to(CreateAddressUseCase);
 };
