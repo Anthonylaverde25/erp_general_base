@@ -31,4 +31,5 @@ export const TYPES = {
   ShowCompanyUseCase: Symbol.for("ShowCompanyUseCase"),
   ChangeCompanyUseCase: Symbol.for("ChangeCompanyUseCase"),
   UpdateCompanyUseCase: Symbol.for("UpdateCompanyUseCase"),
+  CreateAddressUseCase: Symbol.for("CreateAddressUseCase"),
 };

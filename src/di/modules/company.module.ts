@@ -6,6 +6,7 @@ import { IndexCompanyUseCase } from '@/application/use_cases/company/IndexCompan
 import { ShowCompanyUseCase } from '@/application/use_cases/company/ShowCompanyUseCase';
 import { ChangeCompanyUseCase } from '@/application/use_cases/company/ChangeCompanyUseCase';
 import { UpdateCompanyUseCase } from '@/application/use_cases/company/UpdateCompanyUseCase';
+import { CreateAddressUseCase } from '@/application/use_cases/company/CreateAddressUseCase';
 
 import { ICompanyActionRepository } from '@/domain/entities/companies/repositories/company.interface.action';
 import { CompanyRepositoryAction } from '@/infrastructure/repositories/companies/company.repository.action';
@@ -20,4 +21,5 @@ export const registerCompanyModule = (container: Container) => {
     container.bind<ShowCompanyUseCase>(TYPES.ShowCompanyUseCase).to(ShowCompanyUseCase);
     container.bind<ChangeCompanyUseCase>(TYPES.ChangeCompanyUseCase).to(ChangeCompanyUseCase);
     container.bind<UpdateCompanyUseCase>(TYPES.UpdateCompanyUseCase).to(UpdateCompanyUseCase);
+    container.bind<CreateAddressUseCase>(TYPES.CreateAddressUseCase).to(CreateAddressUseCase);
 };

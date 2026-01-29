@@ -21,6 +21,7 @@ import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import { ArrowForwardIosSharp, Add, LocationOn, ContactPhone, Email, Phone } from '@mui/icons-material';
 import { CompanySettingsForm } from '../pages/SettingPage';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
+import CreateAddressModal from '../../address/components/modals/CreateAddressModal';
 
 // Styled Accordion Components
 const Accordion = styled((props: AccordionProps) => (
@@ -74,6 +75,7 @@ export default function LocationContactTab() {
 
     const [expandedAddress, setExpandedAddress] = React.useState<number | false>(0);
     const [expandedContact, setExpandedContact] = React.useState<number | false>(0);
+    const [openAddressModal, setOpenAddressModal] = React.useState(false);
 
     const handleAddressChange = (panel: number) => (_event: React.SyntheticEvent, newExpanded: boolean) => {
         setExpandedAddress(newExpanded ? panel : false);
@@ -101,14 +103,23 @@ export default function LocationContactTab() {
                     color="primary"
                     size="large"
                     startIcon={<Add />}
-                    onClick={() => {
-                        appendAddress({ street: '', city: '', state: '', postal_code: '', country: '', default: false });
-                        setExpandedAddress(addressFields.length);
-                    }}
+                    onClick={() => setOpenAddressModal(true)}
                 >
                     Agregar Dirección
                 </Button>
             </Stack>
+
+            <CreateAddressModal
+                open={openAddressModal}
+                onClose={() => setOpenAddressModal(false)}
+                onSubmit={(data) => {
+                    appendAddress(data);
+                    // Open the newly added address
+                    setTimeout(() => {
+                        setExpandedAddress(addressFields.length); // length is updated in next render, but using current length works because we are appending 1 item
+                    }, 0);
+                }}
+            />
 
             {addressFields.length > 0 ? (
                 <Box mb={4}>
