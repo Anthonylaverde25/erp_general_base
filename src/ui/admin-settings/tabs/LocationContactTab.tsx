@@ -10,7 +10,10 @@ import {
     Switch,
     Button,
     Divider,
-    IconButton
+    IconButton,
+    Chip,
+    Paper,
+    Grid
 } from '@mui/material';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionSummary, {
@@ -22,6 +25,7 @@ import { ArrowForwardIosSharp, Add, LocationOn, ContactPhone, Email, Phone } fro
 import { CompanySettingsForm } from '../pages/SettingPage';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import CreateAddressModal from '../../address/components/modals/CreateAddressModal';
+import HeaderDefaultAddress from '@/ui/address/components/HeaderDefaultAddress';
 
 // Styled Accordion Components
 const Accordion = styled((props: AccordionProps) => (
@@ -73,8 +77,24 @@ export default function LocationContactTab() {
         name: 'contacts'
     });
 
+    // Sort addresses for display: Default address first
+    const sortedAddressFields = React.useMemo(() => {
+        return addressFields.map((field, index) => ({ field, originalIndex: index }))
+            .sort((a, b) => {
+                const aDef = !!a.field.default;
+                const bDef = !!b.field.default;
+                if (aDef === bDef) return 0;
+                return aDef ? -1 : 1;
+            });
+    }, [addressFields]);
+
     const [expandedAddress, setExpandedAddress] = React.useState<number | false>(0);
-    const [expandedContact, setExpandedContact] = React.useState<number | false>(0);
+
+    const [expandedContact, setExpandedContact] = React.useState<number | false>(() => {
+        const defaultIndex = contactFields.findIndex(contact => (contact as any).default);
+        return defaultIndex !== -1 ? defaultIndex : 0;
+    });
+
     const [openAddressModal, setOpenAddressModal] = React.useState(false);
 
     const handleAddressChange = (panel: number) => (_event: React.SyntheticEvent, newExpanded: boolean) => {
@@ -109,21 +129,12 @@ export default function LocationContactTab() {
                 </Button>
             </Stack>
 
-            <CreateAddressModal
-                open={openAddressModal}
-                onClose={() => setOpenAddressModal(false)}
-                onSubmit={(data) => {
-                    appendAddress(data);
-                    // Open the newly added address
-                    setTimeout(() => {
-                        setExpandedAddress(addressFields.length); // length is updated in next render, but using current length works because we are appending 1 item
-                    }, 0);
-                }}
-            />
-
             {addressFields.length > 0 ? (
                 <Box mb={4}>
-                    {addressFields.map((field, index) => (
+                    <div className='border p-4 mb-4'>
+                        <HeaderDefaultAddress address={addressFields as any} />
+                    </div>
+                    {sortedAddressFields.map(({ field, originalIndex }, index) => (
                         <Accordion
                             key={field.id}
                             expanded={expandedAddress === index}
@@ -134,7 +145,7 @@ export default function LocationContactTab() {
                                     <LocationOn color="primary" fontSize="small" />
                                     <Box sx={{ flex: 1 }}>
                                         <Typography fontWeight={500}>
-                                            {field.street || `Dirección ${index + 1}`}
+                                            {field.street || `Dirección ${originalIndex + 1}`}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
                                             {[field.city, field.state, field.country]
@@ -142,27 +153,19 @@ export default function LocationContactTab() {
                                                 .join(', ') || 'Sin detalles'}
                                         </Typography>
                                     </Box>
-                                    {field.default && (
-                                        <Typography
-                                            variant="caption"
-                                            sx={{
-                                                bgcolor: 'primary.main',
-                                                color: 'primary.contrastText',
-                                                px: 1,
-                                                py: 0.5,
-                                                borderRadius: 1,
-                                                fontWeight: 600
-                                            }}
-                                        >
-                                            PRINCIPAL
-                                        </Typography>
-                                    )}
+                                    {
+                                        field.default && (
+                                            <Chip label="Dirección Principal" />
+                                        )
+                                    }
+
+
                                     <IconButton
                                         size="small"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             // TODO: Open edit modal for address
-                                            console.log('Edit address', index);
+                                            console.log('Edit address', originalIndex);
                                         }}
                                         sx={{ ml: 1 }}
                                     >
@@ -172,17 +175,18 @@ export default function LocationContactTab() {
                             </AccordionSummary>
 
                             <AccordionDetails>
+
                                 <Stack spacing={3}>
                                     <Controller
-                                        name={`addresses.${index}.street`}
+                                        name={`addresses.${originalIndex}.street`}
                                         control={control}
                                         render={({ field }) => (
                                             <TextField
                                                 {...field}
                                                 label="Calle y número"
                                                 placeholder="Ej: Av. Libertador 1234"
-                                                error={!!errors.addresses?.[index]?.street}
-                                                helperText={errors.addresses?.[index]?.street?.message}
+                                                error={!!errors.addresses?.[originalIndex]?.street}
+                                                helperText={errors.addresses?.[originalIndex]?.street?.message}
                                                 fullWidth
                                                 variant="filled"
                                                 InputProps={{ readOnly: true }}
@@ -192,15 +196,15 @@ export default function LocationContactTab() {
 
                                     <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
                                         <Controller
-                                            name={`addresses.${index}.city`}
+                                            name={`addresses.${originalIndex}.city`}
                                             control={control}
                                             render={({ field }) => (
                                                 <TextField
                                                     {...field}
                                                     label="Ciudad"
                                                     placeholder="Ciudad"
-                                                    error={!!errors.addresses?.[index]?.city}
-                                                    helperText={errors.addresses?.[index]?.city?.message}
+                                                    error={!!errors.addresses?.[originalIndex]?.city}
+                                                    helperText={errors.addresses?.[originalIndex]?.city?.message}
                                                     fullWidth
                                                     variant="filled"
                                                     InputProps={{ readOnly: true }}
@@ -208,15 +212,15 @@ export default function LocationContactTab() {
                                             )}
                                         />
                                         <Controller
-                                            name={`addresses.${index}.state`}
+                                            name={`addresses.${originalIndex}.state`}
                                             control={control}
                                             render={({ field }) => (
                                                 <TextField
                                                     {...field}
                                                     label="Provincia / Estado"
                                                     placeholder="Provincia"
-                                                    error={!!errors.addresses?.[index]?.state}
-                                                    helperText={errors.addresses?.[index]?.state?.message}
+                                                    error={!!errors.addresses?.[originalIndex]?.state}
+                                                    helperText={errors.addresses?.[originalIndex]?.state?.message}
                                                     fullWidth
                                                     variant="filled"
                                                     InputProps={{ readOnly: true }}
@@ -227,15 +231,15 @@ export default function LocationContactTab() {
 
                                     <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
                                         <Controller
-                                            name={`addresses.${index}.postal_code`}
+                                            name={`addresses.${originalIndex}.postal_code`}
                                             control={control}
                                             render={({ field }) => (
                                                 <TextField
                                                     {...field}
                                                     label="Código Postal"
                                                     placeholder="CP"
-                                                    error={!!errors.addresses?.[index]?.postal_code}
-                                                    helperText={errors.addresses?.[index]?.postal_code?.message}
+                                                    error={!!errors.addresses?.[originalIndex]?.postal_code}
+                                                    helperText={errors.addresses?.[originalIndex]?.postal_code?.message}
                                                     fullWidth
                                                     variant="filled"
                                                     InputProps={{ readOnly: true }}
@@ -243,15 +247,15 @@ export default function LocationContactTab() {
                                             )}
                                         />
                                         <Controller
-                                            name={`addresses.${index}.country`}
+                                            name={`addresses.${originalIndex}.country`}
                                             control={control}
                                             render={({ field }) => (
                                                 <TextField
                                                     {...field}
                                                     label="País"
                                                     placeholder="País"
-                                                    error={!!errors.addresses?.[index]?.country}
-                                                    helperText={errors.addresses?.[index]?.country?.message}
+                                                    error={!!errors.addresses?.[originalIndex]?.country}
+                                                    helperText={errors.addresses?.[originalIndex]?.country?.message}
                                                     fullWidth
                                                     variant="filled"
                                                     InputProps={{ readOnly: true }}
@@ -262,7 +266,7 @@ export default function LocationContactTab() {
 
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <Typography variant="body2" color="text.secondary">
-                                            Dirección {addressFields[index].default ? 'principal' : 'secundaria'}
+                                            Dirección {field.default ? 'principal' : 'secundaria'}
                                         </Typography>
                                     </Box>
                                 </Stack>
@@ -429,6 +433,17 @@ export default function LocationContactTab() {
                     </Typography>
                 </Box>
             )}
+            <CreateAddressModal
+                open={openAddressModal}
+                onClose={() => setOpenAddressModal(false)}
+                onSubmit={(data) => {
+                    appendAddress(data);
+                    // Open the newly added address
+                    setTimeout(() => {
+                        setExpandedAddress(addressFields.length); // length is updated in next render, but using current length works because we are appending 1 item
+                    }, 0);
+                }}
+            />
         </Box>
     );
 }

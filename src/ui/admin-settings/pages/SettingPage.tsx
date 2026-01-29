@@ -30,6 +30,7 @@ const contactSchema = z.object({
     id: z.number().optional(),
     email: z.string().email("Email inválido"),
     phone: z.string().optional(),
+    default: z.boolean().default(false),
 });
 
 const companySettingsSchema = z.object({

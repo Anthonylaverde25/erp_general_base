@@ -16,6 +16,7 @@ import * as z from 'zod';
 import AddressForm from '../forms/AddressForm';
 import { useCreateAddressToCompany } from '@/features/companies/hooks/useCreateAddressToCompany';
 import useActiveCompany from '@/features/companies/useActiveCompany';
+import { CreateAddressDTO } from '@/domain/entities/addresses/DTOs/CreateAddressDTO';
 
 const addressSchema = z.object({
     street: z.string().min(1, "La calle es requerida"),
@@ -53,7 +54,7 @@ export default function CreateAddressModal({ open, onClose, onSubmit }: CreateAd
 
     const { handleSubmit, reset } = methods;
 
-    const handleFormSubmit = async (data: AddressFormData) => {
+    const handleFormSubmit = async (data: CreateAddressDTO) => {
         if (!companyId) return;
 
         try {
