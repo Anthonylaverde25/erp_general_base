@@ -101,6 +101,7 @@ export default function SettingPage() {
                     id: contact.id,
                     email: contact.email || "",
                     phone: contact.phone || "",
+                    default: contact.default || false,
                 })) || [],
                 preferences: {
                     language: "Español",

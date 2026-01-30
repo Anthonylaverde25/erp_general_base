@@ -6,14 +6,10 @@ import {
     TextField,
     Stack,
     Typography,
-    FormControlLabel,
-    Switch,
     Button,
     Divider,
     IconButton,
     Chip,
-    Paper,
-    Grid
 } from '@mui/material';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionSummary, {
@@ -26,6 +22,8 @@ import { CompanySettingsForm } from '../pages/SettingPage';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import CreateAddressModal from '../../address/components/modals/CreateAddressModal';
 import UpdateAddressModal from '../../address/components/modals/UpdateAddressModal';
+import CreateContactModal from '../../contacts/components/modals/CreateContactModal';
+import UpdateContactModal from '../../contacts/components/modals/UpdateContactModal';
 import HeaderDefaultAddress from '@/ui/address/components/HeaderDefaultAddress';
 import HeaderDefaultContact from '../components/HeaderDefaultContact';
 
@@ -90,13 +88,32 @@ export default function LocationContactTab() {
             });
     }, [addressFields]);
 
-    const [expandedAddress, setExpandedAddress] = React.useState<number | false>(false);
+    // Sort contacts for display: Default contact first
+    const sortedContactFields = React.useMemo(() => {
+        return contactFields.map((field, index) => ({ field, originalIndex: index }))
+            .sort((a, b) => {
+                const aDef = !!a.field.default;
+                const bDef = !!b.field.default;
+                if (aDef === bDef) return 0;
+                return aDef ? -1 : 1;
+            });
+    }, [contactFields]);
 
+    const [expandedAddress, setExpandedAddress] = React.useState<number | false>(false);
     const [expandedContact, setExpandedContact] = React.useState<number | false>(false);
+
+    // ... (keep state) ...
 
     const [openAddressModal, setOpenAddressModal] = React.useState(false);
     const [openUpdateAddressModal, setOpenUpdateAddressModal] = React.useState(false);
     const [selectedAddressId, setSelectedAddressId] = React.useState<number | null>(null);
+
+    // Contact Modal State
+    const [openCreateContactModal, setOpenCreateContactModal] = React.useState(false);
+    const [openUpdateContactModal, setOpenUpdateContactModal] = React.useState(false);
+    const [selectedContactId, setSelectedContactId] = React.useState<number | null>(null);
+
+    // ... (keep handlers) ...
 
     const handleEditAddress = (id: number) => {
         console.log('Edit address ID', id);
@@ -109,6 +126,17 @@ export default function LocationContactTab() {
         setSelectedAddressId(null);
     };
 
+    const handleEditContact = (id: number) => {
+        console.log('Edit contact ID', id);
+        setSelectedContactId(id);
+        setOpenUpdateContactModal(true);
+    };
+
+    const handleCloseUpdateContactModal = () => {
+        setOpenUpdateContactModal(false);
+        setSelectedContactId(null);
+    };
+
     const handleAddressChange = (panel: number) => (_event: React.SyntheticEvent, newExpanded: boolean) => {
         setExpandedAddress(newExpanded ? panel : false);
     };
@@ -117,11 +145,11 @@ export default function LocationContactTab() {
         setExpandedContact(newExpanded ? panel : false);
     };
 
-    console.log('addressFields', addressFields);
-
     return (
         <Box>
             {/* Addresses Section */}
+
+
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
                 <Box>
                     <Typography variant="h6" fontWeight={600}>
@@ -145,7 +173,7 @@ export default function LocationContactTab() {
 
             {addressFields.length > 0 ? (
                 <Box>
-                    <div className='border p-4 mb-4'>
+                    <div className='mb-2'>
                         <HeaderDefaultAddress address={addressFields as any} />
                     </div>
                     {sortedAddressFields.map(({ field, originalIndex }, index) => (
@@ -154,6 +182,7 @@ export default function LocationContactTab() {
                             expanded={expandedAddress === index}
                             onChange={handleAddressChange(index)}
                         >
+                            {/* ... (keep address accordion content) ... */}
                             <AccordionSummary>
                                 <Stack direction="row" alignItems="center" spacing={2} sx={{ width: '100%', pr: 2 }}>
                                     <LocationOn color="primary" fontSize="small" />
@@ -324,10 +353,7 @@ export default function LocationContactTab() {
                     color="primary"
                     size="large"
                     startIcon={<Add />}
-                    onClick={() => {
-                        appendContact({ email: '', phone: '' });
-                        setExpandedContact(contactFields.length);
-                    }}
+                    onClick={() => setOpenCreateContactModal(true)}
                 >
                     Agregar Contacto
                 </Button>
@@ -335,16 +361,15 @@ export default function LocationContactTab() {
 
             {contactFields.length > 0 ? (
                 <Box>
-                    <div className='border p-4 mb-4'>
+                    <div className='mb-2'>
                         <HeaderDefaultContact
                             contacts={contactFields as any}
                             onChangeContact={() => {
-                                appendContact({ email: '', phone: '' });
-                                setExpandedContact(contactFields.length);
+                                setOpenCreateContactModal(true);
                             }}
                         />
                     </div>
-                    {contactFields.map((field, index) => (
+                    {sortedContactFields.map(({ field, originalIndex }, index) => (
                         <Accordion
                             key={field.id}
                             expanded={expandedContact === index}
@@ -355,7 +380,7 @@ export default function LocationContactTab() {
                                     <ContactPhone color="primary" fontSize="small" />
                                     <Box sx={{ flex: 1 }}>
                                         <Typography fontWeight={500}>
-                                            {field.email || field.phone || `Contacto ${index + 1}`}
+                                            {field.email || field.phone || `Contacto ${originalIndex + 1}`}
                                         </Typography>
                                         <Stack direction="row" spacing={2} alignItems="center">
                                             {field.email && (
@@ -381,12 +406,17 @@ export default function LocationContactTab() {
                                             )}
                                         </Stack>
                                     </Box>
+                                    {
+                                        field.default && (
+                                            <Chip label="Contacto Principal" />
+                                        )
+                                    }
                                     <IconButton
                                         size="small"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            // TODO: Open edit modal for contact
-                                            console.log('Edit contact', index);
+                                            const realId = getValues(`contacts.${originalIndex}.id`);
+                                            handleEditContact(realId);
                                         }}
                                         sx={{ ml: 1 }}
                                     >
@@ -399,7 +429,7 @@ export default function LocationContactTab() {
                                 <Stack spacing={3}>
                                     <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
                                         <Controller
-                                            name={`contacts.${index}.email`}
+                                            name={`contacts.${originalIndex}.email`}
                                             control={control}
                                             render={({ field }) => (
                                                 <TextField
@@ -407,8 +437,8 @@ export default function LocationContactTab() {
                                                     label="Correo Electrónico"
                                                     placeholder="contacto@empresa.com"
                                                     type="email"
-                                                    error={!!errors.contacts?.[index]?.email}
-                                                    helperText={errors.contacts?.[index]?.email?.message}
+                                                    error={!!errors.contacts?.[originalIndex]?.email}
+                                                    helperText={errors.contacts?.[originalIndex]?.email?.message}
                                                     fullWidth
                                                     variant="filled"
                                                     InputProps={{ readOnly: true }}
@@ -416,7 +446,7 @@ export default function LocationContactTab() {
                                             )}
                                         />
                                         <Controller
-                                            name={`contacts.${index}.phone`}
+                                            name={`contacts.${originalIndex}.phone`}
                                             control={control}
                                             render={({ field }) => (
                                                 <TextField
@@ -424,8 +454,8 @@ export default function LocationContactTab() {
                                                     label="Teléfono"
                                                     placeholder="+54 11 1234-5678"
                                                     type="tel"
-                                                    error={!!errors.contacts?.[index]?.phone}
-                                                    helperText={errors.contacts?.[index]?.phone?.message}
+                                                    error={!!errors.contacts?.[originalIndex]?.phone}
+                                                    helperText={errors.contacts?.[originalIndex]?.phone?.message}
                                                     fullWidth
                                                     variant="filled"
                                                     InputProps={{ readOnly: true }}
@@ -455,14 +485,15 @@ export default function LocationContactTab() {
                     </Typography>
                 </Box>
             )}
+
+            {/* ADDRESS MODALS */}
             <CreateAddressModal
                 open={openAddressModal}
                 onClose={() => setOpenAddressModal(false)}
                 onSubmit={(data) => {
                     appendAddress(data);
-                    // Open the newly added address
                     setTimeout(() => {
-                        setExpandedAddress(addressFields.length); // length is updated in next render, but using current length works because we are appending 1 item
+                        setExpandedAddress(addressFields.length);
                     }, 0);
                 }}
             />
@@ -471,9 +502,27 @@ export default function LocationContactTab() {
                 onClose={handleCloseUpdateModal}
                 addressId={selectedAddressId}
                 onSubmit={(data) => {
-                    console.log('Update address data:', data, 'for ID:', selectedAddressId);
-                    // Update logic to be implemented later
                     handleCloseUpdateModal();
+                }}
+            />
+
+            {/* CONTACT MODALS */}
+            <CreateContactModal
+                open={openCreateContactModal}
+                onClose={() => setOpenCreateContactModal(false)}
+                onSubmit={(data) => {
+                    appendContact(data);
+                    setTimeout(() => {
+                        setExpandedContact(contactFields.length);
+                    }, 0);
+                }}
+            />
+            <UpdateContactModal
+                open={openUpdateContactModal}
+                onClose={handleCloseUpdateContactModal}
+                contactId={selectedContactId}
+                onSubmit={(data) => {
+                    handleCloseUpdateContactModal();
                 }}
             />
         </Box>

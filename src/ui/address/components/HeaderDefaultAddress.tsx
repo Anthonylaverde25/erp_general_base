@@ -6,6 +6,7 @@ import {
     Button
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
+import { LocationOn, Map as MapIcon } from "@mui/icons-material";
 
 type Props = {
     address: Address[];
@@ -15,7 +16,35 @@ type Props = {
 export default function HeaderDefaultAddress({ address, onChangeAddress }: Props) {
     const defaultAddress = address.find((addr) => addr.default);
 
-    if (!defaultAddress) return null;
+    if (!defaultAddress) {
+        return (
+            <Stack
+                direction="row"
+                alignItems="center"
+                spacing={2}
+                sx={{
+                    p: 2,
+                    borderRadius: 1,
+                    border: 1,
+                    borderColor: 'divider',
+                    borderLeftWidth: 4,
+                    borderLeftColor: 'warning.main',
+                    bgcolor: 'background.paper',
+                    boxShadow: 0
+                }}
+            >
+                <FuseSvgIcon size={24} color="warning">heroicons-outline:exclamation-triangle</FuseSvgIcon>
+                <Box>
+                    <Typography variant="subtitle2" fontWeight={600} color="text.primary">
+                        Atención
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Es necesario establecer una dirección por defecto para ser usada para facturación.
+                    </Typography>
+                </Box>
+            </Stack>
+        );
+    }
 
     const { street, street_2, city, state, postal_code, country } = defaultAddress;
 
@@ -25,59 +54,69 @@ export default function HeaderDefaultAddress({ address, onChangeAddress }: Props
             alignItems="stretch"
             justifyContent="space-between"
             spacing={2}
+            sx={{
+                p: 2,
+                borderRadius: 1,
+                border: 1,
+                borderColor: 'divider',
+                borderLeftWidth: 4,
+                borderLeftColor: 'primary.main', // Color primario para indicar "Default/Active"
+                bgcolor: (theme) => theme.palette.mode === 'light' ? 'grey.50' : 'background.default',
+            }}
         >
             {/* Bloque dirección */}
             <Stack spacing={0.5}>
-                {/* Etiqueta */}
-                <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    fontWeight={600}
-                    sx={{ textTransform: "uppercase", letterSpacing: 0.5 }}
-                >
-                    Dirección fiscal
-                </Typography>
+
 
                 {/* Línea principal */}
-                <Typography variant="body1" fontWeight={500} lineHeight={1.4}>
-                    {street}
-                </Typography>
-
-                {street_2 && (
-                    <Typography variant="body2" color="text.secondary" lineHeight={1.4}>
-                        {street_2}
-                    </Typography>
-                )}
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <LocationOn sx={{ fontSize: 18, color: 'text.secondary' }} />
+                    <Box>
+                        <Typography variant="body1" fontWeight={600} lineHeight={1.4}>
+                            {street}
+                        </Typography>
+                        {street_2 && (
+                            <Typography variant="body2" color="text.secondary" lineHeight={1.4}>
+                                {street_2}
+                            </Typography>
+                        )}
+                    </Box>
+                </Stack>
 
                 {/* Metadatos */}
-                <Stack direction="row" spacing={1} flexWrap="wrap">
-                    <Typography variant="body2" color="text.secondary">
-                        {city}, {state}
-                    </Typography>
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
+                    <MapIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                    <Stack direction="row" spacing={1} flexWrap="wrap">
+                        <Typography variant="body2" color="text.secondary">
+                            {city}, {state}
+                        </Typography>
 
-                    <Typography variant="body2" color="text.secondary">
-                        • CP {postal_code}
-                    </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            • CP {postal_code}
+                        </Typography>
 
-                    <Typography variant="body2" color="text.secondary">
-                        {country}
-                    </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            • {country}
+                        </Typography>
+                    </Stack>
                 </Stack>
             </Stack>
 
             {/* Acción */}
             <Button
-                variant="text"
+                variant="outlined"
                 size="small"
+                color="inherit"
                 startIcon={
                     <FuseSvgIcon size={16}>
-                        heroicons-outline:arrow-path
+                        heroicons-outline:pencil
                     </FuseSvgIcon>
                 }
                 onClick={onChangeAddress}
                 sx={{
                     alignSelf: { xs: "flex-start", sm: "center" },
-                    whiteSpace: "nowrap"
+                    whiteSpace: "nowrap",
+                    borderColor: 'divider'
                 }}
             >
                 Cambiar

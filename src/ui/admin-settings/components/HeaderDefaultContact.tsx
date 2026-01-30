@@ -2,7 +2,8 @@ import { Contact } from "@/types/company.types";
 import {
     Stack,
     Typography,
-    Button
+    Button,
+    Box
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import { Email, Phone } from "@mui/icons-material";
@@ -14,9 +15,37 @@ type Props = {
 
 export default function HeaderDefaultContact({ contacts, onChangeContact }: Props) {
     // Tomamos el primer contacto como "Default" o "Principal" de manera estática
-    const defaultContact = contacts[0];
+    const defaultContact = contacts.find((c) => c.default);
 
-    if (!defaultContact) return null;
+    if (!defaultContact) {
+        return (
+            <Stack
+                direction="row"
+                alignItems="center"
+                spacing={2}
+                sx={{
+                    p: 2,
+                    borderRadius: 1,
+                    border: 1,
+                    borderColor: 'divider',
+                    borderLeftWidth: 4,
+                    borderLeftColor: 'warning.main',
+                    bgcolor: 'background.paper',
+                    boxShadow: 0
+                }}
+            >
+                <FuseSvgIcon size={24} color="warning">heroicons-outline:exclamation-triangle</FuseSvgIcon>
+                <Box>
+                    <Typography variant="subtitle2" fontWeight={600} color="text.primary">
+                        Atención
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Es necesario establecer un contacto por defecto.
+                    </Typography>
+                </Box>
+            </Stack>
+        );
+    }
 
     const { email, phone } = defaultContact;
 
@@ -26,25 +55,26 @@ export default function HeaderDefaultContact({ contacts, onChangeContact }: Prop
             alignItems="stretch"
             justifyContent="space-between"
             spacing={2}
+            sx={{
+                p: 2,
+                borderRadius: 1,
+                border: 1,
+                borderColor: 'divider',
+                borderLeftWidth: 4,
+                borderLeftColor: 'primary.main',
+                bgcolor: (theme) => theme.palette.mode === 'light' ? 'grey.50' : 'background.default',
+            }}
         >
             {/* Bloque contacto */}
             <Stack spacing={0.5}>
-                {/* Etiqueta */}
-                <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    fontWeight={600}
-                    sx={{ textTransform: "uppercase", letterSpacing: 0.5 }}
-                >
-                    Contacto Principal
-                </Typography>
+
 
                 {/* Info Principal */}
-                <Stack spacing={0.5}>
+                <Stack spacing={0.5} sx={{ mt: 1 }}>
                     {email && (
                         <Stack direction="row" spacing={1} alignItems="center">
                             <Email sx={{ fontSize: 16, color: 'text.secondary' }} />
-                            <Typography variant="body1" fontWeight={500} lineHeight={1.4}>
+                            <Typography variant="body1" fontWeight={600} lineHeight={1.4}>
                                 {email}
                             </Typography>
                         </Stack>
@@ -65,20 +95,22 @@ export default function HeaderDefaultContact({ contacts, onChangeContact }: Prop
             {/* Acción - Opcional, similar a HeaderDefaultAddress */}
             {onChangeContact && (
                 <Button
-                    variant="text"
+                    variant="outlined"
                     size="small"
+                    color="inherit"
                     startIcon={
                         <FuseSvgIcon size={16}>
-                            heroicons-outline:plus
+                            heroicons-outline:pencil
                         </FuseSvgIcon>
                     }
                     onClick={onChangeContact}
                     sx={{
                         alignSelf: { xs: "flex-start", sm: "center" },
-                        whiteSpace: "nowrap"
+                        whiteSpace: "nowrap",
+                        borderColor: 'divider'
                     }}
                 >
-                    Agregar
+                    Cambiar
                 </Button>
             )}
         </Stack>

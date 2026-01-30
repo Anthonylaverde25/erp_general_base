@@ -38,4 +38,11 @@ export const TYPES = {
   ShowAddressUseCase: Symbol.for("ShowAddressUseCase"),
   UpdateAddressUseCase: Symbol.for("UpdateAddressUseCase"),
   DeleteAddressUseCase: Symbol.for("DeleteAddressUseCase"),
+
+  // Contacts
+  IContactRepository: Symbol.for("IContactRepository"),
+  ShowContactUseCase: Symbol.for("ShowContactUseCase"),
+  UpdateContactUseCase: Symbol.for("UpdateContactUseCase"),
+  CreateContactUseCase: Symbol.for("CreateContactUseCase"),
+  DeleteContactUseCase: Symbol.for("DeleteContactUseCase"),
 };

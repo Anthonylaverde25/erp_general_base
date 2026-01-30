@@ -13,6 +13,7 @@ export interface Contact {
     id?: number;
     email: string;
     phone?: string;
+    default?: boolean;
 }
 
 export interface Company {
