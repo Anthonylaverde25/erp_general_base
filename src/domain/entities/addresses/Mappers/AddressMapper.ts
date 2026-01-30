@@ -16,14 +16,12 @@ export class AddressMapper {
         return new AddressEntity(
             dto.id,
             dto.street,
-            dto.street_2,
             dto.city,
             dto.state,
             dto.postal_code,
             dto.country,
-            dto.default
-
-
+            dto.default,
+            dto.street_2
         );
     }
 

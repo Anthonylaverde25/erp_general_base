@@ -19,6 +19,9 @@ export default function useUpdateAddress() {
         onSuccess: ({ message }, { id }) => {
             queryClient.invalidateQueries({ queryKey: ["addresses"] });
             queryClient.invalidateQueries({ queryKey: ["addresses", id] });
+            queryClient.invalidateQueries({ queryKey: ["companies"] });
+            queryClient.invalidateQueries({ queryKey: ["activeCompany"] });
+
             enqueueSnackbar(message || "Dirección actualizada exitosamente", { variant: "success" });
         },
         onError: (error: any) => {

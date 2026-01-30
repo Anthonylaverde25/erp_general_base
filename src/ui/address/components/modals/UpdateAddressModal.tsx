@@ -64,8 +64,8 @@ export default function UpdateAddressModal({ open, onClose, onSubmit, addressId 
                 state: data.state,
                 postal_code: data.postal_code,
                 country: data.country,
-                default: data.default,
-                // Add id if entity requires it strictly, but partial usually omits
+                default_address: data.default,
+                street_2: null // Form doesn't have street_2 yet, setting to null or undefined is safe if entity allows optional
             };
 
             await handleUpdateAddress(addressId, updateData);
