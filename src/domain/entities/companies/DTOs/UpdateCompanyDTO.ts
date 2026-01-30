@@ -3,7 +3,7 @@ export interface UpdateCompanyDTO {
     name?: string;
     cif?: string;
     website?: string;
-    corporate_color?: string;
+    brandColor?: string;
     design_type?: string;
     max_users?: number;
     logo?: File | string | null;

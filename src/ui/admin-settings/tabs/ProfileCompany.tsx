@@ -124,7 +124,7 @@ export default function ProfileCompany() {
                 name: activeCompany.name || "",
                 cif: activeCompany.cif || "",
                 website: activeCompany.website || "",
-                corporate_color: activeCompany.corporate_color || "#1976d2",
+                brandColor: activeCompany.brandColor || "#1976d2",
                 design_type: "standard",
                 logo: null,
                 favicon: null,
@@ -144,7 +144,7 @@ export default function ProfileCompany() {
                 name: watch("name"),
                 cif: watch("cif"),
                 website: watch("website"),
-                corporate_color: watch("corporate_color"),
+                brandColor: watch("brandColor"),
                 design_type: watch("design_type"),
                 logo: watch("logo"), // File or null
                 favicon: watch("favicon"), // File or null
@@ -298,7 +298,7 @@ export default function ProfileCompany() {
                                             width: 48,
                                             height: 48,
                                             borderRadius: 1,
-                                            bgcolor: watch('corporate_color') || "#1976d2",
+                                            bgcolor: watch('brandColor') || "#1976d2",
                                             border: '1px solid',
                                             borderColor: 'divider',
                                             boxShadow: 1
@@ -306,7 +306,7 @@ export default function ProfileCompany() {
                                     />
                                     <Box sx={{ flex: 1, maxWidth: 200 }}>
                                         <TextField
-                                            {...register("corporate_color")}
+                                            {...register("brandColor")}
                                             type="color"
                                             fullWidth
                                             size="small"

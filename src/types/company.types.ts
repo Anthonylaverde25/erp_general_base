@@ -21,7 +21,7 @@ export interface Company {
     name: string;
     cif?: string; // Added field from payload
     max_users?: number; // Maximum number of users allowed for this company
-    corporate_color?: string; // Corporate brand color
+    brandColor?: string; // Corporate brand color
     addresses?: Address[]; // Changed from address string to Address array
     contacts?: Contact[]; // Added contacts array
     website?: string;

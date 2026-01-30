@@ -25,37 +25,40 @@ export class CompanyRepositoryCrud implements ICompanyCrudRepository {
         // Check if data contains files
         const hasFiles = (data.logo instanceof File) || (data.favicon instanceof File);
 
+        // Prepare payload with snake_case mapping
+        const payload: any = { ...data };
+        if (data.brandColor) {
+            payload.brand_color = data.brandColor;
+            delete payload.brandColor;
+        }
+
         let response;
 
         if (hasFiles) {
             const formData = new FormData();
             formData.append('_method', 'PUT');
 
-            Object.entries(data).forEach(([key, value]) => {
+            Object.entries(payload).forEach(([key, value]) => {
                 if (value !== undefined && value !== null) {
                     if (key === 'logo' || key === 'favicon') {
                         if (value instanceof File) {
                             formData.append(key, value);
                         }
-                        // If it's a string (URL) or null and we want to remove, handle accordingly?
-                        // Usually if we want to remove, we might send null. 
-                        // But FormData string "null" is weird. 
-                        // Let's assume File means upload.
                     } else {
                         formData.append(key, String(value));
                     }
                 }
             });
 
-            // Handling explicit nulls for removal if needed, but for now assuming File upload focus
-            if (data.logo === null) formData.append('logo', ''); // Trigger removal if backend supports empty string as null
+            // Handling explicit nulls
+            if (data.logo === null) formData.append('logo', '');
             if (data.favicon === null) formData.append('favicon', '');
 
             response = await axiosInstance.post(`/companies/${id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
         } else {
-            response = await axiosInstance.put(`/companies/${id}`, data);
+            response = await axiosInstance.put(`/companies/${id}`, payload);
         }
 
         const { company, message } = response.data;

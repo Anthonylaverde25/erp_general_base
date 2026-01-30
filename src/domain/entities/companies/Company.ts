@@ -6,7 +6,7 @@ export class Company implements ICompany {
     private _name: string;
     private _cif?: string;
     private _max_users?: number;
-    private _corporate_color?: string;
+    private _brandColor?: string;
     private _addresses?: Address[];
     private _contacts?: Contact[];
     private _website?: string;
@@ -17,7 +17,7 @@ export class Company implements ICompany {
         this._name = props.name;
         this._cif = props.cif;
         this._max_users = props.max_users;
-        this._corporate_color = props.corporate_color;
+        this._brandColor = props.brandColor;
         this._addresses = props.addresses;
         this._contacts = props.contacts;
         this._website = props.website;
@@ -40,8 +40,8 @@ export class Company implements ICompany {
         return this._max_users;
     }
 
-    get corporate_color(): string | undefined {
-        return this._corporate_color;
+    get brandColor(): string | undefined {
+        return this._brandColor;
     }
 
     get addresses(): Address[] | undefined {
@@ -86,7 +86,7 @@ export class Company implements ICompany {
             name: this._name,
             cif: this._cif,
             max_users: this._max_users,
-            corporate_color: this._corporate_color,
+            brandColor: this._brandColor,
             addresses: this._addresses,
             contacts: this._contacts,
             website: this._website,
