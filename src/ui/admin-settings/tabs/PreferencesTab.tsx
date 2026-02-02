@@ -7,6 +7,7 @@ import { CompanySettingsForm } from '../pages/SettingPage';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import InvoiceTemplateSelector from '../components/InvoiceTemplateSelector';
 
 export default function PreferencesTab() {
     const { register, watch, setValue, reset, formState: { isSubmitting } } = useFormContext<CompanySettingsForm>();
@@ -134,129 +135,7 @@ export default function PreferencesTab() {
 
                 {/* Invoice Template Section */}
                 <Box sx={{ mt: 2 }}>
-                    <Typography
-                        variant="subtitle2"
-                        sx={{
-                            fontWeight: 700,
-                            color: "text.primary",
-                            mb: 1.5,
-                            display: "block",
-                            fontSize: "0.95rem",
-                        }}
-                    >
-                        Plantilla de Factura
-                    </Typography>
-                    <Typography
-                        variant="caption"
-                        sx={{
-                            display: "block",
-                            color: "text.secondary",
-                            mb: 2,
-                            fontSize: "0.85rem",
-                        }}
-                    >
-                        Selecciona el diseño para tus documentos de facturación
-                    </Typography>
-                    <Box
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: "repeat(3, 1fr)",
-                            gap: 2,
-                        }}
-                    >
-                        {[
-                            {
-                                id: "standard",
-                                label: "Estándar",
-                                description: "Diseño clásico y profesional",
-                                icon: "lucide:file-text",
-                            },
-                            {
-                                id: "minimal",
-                                label: "Minimalista",
-                                description: "Limpio y moderno",
-                                icon: "lucide:layout-template",
-                            },
-                            {
-                                id: "large",
-                                label: "Logo Grande",
-                                description: "Con logo destacado",
-                                icon: "lucide:image",
-                            },
-                        ].map((design) => (
-                            <Box
-                                key={design.id}
-                                onClick={() => setValue("design_type", design.id, { shouldDirty: true })}
-                                sx={{
-                                    p: 2.5,
-                                    border: "2px solid",
-                                    borderColor:
-                                        designType === design.id
-                                            ? "primary.main"
-                                            : "divider",
-                                    bgcolor: "background.paper",
-                                    cursor: "pointer",
-                                    opacity: 1,
-                                    transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-                                    fontWeight: designType === design.id ? 700 : 500,
-                                    textAlign: "center",
-                                    borderRadius: 1.5,
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                    gap: 1.2,
-                                    "&:hover": {
-                                        borderColor: "primary.main",
-                                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.08)",
-                                        transform: "translateY(-2px)",
-                                    },
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        width: 56,
-                                        height: 56,
-                                        borderRadius: 1.25,
-                                        bgcolor: "action.selected",
-                                    }}
-                                >
-                                    <FuseSvgIcon
-                                        sx={{
-                                            fontSize: 32,
-                                            color: "primary.main",
-                                        }}
-                                    >
-                                        {design.icon}
-                                    </FuseSvgIcon>
-                                </Box>
-                                <Box>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{
-                                            fontWeight: designType === design.id ? 700 : 600,
-                                            color: "text.primary",
-                                        }}
-                                    >
-                                        {design.label}
-                                    </Typography>
-                                    <Typography
-                                        variant="caption"
-                                        sx={{
-                                            display: "block",
-                                            color: "text.secondary",
-                                            mt: 0.5,
-                                            fontSize: "0.75rem",
-                                        }}
-                                    >
-                                        {design.description}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        ))}
-                    </Box>
+                    <InvoiceTemplateSelector />
                 </Box>
             </Box>
         </Box>

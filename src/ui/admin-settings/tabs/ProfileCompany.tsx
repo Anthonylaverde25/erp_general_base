@@ -12,12 +12,63 @@ import useActiveCompany from '@/features/companies/useActiveCompany';
 import useUpdateCompany from '@/features/companies/hooks/useUpdateCompany';
 
 import LocationContactTab from './LocationContactTab';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import SectionHeader from '../components/SectionHeader';
+import InvoiceTemplateSelector from '../components/InvoiceTemplateSelector';
 
 export default function ProfileCompany() {
     const { register, setValue, watch, reset, formState: { isSubmitting, isDirty } } = useFormContext<CompanySettingsForm>();
     const activeCompany = useActiveCompany();
     const { mutateAsync: updateCompany, isPending } = useUpdateCompany();
-    const [isEditing, setIsEditing] = React.useState(false);
+
+
+    // Modal State
+    const [openModal, setOpenModal] = useState(false);
+    const [modalData, setModalData] = useState({
+        name: "",
+        cif: "",
+        website: "",
+        brandColor: "#1976d2"
+    });
+
+    const handleOpenModal = () => {
+        if (activeCompany) {
+            setModalData({
+                name: activeCompany.name || "",
+                cif: activeCompany.cif || "",
+                website: activeCompany.website || "",
+                brandColor: activeCompany.brandColor || "#1976d2"
+            });
+        }
+        setOpenModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
+    };
+
+    const handleModalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setModalData({
+            ...modalData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleModalSave = async () => {
+        if (!activeCompany) return;
+        try {
+            await updateCompany({
+                id: activeCompany.id,
+                data: modalData
+            });
+            setOpenModal(false);
+        } catch (error) {
+            console.error("Failed to update company via modal", error);
+        }
+    };
 
     console.log('activeCompany', activeCompany)
 
@@ -25,7 +76,6 @@ export default function ProfileCompany() {
     // Watch fields for logic and previews
     const logoFile = watch("logo");
     const faviconFile = watch("favicon");
-    const designType = watch("design_type");
 
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
     const [faviconPreview, setFaviconPreview] = useState<string | null>(null);
@@ -129,116 +179,25 @@ export default function ProfileCompany() {
         maxFiles: 1,
     });
 
-    const handleEdit = () => {
-        setIsEditing(true);
-    };
 
-    const handleCancel = () => {
-        setIsEditing(false);
-        // Reset profile fields to original values
-        if (activeCompany) {
-            reset({
-                name: activeCompany.name || "",
-                cif: activeCompany.cif || "",
-                website: activeCompany.website || "",
-                brandColor: activeCompany.brandColor || "#1976d2",
-                design_type: "standard",
-                logo: undefined,
-                favicon: undefined,
-            }, { keepDefaultValues: true });
-        }
-    };
 
-    const handleSave = async () => {
-        try {
-            if (!activeCompany?.id) {
-                console.error("No active company");
-                return;
-            }
 
-            // Get current form values for profile fields
-            const formData = {
-                name: watch("name"),
-                cif: watch("cif"),
-                website: watch("website"),
-                brandColor: watch("brandColor"),
-                design_type: watch("design_type"),
-                logo: watch("logo"), // File or null
-                favicon: watch("favicon"), // File or null
-            };
-
-            console.log("Profile data to save:", formData);
-
-            // Call update company mutation
-            await updateCompany({
-                id: activeCompany.id,
-                data: formData,
-            });
-
-            setIsEditing(false);
-        } catch (error) {
-            console.error("Error saving profile:", error);
-        }
-    };
 
     return (
         <Box>
             {/* Section Header with Edit Controls */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-
+            <Box className='flex justify-end p-2 mb-2 border'>
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    {!isEditing && (
-                        <Button
-                            className="btn-primary"
-                            variant="outlined"
-                            size="large"
-                            startIcon={<FuseSvgIcon size={16}>heroicons-outline:pencil</FuseSvgIcon>}
-                            onClick={handleEdit}
-                        >
-                            Editar
-                        </Button>
-                    )}
-
-                    {!isEditing && isDirty && (
-                        <Button
-                            className="btn-primary"
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            startIcon={<FuseSvgIcon size={16}>heroicons-outline:check</FuseSvgIcon>}
-                            onClick={handleSave}
-                            disabled={isSubmitting}
-                        >
-                            Guardar
-                        </Button>
-                    )}
-
-                    {isEditing && (
-                        <>
-                            <Button
-                                className="btn-secondary"
-                                variant="outlined"
-                                color="secondary"
-                                size="large"
-                                startIcon={<FuseSvgIcon size={16}>heroicons-outline:x-mark</FuseSvgIcon>}
-                                onClick={handleCancel}
-                                disabled={isSubmitting}
-                            >
-                                Cancelar
-                            </Button>
-                            <Button
-                                className="btn-primary"
-                                variant="contained"
-                                color="primary"
-                                size="large"
-                                startIcon={<FuseSvgIcon size={16}>heroicons-outline:check</FuseSvgIcon>}
-                                onClick={handleSave}
-                                disabled={isSubmitting}
-                            >
-                                Guardar
-                            </Button>
-                        </>
-                    )}
+                    <Button
+                        className="btn-primary"
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        startIcon={<FuseSvgIcon size={16}>heroicons-outline:pencil-square</FuseSvgIcon>}
+                        onClick={handleOpenModal}
+                    >
+                        Editar
+                    </Button>
                 </Box>
             </Box>
 
@@ -253,14 +212,10 @@ export default function ProfileCompany() {
 
                     {/* LEFT: DETAILS FORM */}
                     <Box>
-                        <Box sx={{ mb: 3 }}>
-                            <Typography variant="h6" fontWeight={600}>
-                                Información General
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Detalles básicos de la empresa
-                            </Typography>
-                        </Box>
+                        <SectionHeader
+                            title="Información General"
+                            subtitle="Detalles básicos de la empresa"
+                        />
 
                         <Box sx={{
                             display: 'grid',
@@ -276,7 +231,7 @@ export default function ProfileCompany() {
                                     fullWidth
                                     size="small"
                                     variant="filled"
-                                    InputProps={{ readOnly: !isEditing }}
+                                    InputProps={{ readOnly: true }}
                                 />
                             </Box>
                             <Box>
@@ -289,7 +244,7 @@ export default function ProfileCompany() {
                                     fullWidth
                                     size="small"
                                     variant="filled"
-                                    InputProps={{ readOnly: !isEditing }}
+                                    InputProps={{ readOnly: true }}
                                 />
                             </Box>
                             <Box>
@@ -301,7 +256,7 @@ export default function ProfileCompany() {
                                     fullWidth
                                     size="small"
                                     variant="filled"
-                                    InputProps={{ readOnly: !isEditing }}
+                                    InputProps={{ readOnly: true }}
                                 />
                             </Box>
 
@@ -310,7 +265,21 @@ export default function ProfileCompany() {
                                     Cantidad Máxima de Usuarios
                                 </Typography>
                                 <TextField
-                                    value={activeCompany?.max_users || ""}
+                                    value={activeCompany?.settings?.maxUsers || ""}
+                                    fullWidth
+                                    size="small"
+                                    variant="filled"
+                                    disabled
+                                    InputProps={{ readOnly: true }}
+                                />
+                            </Box>
+
+                            <Box>
+                                <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary", mb: 0.5, display: 'block' }}>
+                                    Zona Horaria
+                                </Typography>
+                                <TextField
+                                    value={activeCompany?.settings?.timezone || ""}
                                     fullWidth
                                     size="small"
                                     variant="filled"
@@ -360,14 +329,10 @@ export default function ProfileCompany() {
 
                     {/* RIGHT: BRANDING ASSETS */}
                     <Box>
-                        <Box sx={{ mb: 3 }}>
-                            <Typography variant="h6" fontWeight={600}>
-                                Logo y Favicon
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Gestiona el logo y favicon de tu empresa
-                            </Typography>
-                        </Box>
+                        <SectionHeader
+                            title="Logo y Favicon"
+                            subtitle="Gestiona el logo y favicon de tu empresa"
+                        />
 
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                             {/* Logo Dropzone */}
@@ -507,15 +472,86 @@ export default function ProfileCompany() {
                 </Box>
 
 
-                {/* 2. SECTION: UBICACIÓN Y CONTACTO */}
-                {/* <Box>
-                    <LocationContactTab />
-                </Box> */}
+
 
 
 
 
             </Box>
+
+            {/* Edit Company Modal */}
+            <Dialog open={openModal} onClose={handleCloseModal} fullWidth maxWidth="sm">
+                <DialogTitle>Editar Información de la Empresa</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+                        <TextField
+                            label="Nombre de la Empresa"
+                            name="name"
+                            value={modalData.name}
+                            onChange={handleModalChange}
+                            fullWidth
+                            variant="filled"
+                        />
+                        <TextField
+                            label="CIF / NIF"
+                            name="cif"
+                            value={modalData.cif}
+                            onChange={handleModalChange}
+                            fullWidth
+                            variant="filled"
+                        />
+                        <TextField
+                            label="Sitio Web"
+                            name="website"
+                            value={modalData.website}
+                            onChange={handleModalChange}
+                            fullWidth
+                            variant="filled"
+                        />
+                        <Box>
+                            <Typography variant="caption" sx={{ mb: 1, display: 'block' }}>
+                                Color Corporativo
+                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <Box
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: 1,
+                                        bgcolor: modalData.brandColor,
+                                        border: '1px solid',
+                                        borderColor: 'divider'
+                                    }}
+                                />
+                                <TextField
+                                    name="brandColor"
+                                    type="color"
+                                    value={modalData.brandColor}
+                                    onChange={handleModalChange}
+                                    fullWidth
+                                    variant="filled"
+                                    sx={{
+                                        "& input[type='color']": {
+                                            height: "40px",
+                                            cursor: "pointer",
+                                            p: 0,
+                                            border: 'none'
+                                        }
+                                    }}
+                                />
+                            </Box>
+                        </Box>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseModal} color="secondary">
+                        Cancelar
+                    </Button>
+                    <Button onClick={handleModalSave} variant="contained" color="primary">
+                        Guardar
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
