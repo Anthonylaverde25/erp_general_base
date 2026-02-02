@@ -25,19 +25,6 @@ export class BankAccountRepositoryCrud implements IBankAccountCrudRepository {
     }
   }
 
-  async create(
-    data: BankAccountEntity,
-  ): Promise<{ bank_account: BankAccountEntity; message: string }> {
-    const payload = data.toPlainObject();
-    const {
-      data: { bank_account, message },
-    } = await axiosInstance.post("companies/bank-accounts", payload);
-
-    return {
-      bank_account: BankAccountMapper.fromDetailDTO(bank_account),
-      message: message || "Cuenta bancaria creada correctamente",
-    };
-  }
 
   async update(
     id: number,

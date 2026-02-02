@@ -1,7 +1,8 @@
-import { CreateBankAccountUseCase } from "@/application/use_cases/bank_accounts/CreateBankAccountUseCase";
+import { CreateBankAccountUseCase } from "@/application/use_cases/company/CreateBankAccountUseCase";
 import { container } from "@/di/container";
 import { TYPES } from "@/di/types";
 import { CreateBankAccountType } from "@/types/bank_account.types";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 
@@ -11,9 +12,9 @@ export default function useCreateBankAccount() {
   );
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
-
   const mutation = useMutation({
     mutationFn: (data: CreateBankAccountType) => use_case.execute(data),
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bank-accounts"] });
       enqueueSnackbar("Cuenta bancaria creada exitosamente", {

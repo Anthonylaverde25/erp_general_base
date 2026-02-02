@@ -12,7 +12,7 @@ import {
 import { Business, Save, Close } from "@mui/icons-material";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import useCreateBankAccount from "@/features/bank_accounts/hooks/useCreateBankAccount";
+import useCreateBankAccount from "@/features/companies/hooks/useCreateBankAccountToCompany";
 import {
   CreateBankAccountFormType,
   createBankAccountSchema,

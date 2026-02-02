@@ -4,6 +4,9 @@ import { ICompanyActionRepository } from '@/domain/entities/companies/repositori
 import { Company } from '@/types/company.types';
 import { AddressEntity } from '@/domain/entities/addresses/Address';
 import { AddressMapper } from '@/domain/entities/addresses/Mappers/AddressMapper';
+import { BankAccountEntity } from '@/domain/entities/bank_accounts/BankAccount';
+import { BankAccountMapper } from '@/domain/entities/bank_accounts/Mappers/BankAccountMapper';
+
 
 @injectable()
 export class CompanyRepositoryAction implements ICompanyActionRepository {
@@ -17,6 +20,13 @@ export class CompanyRepositoryAction implements ICompanyActionRepository {
 
         return { address: AddressMapper.fromDetailDTO(address), message };
     }
+
+    async createBankAccount(data: BankAccountEntity): Promise<{ bank_account: BankAccountEntity; message: string }> {
+        const { data: { bank_account, message } } = await axiosInstance.post(`companies/bank-accounts`, data.toPlainObject());
+
+        return { bank_account: BankAccountMapper.fromDetailDTO(bank_account), message };
+    }
+
 
     async changeDefaultAddress(addressId: number): Promise<{ status: number; message: string }> {
         const { data: { message }, status } = await axiosInstance.patch('companies/change-default-address', { address_id: addressId });
