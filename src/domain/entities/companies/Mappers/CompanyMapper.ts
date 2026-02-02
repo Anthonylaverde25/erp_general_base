@@ -5,7 +5,8 @@ export class CompanyMapper {
     static fromDetailDTO(dto: ICompany): Company {
         return new Company({
             ...dto,
-            brandColor: (dto as any).brand_color || dto.brandColor // Handle both cases just in case
+            brandColor: (dto as any).brand_color || dto.brandColor, // Handle both cases just in case
+            favicon_url: (dto as any).favicon_url || dto.favicon_url
         });
     }
 

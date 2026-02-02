@@ -22,8 +22,8 @@ export class CompanyRepositoryCrud implements ICompanyCrudRepository {
     }
 
     async update(id: number, data: UpdateCompanyDTO): Promise<{ company: Company; message: string }> {
-        // Check if data contains files
-        const hasFiles = (data.logo instanceof File) || (data.favicon instanceof File);
+        // Check if data contains files or explicit nulls (deletions)
+        const hasFiles = (data.logo instanceof File) || (data.logo === null) || (data.favicon instanceof File) || (data.favicon === null);
 
         // Prepare payload with snake_case mapping
         const payload: any = { ...data };

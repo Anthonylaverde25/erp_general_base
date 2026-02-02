@@ -11,6 +11,7 @@ export class Company implements ICompany {
     private _contacts?: Contact[];
     private _website?: string;
     private _logo_url?: string;
+    private _favicon_url?: string;
 
     constructor(props: ICompany) {
         this._id = props.id;
@@ -22,6 +23,7 @@ export class Company implements ICompany {
         this._contacts = props.contacts;
         this._website = props.website;
         this._logo_url = props.logo_url;
+        this._favicon_url = props.favicon_url;
     }
 
     get id(): number {
@@ -60,6 +62,10 @@ export class Company implements ICompany {
         return this._logo_url;
     }
 
+    get favicon_url(): string | undefined {
+        return this._favicon_url;
+    }
+
     // Legacy getters if needed for compatibility, returning first element or undefined
     get address(): string | undefined {
         return this._addresses?.[0]?.street; // Approximate mapping
@@ -90,7 +96,8 @@ export class Company implements ICompany {
             addresses: this._addresses,
             contacts: this._contacts,
             website: this._website,
-            logo_url: this._logo_url
+            logo_url: this._logo_url,
+            favicon_url: this._favicon_url
         };
     }
 }

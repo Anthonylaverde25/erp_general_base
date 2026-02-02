@@ -26,6 +26,7 @@ export interface Company {
     contacts?: Contact[]; // Added contacts array
     website?: string;
     logo_url?: string;
+    favicon_url?: string;
     // Legacy fields - keeping optional just in case, or removing if strictly following new structure. 
     // Given the request is to refactor for relations, I will prioritize the new structure.
 }

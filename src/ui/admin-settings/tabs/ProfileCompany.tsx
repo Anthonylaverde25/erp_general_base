@@ -30,7 +30,7 @@ export default function ProfileCompany() {
 
     const currentLogo = logoPreview || activeCompany?.logo_url;
     // Favicon might not exist on Company entity yet, so we just use preview
-    const currentFavicon = faviconPreview;
+    const currentFavicon = faviconPreview || activeCompany?.favicon_url;
 
     useEffect(() => {
         if (!logoFile) {
@@ -58,40 +58,55 @@ export default function ProfileCompany() {
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         const file = acceptedFiles && acceptedFiles[0];
-        if (file && activeCompany) {
-            // Optimistic update
-            const objectUrl = URL.createObjectURL(file);
-            setLogoPreview(objectUrl);
-            setValue("logo", file); // Keep form sync just in case
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                // You might want to use enqueueSnackbar here if available, but for now console error or alert
+                console.error("File too large. Max 5MB.");
+                return;
+            }
 
-            try {
-                await updateCompany({
-                    id: activeCompany.id,
-                    data: { logo: file }
-                });
-            } catch (error) {
-                console.error("Failed to upload logo", error);
-                setLogoPreview(null); // Revert on error
+            if (activeCompany) {
+                // Optimistic update
+                const objectUrl = URL.createObjectURL(file);
+                setLogoPreview(objectUrl);
+                setValue("logo", file); // Keep form sync just in case
+
+                try {
+                    await updateCompany({
+                        id: activeCompany.id,
+                        data: { logo: file }
+                    });
+                } catch (error) {
+                    console.error("Failed to upload logo", error);
+                    setLogoPreview(null); // Revert on error
+                }
             }
         }
     }, [activeCompany, updateCompany, setValue]);
 
     const onFaviconDrop = useCallback(async (acceptedFiles: File[]) => {
         const file = acceptedFiles && acceptedFiles[0];
-        if (file && activeCompany) {
-            // Optimistic update
-            const objectUrl = URL.createObjectURL(file);
-            setFaviconPreview(objectUrl);
-            setValue("favicon", file);
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                console.error("File too large. Max 5MB.");
+                return;
+            }
 
-            try {
-                await updateCompany({
-                    id: activeCompany.id,
-                    data: { favicon: file }
-                });
-            } catch (error) {
-                console.error("Failed to upload favicon", error);
-                setFaviconPreview(null);
+            if (activeCompany) {
+                // Optimistic update
+                const objectUrl = URL.createObjectURL(file);
+                setFaviconPreview(objectUrl);
+                setValue("favicon", file);
+
+                try {
+                    await updateCompany({
+                        id: activeCompany.id,
+                        data: { favicon: file }
+                    });
+                } catch (error) {
+                    console.error("Failed to upload favicon", error);
+                    setFaviconPreview(null);
+                }
             }
         }
     }, [activeCompany, updateCompany, setValue]);
@@ -126,8 +141,8 @@ export default function ProfileCompany() {
                 website: activeCompany.website || "",
                 brandColor: activeCompany.brandColor || "#1976d2",
                 design_type: "standard",
-                logo: null,
-                favicon: null,
+                logo: undefined,
+                favicon: undefined,
             }, { keepDefaultValues: true });
         }
     };
