@@ -13,7 +13,6 @@ export default function useIndexUser() {
 		queryFn: () => use_case.execute(),
 		refetchOnWindowFocus: false,
 		placeholderData: (previousData) => previousData,
-		// staleTime: 5 * 60 * 1000,
 	});
 
 	return {

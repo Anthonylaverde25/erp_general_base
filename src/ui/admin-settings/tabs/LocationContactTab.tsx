@@ -65,16 +65,19 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 }));
 
 export default function LocationContactTab() {
-    const { control, formState: { errors }, getValues } = useFormContext<CompanySettingsForm>();
+    const { control, formState: { errors }, getValues, setValue } = useFormContext<CompanySettingsForm>();
 
-    const { fields: addressFields, append: appendAddress } = useFieldArray({
+
+    const { fields: addressFields, append: appendAddress, replace: replaceAddress } = useFieldArray({
         control,
-        name: 'addresses'
+        name: 'addresses',
+        keyName: 'fieldId'
     });
 
-    const { fields: contactFields, append: appendContact } = useFieldArray({
+    const { fields: contactFields, append: appendContact, replace: replaceContact } = useFieldArray({
         control,
-        name: 'contacts'
+        name: 'contacts',
+        keyName: 'fieldId'
     });
 
     // Sort addresses for display: Default address first
@@ -145,6 +148,27 @@ export default function LocationContactTab() {
         setExpandedContact(newExpanded ? panel : false);
     };
 
+    const handleSetDefaultAddress = (id: number) => {
+        // ... (keep implementation)
+        const currentAddresses = getValues('addresses');
+        const updatedAddresses = currentAddresses.map((addr: any) => ({
+            ...addr,
+            default: addr.id === id
+        }));
+        replaceAddress(updatedAddresses);
+    };
+
+    const handleSetDefaultContact = (id: number) => {
+        // ... (keep implementation)
+        const currentContacts = getValues('contacts');
+        const updatedContacts = currentContacts.map((contact: any) => ({
+            ...contact,
+            default: contact.id === id
+        }));
+        replaceContact(updatedContacts);
+    };
+
+
     return (
         <Box>
             {/* Addresses Section */}
@@ -174,11 +198,14 @@ export default function LocationContactTab() {
             {addressFields.length > 0 ? (
                 <Box>
                     <div className='mb-2'>
-                        <HeaderDefaultAddress address={addressFields as any} />
+                        <HeaderDefaultAddress
+                            address={addressFields as any}
+                            onSetDefault={handleSetDefaultAddress}
+                        />
                     </div>
                     {sortedAddressFields.map(({ field, originalIndex }, index) => (
                         <Accordion
-                            key={field.id}
+                            key={(field as any).fieldId}
                             expanded={expandedAddress === index}
                             onChange={handleAddressChange(index)}
                         >
@@ -364,14 +391,12 @@ export default function LocationContactTab() {
                     <div className='mb-2'>
                         <HeaderDefaultContact
                             contacts={contactFields as any}
-                            onChangeContact={() => {
-                                setOpenCreateContactModal(true);
-                            }}
+                            onSetDefault={handleSetDefaultContact}
                         />
                     </div>
                     {sortedContactFields.map(({ field, originalIndex }, index) => (
                         <Accordion
-                            key={field.id}
+                            key={(field as any).fieldId}
                             expanded={expandedContact === index}
                             onChange={handleContactChange(index)}
                         >

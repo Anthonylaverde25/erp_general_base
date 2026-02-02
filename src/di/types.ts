@@ -32,6 +32,8 @@ export const TYPES = {
   ChangeCompanyUseCase: Symbol.for("ChangeCompanyUseCase"),
   UpdateCompanyUseCase: Symbol.for("UpdateCompanyUseCase"),
   CreateAddressUseCase: Symbol.for("CreateAddressUseCase"),
+  ChangeDefaultAddressUseCase: Symbol.for("ChangeDefaultAddressUseCase"),
+  ChangeDefaultContactUseCase: Symbol.for("ChangeDefaultContactUseCase"),
 
   // Addresses
   IAddressRepository: Symbol.for("IAddressRepository"),

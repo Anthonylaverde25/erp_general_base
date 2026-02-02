@@ -8,6 +8,8 @@ import { ChangeCompanyUseCase } from '@/application/use_cases/company/ChangeComp
 import { UpdateCompanyUseCase } from '@/application/use_cases/company/UpdateCompanyUseCase';
 import { CreateAddressUseCase } from '@/application/use_cases/company/CreateAddressUseCase';
 
+import { ChangeDefaultAddressUseCase } from '@/application/use_cases/company/ChangeDefaultAddressUseCase';
+import { ChangeDefaultContactUseCase } from '@/application/use_cases/company/ChangeDefaultContactUseCase';
 import { ICompanyActionRepository } from '@/domain/entities/companies/repositories/company.interface.action';
 import { CompanyRepositoryAction } from '@/infrastructure/repositories/companies/company.repository.action';
 
@@ -22,4 +24,6 @@ export const registerCompanyModule = (container: Container) => {
     container.bind<ChangeCompanyUseCase>(TYPES.ChangeCompanyUseCase).to(ChangeCompanyUseCase);
     container.bind<UpdateCompanyUseCase>(TYPES.UpdateCompanyUseCase).to(UpdateCompanyUseCase);
     // container.bind<CreateAddressUseCase>(TYPES.CreateAddressUseCase).to(CreateAddressUseCase);
+    container.bind<ChangeDefaultAddressUseCase>(TYPES.ChangeDefaultAddressUseCase).to(ChangeDefaultAddressUseCase);
+    container.bind<ChangeDefaultContactUseCase>(TYPES.ChangeDefaultContactUseCase).to(ChangeDefaultContactUseCase);
 };

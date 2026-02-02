@@ -9,13 +9,11 @@ import CreateUserButton from '@/ui/users/component/CreateUserButton';
 import UpdateUserModal from '@/ui/users/component/modals/UpdateUserModal';
 import UserActionMenu from '@/ui/users/component/UserActionMenu';
 import { UserType } from '@/types/user.types';
-import useActiveCompany from '@/features/companies/useActiveCompany';
 
 export default function TeamTabView() {
 
     const { users, isLoading, isError } = useIndexUser();
-    // const activeCompany = useActiveCompany();
-    // console.log('active_company_id', activeCompany?.id)
+
 
     const [selectedId, setSelectedId] = useState<UserType['id'] | null>(null);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);

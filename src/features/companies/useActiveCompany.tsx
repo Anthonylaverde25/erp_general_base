@@ -17,7 +17,7 @@ export default function useActiveCompany(): Company | undefined {
             return show_company_use_case.execute(active_company_id);
         },
         enabled: !!active_company_id,
-        staleTime: 1000 * 60 * 5, // 5 minutes
+        staleTime: 1000 * 60 * 5,
     });
 
     return activeCompany as Company | undefined;

@@ -9,16 +9,21 @@ import {
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import { LocationOn, Map as MapIcon } from "@mui/icons-material";
-import SelectDefaultModal from "@/ui/admin-settings/components/SelectDefaultModal";
+import SelectDefaultAddressModal from "@/ui/address/components/modals/SelectDefaultAddressModal";
 
 type Props = {
     address: Address[];
-    onChangeAddress?: () => void;
+    onSetDefault: (id: number) => void;
 };
 
-export default function HeaderDefaultAddress({ address, onChangeAddress }: Props) {
+export default function HeaderDefaultAddress({ address, onSetDefault }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     const defaultAddress = address.find((addr) => addr.default);
+
+    const handleSelect = (id: number) => {
+        onSetDefault(id);
+        setModalOpen(false);
+    };
 
     if (!defaultAddress) {
         return (
@@ -69,17 +74,12 @@ export default function HeaderDefaultAddress({ address, onChangeAddress }: Props
 
                 </Stack>
 
-                <SelectDefaultModal
+                <SelectDefaultAddressModal
                     open={modalOpen}
                     onClose={() => setModalOpen(false)}
-                    type="address"
                     items={address}
                     currentDefaultId={defaultAddress?.id}
-                    onSelect={(id) => {
-                        console.log('Selected address:', id);
-                        // TODO: Implement actual update logic
-                        setModalOpen(false);
-                    }}
+                    onSelect={handleSelect}
                 />
             </>
         );
@@ -152,7 +152,7 @@ export default function HeaderDefaultAddress({ address, onChangeAddress }: Props
                             heroicons-outline:pencil
                         </FuseSvgIcon>
                     }
-                    onClick={onChangeAddress}
+                    onClick={() => setModalOpen(true)}
                     sx={{
                         alignSelf: { xs: "flex-start", sm: "center" },
                         whiteSpace: "nowrap",
@@ -163,17 +163,12 @@ export default function HeaderDefaultAddress({ address, onChangeAddress }: Props
                 </Button>
             </Stack>
 
-            <SelectDefaultModal
+            <SelectDefaultAddressModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
-                type="address"
                 items={address}
                 currentDefaultId={defaultAddress?.id}
-                onSelect={(id) => {
-                    console.log('Selected address:', id);
-                    // TODO: Implement actual update logic
-                    setModalOpen(false);
-                }}
+                onSelect={handleSelect}
             />
         </>
     );

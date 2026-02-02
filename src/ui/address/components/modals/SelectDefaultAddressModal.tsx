@@ -15,37 +15,41 @@ import {
     Stack
 } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { Address, Contact } from '@/types/company.types';
-import { LocationOn, Map as MapIcon, Email, Phone } from '@mui/icons-material';
+import { useChangeDefaultAddress } from '@/features/companies/hooks/useChangeDefaultAddress';
+import { Address } from '@/types/company.types';
+import { LocationOn, Map as MapIcon } from '@mui/icons-material';
+import { toast } from 'sonner';
 
-type SelectDefaultModalProps = {
+type SelectDefaultAddressModalProps = {
     open: boolean;
     onClose: () => void;
-    type: 'address' | 'contact';
-    items: Address[] | Contact[];
+    items: Address[];
     currentDefaultId?: number;
     onSelect: (id: number) => void;
 };
 
-export default function SelectDefaultModal({
+export default function SelectDefaultAddressModal({
     open,
     onClose,
-    type,
     items,
     currentDefaultId,
     onSelect
-}: SelectDefaultModalProps) {
+}: SelectDefaultAddressModalProps) {
     const [selectedId, setSelectedId] = useState<number | undefined>(currentDefaultId);
+    const { handleChangeDefaultAddress } = useChangeDefaultAddress();
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (selectedId !== undefined) {
-            onSelect(selectedId);
+            try {
+                await handleChangeDefaultAddress(selectedId);
+                onSelect(selectedId); // We might want to pass the ID back even if we don't use the response message
+                onClose();
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            onClose();
         }
-        onClose();
-    };
-
-    const isAddress = (item: Address | Contact): item is Address => {
-        return type === 'address';
     };
 
     return (
@@ -72,7 +76,7 @@ export default function SelectDefaultModal({
                 }}
             >
                 <Typography variant="h6" fontWeight={600}>
-                    Seleccionar {type === 'address' ? 'Dirección' : 'Contacto'} Predeterminado
+                    Seleccionar Dirección Predeterminada
                 </Typography>
                 <IconButton onClick={onClose} size="small">
                     <FuseSvgIcon size={20}>heroicons-outline:x-mark</FuseSvgIcon>
@@ -85,9 +89,13 @@ export default function SelectDefaultModal({
                         const isSelected = selectedId === item.id;
                         const isCurrentDefault = currentDefaultId === item.id;
 
+                        // Use fieldId as key if available (from useFieldArray), otherwise fallback to id or index
+                        // We must cast to any because Address type might not have fieldId defined explicitly
+                        const key = (item as any).fieldId || item.id || index;
+
                         return (
                             <ListItem
-                                key={item.id || index}
+                                key={key}
                                 disablePadding
                                 sx={{
                                     borderBottom: index < items.length - 1 ? 1 : 0,
@@ -121,41 +129,20 @@ export default function SelectDefaultModal({
                                             </FuseSvgIcon>
                                         )}
                                         <Box sx={{ flex: 1 }}>
-                                            {isAddress(item) ? (
-                                                // Address rendering
-                                                <Stack spacing={0.5}>
-                                                    <Stack direction="row" spacing={1} alignItems="center">
-                                                        <LocationOn sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                                        <Typography variant="body1" fontWeight={600}>
-                                                            {item.street}
-                                                        </Typography>
-                                                    </Stack>
-                                                    <Stack direction="row" spacing={1} alignItems="center">
-                                                        <MapIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                                        <Typography variant="body2" color="text.secondary">
-                                                            {item.city}, {item.state} - {item.postal_code}
-                                                        </Typography>
-                                                    </Stack>
+                                            <Stack spacing={0.5}>
+                                                <Stack direction="row" spacing={1} alignItems="center">
+                                                    <LocationOn sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                                    <Typography variant="body1" fontWeight={600}>
+                                                        {item.street}
+                                                    </Typography>
                                                 </Stack>
-                                            ) : (
-                                                // Contact rendering
-                                                <Stack spacing={0.5}>
-                                                    <Stack direction="row" spacing={1} alignItems="center">
-                                                        <Email sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                                        <Typography variant="body1" fontWeight={600}>
-                                                            {item.email}
-                                                        </Typography>
-                                                    </Stack>
-                                                    {item.phone && (
-                                                        <Stack direction="row" spacing={1} alignItems="center">
-                                                            <Phone sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                {item.phone}
-                                                            </Typography>
-                                                        </Stack>
-                                                    )}
+                                                <Stack direction="row" spacing={1} alignItems="center">
+                                                    <MapIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {item.city}, {item.state} - {item.postal_code}
+                                                    </Typography>
                                                 </Stack>
-                                            )}
+                                            </Stack>
                                         </Box>
                                         {isCurrentDefault && (
                                             <Chip

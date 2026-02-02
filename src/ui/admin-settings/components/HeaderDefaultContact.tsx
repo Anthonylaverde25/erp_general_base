@@ -8,17 +8,22 @@ import {
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import { Email, Phone } from "@mui/icons-material";
-import SelectDefaultModal from "@/ui/admin-settings/components/SelectDefaultModal";
+import SelectDefaultContactModal from "@/ui/admin-settings/components/modals/SelectDefaultContactModal";
 
 type Props = {
     contacts: Contact[];
-    onChangeContact?: () => void;
+    onSetDefault: (id: number) => void;
 };
 
-export default function HeaderDefaultContact({ contacts, onChangeContact }: Props) {
+export default function HeaderDefaultContact({ contacts, onSetDefault }: Props) {
     const [modalOpen, setModalOpen] = useState(false);
     // Tomamos el primer contacto como "Default" o "Principal" de manera estática
     const defaultContact = contacts.find((c) => c.default);
+
+    const handleSelect = (id: number) => {
+        onSetDefault(id);
+        setModalOpen(false);
+    };
 
     if (!defaultContact) {
         return (
@@ -66,17 +71,12 @@ export default function HeaderDefaultContact({ contacts, onChangeContact }: Prop
                     </Button>
                 </Stack>
 
-                <SelectDefaultModal
+                <SelectDefaultContactModal
                     open={modalOpen}
                     onClose={() => setModalOpen(false)}
-                    type="contact"
                     items={contacts}
                     currentDefaultId={defaultContact?.id}
-                    onSelect={(id) => {
-                        console.log('Selected contact:', id);
-                        // TODO: Implement actual update logic
-                        setModalOpen(false);
-                    }}
+                    onSelect={handleSelect}
                 />
             </>
         );
@@ -129,39 +129,32 @@ export default function HeaderDefaultContact({ contacts, onChangeContact }: Prop
                 </Stack>
 
                 {/* Acción - Opcional, similar a HeaderDefaultAddress */}
-                {onChangeContact && (
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        color="inherit"
-                        startIcon={
-                            <FuseSvgIcon size={16}>
-                                heroicons-outline:pencil
-                            </FuseSvgIcon>
-                        }
-                        onClick={onChangeContact}
-                        sx={{
-                            alignSelf: { xs: "flex-start", sm: "center" },
-                            whiteSpace: "nowrap",
-                            borderColor: 'divider'
-                        }}
-                    >
-                        Cambiar
-                    </Button>
-                )}
+                <Button
+                    variant="outlined"
+                    size="small"
+                    color="inherit"
+                    startIcon={
+                        <FuseSvgIcon size={16}>
+                            heroicons-outline:pencil
+                        </FuseSvgIcon>
+                    }
+                    onClick={() => setModalOpen(true)}
+                    sx={{
+                        alignSelf: { xs: "flex-start", sm: "center" },
+                        whiteSpace: "nowrap",
+                        borderColor: 'divider'
+                    }}
+                >
+                    Cambiar
+                </Button>
             </Stack>
 
-            <SelectDefaultModal
+            <SelectDefaultContactModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
-                type="contact"
                 items={contacts}
                 currentDefaultId={defaultContact?.id}
-                onSelect={(id) => {
-                    console.log('Selected contact:', id);
-                    // TODO: Implement actual update logic
-                    setModalOpen(false);
-                }}
+                onSelect={handleSelect}
             />
         </>
     );

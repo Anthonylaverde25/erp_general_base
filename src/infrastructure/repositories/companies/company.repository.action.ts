@@ -17,4 +17,14 @@ export class CompanyRepositoryAction implements ICompanyActionRepository {
 
         return { address: AddressMapper.fromDetailDTO(address), message };
     }
+
+    async changeDefaultAddress(addressId: number): Promise<{ status: number; message: string }> {
+        const { data: { message }, status } = await axiosInstance.patch('companies/change-default-address', { address_id: addressId });
+        return { status, message };
+    }
+
+    async changeDefaultContact(contactId: number): Promise<{ status: number; message: string }> {
+        const { data: { message }, status } = await axiosInstance.patch('companies/change-default-contact', { contact_id: contactId });
+        return { status, message };
+    }
 }
