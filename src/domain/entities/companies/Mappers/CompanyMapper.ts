@@ -3,10 +3,12 @@ import { Company as ICompany } from '@/types/company.types';
 
 export class CompanyMapper {
     static fromDetailDTO(dto: ICompany): Company {
+        console.log('dto', dto);
         return new Company({
             ...dto,
             brandColor: (dto as any).brand_color || dto.brandColor, // Handle both cases just in case
-            favicon_url: (dto as any).favicon_url || dto.favicon_url
+            favicon_url: (dto as any).favicon_url || dto.favicon_url,
+
         });
     }
 

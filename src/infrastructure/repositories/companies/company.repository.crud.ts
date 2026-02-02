@@ -18,6 +18,7 @@ export class CompanyRepositoryCrud implements ICompanyCrudRepository {
         const {
             data: { company }
         } = await axiosInstance.get(`companies/${id}`);
+        console.log('company', company);
         return CompanyMapper.fromDetailDTO(company);
     }
 

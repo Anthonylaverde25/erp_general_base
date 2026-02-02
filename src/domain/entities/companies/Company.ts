@@ -1,5 +1,6 @@
 import { Company as ICompany, Address, Contact } from '@/types/company.types';
 import { UpdateCompanyDTO } from './DTOs/UpdateCompanyDTO';
+import { CompanySettingEntity } from './CompanySettingEntity';
 
 export class Company implements ICompany {
     private _id: number;
@@ -12,6 +13,7 @@ export class Company implements ICompany {
     private _website?: string;
     private _logo_url?: string;
     private _favicon_url?: string;
+    private _settings?: CompanySettingEntity
 
     constructor(props: ICompany) {
         this._id = props.id;
@@ -24,11 +26,17 @@ export class Company implements ICompany {
         this._website = props.website;
         this._logo_url = props.logo_url;
         this._favicon_url = props.favicon_url;
+        this._settings = props.settings ? new CompanySettingEntity(props.settings) : undefined;
     }
 
     get id(): number {
         return this._id;
     }
+
+    get settings(): CompanySettingEntity | undefined {
+        return this._settings;
+    }
+
 
     get name(): string {
         return this._name;
@@ -97,7 +105,8 @@ export class Company implements ICompany {
             contacts: this._contacts,
             website: this._website,
             logo_url: this._logo_url,
-            favicon_url: this._favicon_url
+            favicon_url: this._favicon_url,
+            settings: this._settings
         };
     }
 }

@@ -27,8 +27,23 @@ export interface Company {
     website?: string;
     logo_url?: string;
     favicon_url?: string;
+    settings?: CompanySettingType;
     // Legacy fields - keeping optional just in case, or removing if strictly following new structure. 
     // Given the request is to refactor for relations, I will prioritize the new structure.
 }
+
+export interface CompanySettingType {
+    id?: number,
+    maxUsers: number,
+    maxStorageMb: number,
+    currency: string,
+    timezone: string,
+
+
+
+
+}
+
+
 
 export type ActiveCompany = Company;

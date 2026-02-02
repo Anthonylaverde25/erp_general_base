@@ -19,6 +19,8 @@ export default function ProfileCompany() {
     const { mutateAsync: updateCompany, isPending } = useUpdateCompany();
     const [isEditing, setIsEditing] = React.useState(false);
 
+    console.log('activeCompany', activeCompany)
+
 
     // Watch fields for logic and previews
     const logoFile = watch("logo");
@@ -303,6 +305,20 @@ export default function ProfileCompany() {
                                 />
                             </Box>
 
+                            <Box>
+                                <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary", mb: 0.5, display: 'block' }}>
+                                    Cantidad Máxima de Usuarios
+                                </Typography>
+                                <TextField
+                                    value={activeCompany?.max_users || ""}
+                                    fullWidth
+                                    size="small"
+                                    variant="filled"
+                                    disabled
+                                    InputProps={{ readOnly: true }}
+                                />
+                            </Box>
+
                             <Box sx={{ gridColumn: '1 / -1' }}>
                                 <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary", mb: 1, display: 'block' }}>
                                     Color Corporativo
@@ -492,76 +508,11 @@ export default function ProfileCompany() {
 
 
                 {/* 2. SECTION: UBICACIÓN Y CONTACTO */}
-                <Box>
+                {/* <Box>
                     <LocationContactTab />
-                </Box>
-
-                {/* 3. SECTION: AJUSTES DE DISEÑO */}
-                <Box>
-                    <Box sx={{ mb: 3 }}>
-                        <Typography variant="h6" fontWeight={600} sx={{ color: 'text.primary' }}>
-                            Ajustes de Diseño
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Personaliza los colores y la plantilla de tus documentos
-                        </Typography>
-                    </Box>
-
-                    {/* Sub-section: ESTILO Y PLANTILLA */}
-                    <Box sx={{ display: "grid", gap: 4 }}>
+                </Box> */}
 
 
-                        <Box>
-                            <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary", mb: 1.5, display: 'block' }}>
-                                Plantilla de Factura
-                            </Typography>
-                            <Box sx={{
-                                display: "grid",
-                                gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
-                                gap: 2
-                            }}>
-                                {[
-                                    { id: "standard", label: "Estándar", description: "Clásico y profesional", icon: "lucide:file-text" },
-                                    { id: "minimal", label: "Minimalista", description: "Limpio y simple", icon: "lucide:layout-template" },
-                                    { id: "large", label: "Logo Grande", description: "Énfasis en marca", icon: "lucide:image" },
-                                ].map((design) => (
-                                    <Box
-                                        key={design.id}
-                                        onClick={() => setValue("design_type", design.id, { shouldDirty: true })}
-                                        sx={{
-                                            p: 2,
-                                            border: "2px solid",
-                                            borderColor: designType === design.id ? "primary.main" : "divider",
-                                            bgcolor: designType === design.id ? "primary.50" : "background.paper",
-                                            cursor: "pointer",
-                                            borderRadius: 2,
-                                            opacity: 1,
-                                            transition: "all 0.2s ease",
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            alignItems: "center",
-                                            gap: 1,
-                                            textAlign: "center",
-                                            "&:hover": { borderColor: "primary.main", transform: 'translateY(-2px)' }
-                                        }}
-                                    >
-                                        <FuseSvgIcon sx={{ fontSize: 28, color: designType === design.id ? "primary.main" : "text.secondary" }}>
-                                            {design.icon}
-                                        </FuseSvgIcon>
-                                        <Box>
-                                            <Typography variant="body2" fontWeight={designType === design.id ? 700 : 600} color={designType === design.id ? "primary.dark" : "text.primary"}>
-                                                {design.label}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                                                {design.description}
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-                                ))}
-                            </Box>
-                        </Box>
-                    </Box>
-                </Box>
 
 
             </Box>
