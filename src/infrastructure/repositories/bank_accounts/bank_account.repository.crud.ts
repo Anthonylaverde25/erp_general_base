@@ -31,7 +31,7 @@ export class BankAccountRepositoryCrud implements IBankAccountCrudRepository {
     const payload = data.toPlainObject();
     const {
       data: { bank_account, message },
-    } = await axiosInstance.post("/bank-accounts", payload);
+    } = await axiosInstance.post("companies/bank-accounts", payload);
 
     return {
       bank_account: BankAccountMapper.fromDetailDTO(bank_account),
