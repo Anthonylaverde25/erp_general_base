@@ -31,9 +31,9 @@ export class PaymentMethodRepositoryCrud implements IPaymentMethodRepository {
     }
 
     async update(id: PaymentMethod['id'], data: Partial<PaymentMethodEntity>): Promise<{ paymentMethod: PaymentMethodEntity; message: string; }> {
-        const payload = data.toPlainObject();
         try {
-            const { data: { payment_method, message } } = await axiosInstance.put(`payment-methods/${id}`, payload);
+
+            const { data: { payment_method, message } } = await axiosInstance.put(`payment-methods/${id}`, data);
             return {
                 paymentMethod: PaymentMethodMapper.fromDetailDTO(payment_method),
                 message
