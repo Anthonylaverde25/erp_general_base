@@ -16,12 +16,19 @@ import {
   alpha,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateBankAccountModal from "../components/modals/CreateBankAccountModal";
 import UpdateBankAccountModal from "../components/modals/UpdateBankAccountModal";
 import { BankAccountType } from "@/types/bank_account.types";
+import axiosInstance from "@/lib/@axios";
 
-export default function BankAccountsTabView() {
+interface BankAccountsTabViewProps {
+  createButtonText?: string;
+}
+
+export default function BankAccountsTabView({
+  createButtonText = "Crear cuenta bancaria",
+}: BankAccountsTabViewProps) {
   const theme = useTheme();
   const { bankAccounts, isLoading, isError } = useIndexBankAccounts();
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -35,6 +42,15 @@ export default function BankAccountsTabView() {
     setSelectedBankAccount(bankAccountId);
     setUpdateModalOpen(true);
   };
+
+
+  // useEffect(() => {
+  //   const fetchBankAccounts = async () => {
+  //     const response = await axiosInstance.get("payment-methods/");
+  //     console.log(response.data);
+  //   };
+  //   fetchBankAccounts();
+  // }, [])
 
   if (isLoading)
     return (
@@ -80,7 +96,7 @@ export default function BankAccountsTabView() {
           }
           onClick={() => setCreateModalOpen(true)}
         >
-          Crear cuenta bancaria
+          {createButtonText}
         </Button>
       </Stack>
 

@@ -64,6 +64,14 @@ const SettingsAppNavigation: FuseNavItemType = {
       url: "/apps/settings/bank-accounts",
       subtitle: "Manage your bank accounts and financial information",
     },
+    {
+      id: "apps.settings.paymentMethods",
+      icon: "lucide:credit-card",
+      title: "Payment Methods",
+      type: "item",
+      url: "/apps/settings/payment-methods",
+      subtitle: "Manage your payment methods and financial information",
+    },
   ],
 };
 

@@ -22,6 +22,9 @@ const RolesTabView = lazy(() => import("@/ui/roles/pages/RoleTabView"));
 const BankAccountTabView = lazy(
   () => import("@/ui/bank_accounts/pages/BankAccountTabView"),
 );
+const PaymentMethodsPage = lazy(
+  () => import("@/ui/payment_methods/pages/PaymentMethodsPage"),
+);
 
 /**
  * The Settings App Route.
@@ -65,6 +68,10 @@ const Route: FuseRouteItemType = {
     {
       path: "bank-accounts",
       element: <BankAccountTabView />,
+    },
+    {
+      path: "payment-methods",
+      element: <PaymentMethodsPage />,
     },
     {
       path: "",

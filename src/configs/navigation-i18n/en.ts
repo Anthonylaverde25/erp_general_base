@@ -58,7 +58,8 @@ const locale = {
 	COMPANY: 'Company',
 	USERS: 'Users',
 	ROLES_PERMISSIONS: 'Roles & Permissions',
-	TAXES: 'Taxes'
+	TAXES: 'Taxes',
+	PAYMENT_METHODS: 'Payment Methods'
 };
 
 export default locale;

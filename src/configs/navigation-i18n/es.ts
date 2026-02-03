@@ -58,7 +58,8 @@ const locale = {
 	COMPANY: 'Empresa',
 	USERS: 'Usuarios',
 	ROLES_PERMISSIONS: 'Roles y Permisos',
-	TAXES: 'Impuestos'
+	TAXES: 'Impuestos',
+	PAYMENT_METHODS: 'Métodos de Pago'
 };
 
 export default locale;
