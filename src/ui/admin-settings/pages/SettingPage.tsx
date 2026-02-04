@@ -14,6 +14,7 @@ import ProfileCompany from '../tabs/ProfileCompany';
 import LocationContactTab from '../tabs/LocationContactTab';
 import PreferencesTab from '../tabs/PreferencesTab';
 import DangerZoneTab from '../tabs/DangerZoneTab';
+import RolesTabView from '../../roles/pages/RoleTabView';
 import useActiveCompany from "@/features/companies/useActiveCompany";
 
 const addressSchema = z.object({
@@ -142,6 +143,10 @@ export default function SettingPage() {
                             label="Preferencias"
                         />
                         <Tab
+                            icon={<FuseSvgIcon>heroicons-outline:shield-check</FuseSvgIcon>}
+                            label="Roles y Permisos"
+                        />
+                        <Tab
                             icon={<FuseSvgIcon>lucide:alert-triangle</FuseSvgIcon>}
                             label="Danger"
                         />
@@ -154,7 +159,8 @@ export default function SettingPage() {
                         {tab === 0 && <ProfileCompany />}
                         {tab === 1 && <LocationContactTab />}
                         {tab === 2 && <PreferencesTab />}
-                        {tab === 3 && <DangerZoneTab />}
+                        {tab === 3 && <RolesTabView />}
+                        {tab === 4 && <DangerZoneTab />}
                     </Box>
                 </Box>
             </Box>

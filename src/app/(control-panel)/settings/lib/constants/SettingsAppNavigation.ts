@@ -50,7 +50,7 @@ const SettingsAppNavigation: FuseNavItemType = {
     },
     {
       id: "apps.settings.roles",
-      icon: "lucide:users",
+      icon: "lucide:shield",
       title: "Roles",
       type: "item",
       url: "/apps/settings/roles",

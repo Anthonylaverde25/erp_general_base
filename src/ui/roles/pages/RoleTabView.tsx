@@ -1,25 +1,22 @@
 import useIndexRoles from "@/features/roles/hooks/useIndexRoles";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
   Box,
-  Chip,
-  IconButton,
-  Tooltip,
+  Typography,
   Stack,
   Button,
   useTheme,
+  CircularProgress,
+  Chip,
+  IconButton,
+  Tooltip,
   alpha,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CreateRoleModal from "../components/modals/CreateRoleModal";
 import UpdateRoleModal from "../components/modals/UpdateRoleModal";
+import RoleListSidebar from "../components/RoleListSidebar";
+import RolePermissionMatrix from "../components/RolePermissionMatrix";
 import { RoleType } from "@/types/role.types";
 
 export default function RolesTabView() {
@@ -27,155 +24,113 @@ export default function RolesTabView() {
   const { roles, isLoading, isError } = useIndexRoles();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
-  const [assignPermissionsModalOpen, setAssignPermissionsModalOpen] =
-    useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleType["id"] | null>(null);
 
-  const handleEditRole = (roleId: RoleType["id"]) => {
-    console.log("Editing role with ID:", roleId);
-    setSelectedRole(roleId);
-    setUpdateModalOpen(true);
-  };
+  // Default selection logic
+  useEffect(() => {
+    if (roles && roles.length > 0 && !selectedRole) {
+      const superAdmin = roles.find((r) => r.code === "super_admin");
+      if (superAdmin) {
+        setSelectedRole(superAdmin.id);
+      } else {
+        setSelectedRole(roles[0].id);
+      }
+    }
+  }, [roles, selectedRole]);
 
-  const handleAssignPermissions = (roleId: RoleType["id"]) => {
-    console.log("Assigning permissions to role with ID:", roleId);
-    setSelectedRole(roleId);
-    setAssignPermissionsModalOpen(true);
+  const handleEditRole = () => {
+    if (selectedRole) {
+      setUpdateModalOpen(true);
+    }
   };
 
   if (isLoading)
     return (
-      <Box className="flex h-64 items-center justify-center">
-        <Typography color="text.secondary">Cargando roles...</Typography>
+      <Box className="flex h-96 items-center justify-center">
+        <CircularProgress />
       </Box>
     );
 
   if (isError)
     return (
-      <Box className="flex h-64 items-center justify-center">
+      <Box className="flex h-96 items-center justify-center">
         <Typography color="error">Error al cargar los roles</Typography>
       </Box>
     );
 
+  const activeRole = roles?.find((r) => r.id === selectedRole);
+
   return (
-    <Box className="w-full overflow-hidden">
-      {/* Header Section */}
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        spacing={2}
-        sx={{
-          p: 3,
-          borderBottom: `1px solid ${theme.palette.divider}`,
-        }}
-      >
-        <div />
-        <Button
-          className="btn-primary"
-          variant="contained"
-          color="primary"
-          size="large"
-          startIcon={
-            <FuseSvgIcon size={20}>heroicons-outline:shield-check</FuseSvgIcon>
-          }
-          onClick={() => setCreateModalOpen(true)}
-        >
-          Crear rol
-        </Button>
-      </Stack>
+    <Box className="flex w-full h-[calc(100vh-200px)] overflow-hidden border rounded-lg bg-white">
+      {/* Sidebar */}
+      <RoleListSidebar
+        roles={roles || []}
+        selectedRoleId={selectedRole}
+        onSelectRole={setSelectedRole}
+        onCreateRole={() => setCreateModalOpen(true)}
+      />
 
-      {/* Table Section */}
-      <TableContainer>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow
-              sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.05) }}
+      {/* Main Content */}
+      <Box className="flex-1 flex flex-col overflow-hidden bg-white">
+        {activeRole ? (
+          <>
+            {/* Role Header */}
+            <Box
+              className="p-6 border-b"
+              sx={{ bgcolor: (theme) => alpha(theme.palette.primary.main, 0.02) }}
             >
-              <TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Código</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Descripción</TableCell>
-              <TableCell align="right" sx={{ pr: 3, fontWeight: 700 }}>
-                Acciones
-              </TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {roles?.map((role) => (
-              <TableRow
-                key={role.id}
-                hover
-                sx={{
-                  transition: "all 0.2s ease",
-                  "&:last-child td": { borderBottom: 0 },
-                }}
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="flex-start"
               >
-                {/* Nombre */}
-                <TableCell sx={{ pl: 3 }}>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    {role.name}
-                  </Typography>
-                </TableCell>
-
-                {/* Código */}
-                <TableCell>
-                  <Chip label={role.code} size="small" variant="outlined" />
-                </TableCell>
-
-                {/* Descripción */}
-                <TableCell>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      maxWidth: "400px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                    title={role.description}
-                  >
-                    {role.description || "Sin descripción"}
-                  </Typography>
-                </TableCell>
-
-                {/* Acciones */}
-                <TableCell align="right" sx={{ pr: 3 }}>
-                  <Tooltip title="Editar rol">
-                    <IconButton
+                <Box>
+                  <Stack direction="row" alignItems="center" spacing={2} mb={1}>
+                    <Typography variant="h5" fontWeight={700}>
+                      {activeRole.name}
+                    </Typography>
+                    <Chip
+                      label={activeRole.code}
                       size="small"
-                      onClick={() => handleEditRole(role.id)}
-                    >
-                      <FuseSvgIcon size={20}>
-                        heroicons-outline:pencil-square
-                      </FuseSvgIcon>
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Asignar permisos">
-                    <IconButton
-                      size="small"
-                      onClick={() => handleAssignPermissions(role.id)}
-                    >
-                      <FuseSvgIcon size={20}>heroicons-outline:key</FuseSvgIcon>
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
-              </TableRow>
-            ))}
-
-            {(!roles || roles.length === 0) && (
-              <TableRow>
-                <TableCell colSpan={4} align="center" sx={{ py: 8 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    No hay roles disponibles
+                      sx={{
+                        borderRadius: 1,
+                        bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
+                        color: theme.palette.primary.main,
+                        fontWeight: 600,
+                        fontFamily: "monospace",
+                      }}
+                    />
+                  </Stack>
+                  <Typography variant="body1" color="text.secondary">
+                    {activeRole.description || "Sin descripción disponible para este rol."}
                   </Typography>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                </Box>
+                <Button
+                  variant="outlined"
+                  startIcon={<FuseSvgIcon>heroicons-outline:pencil-square</FuseSvgIcon>}
+                  onClick={handleEditRole}
+                >
+                  Editar Rol
+                </Button>
+              </Stack>
+            </Box>
+
+            {/* Permissions Matrix */}
+            <Box className="flex-1 overflow-y-auto">
+              <RolePermissionMatrix />
+            </Box>
+          </>
+        ) : (
+          <Box className="flex flex-col items-center justify-center h-full text-center p-8">
+            <FuseSvgIcon size={64} color="disabled" className="mb-4">
+              heroicons-outline:shield-exclamation
+            </FuseSvgIcon>
+            <Typography variant="h6" color="text.secondary">
+              Selecciona un rol para ver sus detalles
+            </Typography>
+          </Box>
+        )}
+      </Box>
 
       {/* Modals */}
       <CreateRoleModal
@@ -186,10 +141,7 @@ export default function RolesTabView() {
       {selectedRole && (
         <UpdateRoleModal
           open={updateModalOpen}
-          onClose={() => {
-            setUpdateModalOpen(false);
-            setSelectedRole(null);
-          }}
+          onClose={() => setUpdateModalOpen(false)}
           roleId={selectedRole}
         />
       )}

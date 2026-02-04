@@ -13,8 +13,8 @@ import {
     Stack,
     Button,
     useTheme,
+    alpha,
     Chip,
-    CircularProgress,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import { useState } from "react";
@@ -36,149 +36,193 @@ export default function PaymentMethodsTabView() {
         setUpdateModalOpen(true);
     };
 
-    const getTypeLabel = (type: string) => {
-        const types: Record<string, string> = {
-            cash: "Efectivo",
-            bank_transfer: "Transferencia",
-            credit_card: "Tarjeta de Crédito",
-            debit_card: "Tarjeta de Débito",
-            check: "Cheque",
-            other: "Otro",
+    const getTypeConfig = (type: string) => {
+        const configs: Record<string, { label: string; icon: string; color: string }> = {
+            cash: {
+                label: "Efectivo",
+                icon: "heroicons-outline:banknotes",
+                color: theme.palette.success.main
+            },
+            bank_transfer: {
+                label: "Transferencia",
+                icon: "heroicons-outline:building-library",
+                color: theme.palette.info.main
+            },
+            credit_card: {
+                label: "Tarjeta de Crédito",
+                icon: "heroicons-outline:credit-card",
+                color: theme.palette.primary.main
+            },
+            debit_card: {
+                label: "Tarjeta de Débito",
+                icon: "heroicons-outline:credit-card",
+                color: theme.palette.secondary.main
+            },
+            check: {
+                label: "Cheque",
+                icon: "heroicons-outline:document-text",
+                color: theme.palette.warning.main
+            },
+            other: {
+                label: "Otro",
+                icon: "heroicons-outline:ellipsis-horizontal-circle",
+                color: theme.palette.grey[600]
+            },
         };
-        return types[type] || type;
+        return configs[type] || configs.other;
     };
 
     if (isLoading)
         return (
-            <Box className="flex h-96 items-center justify-center">
-                <CircularProgress size={32} />
+            <Box className="flex h-64 items-center justify-center">
+                <Typography color="text.secondary">
+                    Cargando métodos de pago...
+                </Typography>
             </Box>
         );
 
     if (isError)
         return (
-            <Box className="flex h-96 items-center justify-center">
-                <Typography color="error">Error al cargar</Typography>
+            <Box className="flex h-64 items-center justify-center">
+                <Typography color="error">
+                    Error al cargar los métodos de pago
+                </Typography>
             </Box>
         );
 
     return (
-        <Box className="w-full">
-            {/* Header */}
+        <Box className="w-full overflow-hidden">
+            {/* Header Section */}
             <Stack
                 direction="row"
-                justifyContent="flex-end"
+                justifyContent="space-between"
                 alignItems="center"
+                spacing={2}
                 sx={{
-                    px: 3,
-                    py: 2,
+                    p: 3,
                     borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
             >
+                <div />
                 <Button
                     className="btn-primary"
                     variant="contained"
                     color="primary"
                     size="large"
-                    startIcon={<FuseSvgIcon size={16}>heroicons-outline:plus</FuseSvgIcon>}
+                    startIcon={
+                        <FuseSvgIcon size={20}>
+                            heroicons-outline:credit-card
+                        </FuseSvgIcon>
+                    }
                     onClick={() => setCreateModalOpen(true)}
                 >
-                    Agregar método de pago
+                    Crear método de pago
                 </Button>
             </Stack>
 
-            {/* Table */}
-            {(!paymentMethods || paymentMethods.length === 0) ? (
-                <Box sx={{ p: 8, textAlign: "center" }}>
-                    <Typography variant="body2" color="text.secondary">
-                        No hay métodos de pago
-                    </Typography>
-                    <Button
-                        variant="text"
-                        size="small"
-                        startIcon={<FuseSvgIcon size={16}>heroicons-outline:plus</FuseSvgIcon>}
-                        onClick={() => setCreateModalOpen(true)}
-                        sx={{ mt: 2 }}
-                    >
-                        Agregar método
-                    </Button>
-                </Box>
-            ) : (
-                <TableContainer>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 600, color: "text.secondary", fontSize: "0.75rem" }}>
-                                    NOMBRE
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: "text.secondary", fontSize: "0.75rem" }}>
-                                    TIPO
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: "text.secondary", fontSize: "0.75rem" }}>
-                                    DESCRIPCIÓN
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: "text.secondary", fontSize: "0.75rem" }}>
-                                    ESTADO
-                                </TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 600, color: "text.secondary", fontSize: "0.75rem" }}>
-                                    ACCIONES
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {paymentMethods.map((paymentMethod) => (
+            {/* Table Section */}
+            <TableContainer>
+                <Table sx={{ minWidth: 650 }}>
+                    <TableHead>
+                        <TableRow
+                            sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.05) }}
+                        >
+                            <TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Tipo</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Descripción</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Estado</TableCell>
+                            <TableCell align="right" sx={{ pr: 3, fontWeight: 700 }}>
+                                Acciones
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+
+                    <TableBody>
+                        {paymentMethods?.map((paymentMethod) => {
+                            const typeConfig = getTypeConfig(paymentMethod.type);
+                            return (
                                 <TableRow
                                     key={paymentMethod.id}
+                                    hover
                                     sx={{
-                                        "&:hover": { backgroundColor: theme.palette.action.hover },
+                                        transition: "all 0.2s ease",
                                         "&:last-child td": { borderBottom: 0 },
                                     }}
                                 >
-                                    <TableCell>
-                                        <Typography variant="body2" fontWeight={500}>
+                                    {/* Nombre */}
+                                    <TableCell sx={{ pl: 3 }}>
+                                        <Typography variant="subtitle2" fontWeight={600}>
                                             {paymentMethod.name}
                                         </Typography>
                                     </TableCell>
+
+                                    {/* Tipo */}
                                     <TableCell>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {getTypeLabel(paymentMethod.type)}
-                                        </Typography>
+                                        <Stack direction="row" alignItems="center" spacing={1}>
+                                            <FuseSvgIcon
+                                                size={18}
+                                                sx={{ color: typeConfig.color }}
+                                            >
+                                                {typeConfig.icon}
+                                            </FuseSvgIcon>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {typeConfig.label}
+                                            </Typography>
+                                        </Stack>
                                     </TableCell>
+
+                                    {/* Descripción */}
                                     <TableCell>
                                         <Typography variant="body2" color="text.secondary">
                                             {paymentMethod.description || "-"}
                                         </Typography>
                                     </TableCell>
+
+                                    {/* Estado */}
                                     <TableCell>
                                         <Chip
+                                            className="w-[100px]"
                                             label={paymentMethod.is_active ? "Activo" : "Inactivo"}
-                                            size="small"
-                                            variant="outlined"
-                                            color={paymentMethod.is_active ? "success" : "default"}
-                                            sx={{ height: 22, fontSize: "0.75rem" }}
+                                            variant="filled"
                                         />
                                     </TableCell>
-                                    <TableCell align="right">
-                                        <Tooltip title="Editar">
+
+                                    {/* Acciones */}
+                                    <TableCell align="right" sx={{ pr: 3 }}>
+                                        <Tooltip title="Editar método">
                                             <IconButton
                                                 size="small"
                                                 onClick={() => handleEditPaymentMethod(paymentMethod.id!)}
                                             >
-                                                <FuseSvgIcon size={18}>heroicons-outline:pencil</FuseSvgIcon>
+                                                <FuseSvgIcon size={20}>
+                                                    heroicons-outline:pencil-square
+                                                </FuseSvgIcon>
                                             </IconButton>
                                         </Tooltip>
-                                        <Tooltip title="Eliminar">
-                                            <IconButton size="small">
-                                                <FuseSvgIcon size={18}>heroicons-outline:trash</FuseSvgIcon>
+                                        <Tooltip title="Eliminar método">
+                                            <IconButton size="small" color="error">
+                                                <FuseSvgIcon size={20}>
+                                                    heroicons-outline:trash
+                                                </FuseSvgIcon>
                                             </IconButton>
                                         </Tooltip>
                                     </TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            )}
+                            );
+                        })}
+
+                        {(!paymentMethods || paymentMethods.length === 0) && (
+                            <TableRow>
+                                <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        No hay métodos de pago disponibles
+                                    </Typography>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
             {/* Modals */}
             <CreatePaymentMethodModal
