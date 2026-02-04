@@ -6,6 +6,7 @@ import { registerCompanyModule } from "./modules/company.module";
 import { registerAddressModule } from "./modules/address.module";
 import { registerContactModule } from "./modules/contact.module";
 import { registerPaymentMethodModule } from "./modules/payment_method.module";
+import { registerStoreModule } from "./modules/store.module";
 
 const container = new Container();
 
@@ -17,5 +18,6 @@ registerCompanyModule(container);
 registerAddressModule(container);
 registerContactModule(container);
 registerPaymentMethodModule(container);
+registerStoreModule(container);
 
 export { container };

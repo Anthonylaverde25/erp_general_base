@@ -72,6 +72,14 @@ const SettingsAppNavigation: FuseNavItemType = {
       url: "/apps/settings/payment-methods",
       subtitle: "Manage your payment methods and financial information",
     },
+    {
+      id: "apps.settings.stores",
+      icon: "lucide:building-2",
+      title: "Stores",
+      type: "item",
+      url: "/apps/settings/stores",
+      subtitle: "Manage your stores and financial information",
+    },
   ],
 };
 

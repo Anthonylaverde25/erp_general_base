@@ -55,4 +55,8 @@ export const TYPES = {
   ShowPaymentMethodUseCase: Symbol.for("ShowPaymentMethodUseCase"),
   UpdatePaymentMethodUseCase: Symbol.for("UpdatePaymentMethodUseCase"),
   DeletePaymentMethodUseCase: Symbol.for("DeletePaymentMethodUseCase"),
+
+  // Stores
+  IStoreRepository: Symbol.for("IStoreRepository"),
+  IndexStoresUseCase: Symbol.for("IndexStoresUseCase"),
 };

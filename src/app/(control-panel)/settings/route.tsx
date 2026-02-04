@@ -25,6 +25,9 @@ const BankAccountTabView = lazy(
 const PaymentMethodsPage = lazy(
   () => import("@/ui/payment_methods/pages/PaymentMethodsPage"),
 );
+const StoresPage = lazy(
+  () => import("@/ui/stores/pages/StoresPage"),
+);
 
 /**
  * The Settings App Route.
@@ -72,6 +75,10 @@ const Route: FuseRouteItemType = {
     {
       path: "payment-methods",
       element: <PaymentMethodsPage />,
+    },
+    {
+      path: "stores",
+      element: <StoresPage />,
     },
     {
       path: "",
