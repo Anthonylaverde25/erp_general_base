@@ -2,115 +2,115 @@ import React from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import {
     TextField,
-    Stack,
     FormControlLabel,
-    Switch
+    Switch,
+    Box
 } from '@mui/material';
 
-export default function AddressForm() {
-    const { control, formState: { errors } } = useFormContext();
+interface AddressFormProps {
+    prefix?: string;
+}
+
+export default function AddressForm({ prefix }: AddressFormProps) {
+    const { control } = useFormContext();
+
+    const getName = (name: string) => prefix ? `${prefix}.${name}` : name;
+
+    const renderTextField = (
+        name: string,
+        label: string,
+        placeholder: string,
+        autoFocus = false
+    ) => (
+        <Controller
+            name={getName(name)}
+            control={control}
+            render={({ field, fieldState }) => (
+                <TextField
+                    {...field}
+                    label={label}
+                    placeholder={placeholder}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    fullWidth
+                    variant="filled"
+                    size="medium"
+                    autoFocus={autoFocus && !prefix}
+                />
+            )}
+        />
+    );
 
     return (
-        <Stack spacing={3}>
-            <Controller
-                name="street"
-                control={control}
-                render={({ field }) => (
-                    <TextField
-                        {...field}
-                        label="Calle y número"
-                        placeholder="Ej: Av. Libertador 1234"
-                        error={!!errors.street}
-                        helperText={errors.street?.message as string}
-                        fullWidth
-                        variant="filled"
-                        autoFocus
-                    />
+        <Box sx={{ mt: 2 }}>
+
+            {/* Calle full width */}
+            <Box mb={2}>
+                {renderTextField(
+                    "street",
+                    "Calle y número",
+                    "Ej: Av. Libertador 1234",
+                    true
                 )}
-            />
+            </Box>
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <Controller
-                    name="city"
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Ciudad"
-                            placeholder="Ciudad"
-                            error={!!errors.city}
-                            helperText={errors.city?.message as string}
-                            fullWidth
-                            variant="filled"
-                        />
-                    )}
-                />
-                <Controller
-                    name="state"
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Provincia / Estado"
-                            placeholder="Provincia"
-                            error={!!errors.state}
-                            helperText={errors.state?.message as string}
-                            fullWidth
-                            variant="filled"
-                        />
-                    )}
-                />
-            </Stack>
+            {/* Fila 2 */}
+            <Box
+                display="flex"
+                gap={2}
+                mb={2}
+                flexWrap="wrap"
+            >
+                <Box flex={1} minWidth={220}>
+                    {renderTextField("postal_code", "Código Postal", "CP")}
+                </Box>
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <Controller
-                    name="postal_code"
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="Código Postal"
-                            placeholder="CP"
-                            error={!!errors.postal_code}
-                            helperText={errors.postal_code?.message as string}
-                            fullWidth
-                            variant="filled"
-                        />
-                    )}
-                />
-                <Controller
-                    name="country"
-                    control={control}
-                    render={({ field }) => (
-                        <TextField
-                            {...field}
-                            label="País"
-                            placeholder="País"
-                            error={!!errors.country}
-                            helperText={errors.country?.message as string}
-                            fullWidth
-                            variant="filled"
-                        />
-                    )}
-                />
-            </Stack>
+                <Box flex={1} minWidth={220}>
+                    {renderTextField("city", "Ciudad", "Ciudad")}
+                </Box>
+            </Box>
 
-            <Controller
-                name="default"
-                control={control}
-                render={({ field }) => (
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                checked={field.value}
-                                onChange={(e) => field.onChange(e.target.checked)}
-                                color="primary"
-                            />
-                        }
-                        label="Marcar como dirección principal"
-                    />
-                )}
-            />
-        </Stack>
+            {/* Fila 3 */}
+            <Box
+                display="flex"
+                gap={2}
+                mb={2}
+                flexWrap="wrap"
+            >
+                <Box flex={1} minWidth={220}>
+                    {renderTextField("state", "Provincia / Estado", "Provincia")}
+                </Box>
+
+                <Box flex={1} minWidth={220}>
+                    {renderTextField("country", "País", "País")}
+                </Box>
+            </Box>
+
+            {/* Switch */}
+            <Box
+                display="flex"
+                justifyContent="start"
+                mt={1}
+            >
+                <Controller
+                    name={getName("default")}
+                    control={control}
+                    render={({ field }) => (
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={!!field.value}
+                                    onChange={(e) =>
+                                        field.onChange(e.target.checked)
+                                    }
+                                />
+                            }
+                            label="Marcar como dirección principal"
+                        />
+                    )}
+                />
+            </Box>
+
+        </Box>
     );
 }

@@ -1,5 +1,6 @@
 import { Store } from "@/types/store.types";
 import { CreateStoreDTO } from "./DTOs/CreateStoreDTO";
+import { Address } from "@/types/company.types";
 
 export class StoreEntity implements Store {
     constructor(
@@ -8,6 +9,7 @@ export class StoreEntity implements Store {
         public name: string,
         public code: string | undefined,
         public is_active: boolean,
+        public address?: Address,
     ) { }
 
     static fromPrimitives(data: Store): StoreEntity {
@@ -17,6 +19,7 @@ export class StoreEntity implements Store {
             data.name,
             data.code,
             data.is_active ?? true,
+            data.address,
         );
     }
 
@@ -27,6 +30,11 @@ export class StoreEntity implements Store {
             data.name,
             data.code,
             data.is_active ?? true,
+            // Address creation logic should be handled by repository transformation if needed, 
+            // but for entity structure we keep it undefined for now or map it if DTO had it.
+            // Since DTO has CreateAddressDTO, not Address entity, we leave it undefined here 
+            // as this method is usually for local optimistic creation or similar.
+            undefined
         );
     }
 
@@ -37,6 +45,7 @@ export class StoreEntity implements Store {
             name: this.name,
             code: this.code,
             is_active: this.is_active,
+            address: this.address,
         };
     }
 }

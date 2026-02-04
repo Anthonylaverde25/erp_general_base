@@ -59,4 +59,8 @@ export const TYPES = {
   // Stores
   IStoreRepository: Symbol.for("IStoreRepository"),
   IndexStoresUseCase: Symbol.for("IndexStoresUseCase"),
+  CreateStoreUseCase: Symbol.for("CreateStoreUseCase"),
+  ShowStoreUseCase: Symbol.for("ShowStoreUseCase"),
+  UpdateStoreUseCase: Symbol.for("UpdateStoreUseCase"),
+  DeleteStoreUseCase: Symbol.for("DeleteStoreUseCase"),
 };

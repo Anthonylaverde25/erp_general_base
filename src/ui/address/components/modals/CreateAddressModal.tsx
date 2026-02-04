@@ -83,7 +83,7 @@ export default function CreateAddressModal({ open, onClose, onSubmit }: CreateAd
         <Dialog
             open={open}
             onClose={handleClose}
-            maxWidth="sm"
+            maxWidth='sm'
             fullWidth
             PaperProps={{
                 sx: { borderRadius: 2 }

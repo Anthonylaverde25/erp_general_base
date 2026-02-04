@@ -21,4 +21,23 @@ export class StoreRepositoryCrud implements IStoreRepository {
             message
         };
     }
+
+    async show(id: number): Promise<StoreEntity> {
+        const {
+            data: { store }
+        } = await axiosInstance.get(`stores/${id}`);
+        return StoreEntity.fromPrimitives(store);
+    }
+
+    async update(id: number, data: Partial<StoreEntity>): Promise<{ store: StoreEntity; message: string; }> {
+        const { data: { store, message } } = await axiosInstance.put(`stores/${id}`, data);
+        return {
+            store: StoreMapper.fromDetailDTO(store),
+            message
+        };
+    }
+
+    async delete(id: number): Promise<void> {
+        await axiosInstance.delete(`stores/${id}`);
+    }
 }

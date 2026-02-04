@@ -18,12 +18,30 @@ import {
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import { useState } from "react";
 import useIndexStores from "@/features/stores/hooks/useIndexStores";
+import useDeleteStore from "@/features/stores/hooks/useDeleteStore";
+import CreateStoreModal from "./modals/CreateStoreModal";
+import UpdateStoreModal from "./modals/UpdateStoreModal";
+import { StoreEntity } from "@/domain/entities/stores/StoreEntity";
 
 export default function StoresTabView() {
     const theme = useTheme();
     const { stores, isLoading, isError } = useIndexStores();
+    const { handleDeleteStore } = useDeleteStore();
 
     const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [updateModalOpen, setUpdateModalOpen] = useState(false);
+    const [selectedStore, setSelectedStore] = useState<number | null>(null);
+
+    const handleEditStore = (storeId: number) => {
+        setSelectedStore(storeId);
+        setUpdateModalOpen(true);
+    };
+
+    const onDeleteStore = async (storeId: number) => {
+        if (confirm("¿Está seguro de eliminar esta tienda?")) {
+            await handleDeleteStore(storeId);
+        }
+    };
 
     if (isLoading)
         return (
@@ -127,7 +145,7 @@ export default function StoresTabView() {
                                     <Tooltip title="Editar tienda">
                                         <IconButton
                                             size="small"
-                                            onClick={() => { }}
+                                            onClick={() => handleEditStore(store.id!)}
                                         >
                                             <FuseSvgIcon size={20}>
                                                 heroicons-outline:pencil-square
@@ -135,7 +153,11 @@ export default function StoresTabView() {
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Eliminar tienda">
-                                        <IconButton size="small" color="error">
+                                        <IconButton
+                                            size="small"
+                                            color="error"
+                                            onClick={() => onDeleteStore(store.id!)}
+                                        >
                                             <FuseSvgIcon size={20}>
                                                 heroicons-outline:trash
                                             </FuseSvgIcon>
@@ -157,6 +179,23 @@ export default function StoresTabView() {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            {/* Modals */}
+            <CreateStoreModal
+                open={createModalOpen}
+                onClose={() => setCreateModalOpen(false)}
+            />
+
+            {selectedStore && (
+                <UpdateStoreModal
+                    open={updateModalOpen}
+                    onClose={() => {
+                        setUpdateModalOpen(false);
+                        setSelectedStore(null);
+                    }}
+                    storeId={selectedStore}
+                />
+            )}
         </Box>
     );
 }

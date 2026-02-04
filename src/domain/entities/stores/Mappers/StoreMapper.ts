@@ -8,6 +8,7 @@ export class StoreMapper {
             name: data.name,
             code: data.code,
             is_active: data.is_active,
+            address: data.address, // Assuming API returns nested address object matching interface
         });
     }
 
