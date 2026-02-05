@@ -31,6 +31,12 @@ const StoresPage = lazy(
 const NumberSeriesPage = lazy(
   () => import("@/ui/number_series/pages/NumberSeriesPage"),
 );
+const TaxTypesPage = lazy(
+  () => import("@/ui/tax_types/pages/TaxTypesPage"),
+);
+const TaxRatesPage = lazy(
+  () => import("@/ui/tax_rates/pages/TaxRatesPage"),
+);
 
 /**
  * The Settings App Route.
@@ -86,6 +92,14 @@ const Route: FuseRouteItemType = {
     {
       path: "number-serie",
       element: <NumberSeriesPage />,
+    },
+    {
+      path: "tax-types",
+      element: <TaxTypesPage />,
+    },
+    {
+      path: "tax-rate",
+      element: <TaxRatesPage />,
     },
     {
       path: "",

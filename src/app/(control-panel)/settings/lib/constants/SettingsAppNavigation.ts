@@ -87,6 +87,21 @@ const SettingsAppNavigation: FuseNavItemType = {
       type: "item",
       url: "/apps/settings/number-serie",
       subtitle: "Manage your number serie and financial information",
+    }, {
+      id: "apps.settings.tax_types",
+      icon: "lucide:building-2",
+      title: "Tax Types",
+      type: "item",
+      url: "/apps/settings/tax-types",
+      subtitle: "Manage your tax types and financial information",
+    },
+    {
+      id: "apps.settings.taxRate",
+      icon: "lucide:building-2",
+      title: "Tax Rate",
+      type: "item",
+      url: "/apps/settings/tax-rate",
+      subtitle: "Manage your tax rate and financial information",
     },
   ],
 };

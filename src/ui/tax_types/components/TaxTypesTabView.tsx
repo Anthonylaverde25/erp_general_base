@@ -14,37 +14,61 @@ import {
     useTheme,
     alpha,
     Chip,
+    Switch,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
-import useIndexNumberSeries from "@/features/number_series/hooks/useIndexNumberSeries";
-import { NumberSeriesEntity } from "@/domain/entities/number_series/NumberSeriesEntity";
-
 import { useState } from "react";
-import CreateNumberSeriesModal from "./modals/CreateNumberSeriesModal";
-import UpdateNumberSeriesModal from "./modals/UpdateNumberSeriesModal";
+import useIndexTaxTypes from "@/features/tax_types/hooks/useIndexTaxTypes";
+import useUpdateTaxType from "@/features/tax_types/hooks/useUpdateTaxType";
+import { TaxTypeEntity } from "@/domain/entities/tax_types/TaxTypeEntity";
+import TaxTypesModal from "./modals/TaxTypesModal";
 
-export default function NumberSeriesTabView() {
+export default function TaxTypesTabView() {
     const theme = useTheme();
-    const { numberSeries, isLoading, isError } = useIndexNumberSeries();
-    const [createModalOpen, setCreateModalOpen] = useState(false);
-    const [updateModalOpen, setUpdateModalOpen] = useState(false);
-    const [selectedSeries, setSelectedSeries] = useState<NumberSeriesEntity | null>(null);
+    const { taxTypes, isLoading, isError } = useIndexTaxTypes();
+    const { handleUpdateTaxType } = useUpdateTaxType();
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedTaxType, setSelectedTaxType] = useState<TaxTypeEntity | null>(null);
 
-    const handleEdit = (series: NumberSeriesEntity) => {
-        setSelectedSeries(series);
-        setUpdateModalOpen(true);
+    const handleCreate = () => {
+        setSelectedTaxType(null);
+        setModalOpen(true);
     };
 
-    const handleCloseUpdateModal = () => {
-        setUpdateModalOpen(false);
-        setSelectedSeries(null);
+    const handleEdit = (taxType: TaxTypeEntity) => {
+        setSelectedTaxType(taxType);
+        setModalOpen(true);
+    };
+
+    const handleDelete = (id: number) => {
+        console.log("Delete tax type clicked", id);
+        // TODO: Implement delete functionality
+    };
+
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setSelectedTaxType(null);
+    };
+
+    const handleStatusChange = async (taxType: TaxTypeEntity) => {
+        try {
+            await handleUpdateTaxType({
+                id: taxType.id,
+                code: taxType.code,
+                name: taxType.name,
+                description: taxType.description || "",
+                is_active: !taxType.is_active,
+            });
+        } catch (error) {
+            console.error("Error updating status:", error);
+        }
     };
 
     if (isLoading)
         return (
             <Box className="flex h-64 items-center justify-center">
                 <Typography color="text.secondary">
-                    Cargando series numéricas...
+                    Cargando tipos de impuestos...
                 </Typography>
             </Box>
         );
@@ -53,7 +77,7 @@ export default function NumberSeriesTabView() {
         return (
             <Box className="flex h-64 items-center justify-center">
                 <Typography color="error">
-                    Error al cargar las series numéricas
+                    Error al cargar los tipos de impuestos
                 </Typography>
             </Box>
         );
@@ -82,9 +106,9 @@ export default function NumberSeriesTabView() {
                             heroicons-outline:plus
                         </FuseSvgIcon>
                     }
-                    onClick={() => setCreateModalOpen(true)}
+                    onClick={handleCreate}
                 >
-                    Crear serie
+                    Crear tipo de impuesto
                 </Button>
             </Stack>
 
@@ -98,11 +122,9 @@ export default function NumberSeriesTabView() {
                                 borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
                             }}
                         >
-                            <TableCell sx={{ pl: 3, fontWeight: 700 }}>Tipo de Documento</TableCell>
-                            <TableCell sx={{ fontWeight: 700 }}>Serie</TableCell>
-                            <TableCell sx={{ fontWeight: 700 }}>Año</TableCell>
-                            <TableCell sx={{ fontWeight: 700 }}>Número Actual</TableCell>
-                            <TableCell sx={{ fontWeight: 700 }}>Términos</TableCell>
+                            <TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Descripción</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Estado</TableCell>
                             <TableCell align="right" sx={{ pr: 3, fontWeight: 700 }}>
                                 Acciones
                             </TableCell>
@@ -110,9 +132,9 @@ export default function NumberSeriesTabView() {
                     </TableHead>
 
                     <TableBody>
-                        {numberSeries?.map((series) => (
+                        {taxTypes?.map((taxType) => (
                             <TableRow
-                                key={series.id}
+                                key={taxType.id}
                                 hover
                                 sx={{
                                     transition: "all 0.2s ease",
@@ -128,59 +150,40 @@ export default function NumberSeriesTabView() {
                                     },
                                 }}
                             >
-                                {/* Tipo de Documento */}
+                                {/* Nombre */}
                                 <TableCell sx={{ pl: 3 }}>
-                                    <Stack spacing={0.5}>
-                                        <Typography variant="subtitle2" fontWeight={600}>
-                                            {series.document_type?.name || "-"}
-                                        </Typography>
-                                        <Chip
-                                            label={series.document_type?.code || "-"}
-                                            size="small"
-                                            sx={{ width: "fit-content" }}
-                                        />
-                                    </Stack>
-                                </TableCell>
-
-                                {/* Serie */}
-                                <TableCell>
-                                    <Typography variant="body2" fontWeight={600}>
-                                        {series.serie}
+                                    <Typography variant="subtitle2" fontWeight={600}>
+                                        {taxType.name}
                                     </Typography>
                                 </TableCell>
 
-                                {/* Año */}
-                                <TableCell>
-                                    <Typography variant="body2">
-                                        {series.year}
-                                    </Typography>
-                                </TableCell>
-
-                                {/* Número Actual */}
-                                <TableCell>
-                                    <Typography variant="body2" fontWeight={600} color="primary">
-                                        {series.current_number}
-                                    </Typography>
-                                </TableCell>
-
-                                {/* Términos */}
+                                {/* Descripción */}
                                 <TableCell>
                                     <Typography variant="body2" color="text.secondary">
-                                        {series.terms || "-"}
+                                        {taxType.description || "-"}
                                     </Typography>
+                                </TableCell>
+
+                                {/* Estado */}
+                                <TableCell>
+                                    <Switch
+                                        checked={taxType.is_active}
+                                        onChange={() => handleStatusChange(taxType)}
+                                        inputProps={{ "aria-label": "controlled" }}
+                                    />
                                 </TableCell>
 
                                 {/* Acciones */}
                                 <TableCell align="right" sx={{ pr: 3 }}>
-                                    <Tooltip title="Editar serie">
-                                        <IconButton size="small" onClick={() => handleEdit(series)}>
+                                    <Tooltip title="Editar">
+                                        <IconButton size="small" onClick={() => handleEdit(taxType)}>
                                             <FuseSvgIcon size={20}>
                                                 heroicons-outline:pencil-square
                                             </FuseSvgIcon>
                                         </IconButton>
                                     </Tooltip>
-                                    <Tooltip title="Eliminar serie">
-                                        <IconButton size="small" color="error">
+                                    <Tooltip title="Eliminar">
+                                        <IconButton size="small" color="error" onClick={() => handleDelete(taxType.id)}>
                                             <FuseSvgIcon size={20}>
                                                 heroicons-outline:trash
                                             </FuseSvgIcon>
@@ -190,11 +193,11 @@ export default function NumberSeriesTabView() {
                             </TableRow>
                         ))}
 
-                        {(!numberSeries || numberSeries.length === 0) && (
+                        {(!taxTypes || taxTypes.length === 0) && (
                             <TableRow>
-                                <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
+                                <TableCell colSpan={4} align="center" sx={{ py: 8 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        No hay series numéricas disponibles
+                                        No hay tipos de impuestos disponibles
                                     </Typography>
                                 </TableCell>
                             </TableRow>
@@ -203,15 +206,10 @@ export default function NumberSeriesTabView() {
                 </Table>
             </TableContainer>
 
-            <CreateNumberSeriesModal
-                open={createModalOpen}
-                onClose={() => setCreateModalOpen(false)}
-            />
-
-            <UpdateNumberSeriesModal
-                open={updateModalOpen}
-                onClose={handleCloseUpdateModal}
-                numberSeries={selectedSeries}
+            <TaxTypesModal
+                open={modalOpen}
+                onClose={handleCloseModal}
+                taxType={selectedTaxType}
             />
         </Box>
     );

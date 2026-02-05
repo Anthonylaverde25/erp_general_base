@@ -9,6 +9,7 @@ import { registerPaymentMethodModule } from "./modules/payment_method.module";
 import { registerStoreModule } from "./modules/store.module";
 import { registerDocumentTypeModule } from "./modules/document_type.module";
 import { registerNumberSeriesModule } from "./modules/number_series.module";
+import { registerTaxTypesModule } from "./modules/tax_types.module";
 
 const container = new Container();
 
@@ -23,5 +24,6 @@ registerPaymentMethodModule(container);
 registerStoreModule(container);
 registerDocumentTypeModule(container);
 registerNumberSeriesModule(container);
+registerTaxTypesModule(container);
 
 export { container };

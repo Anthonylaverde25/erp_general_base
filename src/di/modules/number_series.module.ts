@@ -4,6 +4,7 @@ import { INumberSeriesRepository } from "@/domain/entities/number_series/reposit
 import { NumberSeriesRepositoryCrud } from "@/infrastructure/repositories/number_series/NumberSeriesRepositoryCrud";
 import { IndexNumberSeriesUseCase } from "@/application/use_cases/number_series/IndexNumberSeriesUseCase";
 import { CreateNumberSeriesUseCase } from "@/application/use_cases/number_series/CreateNumberSeriesUseCase";
+import { UpdateNumberSeriesUseCase } from "@/application/use_cases/number_series/UpdateNumberSeriesUseCase";
 
 export function registerNumberSeriesModule(container: Container) {
     // Repository
@@ -18,4 +19,7 @@ export function registerNumberSeriesModule(container: Container) {
     container
         .bind<CreateNumberSeriesUseCase>(TYPES.CreateNumberSeriesUseCase)
         .to(CreateNumberSeriesUseCase);
+    container
+        .bind<UpdateNumberSeriesUseCase>(TYPES.UpdateNumberSeriesUseCase)
+        .to(UpdateNumberSeriesUseCase);
 }
