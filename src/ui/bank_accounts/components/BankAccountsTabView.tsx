@@ -105,7 +105,10 @@ export default function BankAccountsTabView({
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow
-              sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.05) }}
+              sx={{
+                backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+              }}
             >
               <TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Titular</TableCell>
@@ -125,6 +128,15 @@ export default function BankAccountsTabView({
                 sx={{
                   transition: "all 0.2s ease",
                   "&:last-child td": { borderBottom: 0 },
+                  "&:nth-of-type(odd)": {
+                    backgroundColor: alpha(theme.palette.action.hover, 0.4),
+                  },
+                  "&:nth-of-type(even)": {
+                    backgroundColor: "transparent",
+                  },
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                  },
                 }}
               >
                 {/* Nombre */}
@@ -136,14 +148,14 @@ export default function BankAccountsTabView({
 
                 {/* Titular */}
                 <TableCell>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2">
                     {bankAccount.account_holder}
                   </Typography>
                 </TableCell>
 
                 {/* Número de Cuenta */}
                 <TableCell>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2">
                     {bankAccount.account_number}
                   </Typography>
                 </TableCell>

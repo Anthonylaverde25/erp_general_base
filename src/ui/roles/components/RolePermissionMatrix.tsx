@@ -101,30 +101,54 @@ export default function RolePermissionMatrix() {
 
     return (
         <Box className="w-full">
-            <Box sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.05), borderBottom: 1, borderColor: "divider" }}>
-                <Typography variant="subtitle1" fontWeight={600}>
+            <Box sx={{
+                p: 3,
+                bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                borderBottom: `2px solid`,
+                borderColor: (theme) => alpha(theme.palette.primary.main, 0.2)
+            }}>
+                <Typography variant="h6" fontWeight={700}>
                     Matriz de Acceso
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                     Configure los permisos de nivel de sistema (rwx style)
                 </Typography>
             </Box>
             <TableContainer>
-                <Table size="small">
+                <Table>
                     <TableHead>
-                        <TableRow>
-                            <TableCell sx={{ fontWeight: 700 }}>Recurso</TableCell>
-                            <TableCell align="center" width="100">Lectura (r)</TableCell>
-                            <TableCell align="center" width="100">Escritura (w)</TableCell>
-                            <TableCell align="center" width="100">Eliminar (x)</TableCell>
-                            <TableCell align="center" width="80">Estado</TableCell>
-                            <TableCell align="right" width="80">Octal</TableCell>
+                        <TableRow sx={{
+                            backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.15),
+                            borderBottom: (theme) => `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                        }}>
+                            <TableCell sx={{ fontWeight: 700, pl: 3 }}>Recurso</TableCell>
+                            <TableCell align="center" width="120" sx={{ fontWeight: 700 }}>Lectura (r)</TableCell>
+                            <TableCell align="center" width="120" sx={{ fontWeight: 700 }}>Escritura (w)</TableCell>
+                            <TableCell align="center" width="120" sx={{ fontWeight: 700 }}>Eliminar (x)</TableCell>
+                            <TableCell align="center" width="100" sx={{ fontWeight: 700 }}>Estado</TableCell>
+                            <TableCell align="right" width="100" sx={{ fontWeight: 700, pr: 3 }}>Octal</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {permissions.map((resource) => (
-                            <TableRow key={resource.resourceId} hover>
-                                <TableCell>
+                        {permissions.map((resource, index) => (
+                            <TableRow
+                                key={resource.resourceId}
+                                hover
+                                sx={{
+                                    transition: "all 0.2s ease",
+                                    "&:last-child td": { borderBottom: 0 },
+                                    "&:nth-of-type(odd)": {
+                                        backgroundColor: (theme) => alpha(theme.palette.action.hover, 0.4),
+                                    },
+                                    "&:nth-of-type(even)": {
+                                        backgroundColor: "transparent",
+                                    },
+                                    "&:hover": {
+                                        backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                                    },
+                                }}
+                            >
+                                <TableCell sx={{ pl: 3 }}>
                                     <Typography variant="body2" fontWeight={600}>
                                         {resource.resourceName}
                                     </Typography>
@@ -174,15 +198,18 @@ export default function RolePermissionMatrix() {
                                 </TableCell>
 
                                 {/* Octal Code */}
-                                <TableCell align="right">
+                                <TableCell align="right" sx={{ pr: 3 }}>
                                     <Typography
-                                        variant="caption"
+                                        variant="body2"
                                         sx={{
                                             fontFamily: 'monospace',
-                                            bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                            color: theme.palette.primary.main,
-                                            px: 1,
-                                            borderRadius: 1
+                                            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
+                                            color: 'primary.main',
+                                            px: 1.5,
+                                            py: 0.5,
+                                            borderRadius: 1,
+                                            fontWeight: 600,
+                                            display: 'inline-block'
                                         }}
                                     >
                                         {getOctalCode(resource.permissions)}00

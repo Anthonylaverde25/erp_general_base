@@ -7,7 +7,19 @@ import Logo from '../../components/Logo';
 
 const Root = styled('div')(({ theme }) => ({
 	backgroundColor: theme.vars.palette.background.default,
-	color: theme.vars.palette.text.primary
+	color: theme.vars.palette.text.primary,
+	'& ::-webkit-scrollbar-thumb': {
+		boxShadow: `inset 0 0 0 20px ${'rgba(255, 255, 255, 0.24)'}`,
+		...theme.applyStyles('light', {
+			boxShadow: `inset 0 0 0 20px ${'rgba(0, 0, 0, 0.24)'}`
+		})
+	},
+	'& ::-webkit-scrollbar-thumb:active': {
+		boxShadow: `inset 0 0 0 20px ${'rgba(255, 255, 255, 0.37)'}`,
+		...theme.applyStyles('light', {
+			boxShadow: `inset 0 0 0 20px ${'rgba(0, 0, 0, 0.37)'}`
+		})
+	}
 }));
 
 type NavbarLayout2Props = {

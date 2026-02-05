@@ -61,7 +61,10 @@ export default function RolesTabView() {
   const activeRole = roles?.find((r) => r.id === selectedRole);
 
   return (
-    <Box className="flex w-full h-[calc(100vh-200px)] overflow-hidden border rounded-lg bg-white">
+    <Box
+      className="flex w-full h-[calc(100vh-200px)] overflow-hidden "
+      sx={{ bgcolor: 'background.paper' }}
+    >
       {/* Sidebar */}
       <RoleListSidebar
         roles={roles || []}
@@ -71,7 +74,10 @@ export default function RolesTabView() {
       />
 
       {/* Main Content */}
-      <Box className="flex-1 flex flex-col overflow-hidden bg-white">
+      <Box
+        className="flex-1 flex flex-col overflow-hidden"
+        sx={{ bgcolor: 'background.default' }}
+      >
         {activeRole ? (
           <>
             {/* Role Header */}

@@ -24,9 +24,9 @@ export class StoreRepositoryCrud implements IStoreRepository {
 
     async show(id: number): Promise<StoreEntity> {
         const {
-            data: { store }
+            data: { stores }
         } = await axiosInstance.get(`stores/${id}`);
-        return StoreEntity.fromPrimitives(store);
+        return StoreEntity.fromPrimitives(stores);
     }
 
     async update(id: number, data: Partial<StoreEntity>): Promise<{ store: StoreEntity; message: string; }> {

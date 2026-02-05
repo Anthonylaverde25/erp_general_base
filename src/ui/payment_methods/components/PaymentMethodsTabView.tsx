@@ -1,4 +1,5 @@
 import useIndexPaymentMethods from "@/features/payment_methods/hooks/useIndexPaymentMethods";
+import useUpdatePaymentMethod from "@/features/payment_methods/hooks/useUpdatePaymentMethod";
 import {
     Table,
     TableBody,
@@ -14,7 +15,7 @@ import {
     Button,
     useTheme,
     alpha,
-    Chip,
+    Switch,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import { useState } from "react";
@@ -25,6 +26,7 @@ import { PaymentMethod } from "@/types/payment_method.types";
 export default function PaymentMethodsTabView() {
     const theme = useTheme();
     const { paymentMethods, isLoading, isError } = useIndexPaymentMethods();
+    const { handleUpdatePaymentMethod } = useUpdatePaymentMethod();
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
@@ -34,6 +36,14 @@ export default function PaymentMethodsTabView() {
     const handleEditPaymentMethod = (paymentMethodId: PaymentMethod["id"]) => {
         setSelectedPaymentMethod(paymentMethodId);
         setUpdateModalOpen(true);
+    };
+
+    const handleToggleActive = async (paymentMethod: PaymentMethod) => {
+        try {
+            handleUpdatePaymentMethod(paymentMethod.id!, { is_active: !paymentMethod.is_active });
+        } catch (error) {
+            console.error("Error toggling payment method status:", error);
+        }
     };
 
     const getTypeConfig = (type: string) => {
@@ -125,7 +135,10 @@ export default function PaymentMethodsTabView() {
                 <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                         <TableRow
-                            sx={{ backgroundColor: alpha(theme.palette.primary.main, 0.05) }}
+                            sx={{
+                                backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                                borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                            }}
                         >
                             <TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
                             <TableCell sx={{ fontWeight: 700 }}>Tipo</TableCell>
@@ -147,6 +160,15 @@ export default function PaymentMethodsTabView() {
                                     sx={{
                                         transition: "all 0.2s ease",
                                         "&:last-child td": { borderBottom: 0 },
+                                        "&:nth-of-type(odd)": {
+                                            backgroundColor: alpha(theme.palette.action.hover, 0.4),
+                                        },
+                                        "&:nth-of-type(even)": {
+                                            backgroundColor: "transparent",
+                                        },
+                                        "&:hover": {
+                                            backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                                        },
                                     }}
                                 >
                                     {/* Nombre */}
@@ -165,7 +187,7 @@ export default function PaymentMethodsTabView() {
                                             >
                                                 {typeConfig.icon}
                                             </FuseSvgIcon>
-                                            <Typography variant="body2" color="text.secondary">
+                                            <Typography variant="body2">
                                                 {typeConfig.label}
                                             </Typography>
                                         </Stack>
@@ -173,18 +195,24 @@ export default function PaymentMethodsTabView() {
 
                                     {/* Descripción */}
                                     <TableCell>
-                                        <Typography variant="body2" color="text.secondary">
+                                        <Typography variant="body2">
                                             {paymentMethod.description || "-"}
                                         </Typography>
                                     </TableCell>
 
                                     {/* Estado */}
                                     <TableCell>
-                                        <Chip
-                                            className="w-[100px]"
-                                            label={paymentMethod.is_active ? "Activo" : "Inactivo"}
-                                            variant="filled"
-                                        />
+                                        <Tooltip
+                                            title={paymentMethod.is_active ? "Desactivar método" : "Activar método"}
+                                            placement="top"
+                                        >
+                                            <Switch
+                                                checked={paymentMethod.is_active}
+                                                onChange={() => handleToggleActive(paymentMethod)}
+                                                color="primary"
+                                                size="small"
+                                            />
+                                        </Tooltip>
                                     </TableCell>
 
                                     {/* Acciones */}

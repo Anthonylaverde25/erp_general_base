@@ -49,14 +49,15 @@ export default function RoleListSidebar({
             }}
         >
             {/* Header */}
-            <Box className="p-4 border-b">
+            <Box className="p-4 border-b" sx={{ bgcolor: 'background.paper' }}>
                 <Button
                     fullWidth
                     variant="contained"
                     color="primary"
+                    size="large"
                     startIcon={<FuseSvgIcon>heroicons-outline:plus</FuseSvgIcon>}
                     onClick={onCreateRole}
-                    sx={{ mb: 2 }}
+                    sx={{ mb: 2.5 }}
                 >
                     Crear Nuevo Rol
                 </Button>
@@ -73,47 +74,60 @@ export default function RoleListSidebar({
                             </InputAdornment>
                         ),
                     }}
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            bgcolor: theme.palette.background.paper
-                        }
-                    }}
                 />
             </Box>
 
             {/* Role List */}
-            <List className="flex-1 overflow-y-auto p-2 space-y-1">
+            <List className="flex-1 overflow-y-auto p-3 space-y-1">
                 {filteredRoles.map((role) => (
                     <ListItem key={role.id} disablePadding>
                         <ListItemButton
                             selected={selectedRoleId === role.id}
                             onClick={() => onSelectRole(role.id)}
                             sx={{
-                                borderRadius: 1,
+                                borderRadius: 1.5,
                                 mb: 0.5,
+                                py: 1.5,
+                                px: 2,
+                                transition: 'all 0.2s ease',
                                 '&.Mui-selected': {
-                                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                    color: theme.palette.primary.main,
+                                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
+                                    color: 'primary.main',
+                                    borderLeft: (theme) => `3px solid ${theme.palette.primary.main}`,
                                     '&:hover': {
-                                        bgcolor: alpha(theme.palette.primary.main, 0.15),
+                                        bgcolor: (theme) => alpha(theme.palette.primary.main, 0.18),
                                     },
                                     '& .MuiTypography-root': {
                                         fontWeight: 600,
                                     }
                                 },
+                                '&:hover': {
+                                    bgcolor: (theme) => alpha(theme.palette.action.hover, 0.4),
+                                }
                             }}
                         >
                             <ListItemText
                                 primary={role.name}
                                 secondary={
-                                    <span className="flex items-center gap-2 mt-1">
-                                        <Typography variant="caption" component="span" sx={{ fontFamily: 'monospace', opacity: 0.7 }}>
-                                            {role.code}
-                                        </Typography>
-                                    </span>
+                                    <Typography
+                                        variant="caption"
+                                        component="span"
+                                        sx={{
+                                            fontFamily: 'monospace',
+                                            opacity: 0.7,
+                                            display: 'block',
+                                            mt: 0.5
+                                        }}
+                                    >
+                                        {role.code}
+                                    </Typography>
                                 }
+                                primaryTypographyProps={{
+                                    variant: 'body2',
+                                    fontWeight: selectedRoleId === role.id ? 600 : 500
+                                }}
                             />
-                            <FuseSvgIcon size={16} color={selectedRoleId === role.id ? "primary" : "action"}>
+                            <FuseSvgIcon size={18} color={selectedRoleId === role.id ? "primary" : "action"}>
                                 heroicons-outline:chevron-right
                             </FuseSvgIcon>
                         </ListItemButton>

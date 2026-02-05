@@ -8,8 +8,6 @@ import {
     Divider,
     Stack,
     Fade,
-    FormControlLabel,
-    Switch,
 } from "@mui/material";
 import { Store, Save, Close, LocationOn } from "@mui/icons-material";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -164,23 +162,6 @@ export default function UpdateStoreForm({
                                                 helperText={errors.code?.message}
                                                 fullWidth
                                                 variant="filled"
-                                            />
-                                        )}
-                                    />
-
-                                    <Controller
-                                        name="is_active"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        checked={field.value}
-                                                        onChange={field.onChange}
-                                                        color="primary"
-                                                    />
-                                                }
-                                                label="Tienda activa"
                                             />
                                         )}
                                     />

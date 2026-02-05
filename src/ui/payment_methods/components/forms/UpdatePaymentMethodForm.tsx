@@ -9,8 +9,6 @@ import {
     Stack,
     Fade,
     MenuItem,
-    FormControlLabel,
-    Switch,
 } from "@mui/material";
 import { Payment, Save, Close } from "@mui/icons-material";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -171,23 +169,6 @@ export default function UpdatePaymentMethodForm({
                                             variant="filled"
                                             multiline
                                             rows={3}
-                                        />
-                                    )}
-                                />
-
-                                <Controller
-                                    name="is_active"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <FormControlLabel
-                                            control={
-                                                <Switch
-                                                    checked={field.value}
-                                                    onChange={field.onChange}
-                                                    color="primary"
-                                                />
-                                            }
-                                            label="Método activo"
                                         />
                                     )}
                                 />
