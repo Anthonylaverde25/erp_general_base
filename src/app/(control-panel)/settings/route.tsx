@@ -28,6 +28,9 @@ const PaymentMethodsPage = lazy(
 const StoresPage = lazy(
   () => import("@/ui/stores/pages/StoresPage"),
 );
+const NumberSeriesPage = lazy(
+  () => import("@/ui/number_series/pages/NumberSeriesPage"),
+);
 
 /**
  * The Settings App Route.
@@ -79,6 +82,10 @@ const Route: FuseRouteItemType = {
     {
       path: "stores",
       element: <StoresPage />,
+    },
+    {
+      path: "number-serie",
+      element: <NumberSeriesPage />,
     },
     {
       path: "",

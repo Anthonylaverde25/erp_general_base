@@ -63,4 +63,14 @@ export const TYPES = {
   ShowStoreUseCase: Symbol.for("ShowStoreUseCase"),
   UpdateStoreUseCase: Symbol.for("UpdateStoreUseCase"),
   DeleteStoreUseCase: Symbol.for("DeleteStoreUseCase"),
+
+  // Document Types
+  IDocumentTypeRepository: Symbol.for("IDocumentTypeRepository"),
+  IndexDocumentTypesUseCase: Symbol.for("IndexDocumentTypesUseCase"),
+  IndexDocumentTypesByCategoryUseCase: Symbol.for("IndexDocumentTypesByCategoryUseCase"),
+
+  // Number Series
+  INumberSeriesRepository: Symbol.for("INumberSeriesRepository"),
+  IndexNumberSeriesUseCase: Symbol.for("IndexNumberSeriesUseCase"),
+  CreateNumberSeriesUseCase: Symbol.for("CreateNumberSeriesUseCase"),
 };

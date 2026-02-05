@@ -80,6 +80,14 @@ const SettingsAppNavigation: FuseNavItemType = {
       url: "/apps/settings/stores",
       subtitle: "Manage your stores and financial information",
     },
+    {
+      id: "apps.settings.number_serie",
+      icon: "lucide:building-2",
+      title: "Number Serie",
+      type: "item",
+      url: "/apps/settings/number-serie",
+      subtitle: "Manage your number serie and financial information",
+    },
   ],
 };
 
