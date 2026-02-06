@@ -1,5 +1,6 @@
 import useIndexPaymentMethods from "@/features/payment_methods/hooks/useIndexPaymentMethods";
 import useUpdatePaymentMethod from "@/features/payment_methods/hooks/useUpdatePaymentMethod";
+import { useTogglePaymentMethodStatus } from "@/features/payment_methods/hooks/useTogglePaymentMethodStatus";
 import {
     Table,
     TableBody,
@@ -27,6 +28,7 @@ export default function PaymentMethodsTabView() {
     const theme = useTheme();
     const { paymentMethods, isLoading, isError } = useIndexPaymentMethods();
     const { handleUpdatePaymentMethod } = useUpdatePaymentMethod();
+    const togglePaymentMethodStatus = useTogglePaymentMethodStatus();
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
@@ -38,9 +40,12 @@ export default function PaymentMethodsTabView() {
         setUpdateModalOpen(true);
     };
 
-    const handleToggleActive = async (paymentMethod: PaymentMethod) => {
+    const handleToggleActive = async (id: number, currentStatus: boolean) => {
         try {
-            handleUpdatePaymentMethod(paymentMethod.id!, { is_active: !paymentMethod.is_active });
+            await togglePaymentMethodStatus.mutateAsync({
+                id,
+                status: !currentStatus
+            });
         } catch (error) {
             console.error("Error toggling payment method status:", error);
         }
@@ -208,7 +213,7 @@ export default function PaymentMethodsTabView() {
                                         >
                                             <Switch
                                                 checked={paymentMethod.is_active}
-                                                onChange={() => handleToggleActive(paymentMethod)}
+                                                onChange={() => handleToggleActive(paymentMethod.id!, paymentMethod.is_active)}
                                                 color="primary"
                                                 size="small"
                                             />
