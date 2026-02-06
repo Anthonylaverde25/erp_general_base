@@ -14,31 +14,41 @@ import {
     alpha,
     IconButton,
     Tooltip,
+    Switch,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
-import { useIndexTaxRates } from "@/features/tax_rates/hooks/useIndexTaxRates";
-import { TaxRateEntity } from "@/domain/entities/tax_rates/TaxRateEntity";
-import { TaxRatesModal } from "./modals/TaxRatesModal";
+import { useIndexFamilies } from "@/features/families/hooks/useIndexFamilies";
+import { FamilyEntity } from "@/domain/entities/families/FamilyEntity";
+import { FamiliesModal } from "./modals/FamiliesModal";
+import { useUpdateFamily } from "@/features/families/hooks/useUpdateFamily";
 
-export default function TaxRatesTabView() {
+export default function FamiliesTabView() {
     const theme = useTheme();
-    const { data: taxRates, isLoading } = useIndexTaxRates();
+    const { data: families, isLoading } = useIndexFamilies();
+    const updateFamily = useUpdateFamily();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedTaxRate, setSelectedTaxRate] = useState<TaxRateEntity | null>(null);
+    const [selectedFamily, setSelectedFamily] = useState<FamilyEntity | null>(null);
 
     const handleCreate = () => {
-        setSelectedTaxRate(null);
+        setSelectedFamily(null);
         setIsModalOpen(true);
     };
 
-    const handleEdit = (taxRate: TaxRateEntity) => {
-        setSelectedTaxRate(taxRate);
+    const handleEdit = (family: FamilyEntity) => {
+        setSelectedFamily(family);
         setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
-        setSelectedTaxRate(null);
+        setSelectedFamily(null);
+    };
+
+    const handleStatusChange = (family: FamilyEntity) => {
+        updateFamily.mutate({
+            id: family.id,
+            data: { is_active: !family.is_active },
+        });
     };
 
     return (
@@ -67,7 +77,7 @@ export default function TaxRatesTabView() {
                     }
                     onClick={handleCreate}
                 >
-                    Create Tax Rate
+                    Create Family
                 </Button>
             </Stack>
 
@@ -82,9 +92,9 @@ export default function TaxRatesTabView() {
                             }}
                         >
                             <TableCell sx={{ pl: 3, fontWeight: 700 }}>Name</TableCell>
-                            <TableCell sx={{ fontWeight: 700 }}>Description</TableCell>
-                            <TableCell sx={{ fontWeight: 700 }}>Percentage (%)</TableCell>
-                            <TableCell sx={{ fontWeight: 700 }}>Tax Type</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Profit %</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Tax Rate</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Active</TableCell>
                             <TableCell align="right" sx={{ pr: 3, fontWeight: 700 }}>
                                 Actions
                             </TableCell>
@@ -96,14 +106,14 @@ export default function TaxRatesTabView() {
                             <TableRow>
                                 <TableCell colSpan={4} align="center" sx={{ py: 8 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        Loading tax rates...
+                                        Loading families...
                                     </Typography>
                                 </TableCell>
                             </TableRow>
-                        ) : taxRates && taxRates.length > 0 ? (
-                            taxRates.map((taxRate) => (
+                        ) : families && families.length > 0 ? (
+                            families.map((family) => (
                                 <TableRow
-                                    key={taxRate.id}
+                                    key={family.id}
                                     hover
                                     sx={{
                                         transition: "all 0.2s ease",
@@ -121,19 +131,27 @@ export default function TaxRatesTabView() {
                                 >
                                     <TableCell sx={{ pl: 3 }}>
                                         <Typography variant="subtitle2" fontWeight={600}>
-                                            {taxRate.name}
+                                            {family.name}
                                         </Typography>
                                     </TableCell>
-                                    <TableCell>No aplica</TableCell>
-                                    <TableCell>{taxRate.percentage}%</TableCell>
-                                    <TableCell>{taxRate.tax_type?.name || "-"}</TableCell>
+                                    <TableCell>{family.percentage}%</TableCell>
+                                    <TableCell>
+                                        {family.tax_rate?.name || "-"}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Switch
+                                            checked={family.is_active}
+                                            onChange={() => handleStatusChange(family)}
+                                            inputProps={{ "aria-label": "controlled" }}
+                                        />
+                                    </TableCell>
                                     <TableCell align="right" sx={{ pr: 3 }}>
                                         <Stack direction="row" justifyContent="flex-end" spacing={1}>
                                             <Tooltip title="Edit">
                                                 <IconButton
                                                     color="primary"
                                                     size="small"
-                                                    onClick={() => handleEdit(taxRate)}
+                                                    onClick={() => handleEdit(family)}
                                                 >
                                                     <FuseSvgIcon size={20}>
                                                         heroicons-outline:pencil-square
@@ -144,7 +162,7 @@ export default function TaxRatesTabView() {
                                                 <IconButton
                                                     color="error"
                                                     size="small"
-                                                    onClick={() => console.log("Delete tax rate", taxRate.id)}
+                                                    onClick={() => console.log("Delete family", family.id)}
                                                 >
                                                     <FuseSvgIcon size={20}>
                                                         heroicons-outline:trash
@@ -159,7 +177,7 @@ export default function TaxRatesTabView() {
                             <TableRow>
                                 <TableCell colSpan={4} align="center" sx={{ py: 8 }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        No tax rates available
+                                        No families available
                                     </Typography>
                                 </TableCell>
                             </TableRow>
@@ -168,10 +186,10 @@ export default function TaxRatesTabView() {
                 </Table>
             </TableContainer>
 
-            <TaxRatesModal
+            <FamiliesModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
-                data={selectedTaxRate}
+                data={selectedFamily}
             />
         </Box>
     );

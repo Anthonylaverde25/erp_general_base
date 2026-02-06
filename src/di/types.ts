@@ -86,4 +86,9 @@ export const TYPES = {
   IndexTaxRatesUseCase: Symbol.for("IndexTaxRatesUseCase"),
   CreateTaxRateUseCase: Symbol.for("CreateTaxRateUseCase"),
   UpdateTaxRateUseCase: Symbol.for("UpdateTaxRateUseCase"),
+  // Families
+  FamilyRepository: Symbol.for("FamilyRepository"),
+  IndexFamiliesUseCase: Symbol.for("IndexFamiliesUseCase"),
+  CreateFamilyUseCase: Symbol.for("CreateFamilyUseCase"),
+  UpdateFamilyUseCase: Symbol.for("UpdateFamilyUseCase"),
 };

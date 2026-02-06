@@ -103,6 +103,14 @@ const SettingsAppNavigation: FuseNavItemType = {
       url: "/apps/settings/tax-rate",
       subtitle: "Manage your tax rate and financial information",
     },
+    {
+      id: "apps.settings.families",
+      icon: "lucide:building-2",
+      title: "Families",
+      type: "item",
+      url: "/apps/settings/families",
+      subtitle: "Manage your families and financial information",
+    },
   ],
 };
 

@@ -12,6 +12,7 @@ import { registerNumberSeriesModule } from "./modules/number_series.module";
 import { registerTaxTypesModule } from "./modules/tax_types.module";
 
 import { registerTaxRatesModule } from "./modules/tax_rates.module";
+import { registerFamilyModule } from "./modules/family.module";
 
 const container = new Container();
 
@@ -28,5 +29,6 @@ registerDocumentTypeModule(container);
 registerNumberSeriesModule(container);
 registerTaxTypesModule(container);
 registerTaxRatesModule(container);
+registerFamilyModule(container);
 
 export { container };
