@@ -11,6 +11,8 @@ import { registerDocumentTypeModule } from "./modules/document_type.module";
 import { registerNumberSeriesModule } from "./modules/number_series.module";
 import { registerTaxTypesModule } from "./modules/tax_types.module";
 
+import { registerTaxRatesModule } from "./modules/tax_rates.module";
+
 const container = new Container();
 
 // Registrar módulos
@@ -25,5 +27,6 @@ registerStoreModule(container);
 registerDocumentTypeModule(container);
 registerNumberSeriesModule(container);
 registerTaxTypesModule(container);
+registerTaxRatesModule(container);
 
 export { container };
