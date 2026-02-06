@@ -63,6 +63,9 @@ export const TYPES = {
   ShowStoreUseCase: Symbol.for("ShowStoreUseCase"),
   UpdateStoreUseCase: Symbol.for("UpdateStoreUseCase"),
   DeleteStoreUseCase: Symbol.for("DeleteStoreUseCase"),
+  IStoreActionRepository: Symbol.for("IStoreActionRepository"),
+  ToggleStoreStatusUseCase: Symbol.for("ToggleStoreStatusUseCase"),
+
 
   // Document Types
   IDocumentTypeRepository: Symbol.for("IDocumentTypeRepository"),
@@ -91,4 +94,7 @@ export const TYPES = {
   IndexFamiliesUseCase: Symbol.for("IndexFamiliesUseCase"),
   CreateFamilyUseCase: Symbol.for("CreateFamilyUseCase"),
   UpdateFamilyUseCase: Symbol.for("UpdateFamilyUseCase"),
+  ShowFamilyUseCase: Symbol.for("ShowFamilyUseCase"),
+  IFamilyActionRepository: Symbol.for("IFamilyActionRepository"),
+  ToggleFamilyStatusUseCase: Symbol.for("ToggleFamilyStatusUseCase"),
 };

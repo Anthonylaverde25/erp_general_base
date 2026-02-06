@@ -20,6 +20,7 @@ import { useState } from "react";
 import useIndexStores from "@/features/stores/hooks/useIndexStores";
 import useDeleteStore from "@/features/stores/hooks/useDeleteStore";
 import useUpdateStore from "@/features/stores/hooks/useUpdateStore";
+import { useToggleStoreStatus } from "@/features/stores/hooks/useToggleStoreStatus";
 import CreateStoreModal from "./modals/CreateStoreModal";
 import UpdateStoreModal from "./modals/UpdateStoreModal";
 import { StoreEntity } from "@/domain/entities/stores/StoreEntity";
@@ -28,7 +29,9 @@ export default function StoresTabView() {
     const theme = useTheme();
     const { stores, isLoading, isError } = useIndexStores();
     const { handleDeleteStore } = useDeleteStore();
+
     const { handleUpdateStore } = useUpdateStore();
+    const toggleStoreStatus = useToggleStoreStatus();
 
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
@@ -53,11 +56,11 @@ export default function StoresTabView() {
         setUpdateModalOpen(true);
     };
 
-    const handleToggleActive = async (store: StoreEntity) => {
+    const handleToggleActive = async (id: number, currentStatus: boolean) => {
         try {
-            await handleUpdateStore({
-                id: store.id!,
-                data: { is_active: !store.is_active }
+            await toggleStoreStatus.mutateAsync({
+                id,
+                status: !currentStatus
             });
         } catch (error) {
             console.error("Error toggling store status:", error);
@@ -202,7 +205,7 @@ export default function StoresTabView() {
                                     >
                                         <Switch
                                             checked={store.is_active}
-                                            onChange={() => handleToggleActive(store)}
+                                            onChange={() => handleToggleActive(store.id!, store.is_active)}
                                             color="primary"
                                             size="small"
                                         />

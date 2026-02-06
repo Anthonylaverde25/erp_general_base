@@ -21,11 +21,13 @@ import { useIndexFamilies } from "@/features/families/hooks/useIndexFamilies";
 import { FamilyEntity } from "@/domain/entities/families/FamilyEntity";
 import { FamiliesModal } from "./modals/FamiliesModal";
 import { useUpdateFamily } from "@/features/families/hooks/useUpdateFamily";
+import { useToggleFamilyStatus } from "@/features/families/hooks/useToggleFamilyStatus";
 
 export default function FamiliesTabView() {
     const theme = useTheme();
     const { data: families, isLoading } = useIndexFamilies();
     const updateFamily = useUpdateFamily();
+    const toggleFamilyStatus = useToggleFamilyStatus();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedFamily, setSelectedFamily] = useState<FamilyEntity | null>(null);
 
@@ -45,9 +47,9 @@ export default function FamiliesTabView() {
     };
 
     const handleStatusChange = (family: FamilyEntity) => {
-        updateFamily.mutate({
+        toggleFamilyStatus.mutate({
             id: family.id,
-            data: { is_active: !family.is_active },
+            status: !family.is_active,
         });
     };
 
