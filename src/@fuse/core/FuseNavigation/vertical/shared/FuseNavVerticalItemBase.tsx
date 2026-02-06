@@ -115,7 +115,7 @@ function FuseNavVerticalItemBase(props: FuseNavVerticalBaseProps) {
 			<Button
 				component={buttonComponent}
 				className={clsx(
-					'mb-1 flex w-full items-center justify-start gap-2 rounded-md p-2',
+					'mb-1 flex w-full items-center justify-start gap-2 rounded-md p-3',
 					item.active && 'active',
 					item.subtitle && 'items-start',
 					className,
