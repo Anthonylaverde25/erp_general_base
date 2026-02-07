@@ -13,11 +13,14 @@ import {
     Fade,
     FormControlLabel,
     Switch,
+    Autocomplete,
+    Chip,
 } from "@mui/material";
 import { Save, Close } from "@mui/icons-material";
 
 import { useCreateFamily } from "@/features/families/hooks/useCreateFamily";
 import { useUpdateFamily } from "@/features/families/hooks/useUpdateFamily";
+import { useShowFamily } from "@/features/families/hooks/useShowFamily";
 import { FamilyEntity } from "@/domain/entities/families/FamilyEntity";
 import { useIndexTaxRates } from "@/features/tax_rates/hooks/useIndexTaxRates";
 import { CreateFamilyDTO } from "@/domain/entities/families/DTOs/FamilyDTOs";
@@ -27,8 +30,8 @@ const formSchema = z.object({
     name: z.string().min(2, {
         message: "Name must be at least 2 characters.",
     }),
-    tax_rate_id: z.coerce.number().min(1, {
-        message: "Tax Rate is required.",
+    tax_rate_ids: z.array(z.coerce.number()).min(1, {
+        message: "At least one Tax Rate is required.",
     }),
     percentage: z.coerce.number().min(0, {
         message: "Percentage must be positive.",
@@ -49,6 +52,12 @@ export function FamiliesForm({ data, onCancel, onSuccess }: FamiliesFormProps) {
     const updateFamily = useUpdateFamily();
     const { data: taxRates } = useIndexTaxRates();
 
+    const { data: familyData, isLoading: isLoadingFamily } = useShowFamily(
+        data?.id || null
+    );
+
+    const formData = familyData || data;
+
     const {
         control,
         handleSubmit,
@@ -59,20 +68,20 @@ export function FamiliesForm({ data, onCancel, onSuccess }: FamiliesFormProps) {
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
-            tax_rate_id: 0,
+            tax_rate_ids: [],
             percentage: 0,
         },
     });
 
     useEffect(() => {
-        if (data) {
+        if (formData) {
             reset({
-                name: data.name,
-                tax_rate_id: data.tax_rate_id,
-                percentage: data.percentage,
+                name: formData.name,
+                tax_rate_ids: formData.tax_rate_ids,
+                percentage: formData.percentage,
             });
         }
-    }, [data, reset]);
+    }, [formData, reset]);
 
     const onSubmit = (values: FormValues) => {
         if (data) {
@@ -98,13 +107,15 @@ export function FamiliesForm({ data, onCancel, onSuccess }: FamiliesFormProps) {
             // 1. Domain Object
             // Default is_active to true for new families
             const newEntity = FamilyEntity.create({
-                ...values,
+                name: values.name,
+                tax_rate_ids: values.tax_rate_ids,
+                percentage: values.percentage,
                 is_active: true,
             });
             // 2. Plain Object
             const createData: CreateFamilyDTO = {
                 name: newEntity.name,
-                tax_rate_id: newEntity.tax_rate_id,
+                tax_rate_ids: newEntity.tax_rate_ids,
                 percentage: newEntity.percentage,
                 is_active: newEntity.is_active,
             };
@@ -118,7 +129,8 @@ export function FamiliesForm({ data, onCancel, onSuccess }: FamiliesFormProps) {
         }
     };
 
-    const isLoading = createFamily.isPending || updateFamily.isPending;
+    const isLoading =
+        createFamily.isPending || updateFamily.isPending || isLoadingFamily;
 
     return (
         <Fade in={true}>
@@ -157,30 +169,51 @@ export function FamiliesForm({ data, onCancel, onSuccess }: FamiliesFormProps) {
                         )}
                     />
 
-                    {/* Tax Rate */}
+                    {/* Tax Rates */}
                     <Controller
-                        name="tax_rate_id"
+                        name="tax_rate_ids"
                         control={control}
                         render={({ field }) => (
-                            <TextField
-                                {...field}
-                                select
-                                label="Tax Rate"
-                                variant="filled"
-                                fullWidth
-                                error={!!errors.tax_rate_id}
-                                helperText={errors.tax_rate_id?.message}
+                            <Autocomplete
+                                multiple
+                                disablePortal
+                                id="tax-rates-filled"
+                                options={taxRates || []}
+                                getOptionLabel={(option) => option.name}
+                                isOptionEqualToValue={(option, value) => option.id === value.id}
+                                value={
+                                    taxRates?.filter((rate) =>
+                                        field.value?.includes(rate.id)
+                                    ) || []
+                                }
+                                onChange={(_, newValue) => {
+                                    field.onChange(newValue.map((item) => item.id));
+                                }}
+                                renderTags={(value: readonly any[], getTagProps) =>
+                                    value.map((option: any, index: number) => {
+                                        const { key, ...tagProps } = getTagProps({ index });
+                                        return (
+                                            <Chip
+                                                variant="outlined"
+                                                label={option.name}
+                                                key={key}
+                                                {...tagProps}
+                                            />
+                                        );
+                                    })
+                                }
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        variant="filled"
+                                        label="Tax Rates"
+                                        placeholder="Select Tax Rates"
+                                        error={!!errors.tax_rate_ids}
+                                        helperText={errors.tax_rate_ids?.message}
+                                    />
+                                )}
                                 disabled={isLoading}
-                            >
-                                <MenuItem value={0} disabled>
-                                    Select a Tax Rate
-                                </MenuItem>
-                                {taxRates?.map((rate) => (
-                                    <MenuItem key={rate.id} value={rate.id}>
-                                        {rate.name}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
+                            />
                         )}
                     />
 

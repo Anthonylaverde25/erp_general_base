@@ -7,11 +7,13 @@ export class FamilyMapper {
         return new FamilyEntity(
             dto.id,
             dto.company_id,
-            dto.tax_rate_id,
+            dto.tax_rate_ids || (dto.tax_rates ? dto.tax_rates.map(r => r.id) : []),
             dto.name,
             Number(dto.percentage),
             dto.is_active,
-            dto.tax_rate ? TaxRateEntity.fromPrimitives(dto.tax_rate) : undefined
+            dto.tax_rates
+                ? dto.tax_rates.map((rate) => TaxRateEntity.fromPrimitives(rate))
+                : undefined
         );
     }
 

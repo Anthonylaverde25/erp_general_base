@@ -138,7 +138,8 @@ export default function FamiliesTabView() {
                                     </TableCell>
                                     <TableCell>{family.percentage}%</TableCell>
                                     <TableCell>
-                                        {family.tax_rate?.name || "-"}
+                                        {family.tax_rates?.map((t) => t.name).join(", ") ||
+                                            "-"}
                                     </TableCell>
                                     <TableCell>
                                         <Switch

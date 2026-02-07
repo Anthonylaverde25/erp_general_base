@@ -13,9 +13,9 @@ export class StoreRepositoryAction implements IStoreActionRepository {
 
     async removeAddress(storeId: StoreEntity["id"], addressId: AddressEntity["id"]): Promise<void> {
         try {
-            const { data } = await axiosInstance.delete(`stores/${storeId}/addresses/${addressId}`)
-            console.log('direccion elimnada para la tienda', data)
-            return data;
+            const response = await axiosInstance.delete(`stores/${storeId}/addresses/${addressId}`)
+            console.log('direccion elimnada para la tienda', response)
+            return response.data;
         } catch (error) {
             throw error;
         }
