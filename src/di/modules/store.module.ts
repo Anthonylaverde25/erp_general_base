@@ -10,6 +10,7 @@ import { ShowStoreUseCase } from '@/application/use_cases/stores/ShowStoreUseCas
 import { UpdateStoreUseCase } from '@/application/use_cases/stores/UpdateStoreUseCase';
 import { DeleteStoreUseCase } from '@/application/use_cases/stores/DeleteStoreUseCase';
 import { ToggleStoreStatusUseCase } from '@/application/use_cases/stores/ToggleStoreStatusUseCase';
+import { RemoveAddressUseCase } from '@/application/use_cases/stores/RemoveAddressUseCase';
 
 export const registerStoreModule = (container: Container) => {
     // Repository
@@ -23,4 +24,5 @@ export const registerStoreModule = (container: Container) => {
     container.bind<UpdateStoreUseCase>(TYPES.UpdateStoreUseCase).to(UpdateStoreUseCase);
     container.bind<DeleteStoreUseCase>(TYPES.DeleteStoreUseCase).to(DeleteStoreUseCase);
     container.bind<ToggleStoreStatusUseCase>(TYPES.ToggleStoreStatusUseCase).to(ToggleStoreStatusUseCase);
+    container.bind<RemoveAddressUseCase>(TYPES.RemoveAddressUseCase).to(RemoveAddressUseCase);
 };

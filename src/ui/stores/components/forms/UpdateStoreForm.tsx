@@ -8,11 +8,13 @@ import {
     Divider,
     Stack,
     Fade,
+    Dialog,
 } from "@mui/material";
 import { Store, Save, Close, LocationOn } from "@mui/icons-material";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useUpdateStore from "@/features/stores/hooks/useUpdateStore";
 import useShowStore from "@/features/stores/hooks/useShowStore";
+import useRemoveStoreAddress from "@/features/stores/hooks/useRemoveStoreAddress";
 import {
     UpdateStoreFormType,
     updateStoreSchema,
@@ -38,6 +40,8 @@ export default function UpdateStoreForm({
         useShowStore(storeId);
 
     const [addressModalOpen, setAddressModalOpen] = useState(false);
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+    const { handleRemoveAddress, isRemoving } = useRemoveStoreAddress();
 
     const methods = useForm<UpdateStoreFormType>({
         mode: "onChange",
@@ -58,6 +62,15 @@ export default function UpdateStoreForm({
     );
 
     const handleDeleteAddress = () => {
+        if (store?.address?.id) {
+            setConfirmDeleteOpen(true);
+        } else {
+            // If strictly local (not saved yet), just clear fields
+            clearAddressFields();
+        }
+    };
+
+    const clearAddressFields = () => {
         setValue("address", {
             street: "",
             street_2: "",
@@ -67,6 +80,21 @@ export default function UpdateStoreForm({
             country: "",
             default: false,
         }, { shouldValidate: true });
+    };
+
+    const confirmDelete = async () => {
+        if (store?.address?.id) {
+            try {
+                await handleRemoveAddress({
+                    storeId,
+                    addressId: store.address.id
+                });
+                clearAddressFields();
+                setConfirmDeleteOpen(false);
+            } catch (error) {
+                console.error(error);
+            }
+        }
     };
 
     useEffect(() => {
@@ -204,6 +232,39 @@ export default function UpdateStoreForm({
                                         open={addressModalOpen}
                                         onClose={() => setAddressModalOpen(false)}
                                     />
+
+                                    <Dialog
+                                        open={confirmDeleteOpen}
+                                        onClose={() => setConfirmDeleteOpen(false)}
+                                        maxWidth="xs"
+                                        fullWidth
+                                    >
+                                        <Box p={3}>
+                                            <Typography variant="h6" fontWeight={600} gutterBottom>
+                                                ¿Eliminar dirección?
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" paragraph sx={{ mb: 3 }}>
+                                                ¿Estás seguro de que deseas eliminar la dirección de esta tienda? Esta acción no se puede deshacer.
+                                            </Typography>
+                                            <Stack direction="row" spacing={2} justifyContent="flex-end">
+                                                <Button
+                                                    onClick={() => setConfirmDeleteOpen(false)}
+                                                    color="inherit"
+                                                    disabled={isRemoving}
+                                                >
+                                                    Cancelar
+                                                </Button>
+                                                <Button
+                                                    onClick={confirmDelete}
+                                                    variant="contained"
+                                                    color="error"
+                                                    disabled={isRemoving}
+                                                >
+                                                    {isRemoving ? "Eliminando..." : "Eliminar"}
+                                                </Button>
+                                            </Stack>
+                                        </Box>
+                                    </Dialog>
                                 </Box>
                             </Box>
 

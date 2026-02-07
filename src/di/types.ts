@@ -47,6 +47,7 @@ export const TYPES = {
   UpdateContactUseCase: Symbol.for("UpdateContactUseCase"),
   CreateContactUseCase: Symbol.for("CreateContactUseCase"),
   DeleteContactUseCase: Symbol.for("DeleteContactUseCase"),
+  RemoveAddressUseCase: Symbol.for("RemoveAddressUseCase"),
 
   // Payment Methods
   IPaymentMethodRepository: Symbol.for("IPaymentMethodRepository"),
