@@ -1,7 +1,7 @@
-import { UpdateUserUseCase } from '@/application/use_cases/user/UpdateUserUseCase';
+import { UpdateUserUseCase } from "@/application/use_cases/users/UpdateUserUseCase";
 import { container } from '@/di/container';
 import { TYPES } from '@/di/types';
-import { UpdateUserType } from '@/types/user.types';
+import { IUpdateUser } from '@/types/user.types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 
@@ -11,7 +11,7 @@ export default function useUpdateUser() {
     const { enqueueSnackbar } = useSnackbar();
 
     const mutation = useMutation({
-        mutationFn: ({ id, data }: { id: number; data: UpdateUserType }) => use_case.execute(id, data),
+        mutationFn: ({ id, data }: { id: number; data: IUpdateUser }) => use_case.execute(id, data),
         onSuccess: (_, { id }) => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
             queryClient.invalidateQueries({ queryKey: ['user', id] });
@@ -23,7 +23,7 @@ export default function useUpdateUser() {
         }
     });
 
-    const handleUpdateUser = (id: number, data: UpdateUserType) => {
+    const handleUpdateUser = (id: number, data: IUpdateUser) => {
         mutation.mutate({ id, data });
     };
 

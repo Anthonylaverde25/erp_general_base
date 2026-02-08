@@ -3,12 +3,12 @@ import UserModel from '@auth/user/models/UserModel';
 import { PartialDeep } from 'type-fest';
 import api from '@/utils/api';
 import axiosInstance from '@/lib/@axios';
-import { LoginSuccesResponse } from '@/types/auth.types';
-import { UserTypes } from '@/types/user.types';
-import { ActiveCompany } from '@/types/company.types';
+import { ILoginSuccessResponse } from '@/types/auth.types';
+import { IUser } from '@/types/user.types';
+import { ICompany } from '@/types/company.types';
 
 type AuthResponse = {
-	user: UserTypes;
+	user: IUser;
 	access_token: string;
 };
 
@@ -38,7 +38,7 @@ export async function authSignIn(credentials: { email: string; password: string 
 		data: {
 			auth: { user, token }
 		}
-	} = await axiosInstance.post<LoginSuccesResponse>(`auth/login`, credentials);
+	} = await axiosInstance.post<ILoginSuccessResponse>(`auth/login`, credentials);
 
 
 	return {

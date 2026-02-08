@@ -3,7 +3,7 @@ import { IRoleCrudRepository } from "@/domain/entities/roles/repositories/role.i
 import { RoleEntity } from "@/domain/entities/roles/Role";
 import { RoleMapper } from "@/domain/entities/roles/Mappers/RoleMapper";
 import axiosInstance from "@/lib/@axios";
-import { RoleType } from "@/types/role.types";
+import { IRole } from "@/types/role.types";
 
 @injectable()
 export class RoleRepositoryCrud implements IRoleCrudRepository {
@@ -14,7 +14,7 @@ export class RoleRepositoryCrud implements IRoleCrudRepository {
     return RoleMapper.fromDetailDTOList(roles);
   }
 
-  async show(id: RoleType["id"]): Promise<RoleEntity> {
+  async show(id: IRole["id"]): Promise<RoleEntity> {
     try {
       const {
         data: { role },

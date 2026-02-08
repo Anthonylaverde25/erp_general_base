@@ -16,14 +16,7 @@ export const createUserSchema = z
 
 export type CreateUserFormType = z.infer<typeof createUserSchema>;
 
-export const defaultCreateUserValues: CreateUserFormType = {
-	name: '',
-	email: '',
-	password: '',
-	password_confirmation: '',
-	role_id: 0, // 0 as empty/placeholder, managed by form
-	phone: ''
-};
+
 
 export const updateUserSchema = z
 	.object({
@@ -63,13 +56,3 @@ export const updateUserSchema = z
 	);
 
 export type UpdateUserFormType = z.infer<typeof updateUserSchema>;
-
-export const defaultUpdateUserValues = (user?: any): UpdateUserFormType => ({
-	id: user?.id || 0,
-	name: user?.name || '',
-	email: user?.email || '',
-	password: '',
-	password_confirmation: '',
-	role_id: user?.role_id || 0,
-	phone: user?.phone || ''
-});

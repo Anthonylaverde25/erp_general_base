@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import axiosInstance from '@/lib/@axios';
 import { ICompanyActionRepository } from '@/domain/entities/companies/repositories/company.interface.action';
-import { Company } from '@/types/company.types';
+import { ICompany } from '@/types/company.types';
 import { AddressEntity } from '@/domain/entities/addresses/Address';
 import { AddressMapper } from '@/domain/entities/addresses/Mappers/AddressMapper';
 import { BankAccountEntity } from '@/domain/entities/bank_accounts/BankAccount';
@@ -10,7 +10,7 @@ import { BankAccountMapper } from '@/domain/entities/bank_accounts/Mappers/BankA
 
 @injectable()
 export class CompanyRepositoryAction implements ICompanyActionRepository {
-    async changeCompany(id: Company['id']): Promise<string> {
+    async changeCompany(id: ICompany['id']): Promise<string> {
         const { data: { message } } = await axiosInstance.post('companies/change-active-company', { companyId: id });
         return message;
     }

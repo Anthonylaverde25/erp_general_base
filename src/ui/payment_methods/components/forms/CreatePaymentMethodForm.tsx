@@ -16,22 +16,16 @@ import useCreatePaymentMethod from "@/features/payment_methods/hooks/useCreatePa
 import {
     CreatePaymentMethodFormType,
     createPaymentMethodSchema,
-    defaultCreatePaymentMethodValues,
 } from "@/schemas/payment_method/payment_method.schema";
+import { defaultCreatePaymentMethodValues } from "@/schemas/payment_method/payment_method.defaults";
+import { PAYMENT_TYPES } from "../../constants/paymentTypes";
 
 interface CreatePaymentMethodFormProps {
     onCancel: () => void;
     onSuccess?: () => void;
 }
 
-const paymentTypes = [
-    { value: "cash", label: "Efectivo" },
-    { value: "bank_transfer", label: "Transferencia Bancaria" },
-    { value: "credit_card", label: "Tarjeta de Crédito" },
-    { value: "debit_card", label: "Tarjeta de Débito" },
-    { value: "check", label: "Cheque" },
-    { value: "other", label: "Otro" },
-];
+
 
 export default function CreatePaymentMethodForm({
     onCancel,
@@ -50,7 +44,7 @@ export default function CreatePaymentMethodForm({
 
     const onSubmit = async (data: CreatePaymentMethodFormType) => {
         try {
-            await handleCreatePaymentMethod(data);
+            await handleCreatePaymentMethod(data as any);
             onSuccess?.();
             onCancel();
         } catch (error) {
@@ -128,7 +122,7 @@ export default function CreatePaymentMethodForm({
                                             fullWidth
                                             variant="filled"
                                         >
-                                            {paymentTypes.map((option) => (
+                                            {PAYMENT_TYPES.map((option) => (
                                                 <MenuItem key={option.value} value={option.value}>
                                                     {option.label}
                                                 </MenuItem>

@@ -1,7 +1,7 @@
 /**
  * Role Entity Types
  */
-export interface RoleType {
+export interface IRole {
   id: number;
   name: string;
   code: string;
@@ -11,12 +11,12 @@ export interface RoleType {
   updated_at?: string;
 }
 
-export type Role = RoleType;
+
 
 /**
- * CreateRoleType - Type for creating a new role
+ * ICreateRole - Type for creating a new role
  */
-export interface CreateRoleType {
+export interface ICreateRole {
   name: string;
   code: string;
   description: string;
@@ -24,9 +24,9 @@ export interface CreateRoleType {
 }
 
 /**
- * UpdateRoleType - Type for updating an existing role
+ * IUpdateRole - Type for updating an existing role
  */
-export interface UpdateRoleType {
+export interface IUpdateRole {
   id: number;
   name: string;
   code: string;

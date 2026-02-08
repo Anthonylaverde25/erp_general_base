@@ -168,8 +168,8 @@ class FuseNavigationHelper {
 		}
 
 		/*
-            Check if user role is string,
-            */
+			Check if user role is string,
+			*/
 		return authArr.includes(userRole as string);
 	}
 

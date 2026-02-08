@@ -47,7 +47,7 @@ function FuseAuthProvider(props: FuseAuthenticationProviderProps) {
 	}, []);
 
 	const handleAuthStateChange = useCallback(
-		(providerAuthState: FuseAuthProviderState, name: string) => {
+		(providerAuthState: FuseAuthProviderState<any>, name: string) => {
 			setProviderStatuses((prevStatuses) => ({
 				...prevStatuses,
 				[name]: providerAuthState.authStatus

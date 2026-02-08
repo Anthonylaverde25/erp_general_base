@@ -2,15 +2,15 @@ import useAuth from "@fuse/core/FuseAuthProvider/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { container } from "@/di/container";
 import { TYPES } from "@/di/types";
-import { ShowCompanyUseCase } from "@/application/use_cases/company/ShowCompanyUseCase";
-import { Company } from "@/domain/entities/companies/Company";
+import { ShowCompanyUseCase } from "@/application/use_cases/companies/ShowCompanyUseCase";
+import { CompanyEntity } from "@/domain/entities/companies/Company";
 
 
-export default function useActiveCompany(): Company | undefined {
+export default function useActiveCompany(): CompanyEntity | undefined {
     const { authState: { user: { active_company_id } = {} } = {} } = useAuth();
     const show_company_use_case = container.get<ShowCompanyUseCase>(TYPES.ShowCompanyUseCase);
 
-    const { data: activeCompany } = useQuery<Company>({
+    const { data: activeCompany } = useQuery<CompanyEntity>({
         queryKey: ['activeCompany', { id: active_company_id }],
         queryFn: () => {
             if (!active_company_id) return null;
@@ -20,5 +20,5 @@ export default function useActiveCompany(): Company | undefined {
         staleTime: 1000 * 60 * 5,
     });
 
-    return activeCompany as Company | undefined;
+    return activeCompany as CompanyEntity | undefined;
 }

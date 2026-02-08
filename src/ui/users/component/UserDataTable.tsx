@@ -4,7 +4,9 @@ import type { Theme } from '@mui/material/styles';
 import DataTableTopToolbar from '@/components/data-table/DataTableTopToolbar';
 import { UserTableIcons } from './utils/UserTableIcons';
 
-export default function UserDataTable(props: MaterialReactTableProps) {
+import { IUser } from '@/types/user.types';
+
+export default function UserDataTable(props: MaterialReactTableProps<IUser>) {
 	const { columns, data, ...rest } = props;
 
 
@@ -16,7 +18,7 @@ export default function UserDataTable(props: MaterialReactTableProps) {
 		);
 	}
 
-	const defaults = useMemo<Partial<MaterialReactTableProps>>(
+	const defaults = useMemo<Partial<MaterialReactTableProps<IUser>>>(
 		() => ({
 			initialState: {
 				density: 'compact',
@@ -26,7 +28,7 @@ export default function UserDataTable(props: MaterialReactTableProps) {
 					left: ['mrt-row-expand', 'mrt-row-select'],
 					right: ['mrt-row-actions']
 				},
-				pagination: { pageSize: 25 }
+				pagination: { pageIndex: 0, pageSize: 25 }
 			},
 			enableFullScreenToggle: true,
 			enableDensityToggle: true,

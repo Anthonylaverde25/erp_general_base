@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { container } from '@/di/container';
 import { TYPES } from '@/di/types';
-import { UpdateCompanyUseCase } from '@/application/use_cases/company/UpdateCompanyUseCase';
-import { Company } from '@/domain/entities/companies/Company';
+import { UpdateCompanyUseCase } from "@/application/use_cases/companies/UpdateCompanyUseCase";
+import { CompanyEntity } from '@/domain/entities/companies/Company';
 import { UpdateCompanyDTO } from '@/domain/entities/companies/DTOs/UpdateCompanyDTO';
 
 export default function useUpdateCompany() {

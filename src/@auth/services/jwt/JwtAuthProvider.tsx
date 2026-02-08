@@ -8,7 +8,7 @@ import { isTokenValid } from './utils/jwtUtils';
 import JwtAuthContext from '@auth/services/jwt/JwtAuthContext';
 import { JwtAuthContextType } from '@auth/services/jwt/JwtAuthContext';
 import { HTTPError } from 'ky';
-import { UserTypes } from '@/types/user.types';
+import { IUser } from '@/types/user.types';
 
 export type JwtSignInPayload = {
 	email: string;
@@ -33,7 +33,7 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 	/**
 	 * Fuse Auth Provider State
 	 */
-	const [authState, setAuthState] = useState<FuseAuthProviderState<UserTypes>>({
+	const [authState, setAuthState] = useState<FuseAuthProviderState<IUser>>({
 		authStatus: 'configuring',
 		isAuthenticated: false,
 		user: null
@@ -45,7 +45,7 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 	 */
 	useEffect(() => {
 		if (onAuthStateChanged) {
-			onAuthStateChanged(authState);
+			onAuthStateChanged(authState as any);
 		}
 	}, [authState, onAuthStateChanged]);
 
@@ -59,8 +59,8 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 			if (isTokenValid(accessToken)) {
 				try {
 					const response = await authSignInWithToken(accessToken);
-					const userDataRaw = (await response.json()) as UserTypes;
-					const userData = { ...userDataRaw, role: userDataRaw.role?.code } as unknown as UserTypes;
+					const userDataRaw = (await response.json()) as IUser;
+					const userData = { ...userDataRaw, role: userDataRaw.role?.code } as unknown as IUser;
 					return userData;
 				} catch (error) {
 					if (error instanceof HTTPError) {
@@ -107,7 +107,7 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 				setAuthState({
 					authStatus: 'authenticated',
 					isAuthenticated: true,
-					user: { ...user, role: user.role?.code } as unknown as UserTypes
+					user: { ...user, role: user.role?.code } as unknown as IUser
 				});
 
 				setTokenStorageValue(access_token);
@@ -184,7 +184,7 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 				user: {
 					...prev.user,
 					..._user
-				} as UserTypes
+				} as IUser
 			}));
 
 			return response;

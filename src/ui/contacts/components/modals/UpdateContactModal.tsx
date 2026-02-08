@@ -18,7 +18,7 @@ import {
     defaultUpdateContactValues
 } from '@/schemas/contact/contact.schema';
 import ContactForm from '../forms/ContactForm';
-import { Contact } from '@/types/company.types';
+import { IContact } from '@/types/company.types';
 import { useShowContact } from '@/features/contacts/hooks/useShowContact';
 import useUpdateContact from '@/features/contacts/hooks/useUpdateContact';
 import { ContactEntity } from '@/domain/entities/contacts/Contact';
@@ -28,7 +28,7 @@ interface UpdateContactModalProps {
     open: boolean;
     onClose: () => void;
     onSubmit: (data: ContactFormData) => void;
-    contactId: Contact['id']
+    contactId: IContact['id']
 }
 
 export default function UpdateContactModal({ open, onClose, onSubmit, contactId }: UpdateContactModalProps) {

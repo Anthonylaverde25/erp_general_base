@@ -1,22 +1,29 @@
-import { Company } from '../Company';
-import { Company as ICompany } from '@/types/company.types';
+import { CompanyEntity } from "../Company";
+import { ICompany } from "@/types/company.types";
 
 export class CompanyMapper {
-    static fromDetailDTO(dto: ICompany): Company {
-        console.log('dto', dto);
-        return new Company({
-            ...dto,
-            brandColor: (dto as any).brand_color || dto.brandColor, // Handle both cases just in case
-            favicon_url: (dto as any).favicon_url || dto.favicon_url,
-
+    static fromDetailDTO(dto: ICompany): CompanyEntity {
+        return new CompanyEntity({
+            id: dto.id,
+            name: dto.name,
+            cif: dto.cif,
+            addresses: dto.addresses,
+            contacts: dto.contacts,
+            // contacts: dto.contacts?.map(contact => ContactMapper.fromDetailDTO(contact)),
+            brandColor: dto.brandColor,
+            max_users: dto.max_users,
+            website: dto.website,
+            logo_url: dto.logo_url,
+            favicon_url: dto.favicon_url,
+            settings: dto.settings
         });
     }
 
-    static fromDetailDTOList(dto: ICompany[]): Company[] {
-        return dto.map((item) => this.fromDetailDTO(item));
+    static fromDetailDTOList(dto: ICompany[]): CompanyEntity[] {
+        return dto.map((company) => CompanyMapper.fromDetailDTO(company));
     }
 
-    static toCompanyType(company: Company): ICompany {
+    static toCompanyType(company: CompanyEntity): ICompany {
         return company.toPlainObject();
     }
 }

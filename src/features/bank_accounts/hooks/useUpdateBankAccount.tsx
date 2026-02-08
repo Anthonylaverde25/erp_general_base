@@ -1,7 +1,7 @@
 import { UpdateBankAccountUseCase } from "@/application/use_cases/bank_accounts/UpdateBankAccountUseCase";
 import { container } from "@/di/container";
 import { TYPES } from "@/di/types";
-import { UpdateBankAccountType } from "@/types/bank_account.types";
+import { IUpdateBankAccount } from "@/types/bank_account.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 
@@ -13,7 +13,7 @@ export default function useUpdateBankAccount() {
   const { enqueueSnackbar } = useSnackbar();
 
   const mutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateBankAccountType }) =>
+    mutationFn: ({ id, data }: { id: number; data: IUpdateBankAccount }) =>
       use_case.execute(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["bank-accounts"] });
@@ -31,7 +31,7 @@ export default function useUpdateBankAccount() {
     },
   });
 
-  const handleUpdateBankAccount = (id: number, data: UpdateBankAccountType) => {
+  const handleUpdateBankAccount = (id: number, data: IUpdateBankAccount) => {
     mutation.mutate({ id, data });
   };
 

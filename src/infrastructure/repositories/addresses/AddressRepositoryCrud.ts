@@ -3,7 +3,7 @@ import axiosInstance from '@/lib/@axios';
 import { IAddressRepository } from '@/domain/entities/addresses/repositories/address.interface.crud';
 import { AddressEntity } from '@/domain/entities/addresses/Address';
 import { CreateAddressDTO } from '@/domain/entities/addresses/DTOs/CreateAddressDTO';
-import { Address } from '@/types/company.types';
+import { IAddress } from '@/types/company.types';
 import { AddressMapper } from '@/domain/entities/addresses/Mappers/AddressMapper';
 
 @injectable()
@@ -18,14 +18,14 @@ export class AddressRepositoryCrud implements IAddressRepository {
         };
     }
 
-    async show(id: Address['id']): Promise<AddressEntity> {
+    async show(id: IAddress['id']): Promise<AddressEntity> {
         const {
             data: { address }
         } = await axiosInstance.get(`addresses/${id}`);
         return AddressEntity.create(address);
     }
 
-    async update(id: Address['id'], data: Partial<AddressEntity>): Promise<{ address: AddressEntity; message: string; }> {
+    async update(id: IAddress['id'], data: Partial<AddressEntity>): Promise<{ address: AddressEntity; message: string; }> {
         const payload = data.toPlainObject();
         try {
 

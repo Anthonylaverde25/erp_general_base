@@ -1,7 +1,7 @@
 import { CreateRoleUseCase } from "@/application/use_cases/roles/CreateRoleUseCase";
 import { container } from "@/di/container";
 import { TYPES } from "@/di/types";
-import { CreateRoleType } from "@/types/role.types";
+import { ICreateRole } from "@/types/role.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 
@@ -11,7 +11,7 @@ export default function useCreateRole() {
   const { enqueueSnackbar } = useSnackbar();
 
   const mutation = useMutation({
-    mutationFn: (data: CreateRoleType) => use_case.execute(data),
+    mutationFn: (data: ICreateRole) => use_case.execute(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       enqueueSnackbar("Rol creado exitosamente", { variant: "success" });
@@ -24,7 +24,7 @@ export default function useCreateRole() {
     },
   });
 
-  const handleCreateRole = (data: CreateRoleType) => {
+  const handleCreateRole = (data: ICreateRole) => {
     mutation.mutateAsync(data);
   };
 

@@ -1,7 +1,13 @@
 import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import {
+    familySchema,
+    FamilyFormType,
+} from "@/schemas/families/families.schema";
+import {
+    defaultCreateFamilyValues,
+    defaultUpdateFamilyValues,
+} from "@/schemas/families/families.defaults";
 import {
     Button,
     TextField,
@@ -25,21 +31,7 @@ import { FamilyEntity } from "@/domain/entities/families/FamilyEntity";
 import { useIndexTaxRates } from "@/features/tax_rates/hooks/useIndexTaxRates";
 import { CreateFamilyDTO } from "@/domain/entities/families/DTOs/FamilyDTOs";
 
-// Schema definition
-const formSchema = z.object({
-    name: z.string().min(2, {
-        message: "Name must be at least 2 characters.",
-    }),
-    tax_rate_ids: z.array(z.coerce.number()).min(1, {
-        message: "At least one Tax Rate is required.",
-    }),
-    percentage: z.coerce.number().min(0, {
-        message: "Percentage must be positive.",
-    }),
-    // is_active removed from schema input
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface FamiliesFormProps {
     data?: FamilyEntity | null;
@@ -63,27 +55,19 @@ export function FamiliesForm({ data, onCancel, onSuccess }: FamiliesFormProps) {
         handleSubmit,
         reset,
         formState: { errors, isValid },
-    } = useForm<FormValues>({
+    } = useForm<FamilyFormType>({
         mode: "onChange",
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: "",
-            tax_rate_ids: [],
-            percentage: 0,
-        },
+        resolver: zodResolver(familySchema),
+        defaultValues: defaultCreateFamilyValues,
     });
 
     useEffect(() => {
         if (formData) {
-            reset({
-                name: formData.name,
-                tax_rate_ids: formData.tax_rate_ids,
-                percentage: formData.percentage,
-            });
+            reset(defaultUpdateFamilyValues(formData));
         }
     }, [formData, reset]);
 
-    const onSubmit = (values: FormValues) => {
+    const onSubmit = (values: FamilyFormType) => {
         if (data) {
             // 1. Domain Object
             // Preserve existing is_active status

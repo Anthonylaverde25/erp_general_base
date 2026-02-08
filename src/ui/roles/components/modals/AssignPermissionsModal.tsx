@@ -1,12 +1,12 @@
 import { Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import RolePermissionMatrix from "../RolePermissionMatrix";
-import { RoleType } from "@/types/role.types";
+import { IRole } from "@/types/role.types";
 
 interface AssignPermissionsModalProps {
     open: boolean;
     onClose: () => void;
-    roleId: RoleType["id"] | null;
+    roleId?: IRole["id"] | null;
 }
 
 export default function AssignPermissionsModal({

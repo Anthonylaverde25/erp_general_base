@@ -1,7 +1,7 @@
 import { UpdateRoleUseCase } from "@/application/use_cases/roles/UpdateRoleUseCase";
 import { container } from "@/di/container";
 import { TYPES } from "@/di/types";
-import { UpdateRoleType } from "@/types/role.types";
+import { IUpdateRole } from "@/types/role.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 
@@ -11,8 +11,7 @@ export default function useUpdateRole() {
   const { enqueueSnackbar } = useSnackbar();
 
   const mutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateRoleType }) =>
-      use_case.execute(id, data),
+    mutationFn: (data: { id: number, payload: IUpdateRole }) => use_case.execute(data.id, data.payload),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       queryClient.invalidateQueries({ queryKey: ["role", id] });
@@ -27,8 +26,8 @@ export default function useUpdateRole() {
     },
   });
 
-  const handleUpdateRole = (id: number, data: UpdateRoleType) => {
-    mutation.mutate({ id, data });
+  const handleUpdateRole = (id: number, payload: IUpdateRole) => {
+    mutation.mutate({ id, payload });
   };
 
   return {

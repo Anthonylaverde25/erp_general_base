@@ -1,13 +1,13 @@
-import { CompanySettingType } from "@/types/company.types";
+import { ICompanySetting } from "@/types/company.types";
 
-export class CompanySettingEntity implements CompanySettingType {
+export class CompanySettingEntity implements ICompanySetting {
     private _id?: number;
     private _maxUsers: number;
     private _maxStorageMb: number;
     private _currency: string;
     private _timezone: string;
 
-    constructor(props: CompanySettingType) {
+    constructor(props: ICompanySetting) {
         this._id = props.id;
         this._maxUsers = props.maxUsers;
         this._maxStorageMb = props.maxStorageMb;

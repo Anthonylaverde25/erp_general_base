@@ -17,13 +17,13 @@ import useShowBankAccount from "@/features/bank_accounts/hooks/useShowBankAccoun
 import {
   UpdateBankAccountFormType,
   updateBankAccountSchema,
-  defaultUpdateBankAccountValues,
 } from "@/schemas/bank_account/bank_account.schema";
-import { UpdateBankAccountType } from "@/types/bank_account.types";
-import { BankAccountType } from "@/types/bank_account.types";
+import { defaultUpdateBankAccountValues } from "@/schemas/bank_account/bank_account.defaults";
+import { IUpdateBankAccount } from "@/types/bank_account.types";
+import { IBankAccount } from "@/types/bank_account.types";
 
 interface UpdateBankAccountFormProps {
-  bankAccount: BankAccountType;
+  bankAccount: IBankAccount;
   onCancel: () => void;
   onSuccess?: () => void;
 }
@@ -52,7 +52,7 @@ export default function UpdateBankAccountForm({
 
   const onSubmit = async (data: UpdateBankAccountFormType) => {
     try {
-      const payload: UpdateBankAccountType = {
+      const payload: IUpdateBankAccount = {
         id: data.id,
         name: data.name,
         account_holder: data.account_holder,

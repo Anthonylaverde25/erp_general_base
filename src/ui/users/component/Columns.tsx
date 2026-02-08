@@ -1,8 +1,8 @@
 import { MRT_ColumnDef } from 'material-react-table';
 import { Avatar, Chip, Typography, Box } from '@mui/material';
-import { UserType } from '@/types/user.types';
+import { IUser } from '@/types/user.types';
 
-export const UserColumns: MRT_ColumnDef<UserType>[] = [
+export const UserColumns: MRT_ColumnDef<IUser>[] = [
 	{
 		accessorKey: 'name',
 		header: 'Usuario',

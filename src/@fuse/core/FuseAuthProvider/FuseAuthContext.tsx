@@ -1,7 +1,8 @@
 import { createContext } from 'react';
-import { FuseAuthProviderState, FuseAuthProviderType } from './types/FuseAuthTypes';
-import { PartialDeep } from 'type-fest';
 import { User } from '@auth/user';
+import { PartialDeep } from 'type-fest';
+import { FuseAuthProviderState } from './types/FuseAuthTypes'; // Verify import
+import { FuseAuthProviderType } from './types/FuseAuthTypes'; // Keep this import as it's still used by FuseAuthContextType
 
 export type AuthState = FuseAuthProviderState<User> & {
 	provider: string | null;

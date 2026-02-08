@@ -1,6 +1,6 @@
 
 import { z } from "zod";
-import { Address } from "@/types/company.types";
+import { IAddress } from "@/types/company.types";
 
 export const addressSchema = z.object({
     street: z.string().min(1, "La calle es requerida"),
@@ -13,7 +13,7 @@ export const addressSchema = z.object({
 
 export type AddressFormData = z.infer<typeof addressSchema>;
 
-export const defaultUpdateAddressValues = (address?: Address | null): AddressFormData => ({
+export const defaultUpdateAddressValues = (address?: IAddress | null): AddressFormData => ({
     street: address?.street || "",
     city: address?.city || "",
     state: address?.state || "",

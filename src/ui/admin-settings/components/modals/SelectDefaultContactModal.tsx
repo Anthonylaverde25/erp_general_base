@@ -15,14 +15,14 @@ import {
     Stack
 } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { Contact } from '@/types/company.types';
+import { IContact } from '@/types/company.types';
 import { Email, Phone } from '@mui/icons-material';
 import { useChangeDefaultContact } from '@/features/companies/hooks/useChangeDefaultContact';
 
 type SelectDefaultContactModalProps = {
     open: boolean;
     onClose: () => void;
-    items: Contact[];
+    items: IContact[];
     currentDefaultId?: number;
     onSelect: (id: number) => void;
 };

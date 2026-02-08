@@ -1,6 +1,6 @@
-import { CreateRoleType, UpdateRoleType, RoleType } from "@/types/role.types";
+import { ICreateRole, IUpdateRole, IRole } from "@/types/role.types";
 
-export class RoleEntity implements RoleType {
+export class RoleEntity implements IRole {
   constructor(
     public id: number,
     public name: string,
@@ -9,9 +9,9 @@ export class RoleEntity implements RoleType {
     public active: boolean,
     public created_at?: string,
     public updated_at?: string,
-  ) {}
+  ) { }
 
-  static fromPrimitives(data: RoleType): RoleEntity {
+  static fromPrimitives(data: IRole): RoleEntity {
     return new RoleEntity(
       data.id,
       data.name,
@@ -23,7 +23,7 @@ export class RoleEntity implements RoleType {
     );
   }
 
-  static create(data: CreateRoleType): RoleEntity {
+  static create(data: ICreateRole): RoleEntity {
     return new RoleEntity(
       null, // ID will be assigned by backend
       data.name,
@@ -33,7 +33,7 @@ export class RoleEntity implements RoleType {
     );
   }
 
-  static update(id: number, data: UpdateRoleType): RoleEntity {
+  static update(id: number, data: IUpdateRole): RoleEntity {
     return new RoleEntity(
       id,
       data.name,

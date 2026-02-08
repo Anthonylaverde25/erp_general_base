@@ -1,13 +1,13 @@
 import { Dialog, DialogContent, CircularProgress, Box, Typography } from '@mui/material';
 import UpdateUserForm from '../forms/UpdateUserForm';
-import { UserType } from '@/types/user.types';
+import { IUser } from '@/types/user.types';
 import useShowUser from '@/features/users/hooks/useShowUser';
 import LoadingProgress from '@/components/LoadingProgress';
 
 interface UpdateUserDialogProps {
     open: boolean;
     onClose: () => void;
-    userId: UserType['id'];
+    userId: IUser['id'];
 }
 
 export default function UpdateUserDialog({ open, onClose, userId }: UpdateUserDialogProps) {

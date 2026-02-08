@@ -1,7 +1,7 @@
-import { CreateUserUseCase } from '@/application/use_cases/user/CreateUserUseCase';
+import { CreateUserUseCase } from '@/application/use_cases/users/CreateUserUseCase';
 import { container } from '@/di/container';
 import { TYPES } from '@/di/types';
-import { CreateUserType } from '@/types/user.types';
+import { ICreateUser } from '@/types/user.types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 
@@ -11,7 +11,7 @@ export default function useCreateUser() {
 	const { enqueueSnackbar } = useSnackbar();
 
 	const mutation = useMutation({
-		mutationFn: (data: CreateUserType) => use_case.execute(data),
+		mutationFn: (data: ICreateUser) => use_case.execute(data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['users'] });
 			enqueueSnackbar('Usuario creado exitosamente', { variant: 'success' });
@@ -22,7 +22,7 @@ export default function useCreateUser() {
 		}
 	});
 
-	const handleCreateUser = (data: CreateUserType) => {
+	const handleCreateUser = (data: ICreateUser) => {
 		mutation.mutate(data);
 	};
 

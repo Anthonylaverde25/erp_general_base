@@ -18,8 +18,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import useIndexRoles from '@/features/roles/hooks/useIndexRoles';
 import useCreateUser from '@/features/users/hooks/useCreateUser';
-import { CreateUserFormType, createUserSchema, defaultCreateUserValues } from '@/schemas/user/user.schema';
-import { CreateUserType } from '@/types/user.types';
+import { CreateUserFormType, createUserSchema } from '@/schemas/user/user.schema';
+import { defaultCreateUserValues } from '@/schemas/user/user.defaults';
+import { ICreateUser } from '@/types/user.types';
 
 interface CreateUserFormProps {
     onCancel: () => void;
@@ -43,7 +44,7 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
 
     const onSubmit = async (data: CreateUserFormType) => {
         try {
-            const payload: CreateUserType = {
+            const payload: ICreateUser = {
                 name: data.name,
                 email: data.email,
                 password: data.password,

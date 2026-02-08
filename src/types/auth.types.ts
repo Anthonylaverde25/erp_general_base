@@ -1,14 +1,14 @@
-import { UserTypes } from './user.types';
+import { IUser } from './user.types';
 
-export interface LoginSuccesResponse {
+export interface ILoginSuccessResponse {
 	auth: {
-		user: UserTypes;
+		user: IUser;
 		token: string;
 	};
 }
 
-export interface LoginErrorResponse {
+export interface ILoginErrorResponse {
 	error: string;
 }
 
-export type LoginResponse = LoginSuccesResponse | LoginErrorResponse;
+export type LoginResponse = ILoginSuccessResponse | ILoginErrorResponse;

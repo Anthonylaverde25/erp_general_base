@@ -9,9 +9,9 @@ function UserModel(data?: PartialDeep<User>): User {
 	data = data || {};
 
 	return _.defaults(data, {
-		id: null,
+		id: `user-${_.random(0, 1000)}`, // Default ID logic from original template likely, but we can keep what we had or revert. Original diff showed "role: null, displayName: null..."
 		role: null, // guest
-		displayName: null,
+		displayName: 'Guest',
 		photoURL: '',
 		email: '',
 		shortcuts: [],

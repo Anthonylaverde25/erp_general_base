@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import {
+    taxRateSchema,
+    TaxRateFormType,
+} from "@/schemas/tax_rates/tax_rates.schema";
+import { defaultTaxRateValues } from "@/schemas/tax_rates/tax_rates.defaults";
 import {
     Button,
     TextField,
@@ -20,20 +23,7 @@ import { TaxRateEntity } from "@/domain/entities/tax_rates/TaxRateEntity";
 import useIndexTaxTypes from "@/features/tax_types/hooks/useIndexTaxTypes";
 import { CreateTaxRateDTO } from "@/domain/entities/tax_rates/DTOs/CreateTaxRateDTO";
 
-// Schema definition
-const formSchema = z.object({
-    name: z.string().min(2, {
-        message: "Name must be at least 2 characters.",
-    }),
-    percentage: z.coerce.number().min(0, {
-        message: "Percentage must be a positive number.",
-    }),
-    tax_type_id: z.coerce.number().min(1, {
-        message: "Tax Type is required.",
-    }),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface TaxRatesFormProps {
     data?: TaxRateEntity | null;
@@ -51,14 +41,10 @@ export function TaxRatesForm({ data, onCancel, onSuccess }: TaxRatesFormProps) {
         handleSubmit,
         reset,
         formState: { errors, isValid },
-    } = useForm<FormValues>({
+    } = useForm<TaxRateFormType>({
         mode: "onChange",
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: "",
-            percentage: 0,
-            tax_type_id: 0,
-        },
+        resolver: zodResolver(taxRateSchema),
+        defaultValues: defaultTaxRateValues,
     });
 
     useEffect(() => {
@@ -71,7 +57,7 @@ export function TaxRatesForm({ data, onCancel, onSuccess }: TaxRatesFormProps) {
         }
     }, [data, reset]);
 
-    const onSubmit = (values: FormValues) => {
+    const onSubmit = (values: TaxRateFormType) => {
         if (data) {
             // 1. Convert form data to Domain Entity (applies business logic/validation)
             const updatedEntity = TaxRateEntity.update(data.id, values);
@@ -90,7 +76,7 @@ export function TaxRatesForm({ data, onCancel, onSuccess }: TaxRatesFormProps) {
             );
         } else {
             // 1. Convert form data to Domain Entity
-            const newEntity = TaxRateEntity.create(values);
+            const newEntity = TaxRateEntity.create(values as any);
 
             // 2. Flatten Entity for Transport
             const createData: CreateTaxRateDTO = {
@@ -200,6 +186,15 @@ export function TaxRatesForm({ data, onCancel, onSuccess }: TaxRatesFormProps) {
                                             variant="filled"
                                             value={field.value || ""} // Ensure it's not undefined
                                             onChange={(e) => field.onChange(Number(e.target.value))}
+                                            SelectProps={{
+                                                MenuProps: {
+                                                    PaperProps: {
+                                                        sx: {
+                                                            maxHeight: 250,
+                                                        },
+                                                    },
+                                                },
+                                            }}
                                         >
                                             {taxTypes?.map((type) => (
                                                 <MenuItem key={type.id} value={type.id}>

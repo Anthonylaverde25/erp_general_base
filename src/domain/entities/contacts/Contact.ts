@@ -1,7 +1,7 @@
-import { Contact } from "@/types/company.types";
+import { IContact } from "@/types/company.types";
 import { CreateContactDTO } from "./DTOs/CreateContactDTO";
 
-export class ContactEntity implements Contact {
+export class ContactEntity implements IContact {
     constructor(
         public id: number | undefined,
         public email: string,
@@ -14,7 +14,7 @@ export class ContactEntity implements Contact {
         return this.default_contact;
     }
 
-    static fromPrimitives(data: Contact): ContactEntity {
+    static fromPrimitives(data: IContact): ContactEntity {
         return new ContactEntity(
             data.id,
             data.email,
@@ -41,7 +41,7 @@ export class ContactEntity implements Contact {
         );
     }
 
-    toPlainObject(): Contact {
+    toPlainObject(): IContact {
         return {
             id: this.id,
             email: this.email,

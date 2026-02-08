@@ -1,5 +1,5 @@
 import axiosInstance from '@/lib/@axios';
-import { LoginSuccesResponse } from '@/types/auth.types';
+import { ILoginSuccessResponse } from '@/types/auth.types';
 import { useMutation } from '@tanstack/react-query';
 
 interface Credentials {
@@ -10,7 +10,7 @@ interface Credentials {
 export default function useLogin() {
 	const mutate = useMutation({
 		mutationFn: async (credentials: Credentials) => {
-			const { data } = await axiosInstance.post<LoginSuccesResponse>(`auth/login`, credentials);
+			const { data } = await axiosInstance.post<ILoginSuccessResponse>(`auth/login`, credentials);
 			return data;
 		},
 

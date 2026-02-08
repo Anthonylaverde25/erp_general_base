@@ -19,9 +19,9 @@ import useCreateRole from "@/features/roles/hooks/useCreateRole";
 import {
   CreateRoleFormType,
   createRoleSchema,
-  defaultCreateRoleValues,
 } from "@/schemas/role/role.schema";
-import { CreateRoleType } from "@/types/role.types";
+import { defaultCreateRoleValues } from "@/schemas/role/role.defaults";
+import { ICreateRole } from "@/types/role.types";
 
 interface CreateRoleFormProps {
   onCancel: () => void;
@@ -42,7 +42,7 @@ export default function CreateRoleForm({
 
   const { errors, isValid } = formState;
 
-  const onSubmit = async (data: CreateRoleType) => {
+  const onSubmit = async (data: ICreateRole) => {
     console.log("Submitting data:", data);
     try {
       await handleCreateRole(data);

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { IconButton, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { UserType } from '@/types/user.types';
+import { IUser } from '@/types/user.types';
 
 interface UserActionMenuProps {
     row: any;

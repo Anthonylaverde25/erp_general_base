@@ -21,13 +21,12 @@ import useUpdateUser from '@/features/users/hooks/useUpdateUser';
 import {
     UpdateUserFormType,
     updateUserSchema,
-    defaultUpdateUserValues
-} from '@/schemas/user/user.schema';
-import { UpdateUserType } from '@/types/user.types';
-import { UserType } from '@/types/user.types';
+} from "@/schemas/user/user.schema";
+import { defaultUpdateUserValues } from "@/schemas/user/user.defaults";
+import { IUpdateUser, IUser } from "@/types/user.types";
 
 interface UpdateUserFormProps {
-    user: UserType;
+    user: IUser;
     onCancel: () => void;
     onSuccess?: () => void;
 }
@@ -57,7 +56,7 @@ export default function UpdateUserForm({ user, onCancel, onSuccess }: UpdateUser
 
     const onSubmit = async (data: UpdateUserFormType) => {
         try {
-            const payload: UpdateUserType = {
+            const payload: IUpdateUser = {
                 id: data.id,
                 name: data.name,
                 email: data.email,

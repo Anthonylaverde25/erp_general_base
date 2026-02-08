@@ -17,14 +17,14 @@ import CreateRoleModal from "../components/modals/CreateRoleModal";
 import UpdateRoleModal from "../components/modals/UpdateRoleModal";
 import RoleListSidebar from "../components/RoleListSidebar";
 import RolePermissionMatrix from "../components/RolePermissionMatrix";
-import { RoleType } from "@/types/role.types";
+import { IRole } from "@/types/role.types";
 
 export default function RolesTabView() {
   const theme = useTheme();
   const { roles, isLoading, isError } = useIndexRoles();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<RoleType["id"] | null>(null);
+  const [selectedRole, setSelectedRole] = useState<IRole["id"] | null>(null);
 
   // Default selection logic
   useEffect(() => {

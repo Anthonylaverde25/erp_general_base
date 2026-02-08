@@ -1,6 +1,6 @@
 import { Store } from "@/types/store.types";
 import { CreateStoreDTO } from "./DTOs/CreateStoreDTO";
-import { Address } from "@/types/company.types";
+import { IAddress } from "@/types/company.types";
 
 export class StoreEntity implements Store {
     constructor(
@@ -9,7 +9,7 @@ export class StoreEntity implements Store {
         public name: string,
         public code: string | undefined,
         public is_active: boolean,
-        public address?: Address,
+        public address?: IAddress,
     ) { }
 
     static fromPrimitives(data: Store): StoreEntity {

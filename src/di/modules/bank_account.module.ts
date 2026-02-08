@@ -3,7 +3,7 @@ import { TYPES } from "../types";
 import { BankAccountRepositoryCrud } from "@/infrastructure/repositories/bank_accounts/bank_account.repository.crud";
 import { IBankAccountCrudRepository } from "@/domain/entities/bank_accounts/repositories/bank_account.interface.crud";
 import { IndexBankAccountUseCase } from "@/application/use_cases/bank_accounts/IndexBankAccountUseCase";
-import { CreateBankAccountUseCase } from "@/application/use_cases/company/CreateBankAccountUseCase";
+import { CreateBankAccountUseCase } from '@/application/use_cases/companies/CreateBankAccountUseCase';
 import { UpdateBankAccountUseCase } from "@/application/use_cases/bank_accounts/UpdateBankAccountUseCase";
 import { ShowBankAccountUseCase } from "@/application/use_cases/bank_accounts/ShowBankAccountUseCase";
 

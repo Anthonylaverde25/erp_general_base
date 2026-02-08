@@ -1,15 +1,15 @@
-import { Company as ICompany, Address, Contact } from '@/types/company.types';
+import { ICompany, IAddress, IContact } from '@/types/company.types';
 import { UpdateCompanyDTO } from './DTOs/UpdateCompanyDTO';
 import { CompanySettingEntity } from './CompanySettingEntity';
 
-export class Company implements ICompany {
+export class CompanyEntity implements ICompany {
     private _id: number;
     private _name: string;
     private _cif?: string;
     private _max_users?: number;
     private _brandColor?: string;
-    private _addresses?: Address[];
-    private _contacts?: Contact[];
+    private _addresses?: IAddress[];
+    private _contacts?: IContact[];
     private _website?: string;
     private _logo_url?: string;
     private _favicon_url?: string;
@@ -54,11 +54,11 @@ export class Company implements ICompany {
         return this._brandColor;
     }
 
-    get addresses(): Address[] | undefined {
+    get addresses(): IAddress[] | undefined {
         return this._addresses;
     }
 
-    get contacts(): Contact[] | undefined {
+    get contacts(): IContact[] | undefined {
         return this._contacts;
     }
 
@@ -86,7 +86,7 @@ export class Company implements ICompany {
         if (!data) {
             throw new Error("No se proporciono datos");
         }
-        return new Company({
+        return new CompanyEntity({
             id: id,
             name: data.name,
             cif: data.cif,

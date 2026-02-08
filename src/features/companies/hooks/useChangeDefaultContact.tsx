@@ -1,16 +1,16 @@
 import { container } from "@/di/container";
 import { TYPES } from "@/di/types";
-import { ChangeDefaultContactUseCase } from "@/application/use_cases/company/ChangeDefaultContactUseCase";
+import { ChangeDefaultContactUseCase } from "@/application/use_cases/companies/ChangeDefaultContactUseCase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Contact } from "@/types/company.types";
+import { ICompany, IContact } from '@/types/company.types';
 
 export const useChangeDefaultContact = () => {
     const useCase = container.get<ChangeDefaultContactUseCase>(TYPES.ChangeDefaultContactUseCase);
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: async (contactId: Contact['id']) => await useCase.execute(contactId),
+        mutationFn: async (contactId: IContact['id']) => await useCase.execute(contactId),
         onSuccess: ({ message }) => {
             queryClient.invalidateQueries({ queryKey: ['company'] });
             toast.success(message, {
@@ -22,7 +22,7 @@ export const useChangeDefaultContact = () => {
         },
     });
 
-    const handleChangeDefaultContact = (contactId: Contact['id']) => {
+    const handleChangeDefaultContact = (contactId: IContact['id']) => {
         return mutation.mutateAsync(contactId);
     }
 

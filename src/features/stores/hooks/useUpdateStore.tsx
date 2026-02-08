@@ -26,7 +26,7 @@ export default function useUpdateStore() {
         }) => {
             return await use_case.execute({
                 id,
-                data,
+                data: data as any,
             });
         },
         onSuccess: (response) => {

@@ -1,17 +1,17 @@
 import { Container } from 'inversify';
 import { TYPES } from '../types';
 import { ICompanyCrudRepository } from '@/domain/entities/companies/repositories/company.interface.crud';
-import { CompanyRepositoryCrud } from '@/infrastructure/repositories/companies/company.repository.crud';
-import { IndexCompanyUseCase } from '@/application/use_cases/company/IndexCompanyUseCase';
-import { ShowCompanyUseCase } from '@/application/use_cases/company/ShowCompanyUseCase';
-import { ChangeCompanyUseCase } from '@/application/use_cases/company/ChangeCompanyUseCase';
-import { UpdateCompanyUseCase } from '@/application/use_cases/company/UpdateCompanyUseCase';
-import { CreateAddressUseCase } from '@/application/use_cases/company/CreateAddressUseCase';
+import { CompanyRepositoryCrud } from '@/infrastructure/repositories/companies/CompanyRepositoryCrud';
+import { IndexCompanyUseCase } from '@/application/use_cases/companies/IndexCompanyUseCase';
+import { ShowCompanyUseCase } from '@/application/use_cases/companies/ShowCompanyUseCase';
+import { ChangeCompanyUseCase } from '@/application/use_cases/companies/ChangeCompanyUseCase';
+import { UpdateCompanyUseCase } from '@/application/use_cases/companies/UpdateCompanyUseCase';
+import { CreateAddressUseCase } from '@/application/use_cases/companies/CreateAddressUseCase';
 
-import { ChangeDefaultAddressUseCase } from '@/application/use_cases/company/ChangeDefaultAddressUseCase';
-import { ChangeDefaultContactUseCase } from '@/application/use_cases/company/ChangeDefaultContactUseCase';
+import { ChangeDefaultAddressUseCase } from '@/application/use_cases/companies/ChangeDefaultAddressUseCase';
+import { ChangeDefaultContactUseCase } from '@/application/use_cases/companies/ChangeDefaultContactUseCase';
 import { ICompanyActionRepository } from '@/domain/entities/companies/repositories/company.interface.action';
-import { CompanyRepositoryAction } from '@/infrastructure/repositories/companies/company.repository.action';
+import { CompanyRepositoryAction } from '@/infrastructure/repositories/companies/CompanyRepositoryAction';
 
 export const registerCompanyModule = (container: Container) => {
     // Repositories

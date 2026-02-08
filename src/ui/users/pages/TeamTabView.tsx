@@ -8,17 +8,17 @@ import { UserColumns } from '@/ui/users/component/Columns';
 import CreateUserButton from '@/ui/users/component/CreateUserButton';
 import UpdateUserModal from '@/ui/users/component/modals/UpdateUserModal';
 import UserActionMenu from '@/ui/users/component/UserActionMenu';
-import { UserType } from '@/types/user.types';
+import { IUser } from '@/types/user.types';
 
 export default function TeamTabView() {
 
     const { users, isLoading, isError } = useIndexUser();
 
 
-    const [selectedId, setSelectedId] = useState<UserType['id'] | null>(null);
+    const [selectedId, setSelectedId] = useState<IUser['id'] | null>(null);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
 
-    const handleEditUser = (id: UserType['id']) => {
+    const handleEditUser = (id: IUser['id']) => {
         setSelectedId(id);
         setUpdateModalOpen(true);
     };

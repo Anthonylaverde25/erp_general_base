@@ -16,9 +16,9 @@ import useCreateBankAccount from "@/features/companies/hooks/useCreateBankAccoun
 import {
   CreateBankAccountFormType,
   createBankAccountSchema,
-  defaultCreateBankAccountValues,
 } from "@/schemas/bank_account/bank_account.schema";
-import { CreateBankAccountType } from "@/types/bank_account.types";
+import { defaultCreateBankAccountValues } from "@/schemas/bank_account/bank_account.defaults";
+import { ICreateBankAccount } from "@/types/bank_account.types";
 
 interface CreateBankAccountFormProps {
   onCancel: () => void;
@@ -40,7 +40,7 @@ export default function CreateBankAccountForm({
 
   const { errors, isValid } = formState;
 
-  const onSubmit = async (data: CreateBankAccountType) => {
+  const onSubmit = async (data: ICreateBankAccount) => {
     console.log("Submitting data:", data);
     try {
       await handleCreateBankAccount(data);

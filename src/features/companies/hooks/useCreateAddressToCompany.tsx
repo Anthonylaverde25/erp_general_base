@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { container } from "@/di/container";
 import { TYPES } from "@/di/types";
-import { CreateAddressUseCase } from "@/application/use_cases/company/CreateAddressUseCase";
+import { CreateAddressUseCase } from "@/application/use_cases/companies/CreateAddressUseCase";
 import { CreateAddressDTO } from "@/domain/entities/addresses/DTOs/CreateAddressDTO";
 import { toast } from "sonner";
 

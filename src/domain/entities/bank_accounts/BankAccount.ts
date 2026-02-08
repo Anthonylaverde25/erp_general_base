@@ -1,10 +1,10 @@
 import {
-  CreateBankAccountType,
-  UpdateBankAccountType,
-  BankAccountType,
+  ICreateBankAccount,
+  IUpdateBankAccount,
+  IBankAccount,
 } from "@/types/bank_account.types";
 
-export class BankAccountEntity implements BankAccountType {
+export class BankAccountEntity implements IBankAccount {
   constructor(
     public id: number,
     public name: string,
@@ -13,9 +13,9 @@ export class BankAccountEntity implements BankAccountType {
     public swift: string,
     public created_at?: string,
     public updated_at?: string,
-  ) {}
+  ) { }
 
-  static fromPrimitives(data: BankAccountType): BankAccountEntity {
+  static fromPrimitives(data: IBankAccount): BankAccountEntity {
     return new BankAccountEntity(
       data.id,
       data.name,
@@ -27,7 +27,7 @@ export class BankAccountEntity implements BankAccountType {
     );
   }
 
-  static create(data: CreateBankAccountType): BankAccountEntity {
+  static create(data: ICreateBankAccount): BankAccountEntity {
     return new BankAccountEntity(
       null, // ID will be assigned by backend
       data.name,
@@ -37,7 +37,7 @@ export class BankAccountEntity implements BankAccountType {
     );
   }
 
-  static update(id: number, data: UpdateBankAccountType): BankAccountEntity {
+  static update(id: number, data: IUpdateBankAccount): BankAccountEntity {
     return new BankAccountEntity(
       id,
       data.name,

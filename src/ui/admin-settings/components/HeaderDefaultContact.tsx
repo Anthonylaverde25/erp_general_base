@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Contact } from "@/types/company.types";
+import { IContact } from "@/types/company.types";
 import {
     Stack,
     Typography,
@@ -11,7 +11,7 @@ import { Email, Phone } from "@mui/icons-material";
 import SelectDefaultContactModal from "@/ui/admin-settings/components/modals/SelectDefaultContactModal";
 
 type Props = {
-    contacts: Contact[];
+    contacts: IContact[];
     onSetDefault: (id: number) => void;
 };
 

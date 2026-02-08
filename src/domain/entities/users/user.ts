@@ -1,21 +1,21 @@
-import { Role } from '@/types/role.types';
-import { CreateUserType, UpdateUserType, UserType } from '@/types/user.types';
+import { IRole } from '@/types/role.types';
+import { ICreateUser, IUpdateUser, IUser } from '@/types/user.types';
 
 
-export class User implements UserType {
+export class UserEntity implements IUser {
 	private _id: number | null;
 	private _name: string;
 	private _email: string;
 	private _phone: string;
-	private _role: Role | null;
+	private _role: IRole | null;
 	private _role_id: number;
 	private _password: string;
 	private _password_confirmation: string;
 
 	constructor(
-		Props: Omit<UserType, 'role'> &
-			Partial<Pick<UserType, 'role'>> &
-			Partial<Pick<CreateUserType, 'password' | 'password_confirmation'>>
+		Props: Omit<IUser, 'role'> &
+			Partial<Pick<IUser, 'role'>> &
+			Partial<Pick<ICreateUser, 'password' | 'password_confirmation'>>
 	) {
 		this._id = Props.id;
 		this._name = Props.name;
@@ -43,7 +43,7 @@ export class User implements UserType {
 		return this._phone;
 	}
 
-	get role(): Role | null {
+	get role(): IRole | null {
 		return this._role;
 	}
 
@@ -51,7 +51,7 @@ export class User implements UserType {
 		return this._role_id;
 	}
 
-	toPlainObject(): any {
+	toPlainObject(): IUser & Partial<ICreateUser> {
 		return {
 			id: this._id,
 			name: this._name,
@@ -64,11 +64,11 @@ export class User implements UserType {
 		};
 	}
 
-	static create(data: CreateUserType): User {
+	static create(data: ICreateUser): UserEntity {
 		if (!data) return null;
 
 		const { name, email, password, password_confirmation, role_id, phone } = data;
-		return new User({
+		return new UserEntity({
 			id: null,
 			name,
 			email,
@@ -79,11 +79,11 @@ export class User implements UserType {
 		});
 	}
 
-	static update(id: number, data: UpdateUserType): User {
+	static update(id: number, data: IUpdateUser): UserEntity {
 		if (!data) return null;
 
 		const { name, email, password, password_confirmation, role_id, phone } = data;
-		return new User({
+		return new UserEntity({
 			id,
 			name,
 			email,

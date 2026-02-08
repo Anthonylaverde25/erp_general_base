@@ -1,4 +1,4 @@
-export interface Address {
+export interface IAddress {
     id?: number;
     street: string;
     street_2?: string | null;
@@ -9,41 +9,35 @@ export interface Address {
     default: boolean;
 }
 
-export interface Contact {
+export interface IContact {
     id?: number;
     email: string;
     phone?: string;
     default?: boolean;
 }
 
-export interface Company {
+export interface ICompany {
     id: number;
     name: string;
     cif?: string; // Added field from payload
     max_users?: number; // Maximum number of users allowed for this company
     brandColor?: string; // Corporate brand color
-    addresses?: Address[]; // Changed from address string to Address array
-    contacts?: Contact[]; // Added contacts array
+    addresses?: IAddress[]; // Changed from address string to Address array
+    contacts?: IContact[]; // Added contacts array
     website?: string;
     logo_url?: string;
     favicon_url?: string;
-    settings?: CompanySettingType;
+    settings?: ICompanySetting;
     // Legacy fields - keeping optional just in case, or removing if strictly following new structure. 
     // Given the request is to refactor for relations, I will prioritize the new structure.
 }
 
-export interface CompanySettingType {
+export interface ICompanySetting {
     id?: number,
     maxUsers: number,
     maxStorageMb: number,
     currency: string,
     timezone: string,
-
-
-
-
 }
 
 
-
-export type ActiveCompany = Company;

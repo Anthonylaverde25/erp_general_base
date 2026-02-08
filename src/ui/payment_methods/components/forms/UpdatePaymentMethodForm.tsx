@@ -17,8 +17,9 @@ import useShowPaymentMethod from "@/features/payment_methods/hooks/useShowPaymen
 import {
     UpdatePaymentMethodFormType,
     updatePaymentMethodSchema,
-    defaultUpdatePaymentMethodValues,
 } from "@/schemas/payment_method/payment_method.schema";
+import { defaultUpdatePaymentMethodValues } from "@/schemas/payment_method/payment_method.defaults";
+import { PAYMENT_TYPES } from "../../constants/paymentTypes";
 
 interface UpdatePaymentMethodFormProps {
     paymentMethodId: number;
@@ -26,14 +27,7 @@ interface UpdatePaymentMethodFormProps {
     onSuccess?: () => void;
 }
 
-const paymentTypes = [
-    { value: "cash", label: "Efectivo" },
-    { value: "bank_transfer", label: "Transferencia Bancaria" },
-    { value: "credit_card", label: "Tarjeta de Crédito" },
-    { value: "debit_card", label: "Tarjeta de Débito" },
-    { value: "check", label: "Cheque" },
-    { value: "other", label: "Otro" },
-];
+
 
 export default function UpdatePaymentMethodForm({
     paymentMethodId,
@@ -146,7 +140,7 @@ export default function UpdatePaymentMethodForm({
                                             fullWidth
                                             variant="filled"
                                         >
-                                            {paymentTypes.map((option) => (
+                                            {PAYMENT_TYPES.map((option) => (
                                                 <MenuItem key={option.value} value={option.value}>
                                                     {option.label}
                                                 </MenuItem>

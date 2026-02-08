@@ -15,8 +15,8 @@ import useCreateStore from "@/features/stores/hooks/useCreateStore";
 import {
     CreateStoreFormType,
     createStoreSchema,
-    defaultCreateStoreValues,
 } from "@/schemas/store/store.schema";
+import { defaultCreateStoreValues } from "@/schemas/store/store.defaults";
 import StoreAddressCard from "./StoreAddressCard";
 import StoreAddressModal from "./StoreAddressModal";
 import { useState } from "react";
@@ -163,7 +163,7 @@ export default function CreateStoreForm({
                                         <Fade in timeout={400}>
                                             <Box>
                                                 <StoreAddressCard
-                                                    address={addressValues}
+                                                    address={addressValues as any}
                                                     onEdit={() => setAddressModalOpen(true)}
                                                     onDelete={handleDeleteAddress}
                                                 />

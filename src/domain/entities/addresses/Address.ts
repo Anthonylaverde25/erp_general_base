@@ -1,7 +1,7 @@
-import { Address } from "@/types/company.types";
+import { IAddress } from "@/types/company.types";
 import { CreateAddressDTO } from "./DTOs/CreateAddressDTO";
 
-export class AddressEntity implements Address {
+export class AddressEntity implements IAddress {
     constructor(
         public id: number | undefined,
         public street: string,
@@ -18,7 +18,7 @@ export class AddressEntity implements Address {
         return this.default_address;
     }
 
-    static fromPrimitives(data: Address): AddressEntity {
+    static fromPrimitives(data: IAddress): AddressEntity {
         return new AddressEntity(
             data.id,
             data.street,
@@ -57,7 +57,7 @@ export class AddressEntity implements Address {
         );
     }
 
-    toPlainObject(): Address {
+    toPlainObject(): IAddress {
         return {
             id: this.id,
             street: this.street,

@@ -1,7 +1,10 @@
 /**
  * BankAccount Entity Types
  */
-export interface BankAccountType {
+/**
+ * BankAccount Entity Types
+ */
+export interface IBankAccount {
   id: number;
   name: string;
   account_holder: string;
@@ -12,9 +15,9 @@ export interface BankAccountType {
 }
 
 /**
- * CreateBankAccountType - Type for creating a new bank account
+ * ICreateBankAccount - Type for creating a new bank account
  */
-export interface CreateBankAccountType {
+export interface ICreateBankAccount {
   name: string;
   account_holder: string;
   account_number: string;
@@ -22,9 +25,9 @@ export interface CreateBankAccountType {
 }
 
 /**
- * UpdateBankAccountType - Type for updating an existing bank account
+ * IUpdateBankAccount - Type for updating an existing bank account
  */
-export interface UpdateBankAccountType {
+export interface IUpdateBankAccount {
   id: number;
   name: string;
   account_holder: string;

@@ -19,7 +19,7 @@ import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import { useEffect, useState } from "react";
 import CreateBankAccountModal from "../components/modals/CreateBankAccountModal";
 import UpdateBankAccountModal from "../components/modals/UpdateBankAccountModal";
-import { BankAccountType } from "@/types/bank_account.types";
+import { IBankAccount } from "@/types/bank_account.types";
 import axiosInstance from "@/lib/@axios";
 
 interface BankAccountsTabViewProps {
@@ -34,10 +34,10 @@ export default function BankAccountsTabView({
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const [selectedBankAccount, setSelectedBankAccount] = useState<
-    BankAccountType["id"] | null
+    IBankAccount["id"] | null
   >(null);
 
-  const handleEditBankAccount = (bankAccountId: BankAccountType["id"]) => {
+  const handleEditBankAccount = (bankAccountId: IBankAccount["id"]) => {
     console.log("Editing bank account with ID:", bankAccountId);
     setSelectedBankAccount(bankAccountId);
     setUpdateModalOpen(true);

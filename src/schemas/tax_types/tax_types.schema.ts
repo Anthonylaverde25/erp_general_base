@@ -11,15 +11,9 @@ export const createTaxTypeSchema = z.object({
     is_active: z.boolean().default(true),
 });
 
-export type CreateTaxTypeFormType = z.infer<typeof createTaxTypeSchema>;
 
-export const defaultCreateTaxTypeValues: CreateTaxTypeFormType = {
-    code: "",
-    name: "",
-    description: "",
-    operation: "add" as "add" | "subtract",
-    is_active: true,
-};
+
+export type CreateTaxTypeFormType = z.infer<typeof createTaxTypeSchema>;
 
 export const updateTaxTypeSchema = z.object({
     code: z.string().min(1, "El código es requerido").max(50, "El código no puede tener más de 50 caracteres"),
@@ -33,11 +27,3 @@ export const updateTaxTypeSchema = z.object({
 });
 
 export type UpdateTaxTypeFormType = z.infer<typeof updateTaxTypeSchema>;
-
-export const defaultUpdateTaxTypeValues: UpdateTaxTypeFormType = {
-    code: "",
-    name: "",
-    description: "",
-    operation: "add" as "add" | "subtract",
-    is_active: true,
-};

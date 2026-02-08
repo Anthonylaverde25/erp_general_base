@@ -1,4 +1,4 @@
-import { IndexCompanyUseCase } from '@/application/use_cases/company/IndexCompanyUseCase';
+import { IndexCompanyUseCase } from "@/application/use_cases/companies/IndexCompanyUseCase";
 import { container } from '@/di/container';
 import { TYPES } from '@/di/types';
 import { useQuery } from '@tanstack/react-query';

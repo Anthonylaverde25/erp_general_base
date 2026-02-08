@@ -3,7 +3,7 @@ import { TYPES } from '@/di/types';
 import { IUseCase } from '../IUseCase';
 import type { ICompanyActionRepository } from '@/domain/entities/companies/repositories/company.interface.action';
 import { CreateAddressDTO } from '@/domain/entities/addresses/DTOs/CreateAddressDTO';
-import { Company } from '@/types/company.types';
+import { ICompany } from '@/types/company.types';
 import { AddressEntity } from '@/domain/entities/addresses/Address';
 
 @injectable()

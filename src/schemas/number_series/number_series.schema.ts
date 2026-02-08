@@ -13,13 +13,6 @@ export const createNumberSeriesSchema = z.object({
 
 export type CreateNumberSeriesFormType = z.infer<typeof createNumberSeriesSchema>;
 
-export const defaultCreateNumberSeriesValues: CreateNumberSeriesFormType = {
-    document_type_id: 0,
-    serie: "",
-    year: new Date().getFullYear(),
-    terms: "",
-};
-
 export const updateNumberSeriesSchema = z.object({
     document_type_id: z.number({
         required_error: "El tipo de documento es requerido",
@@ -31,10 +24,3 @@ export const updateNumberSeriesSchema = z.object({
 });
 
 export type UpdateNumberSeriesFormType = z.infer<typeof updateNumberSeriesSchema>;
-
-export const defaultUpdateNumberSeriesValues: UpdateNumberSeriesFormType = {
-    document_type_id: 0,
-    serie: "",
-    year: new Date().getFullYear(),
-    terms: "",
-};

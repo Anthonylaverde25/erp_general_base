@@ -14,13 +14,13 @@ import {
     Paper,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
-import { RoleType } from "@/types/role.types";
+import { IRole } from "@/types/role.types";
 import { useState } from "react";
 
 interface RoleListSidebarProps {
-    roles: RoleType[];
-    selectedRoleId: RoleType["id"] | null;
-    onSelectRole: (roleId: RoleType["id"]) => void;
+    roles: IRole[];
+    selectedRoleId: IRole["id"] | null;
+    onSelectRole: (roleId: IRole["id"]) => void;
     onCreateRole: () => void;
 }
 

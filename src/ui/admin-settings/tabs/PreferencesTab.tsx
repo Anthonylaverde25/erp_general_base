@@ -8,6 +8,7 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import InvoiceTemplateSelector from '../components/InvoiceTemplateSelector';
+import { SUPPORTED_LANGUAGES, NUMBER_FORMATS } from '../constants/preferences';
 
 export default function PreferencesTab() {
     const { register, watch, setValue, reset, formState: { isSubmitting } } = useFormContext<CompanySettingsForm>();
@@ -94,8 +95,11 @@ export default function PreferencesTab() {
                         defaultValue="Español"
                         disabled={!isEditing}
                     >
-                        <MenuItem value="Español">Español</MenuItem>
-                        <MenuItem value="Inglés">Inglés</MenuItem>
+                        {SUPPORTED_LANGUAGES.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
                     </TextField>
                 </Box>
                 <Box>
@@ -109,8 +113,11 @@ export default function PreferencesTab() {
                         defaultValue="1,234.56"
                         disabled={!isEditing}
                     >
-                        <MenuItem value="1,234.56">1,234.56</MenuItem>
-                        <MenuItem value="1.234,56">1.234,56</MenuItem>
+                        {NUMBER_FORMATS.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
                     </TextField>
                 </Box>
 

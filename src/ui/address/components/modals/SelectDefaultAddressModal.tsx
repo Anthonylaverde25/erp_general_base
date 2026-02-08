@@ -16,14 +16,14 @@ import {
 } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useChangeDefaultAddress } from '@/features/companies/hooks/useChangeDefaultAddress';
-import { Address } from '@/types/company.types';
+import { IAddress } from '@/types/company.types';
 import { LocationOn, Map as MapIcon } from '@mui/icons-material';
 import { toast } from 'sonner';
 
 type SelectDefaultAddressModalProps = {
     open: boolean;
     onClose: () => void;
-    items: Address[];
+    items: IAddress[];
     currentDefaultId?: number;
     onSelect: (id: number) => void;
 };

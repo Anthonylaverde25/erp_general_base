@@ -1,9 +1,9 @@
-import { ChangeCompanyUseCase } from '@/application/use_cases/company/ChangeCompanyUseCase';
-import { ShowCompanyUseCase } from '@/application/use_cases/company/ShowCompanyUseCase';
+import { ChangeCompanyUseCase } from "@/application/use_cases/companies/ChangeCompanyUseCase";
+import { ShowCompanyUseCase } from '@/application/use_cases/companies/ShowCompanyUseCase';
 import { container } from '@/di/container';
 import { TYPES } from '@/di/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Company } from '@/types/company.types';
+import { ICompany } from '@/types/company.types';
 import { toast } from 'sonner';
 import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
@@ -18,7 +18,7 @@ export default function useChangeCompany() {
     const show_company_use_case = container.get<ShowCompanyUseCase>(TYPES.ShowCompanyUseCase);
 
     const mutation = useMutation({
-        mutationFn: (companyId: Company['id']) => use_case.execute(companyId),
+        mutationFn: (companyId: ICompany['id']) => use_case.execute(companyId),
 
         onSuccess: async (message, companyId) => {
             if (updateUser) {

@@ -12,13 +12,6 @@ export const createRoleSchema = z.object({
 
 export type CreateRoleFormType = z.infer<typeof createRoleSchema>;
 
-export const defaultCreateRoleValues: CreateRoleFormType = {
-  name: "",
-  code: "",
-  description: "",
-  active: true,
-};
-
 export const updateRoleSchema = z.object({
   id: z.number(),
   name: z.string().min(1, "El nombre es requerido"),
@@ -31,11 +24,3 @@ export const updateRoleSchema = z.object({
 });
 
 export type UpdateRoleFormType = z.infer<typeof updateRoleSchema>;
-
-export const defaultUpdateRoleValues = (role?: any): UpdateRoleFormType => ({
-  id: role?.id || 0,
-  name: role?.name || "",
-  code: role?.code || "",
-  description: role?.description || "",
-  active: role?.active !== undefined ? role.active : true,
-});

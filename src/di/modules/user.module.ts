@@ -1,11 +1,11 @@
 import { Container } from 'inversify';
 import { TYPES } from '../types';
 import { IUserCrudRepository } from '@/domain/entities/users/repositories/user.interface.crud';
-import { UserRepositoryCrud } from '@/infrastructure/repositories/users/user.repository.crud';
-import { IndexUserUseCase } from '@/application/use_cases/user/IndexUserUseCase';
-import { CreateUserUseCase } from '@/application/use_cases/user/CreateUserUseCase';
-import { UpdateUserUseCase } from '@/application/use_cases/user/UpdateUserUseCase';
-import { ShowUserUseCase } from '@/application/use_cases/user/ShowUserUseCase';
+import { UserRepositoryCrud } from '@/infrastructure/repositories/users/UserRepositoryCrud';
+import { IndexUserUseCase } from '@/application/use_cases/users/IndexUserUseCase';
+import { CreateUserUseCase } from '@/application/use_cases/users/CreateUserUseCase';
+import { UpdateUserUseCase } from '@/application/use_cases/users/UpdateUserUseCase';
+import { ShowUserUseCase } from '@/application/use_cases/users/ShowUserUseCase';
 
 export const registerUserModule = (container: Container) => {
 	// //Repositories

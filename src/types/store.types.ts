@@ -1,10 +1,12 @@
-import { Address } from "@/types/company.types";
+import { IAddress } from "@/types/company.types";
 
-export interface Store {
+export interface IStore {
     id?: number;
     company_id?: number;
     name: string;
     code?: string;
     is_active: boolean;
-    address?: Address;
+    address?: IAddress;
 }
+
+export type Store = IStore;

@@ -17,6 +17,7 @@ import {
     UpdateNumberSeriesFormType,
     updateNumberSeriesSchema,
 } from "@/schemas/number_series/number_series.schema";
+import { defaultUpdateNumberSeriesValues } from "@/schemas/number_series/number_series.defaults";
 import { DocumentTypeEntity } from "@/domain/entities/document_types/DocumentTypeEntity";
 import { NumberSeriesEntity } from "@/domain/entities/number_series/NumberSeriesEntity";
 
@@ -40,12 +41,7 @@ export default function UpdateNumberSeriesForm({
     const methods = useForm<UpdateNumberSeriesFormType>({
         mode: "onChange",
         resolver: zodResolver(updateNumberSeriesSchema),
-        defaultValues: {
-            document_type_id: numberSeries.document_type_id,
-            serie: numberSeries.serie,
-            year: numberSeries.year,
-            terms: numberSeries.terms || "",
-        },
+        defaultValues: defaultUpdateNumberSeriesValues(numberSeries),
     });
 
     const { control, formState, handleSubmit, reset } = methods;
@@ -53,12 +49,7 @@ export default function UpdateNumberSeriesForm({
 
     // Reset form when numberSeries changes
     useEffect(() => {
-        reset({
-            document_type_id: numberSeries.document_type_id,
-            serie: numberSeries.serie,
-            year: numberSeries.year,
-            terms: numberSeries.terms || "",
-        });
+        reset(defaultUpdateNumberSeriesValues(numberSeries));
     }, [numberSeries, reset]);
 
     const onSubmit = async (data: UpdateNumberSeriesFormType) => {

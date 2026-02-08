@@ -1,4 +1,4 @@
-import { IndexUserUseCase } from '@/application/use_cases/user/IndexUserUseCase';
+import { IndexUserUseCase } from "@/application/use_cases/users/IndexUserUseCase";
 import { container } from '@/di/container';
 import { TYPES } from '@/di/types';
 import useActiveCompany from '@/features/companies/useActiveCompany';

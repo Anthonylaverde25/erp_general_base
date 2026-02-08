@@ -18,13 +18,13 @@ import useUpdateRole from "@/features/roles/hooks/useUpdateRole";
 import {
   UpdateRoleFormType,
   updateRoleSchema,
-  defaultUpdateRoleValues,
 } from "@/schemas/role/role.schema";
-import { UpdateRoleType } from "@/types/role.types";
-import { RoleType } from "@/types/role.types";
+import { defaultUpdateRoleValues } from "@/schemas/role/role.defaults";
+import { IUpdateRole } from "@/types/role.types";
+import { IRole } from "@/types/role.types";
 
 interface UpdateRoleFormProps {
-  role: RoleType;
+  role: IRole;
   onCancel: () => void;
   onSuccess?: () => void;
 }
@@ -52,7 +52,7 @@ export default function UpdateRoleForm({
 
   const onSubmit = async (data: UpdateRoleFormType) => {
     try {
-      const payload: UpdateRoleType = {
+      const payload: IUpdateRole = {
         id: data.id,
         name: data.name,
         code: data.code,

@@ -3,7 +3,7 @@ import { IBankAccountCrudRepository } from "@/domain/entities/bank_accounts/repo
 import { BankAccountEntity } from "@/domain/entities/bank_accounts/BankAccount";
 import { BankAccountMapper } from "@/domain/entities/bank_accounts/Mappers/BankAccountMapper";
 import axiosInstance from "@/lib/@axios";
-import { BankAccountType } from "@/types/bank_account.types";
+import { IBankAccount } from "@/types/bank_account.types";
 
 @injectable()
 export class BankAccountRepositoryCrud implements IBankAccountCrudRepository {
@@ -14,7 +14,7 @@ export class BankAccountRepositoryCrud implements IBankAccountCrudRepository {
     return BankAccountMapper.fromDetailDTOList(bank_accounts);
   }
 
-  async show(id: BankAccountType["id"]): Promise<BankAccountEntity> {
+  async show(id: IBankAccount["id"]): Promise<BankAccountEntity> {
     try {
       const {
         data: { bank_account },

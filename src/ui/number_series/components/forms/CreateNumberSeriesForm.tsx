@@ -14,10 +14,10 @@ import { Save, Close, Description, CalendarMonth, Tag, ListAlt } from "@mui/icon
 import { zodResolver } from "@hookform/resolvers/zod";
 import useCreateNumberSeries from "@/features/number_series/hooks/useCreateNumberSeries";
 import {
-    CreateNumberSeriesFormType,
     createNumberSeriesSchema,
-    defaultCreateNumberSeriesValues,
+    CreateNumberSeriesFormType,
 } from "@/schemas/number_series/number_series.schema";
+import { defaultCreateNumberSeriesValues } from "@/schemas/number_series/number_series.defaults";
 import { DocumentTypeEntity } from "@/domain/entities/document_types/DocumentTypeEntity";
 
 interface CreateNumberSeriesFormProps {

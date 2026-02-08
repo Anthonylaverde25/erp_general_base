@@ -1,20 +1,20 @@
 import { injectable } from 'inversify';
 import axiosInstance from '@/lib/@axios';
 import { ICompanyCrudRepository } from '@/domain/entities/companies/repositories/company.interface.crud';
-import { Company } from '@/domain/entities/companies/Company';
+import { CompanyEntity } from '@/domain/entities/companies/Company';
 import { CompanyMapper } from '@/domain/entities/companies/Mappers/CompanyMapper';
 import { UpdateCompanyDTO } from '@/domain/entities/companies/DTOs/UpdateCompanyDTO';
 
 @injectable()
 export class CompanyRepositoryCrud implements ICompanyCrudRepository {
-    async index(): Promise<Company[]> {
+    async index(): Promise<CompanyEntity[]> {
         const {
             data: { companies }
         } = await axiosInstance.get(`companies`);
         return CompanyMapper.fromDetailDTOList(companies);
     }
 
-    async show(id: number): Promise<Company> {
+    async show(id: number): Promise<CompanyEntity> {
         const {
             data: { company }
         } = await axiosInstance.get(`companies/${id}`);
@@ -22,7 +22,7 @@ export class CompanyRepositoryCrud implements ICompanyCrudRepository {
         return CompanyMapper.fromDetailDTO(company);
     }
 
-    async update(id: number, data: UpdateCompanyDTO): Promise<{ company: Company; message: string }> {
+    async update(id: number, data: UpdateCompanyDTO): Promise<{ company: CompanyEntity; message: string }> {
         // Check if data contains files or explicit nulls (deletions)
         const hasFiles = (data.logo instanceof File) || (data.logo === null) || (data.favicon instanceof File) || (data.favicon === null);
 

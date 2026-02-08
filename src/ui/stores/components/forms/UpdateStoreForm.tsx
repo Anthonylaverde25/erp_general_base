@@ -18,8 +18,8 @@ import useRemoveStoreAddress from "@/features/stores/hooks/useRemoveStoreAddress
 import {
     UpdateStoreFormType,
     updateStoreSchema,
-    defaultUpdateStoreValues,
 } from "@/schemas/store/store.schema";
+import { defaultUpdateStoreValues } from "@/schemas/store/store.defaults";
 import StoreAddressCard from "./StoreAddressCard";
 import StoreAddressModal from "./StoreAddressModal";
 import { useState } from "react";

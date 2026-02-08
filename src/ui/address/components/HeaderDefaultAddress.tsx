@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Address } from "@/types/company.types";
+import { IAddress } from "@/types/company.types";
 import { LiaExchangeAltSolid } from "react-icons/lia";
 import {
     Box,
@@ -12,7 +12,7 @@ import { LocationOn, Map as MapIcon } from "@mui/icons-material";
 import SelectDefaultAddressModal from "@/ui/address/components/modals/SelectDefaultAddressModal";
 
 type Props = {
-    address: Address[];
+    address: IAddress[];
     onSetDefault: (id: number) => void;
 };
 

@@ -21,8 +21,13 @@ import {
     CreateTaxTypeFormType,
     UpdateTaxTypeFormType,
 } from "@/schemas/tax_types/tax_types.schema";
+import {
+    defaultCreateTaxTypeValues,
+    defaultUpdateTaxTypeValues,
+} from "@/schemas/tax_types/tax_types.defaults";
 import { TaxTypeEntity } from "@/domain/entities/tax_types/TaxTypeEntity";
 import { CreateTaxTypeDTO } from "@/domain/entities/tax_types/DTOs/CreateTaxTypeDTO";
+import { TAX_TYPE_OPERATIONS } from "../../constants/taxTypeOperations";
 
 interface TaxTypesFormProps {
     taxType?: TaxTypeEntity | null;
@@ -44,13 +49,9 @@ export default function TaxTypesForm({
     const methods = useForm<CreateTaxTypeFormType | UpdateTaxTypeFormType>({
         mode: "onChange",
         resolver: zodResolver(isEditMode ? updateTaxTypeSchema : createTaxTypeSchema),
-        defaultValues: {
-            code: "",
-            name: "",
-            description: "",
-            operation: "add" as "add" | "subtract",
-            is_active: true,
-        },
+        defaultValues: isEditMode
+            ? defaultUpdateTaxTypeValues(taxType)
+            : defaultCreateTaxTypeValues,
     });
 
     const { control, formState, handleSubmit, reset } = methods;
@@ -58,22 +59,9 @@ export default function TaxTypesForm({
 
     useEffect(() => {
         if (taxType) {
-            reset({
-                code: taxType.code,
-                name: taxType.name,
-                description: taxType.description,
-                // @ts-ignore
-                operation: taxType.operation as "add" | "subtract",
-                is_active: taxType.is_active,
-            });
+            reset(defaultUpdateTaxTypeValues(taxType));
         } else {
-            reset({
-                code: "",
-                name: "",
-                description: "",
-                operation: "add",
-                is_active: true,
-            });
+            reset(defaultCreateTaxTypeValues);
         }
     }, [taxType, reset]);
 
@@ -205,8 +193,11 @@ export default function TaxTypesForm({
                                                 fullWidth
                                                 variant="filled"
                                             >
-                                                <MenuItem value="add">Sumar al total</MenuItem>
-                                                <MenuItem value="subtract">Restar al total</MenuItem>
+                                                {TAX_TYPE_OPERATIONS.map((option) => (
+                                                    <MenuItem key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </MenuItem>
+                                                ))}
                                             </TextField>
                                         )}
                                     />

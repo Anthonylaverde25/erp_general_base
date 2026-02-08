@@ -9,7 +9,7 @@ import {
     Divider,
     CircularProgress
 } from '@mui/material';
-import { Company } from '@/types/company.types';
+import { ICompany } from '@/types/company.types';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import useAuth from '@fuse/core/FuseAuthProvider/useAuth';
 import useChangeCompany from '@/features/companies/hooks/useChangeCompany';
@@ -39,7 +39,7 @@ function CompanySwitcher() {
     }, []);
 
     const handleSelectCompany = useCallback(
-        (companyId: Company['id']) => {
+        (companyId: ICompany['id']) => {
             if (companyId === selectedCompanyId) {
                 handleCloseMenu();
                 return;

@@ -1,12 +1,12 @@
 import { Dialog, DialogContent } from "@mui/material";
 import UpdateRoleForm from "../forms/UpdateRoleForm";
 import useShowRole from "@/features/roles/hooks/useShowRole";
-import { RoleType } from "@/types/role.types";
+import { IRole } from "@/types/role.types";
 
 interface UpdateRoleDialogProps {
   open: boolean;
   onClose: () => void;
-  roleId?: RoleType["id"];
+  roleId?: IRole["id"];
 }
 
 export default function UpdateRoleDialog({

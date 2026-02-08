@@ -1,14 +1,14 @@
-import { Role } from './role.types';
-import { ActiveCompany } from './company.types';
+import { IRole } from './role.types';
+import { ICompany } from './company.types';
 
 /**
  * Tipado general de la entidad user
  */
-export interface UserType {
+export interface IUser {
 	id: number | null;
 	name: string;
 	email: string;
-	role: Role | null;
+	role: IRole | null;
 	role_id?: number;
 
 	// Campos adicionales del backend
@@ -23,17 +23,16 @@ export interface UserType {
 	needs_password_change?: boolean;
 	observations?: string;
 	active_company_id?: number;
-	[key: string]: unknown;
 }
 
-export type UserTypes = UserType;
+
 
 /**
- * CreateUserType - Tipo para crear un nuevo usuario
+ * ICreateUser - Tipo para crear un nuevo usuario
  * SOLO usar durante registro/creación
  * Incluye password que debe ser encriptado ANTES de enviar al backend
  */
-export interface CreateUserType {
+export interface ICreateUser {
 	name: string;
 	email: string;
 	password: string;
@@ -44,10 +43,10 @@ export interface CreateUserType {
 }
 
 /**
- * UpdateUserType - Tipo para actualizar un usuario existente
+ * IUpdateUser - Tipo para actualizar un usuario existente
  * Los campos de password son opcionales (solo si se desea cambiar la contraseña)
  */
-export interface UpdateUserType {
+export interface IUpdateUser {
 	id: number;
 	name: string;
 	email: string;

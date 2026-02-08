@@ -1,9 +1,9 @@
-import { BankAccountType } from "@/types/bank_account.types";
+import { IBankAccount } from "@/types/bank_account.types";
 import { BankAccountEntity } from "../BankAccount";
 
 export interface IBankAccountCrudRepository {
   index(): Promise<BankAccountEntity[]>;
-  show(id: BankAccountType["id"]): Promise<BankAccountEntity>;
+  show(id: IBankAccount["id"]): Promise<BankAccountEntity>;
   update(
     id: number,
     data: BankAccountEntity,

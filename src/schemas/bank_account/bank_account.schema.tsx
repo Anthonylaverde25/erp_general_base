@@ -15,13 +15,6 @@ export const createBankAccountSchema = z.object({
 
 export type CreateBankAccountFormType = z.infer<typeof createBankAccountSchema>;
 
-export const defaultCreateBankAccountValues: CreateBankAccountFormType = {
-  name: "",
-  account_holder: "",
-  account_number: "",
-  swift: "",
-};
-
 export const updateBankAccountSchema = z.object({
   id: z.number(),
   name: z.string().min(1, "El nombre es requerido"),
@@ -37,13 +30,3 @@ export const updateBankAccountSchema = z.object({
 });
 
 export type UpdateBankAccountFormType = z.infer<typeof updateBankAccountSchema>;
-
-export const defaultUpdateBankAccountValues = (
-  bankAccount?: any,
-): UpdateBankAccountFormType => ({
-  id: bankAccount?.id || 0,
-  name: bankAccount?.name || "",
-  account_holder: bankAccount?.account_holder || "",
-  account_number: bankAccount?.account_number || "",
-  swift: bankAccount?.swift || "",
-});

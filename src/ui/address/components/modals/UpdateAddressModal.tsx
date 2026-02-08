@@ -20,7 +20,7 @@ import {
 } from '@/schemas/address/address.schema';
 import AddressForm from '../forms/AddressForm';
 import { CreateAddressDTO } from '@/domain/entities/addresses/DTOs/CreateAddressDTO';
-import { Address } from '@/types/company.types';
+import { IAddress } from '@/types/company.types';
 import { useShowAddress } from '@/features/addresses/hooks/useShowAddress';
 import useUpdateAddress from '@/features/addresses/hooks/useUpdateAddress';
 import { AddressEntity } from '@/domain/entities/addresses/Address';
@@ -30,7 +30,7 @@ interface UpdateAddressModalProps {
     open: boolean;
     onClose: () => void;
     onSubmit: (data: AddressFormData) => void;
-    addressId: Address['id']
+    addressId: IAddress['id']
 }
 
 

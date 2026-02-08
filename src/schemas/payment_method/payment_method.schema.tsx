@@ -10,13 +10,6 @@ export const createPaymentMethodSchema = z.object({
 
 export type CreatePaymentMethodFormType = z.infer<typeof createPaymentMethodSchema>;
 
-export const defaultCreatePaymentMethodValues: CreatePaymentMethodFormType = {
-    name: "",
-    type: "cash",
-    description: "",
-    is_active: true,
-};
-
 export const updatePaymentMethodSchema = z.object({
     id: z.number(),
     name: z.string().min(1, "El nombre es requerido").max(255, "El nombre no puede exceder 255 caracteres"),
@@ -27,13 +20,3 @@ export const updatePaymentMethodSchema = z.object({
 });
 
 export type UpdatePaymentMethodFormType = z.infer<typeof updatePaymentMethodSchema>;
-
-export const defaultUpdatePaymentMethodValues = (
-    paymentMethod?: any,
-): UpdatePaymentMethodFormType => ({
-    id: paymentMethod?.id || 0,
-    name: paymentMethod?.name || "",
-    type: paymentMethod?.type || "cash",
-    description: paymentMethod?.description || "",
-    is_active: paymentMethod?.is_active ?? true,
-});

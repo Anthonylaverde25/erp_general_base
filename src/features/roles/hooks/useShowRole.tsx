@@ -1,10 +1,10 @@
 import { ShowRoleUseCase } from "@/application/use_cases/roles/ShowRoleUsecase";
 import { container } from "@/di/container";
 import { TYPES } from "@/di/types";
-import { RoleType } from "@/types/role.types";
+import { IRole } from "@/types/role.types";
 import { useQuery } from "@tanstack/react-query";
 
-export default function useShowRole(id: RoleType["id"]) {
+export default function useShowRole(id: IRole["id"]) {
   const use_case = container.get<ShowRoleUseCase>(TYPES.ShowRoleUseCase);
 
   const query = useQuery({
