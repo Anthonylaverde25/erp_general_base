@@ -11,21 +11,20 @@ import {
     useTheme,
     alpha,
     Chip,
-    Stack,
     Switch,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
-import { IRole } from "@/types/role.types";
+import { TaxTypeEntity } from "@/domain/entities/tax_types/TaxTypeEntity";
 
-interface RolesTableProps {
-    roles: IRole[] | undefined;
-    onEdit: (id: number) => void;
+interface TaxTypesTableProps {
+    taxTypes: TaxTypeEntity[] | undefined;
+    onEdit: (taxType: TaxTypeEntity) => void;
     onDelete: (id: number) => void;
-    onStatusChange: (id: number, currentStatus: boolean) => void;
+    onStatusChange: (taxType: TaxTypeEntity) => void;
 }
 
-export default function RolesTable(props: RolesTableProps) {
-    const { roles, onEdit, onDelete, onStatusChange } = props;
+export default function TaxTypesTable(props: TaxTypesTableProps) {
+    const { taxTypes, onEdit, onDelete, onStatusChange } = props;
     const theme = useTheme();
 
     return (
@@ -39,8 +38,8 @@ export default function RolesTable(props: RolesTableProps) {
                         }}
                     >
                         <TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
-                        <TableCell sx={{ fontWeight: 700 }}>Código</TableCell>
                         <TableCell sx={{ fontWeight: 700 }}>Descripción</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Operación</TableCell>
                         <TableCell sx={{ fontWeight: 700 }}>Estado</TableCell>
                         <TableCell align="right" sx={{ pr: 3, fontWeight: 700 }}>
                             Acciones
@@ -49,9 +48,9 @@ export default function RolesTable(props: RolesTableProps) {
                 </TableHead>
 
                 <TableBody>
-                    {roles?.map((role) => (
+                    {taxTypes?.map((taxType) => (
                         <TableRow
-                            key={role.id}
+                            key={taxType.id}
                             hover
                             sx={{
                                 transition: "all 0.2s ease",
@@ -70,65 +69,46 @@ export default function RolesTable(props: RolesTableProps) {
                             {/* Nombre */}
                             <TableCell sx={{ pl: 3 }}>
                                 <Typography variant="subtitle2" fontWeight={600}>
-                                    {role.name}
+                                    {taxType.name}
                                 </Typography>
-                            </TableCell>
-
-                            {/* Código */}
-                            <TableCell>
-                                <Chip
-                                    label={role.code}
-                                    size="small"
-                                    sx={{
-                                        borderRadius: 1,
-                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                        color: theme.palette.primary.main,
-                                        fontWeight: 600,
-                                        fontFamily: "monospace",
-                                    }}
-                                />
                             </TableCell>
 
                             {/* Descripción */}
                             <TableCell>
                                 <Typography variant="body2" color="text.secondary">
-                                    {role.description || "-"}
+                                    {taxType.description || "-"}
                                 </Typography>
+                            </TableCell>
+
+                            {/* Operation */}
+                            <TableCell>
+                                <Chip
+                                    label={taxType.operation_label || "-"}
+                                    size="small"
+                                    sx={{ width: "fit-content" }}
+                                />
                             </TableCell>
 
                             {/* Estado */}
                             <TableCell>
-                                <Tooltip
-                                    title={role.active ? "Desactivar rol" : "Activar rol"}
-                                    placement="top"
-                                >
-                                    <Switch
-                                        checked={role.active}
-                                        onChange={() => onStatusChange(role.id, role.active)}
-                                        color="primary"
-                                        size="small"
-                                    />
-                                </Tooltip>
+                                <Switch
+                                    checked={taxType.is_active}
+                                    onChange={() => onStatusChange(taxType)}
+                                    inputProps={{ "aria-label": "controlled" }}
+                                />
                             </TableCell>
 
                             {/* Acciones */}
                             <TableCell align="right" sx={{ pr: 3 }}>
-                                <Tooltip title="Editar rol">
-                                    <IconButton
-                                        size="small"
-                                        onClick={() => onEdit(role.id)}
-                                    >
+                                <Tooltip title="Editar">
+                                    <IconButton size="small" onClick={() => onEdit(taxType)}>
                                         <FuseSvgIcon size={20}>
                                             heroicons-outline:pencil-square
                                         </FuseSvgIcon>
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Eliminar rol">
-                                    <IconButton
-                                        size="small"
-                                        color="error"
-                                        onClick={() => onDelete(role.id)}
-                                    >
+                                <Tooltip title="Eliminar">
+                                    <IconButton size="small" color="error" onClick={() => onDelete(taxType.id)}>
                                         <FuseSvgIcon size={20}>
                                             heroicons-outline:trash
                                         </FuseSvgIcon>
@@ -138,11 +118,11 @@ export default function RolesTable(props: RolesTableProps) {
                         </TableRow>
                     ))}
 
-                    {(!roles || roles.length === 0) && (
+                    {(!taxTypes || taxTypes.length === 0) && (
                         <TableRow>
                             <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
                                 <Typography variant="body2" color="text.secondary">
-                                    No hay roles disponibles
+                                    No hay tipos de impuestos disponibles
                                 </Typography>
                             </TableCell>
                         </TableRow>

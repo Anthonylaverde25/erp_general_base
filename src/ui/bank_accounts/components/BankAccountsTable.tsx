@@ -10,22 +10,18 @@ import {
     Tooltip,
     useTheme,
     alpha,
-    Chip,
-    Stack,
-    Switch,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
-import { IRole } from "@/types/role.types";
+import { IBankAccount } from "@/types/bank_account.types";
 
-interface RolesTableProps {
-    roles: IRole[] | undefined;
+interface BankAccountsTableProps {
+    bankAccounts: IBankAccount[] | undefined;
     onEdit: (id: number) => void;
     onDelete: (id: number) => void;
-    onStatusChange: (id: number, currentStatus: boolean) => void;
 }
 
-export default function RolesTable(props: RolesTableProps) {
-    const { roles, onEdit, onDelete, onStatusChange } = props;
+export default function BankAccountsTable(props: BankAccountsTableProps) {
+    const { bankAccounts, onEdit, onDelete } = props;
     const theme = useTheme();
 
     return (
@@ -39,9 +35,9 @@ export default function RolesTable(props: RolesTableProps) {
                         }}
                     >
                         <TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
-                        <TableCell sx={{ fontWeight: 700 }}>Código</TableCell>
-                        <TableCell sx={{ fontWeight: 700 }}>Descripción</TableCell>
-                        <TableCell sx={{ fontWeight: 700 }}>Estado</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Titular</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Número de Cuenta</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>SWIFT</TableCell>
                         <TableCell align="right" sx={{ pr: 3, fontWeight: 700 }}>
                             Acciones
                         </TableCell>
@@ -49,9 +45,9 @@ export default function RolesTable(props: RolesTableProps) {
                 </TableHead>
 
                 <TableBody>
-                    {roles?.map((role) => (
+                    {bankAccounts?.map((bankAccount) => (
                         <TableRow
-                            key={role.id}
+                            key={bankAccount.id}
                             hover
                             sx={{
                                 transition: "all 0.2s ease",
@@ -70,64 +66,54 @@ export default function RolesTable(props: RolesTableProps) {
                             {/* Nombre */}
                             <TableCell sx={{ pl: 3 }}>
                                 <Typography variant="subtitle2" fontWeight={600}>
-                                    {role.name}
+                                    {bankAccount.name}
                                 </Typography>
                             </TableCell>
 
-                            {/* Código */}
+                            {/* Titular */}
                             <TableCell>
-                                <Chip
-                                    label={role.code}
-                                    size="small"
+                                <Typography variant="body2">
+                                    {bankAccount.account_holder}
+                                </Typography>
+                            </TableCell>
+
+                            {/* Número de Cuenta */}
+                            <TableCell>
+                                <Typography variant="body2">
+                                    {bankAccount.account_number}
+                                </Typography>
+                            </TableCell>
+
+                            {/* SWIFT */}
+                            <TableCell>
+                                <Typography
+                                    variant="body2"
                                     sx={{
-                                        borderRadius: 1,
-                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                        color: theme.palette.primary.main,
                                         fontWeight: 600,
-                                        fontFamily: "monospace",
+                                        color: "primary.main",
                                     }}
-                                />
-                            </TableCell>
-
-                            {/* Descripción */}
-                            <TableCell>
-                                <Typography variant="body2" color="text.secondary">
-                                    {role.description || "-"}
-                                </Typography>
-                            </TableCell>
-
-                            {/* Estado */}
-                            <TableCell>
-                                <Tooltip
-                                    title={role.active ? "Desactivar rol" : "Activar rol"}
-                                    placement="top"
                                 >
-                                    <Switch
-                                        checked={role.active}
-                                        onChange={() => onStatusChange(role.id, role.active)}
-                                        color="primary"
-                                        size="small"
-                                    />
-                                </Tooltip>
+                                    {bankAccount.swift}
+                                </Typography>
                             </TableCell>
 
                             {/* Acciones */}
                             <TableCell align="right" sx={{ pr: 3 }}>
-                                <Tooltip title="Editar rol">
+                                <Tooltip title="Editar cuenta">
                                     <IconButton
                                         size="small"
-                                        onClick={() => onEdit(role.id)}
+                                        onClick={() => onEdit(bankAccount.id)}
                                     >
                                         <FuseSvgIcon size={20}>
                                             heroicons-outline:pencil-square
                                         </FuseSvgIcon>
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Eliminar rol">
+                                <Tooltip title="Eliminar cuenta">
                                     <IconButton
                                         size="small"
                                         color="error"
-                                        onClick={() => onDelete(role.id)}
+                                        onClick={() => onDelete(bankAccount.id)}
                                     >
                                         <FuseSvgIcon size={20}>
                                             heroicons-outline:trash
@@ -138,11 +124,11 @@ export default function RolesTable(props: RolesTableProps) {
                         </TableRow>
                     ))}
 
-                    {(!roles || roles.length === 0) && (
+                    {(!bankAccounts || bankAccounts.length === 0) && (
                         <TableRow>
                             <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
                                 <Typography variant="body2" color="text.secondary">
-                                    No hay roles disponibles
+                                    No hay cuentas bancarias disponibles
                                 </Typography>
                             </TableCell>
                         </TableRow>

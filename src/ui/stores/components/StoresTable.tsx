@@ -10,23 +10,36 @@ import {
     Tooltip,
     useTheme,
     alpha,
-    Chip,
-    Stack,
     Switch,
+    Stack,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
-import { IRole } from "@/types/role.types";
+import { StoreEntity } from "@/domain/entities/stores/StoreEntity";
 
-interface RolesTableProps {
-    roles: IRole[] | undefined;
+interface StoresTableProps {
+    stores: StoreEntity[] | undefined;
     onEdit: (id: number) => void;
     onDelete: (id: number) => void;
     onStatusChange: (id: number, currentStatus: boolean) => void;
 }
 
-export default function RolesTable(props: RolesTableProps) {
-    const { roles, onEdit, onDelete, onStatusChange } = props;
+export default function StoresTable(props: StoresTableProps) {
+    const { stores, onEdit, onDelete, onStatusChange } = props;
     const theme = useTheme();
+
+    const formatAddress = (store: StoreEntity) => {
+        if (!store.address) return null;
+        const { street, street_2, city, state, postal_code, country } = store.address;
+        return {
+            short: `${city}, ${state}`,
+            full: [
+                street,
+                street_2,
+                `${city}, ${state} ${postal_code}`,
+                country
+            ].filter(Boolean).join(', ')
+        };
+    };
 
     return (
         <TableContainer>
@@ -40,7 +53,7 @@ export default function RolesTable(props: RolesTableProps) {
                     >
                         <TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
                         <TableCell sx={{ fontWeight: 700 }}>Código</TableCell>
-                        <TableCell sx={{ fontWeight: 700 }}>Descripción</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Dirección</TableCell>
                         <TableCell sx={{ fontWeight: 700 }}>Estado</TableCell>
                         <TableCell align="right" sx={{ pr: 3, fontWeight: 700 }}>
                             Acciones
@@ -49,9 +62,9 @@ export default function RolesTable(props: RolesTableProps) {
                 </TableHead>
 
                 <TableBody>
-                    {roles?.map((role) => (
+                    {stores?.map((store) => (
                         <TableRow
-                            key={role.id}
+                            key={store.id}
                             hover
                             sx={{
                                 transition: "all 0.2s ease",
@@ -70,41 +83,49 @@ export default function RolesTable(props: RolesTableProps) {
                             {/* Nombre */}
                             <TableCell sx={{ pl: 3 }}>
                                 <Typography variant="subtitle2" fontWeight={600}>
-                                    {role.name}
+                                    {store.name}
                                 </Typography>
                             </TableCell>
 
                             {/* Código */}
                             <TableCell>
-                                <Chip
-                                    label={role.code}
-                                    size="small"
-                                    sx={{
-                                        borderRadius: 1,
-                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                        color: theme.palette.primary.main,
-                                        fontWeight: 600,
-                                        fontFamily: "monospace",
-                                    }}
-                                />
+                                <Typography variant="body2">
+                                    {store.code || "-"}
+                                </Typography>
                             </TableCell>
 
-                            {/* Descripción */}
+                            {/* Dirección */}
                             <TableCell>
-                                <Typography variant="body2" color="text.secondary">
-                                    {role.description || "-"}
-                                </Typography>
+                                {formatAddress(store) ? (
+                                    <Tooltip
+                                        title={formatAddress(store)!.full}
+                                        placement="top"
+                                    >
+                                        <Stack direction="row" spacing={0.5} alignItems="center">
+                                            <FuseSvgIcon size={16} color="action">
+                                                heroicons-outline:map-pin
+                                            </FuseSvgIcon>
+                                            <Typography variant="body2">
+                                                {formatAddress(store)!.short}
+                                            </Typography>
+                                        </Stack>
+                                    </Tooltip>
+                                ) : (
+                                    <Typography variant="body2" color="text.disabled" fontStyle="italic">
+                                        Sin dirección
+                                    </Typography>
+                                )}
                             </TableCell>
 
                             {/* Estado */}
                             <TableCell>
                                 <Tooltip
-                                    title={role.active ? "Desactivar rol" : "Activar rol"}
+                                    title={store.is_active ? "Desactivar tienda" : "Activar tienda"}
                                     placement="top"
                                 >
                                     <Switch
-                                        checked={role.active}
-                                        onChange={() => onStatusChange(role.id, role.active)}
+                                        checked={store.is_active}
+                                        onChange={() => onStatusChange(store.id!, store.is_active)}
                                         color="primary"
                                         size="small"
                                     />
@@ -113,21 +134,21 @@ export default function RolesTable(props: RolesTableProps) {
 
                             {/* Acciones */}
                             <TableCell align="right" sx={{ pr: 3 }}>
-                                <Tooltip title="Editar rol">
+                                <Tooltip title="Editar tienda">
                                     <IconButton
                                         size="small"
-                                        onClick={() => onEdit(role.id)}
+                                        onClick={() => onEdit(store.id!)}
                                     >
                                         <FuseSvgIcon size={20}>
                                             heroicons-outline:pencil-square
                                         </FuseSvgIcon>
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Eliminar rol">
+                                <Tooltip title="Eliminar tienda">
                                     <IconButton
                                         size="small"
                                         color="error"
-                                        onClick={() => onDelete(role.id)}
+                                        onClick={() => onDelete(store.id!)}
                                     >
                                         <FuseSvgIcon size={20}>
                                             heroicons-outline:trash
@@ -138,11 +159,11 @@ export default function RolesTable(props: RolesTableProps) {
                         </TableRow>
                     ))}
 
-                    {(!roles || roles.length === 0) && (
+                    {(!stores || stores.length === 0) && (
                         <TableRow>
                             <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
                                 <Typography variant="body2" color="text.secondary">
-                                    No hay roles disponibles
+                                    No hay tiendas disponibles
                                 </Typography>
                             </TableCell>
                         </TableRow>

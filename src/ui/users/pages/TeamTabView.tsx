@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { Button, Stack } from '@mui/material';
+import { Button, Stack, Box } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 
 import useIndexUser from '@/features/users/hooks/useIndexUsers';
-import UserDataTable from '@/ui/users/component/UserDataTable';
-import { UserColumns } from '@/ui/users/component/Columns';
+import TeamTable from '../component/TeamTable';
+import TeamTableSimple from '../component/TeamTableSimple';
 import CreateUserButton from '@/ui/users/component/CreateUserButton';
 import UpdateUserModal from '@/ui/users/component/modals/UpdateUserModal';
-import UserActionMenu from '@/ui/users/component/UserActionMenu';
 import { IUser } from '@/types/user.types';
 
 export default function TeamTabView() {
@@ -47,33 +46,17 @@ export default function TeamTabView() {
                 </Stack>
             </Stack>
 
-            <UserDataTable
-                columns={UserColumns}
-                data={users}
-                enableRowActions
-                positionActionsColumn="last"
-                renderRowActions={({ row }) => (
-                    <UserActionMenu
-                        row={row}
-                        onEdit={() => handleEditUser(row.original.id)}
-                    />
-                )}
-                enableRowSelection
-                initialState={{
-                    density: 'comfortable',
-                    pagination: { pageSize: 10, pageIndex: 0 }
-                }}
-                muiTablePaperProps={{
-                    elevation: 0,
-                    sx: { borderRadius: 0 }
-                }}
-                displayColumnDefOptions={{
-                    'mrt-row-actions': {
-                        size: 60,
-                        header: ''
-                    }
-                }}
+            <TeamTable
+                users={users}
+                onEdit={handleEditUser}
             />
+
+            <Box sx={{ my: 4 }}>
+                <TeamTableSimple
+                    users={users}
+                    onEdit={handleEditUser}
+                />
+            </Box>
 
             {selectedId && (
                 <UpdateUserModal

@@ -10,22 +10,20 @@ import {
     Tooltip,
     useTheme,
     alpha,
-    Chip,
     Stack,
-    Switch,
+    Chip,
 } from "@mui/material";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
-import { IRole } from "@/types/role.types";
+import { NumberSeriesEntity } from "@/domain/entities/number_series/NumberSeriesEntity";
 
-interface RolesTableProps {
-    roles: IRole[] | undefined;
-    onEdit: (id: number) => void;
+interface NumberSeriesTableProps {
+    numberSeries: NumberSeriesEntity[] | undefined;
+    onEdit: (series: NumberSeriesEntity) => void;
     onDelete: (id: number) => void;
-    onStatusChange: (id: number, currentStatus: boolean) => void;
 }
 
-export default function RolesTable(props: RolesTableProps) {
-    const { roles, onEdit, onDelete, onStatusChange } = props;
+export default function NumberSeriesTable(props: NumberSeriesTableProps) {
+    const { numberSeries, onEdit, onDelete } = props;
     const theme = useTheme();
 
     return (
@@ -38,10 +36,11 @@ export default function RolesTable(props: RolesTableProps) {
                             borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
                         }}
                     >
-                        <TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
-                        <TableCell sx={{ fontWeight: 700 }}>Código</TableCell>
-                        <TableCell sx={{ fontWeight: 700 }}>Descripción</TableCell>
-                        <TableCell sx={{ fontWeight: 700 }}>Estado</TableCell>
+                        <TableCell sx={{ pl: 3, fontWeight: 700 }}>Tipo de Documento</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Serie</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Año</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Número Actual</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Términos</TableCell>
                         <TableCell align="right" sx={{ pr: 3, fontWeight: 700 }}>
                             Acciones
                         </TableCell>
@@ -49,9 +48,9 @@ export default function RolesTable(props: RolesTableProps) {
                 </TableHead>
 
                 <TableBody>
-                    {roles?.map((role) => (
+                    {numberSeries?.map((series) => (
                         <TableRow
-                            key={role.id}
+                            key={series.id}
                             hover
                             sx={{
                                 transition: "all 0.2s ease",
@@ -67,68 +66,59 @@ export default function RolesTable(props: RolesTableProps) {
                                 },
                             }}
                         >
-                            {/* Nombre */}
+                            {/* Tipo de Documento */}
                             <TableCell sx={{ pl: 3 }}>
-                                <Typography variant="subtitle2" fontWeight={600}>
-                                    {role.name}
+                                <Stack spacing={0.5}>
+                                    <Typography variant="subtitle2" fontWeight={600}>
+                                        {series.document_type?.name || "-"}
+                                    </Typography>
+                                    <Chip
+                                        label={series.document_type?.code || "-"}
+                                        size="small"
+                                        sx={{ width: "fit-content" }}
+                                    />
+                                </Stack>
+                            </TableCell>
+
+                            {/* Serie */}
+                            <TableCell>
+                                <Typography variant="body2" fontWeight={600}>
+                                    {series.serie}
                                 </Typography>
                             </TableCell>
 
-                            {/* Código */}
+                            {/* Año */}
                             <TableCell>
-                                <Chip
-                                    label={role.code}
-                                    size="small"
-                                    sx={{
-                                        borderRadius: 1,
-                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                        color: theme.palette.primary.main,
-                                        fontWeight: 600,
-                                        fontFamily: "monospace",
-                                    }}
-                                />
+                                <Typography variant="body2">
+                                    {series.year}
+                                </Typography>
                             </TableCell>
 
-                            {/* Descripción */}
+                            {/* Número Actual */}
+                            <TableCell>
+                                <Typography variant="body2" fontWeight={600} color="primary">
+                                    {series.current_number}
+                                </Typography>
+                            </TableCell>
+
+                            {/* Términos */}
                             <TableCell>
                                 <Typography variant="body2" color="text.secondary">
-                                    {role.description || "-"}
+                                    {series.terms || "-"}
                                 </Typography>
-                            </TableCell>
-
-                            {/* Estado */}
-                            <TableCell>
-                                <Tooltip
-                                    title={role.active ? "Desactivar rol" : "Activar rol"}
-                                    placement="top"
-                                >
-                                    <Switch
-                                        checked={role.active}
-                                        onChange={() => onStatusChange(role.id, role.active)}
-                                        color="primary"
-                                        size="small"
-                                    />
-                                </Tooltip>
                             </TableCell>
 
                             {/* Acciones */}
                             <TableCell align="right" sx={{ pr: 3 }}>
-                                <Tooltip title="Editar rol">
-                                    <IconButton
-                                        size="small"
-                                        onClick={() => onEdit(role.id)}
-                                    >
+                                <Tooltip title="Editar serie">
+                                    <IconButton size="small" onClick={() => onEdit(series)}>
                                         <FuseSvgIcon size={20}>
                                             heroicons-outline:pencil-square
                                         </FuseSvgIcon>
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Eliminar rol">
-                                    <IconButton
-                                        size="small"
-                                        color="error"
-                                        onClick={() => onDelete(role.id)}
-                                    >
+                                <Tooltip title="Eliminar serie">
+                                    <IconButton size="small" color="error" onClick={() => onDelete(series.id)}>
                                         <FuseSvgIcon size={20}>
                                             heroicons-outline:trash
                                         </FuseSvgIcon>
@@ -138,11 +128,11 @@ export default function RolesTable(props: RolesTableProps) {
                         </TableRow>
                     ))}
 
-                    {(!roles || roles.length === 0) && (
+                    {(!numberSeries || numberSeries.length === 0) && (
                         <TableRow>
-                            <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
+                            <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
                                 <Typography variant="body2" color="text.secondary">
-                                    No hay roles disponibles
+                                    No hay series numéricas disponibles
                                 </Typography>
                             </TableCell>
                         </TableRow>
