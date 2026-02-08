@@ -19,14 +19,14 @@ import {
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import { useState } from "react";
 import useIndexTaxTypes from "@/features/tax_types/hooks/useIndexTaxTypes";
-import useUpdateTaxType from "@/features/tax_types/hooks/useUpdateTaxType";
+import { useToggleTaxTypeStatus } from "@/features/tax_types/hooks/useToggleTaxTypeStatus";
 import { TaxTypeEntity } from "@/domain/entities/tax_types/TaxTypeEntity";
 import TaxTypesModal from "./modals/TaxTypesModal";
 
 export default function TaxTypesTabView() {
     const theme = useTheme();
     const { taxTypes, isLoading, isError } = useIndexTaxTypes();
-    const { handleUpdateTaxType } = useUpdateTaxType();
+    const { mutate: toggleStatus } = useToggleTaxTypeStatus();
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedTaxType, setSelectedTaxType] = useState<TaxTypeEntity | null>(null);
 
@@ -50,18 +50,11 @@ export default function TaxTypesTabView() {
         setSelectedTaxType(null);
     };
 
-    const handleStatusChange = async (taxType: TaxTypeEntity) => {
-        try {
-            await handleUpdateTaxType({
-                id: taxType.id,
-                code: taxType.code,
-                name: taxType.name,
-                description: taxType.description || "",
-                is_active: !taxType.is_active,
-            });
-        } catch (error) {
-            console.error("Error updating status:", error);
-        }
+    const handleStatusChange = (taxType: TaxTypeEntity) => {
+        toggleStatus({
+            id: taxType.id,
+            status: !taxType.is_active,
+        });
     };
 
     if (isLoading)
@@ -124,6 +117,7 @@ export default function TaxTypesTabView() {
                         >
                             <TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
                             <TableCell sx={{ fontWeight: 700 }}>Descripción</TableCell>
+                            <TableCell sx={{ fontWeight: 700 }}>Operación</TableCell>
                             <TableCell sx={{ fontWeight: 700 }}>Estado</TableCell>
                             <TableCell align="right" sx={{ pr: 3, fontWeight: 700 }}>
                                 Acciones
@@ -162,6 +156,15 @@ export default function TaxTypesTabView() {
                                     <Typography variant="body2" color="text.secondary">
                                         {taxType.description || "-"}
                                     </Typography>
+                                </TableCell>
+
+                                {/* Operation */}
+                                <TableCell>
+                                    <Chip
+                                        label={taxType.operation_label || "-"}
+                                        size="small"
+                                        sx={{ width: "fit-content" }}
+                                    />
                                 </TableCell>
 
                                 {/* Estado */}

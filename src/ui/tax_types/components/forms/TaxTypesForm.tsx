@@ -9,6 +9,7 @@ import {
     Divider,
     Stack,
     Fade,
+    MenuItem,
 } from "@mui/material";
 import { Save, Close, Description, Tag } from "@mui/icons-material";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +22,7 @@ import {
     UpdateTaxTypeFormType,
 } from "@/schemas/tax_types/tax_types.schema";
 import { TaxTypeEntity } from "@/domain/entities/tax_types/TaxTypeEntity";
+import { CreateTaxTypeDTO } from "@/domain/entities/tax_types/DTOs/CreateTaxTypeDTO";
 
 interface TaxTypesFormProps {
     taxType?: TaxTypeEntity | null;
@@ -46,6 +48,7 @@ export default function TaxTypesForm({
             code: "",
             name: "",
             description: "",
+            operation: "add" as "add" | "subtract",
             is_active: true,
         },
     });
@@ -59,6 +62,8 @@ export default function TaxTypesForm({
                 code: taxType.code,
                 name: taxType.name,
                 description: taxType.description,
+                // @ts-ignore
+                operation: taxType.operation as "add" | "subtract",
                 is_active: taxType.is_active,
             });
         } else {
@@ -66,6 +71,7 @@ export default function TaxTypesForm({
                 code: "",
                 name: "",
                 description: "",
+                operation: "add",
                 is_active: true,
             });
         }
@@ -79,7 +85,7 @@ export default function TaxTypesForm({
                     ...(data as UpdateTaxTypeFormType),
                 });
             } else {
-                await handleCreateTaxType(data as CreateTaxTypeFormType);
+                await handleCreateTaxType(data as unknown as CreateTaxTypeDTO);
             }
             onSuccess?.();
             onCancel();
@@ -183,6 +189,25 @@ export default function TaxTypesForm({
                                                 fullWidth
                                                 variant="filled"
                                             />
+                                        )}
+                                    />
+
+                                    <Controller
+                                        name="operation"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <TextField
+                                                {...field}
+                                                select
+                                                label="Operación"
+                                                error={!!errors.operation}
+                                                helperText={errors.operation?.message}
+                                                fullWidth
+                                                variant="filled"
+                                            >
+                                                <MenuItem value="add">Sumar al total</MenuItem>
+                                                <MenuItem value="subtract">Restar al total</MenuItem>
+                                            </TextField>
                                         )}
                                     />
 

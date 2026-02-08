@@ -178,6 +178,12 @@ export function FamiliesForm({ data, onCancel, onSuccess }: FamiliesFormProps) {
                                 multiple
                                 disablePortal
                                 id="tax-rates-filled"
+                                sx={{
+                                    "& .MuiFilledInput-root": {
+                                        maxHeight: "150px",
+                                        overflowY: "auto",
+                                    },
+                                }}
                                 options={taxRates || []}
                                 getOptionLabel={(option) => option.name}
                                 isOptionEqualToValue={(option, value) => option.id === value.id}

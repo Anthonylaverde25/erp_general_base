@@ -31,4 +31,15 @@ export class TaxTypeRepositoryCrud implements ITaxTypeRepository {
             message
         };
     }
+
+    async changeStatus(id: number): Promise<{ id: number; is_active: boolean; message: string }> {
+        const {
+            data: { id: returnedId, is_active, message },
+        } = await axiosInstance.put(`tax-types/${id}/toggle-status`);
+        return {
+            id: returnedId,
+            is_active,
+            message,
+        };
+    }
 }

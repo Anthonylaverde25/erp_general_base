@@ -5,6 +5,7 @@ import { TaxTypeRepositoryCrud } from "@/infrastructure/repositories/tax_types/T
 import { IndexTaxTypesUseCase } from "@/application/use_cases/tax_types/IndexTaxTypesUseCase";
 import { CreateTaxTypeUseCase } from "@/application/use_cases/tax_types/CreateTaxTypeUseCase";
 import { UpdateTaxTypeUseCase } from "@/application/use_cases/tax_types/UpdateTaxTypeUseCase";
+import { ToggleTaxTypeStatusUseCase } from "@/application/use_cases/tax_types/ToggleTaxTypeStatusUseCase";
 
 export function registerTaxTypesModule(container: Container) {
     // Repository
@@ -22,4 +23,7 @@ export function registerTaxTypesModule(container: Container) {
     container
         .bind<UpdateTaxTypeUseCase>(TYPES.UpdateTaxTypeUseCase)
         .to(UpdateTaxTypeUseCase);
+    container
+        .bind<ToggleTaxTypeStatusUseCase>(TYPES.ToggleTaxTypeStatusUseCase)
+        .to(ToggleTaxTypeStatusUseCase);
 }

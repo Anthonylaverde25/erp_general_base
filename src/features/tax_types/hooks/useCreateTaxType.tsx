@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { container } from "@/di/container";
 import { CreateTaxTypeUseCase } from "@/application/use_cases/tax_types/CreateTaxTypeUseCase";
-import { CreateTaxTypeFormType } from "@/schemas/tax_types/tax_types.schema";
+import { CreateTaxTypeDTO } from "@/domain/entities/tax_types/DTOs/CreateTaxTypeDTO";
 import { toast } from "sonner";
 import { TYPES } from "@/di/types";
 
@@ -15,7 +15,7 @@ export default function useCreateTaxType() {
         mutateAsync: handleCreateTaxType,
         isPending: isLoading,
     } = useMutation({
-        mutationFn: async (data: CreateTaxTypeFormType) => {
+        mutationFn: async (data: CreateTaxTypeDTO) => {
             return await use_case.execute(data);
         },
         onSuccess: ({ message }) => {

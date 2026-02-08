@@ -5,4 +5,5 @@ export interface ITaxTypeRepository {
     index(): Promise<TaxTypeEntity[]>;
     create(data: CreateTaxTypeDTO): Promise<{ tax_type: TaxTypeEntity; message: string }>;
     update(id: TaxType['id'], data: Partial<TaxTypeEntity>): Promise<{ tax_type: TaxTypeEntity; message: string }>;
+    changeStatus(id: number): Promise<{ id: number; is_active: boolean; message: string }>;
 }

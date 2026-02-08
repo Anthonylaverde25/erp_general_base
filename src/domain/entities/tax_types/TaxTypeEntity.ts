@@ -5,6 +5,8 @@ export interface TaxType {
     name: string;
     description: string;
     is_active: boolean;
+    operation: string;
+    operation_label?: string;
 }
 
 export class TaxTypeEntity implements TaxType {
@@ -15,6 +17,8 @@ export class TaxTypeEntity implements TaxType {
         public name: string,
         public description: string,
         public is_active: boolean,
+        public operation: string,
+        public operation_label?: string,
     ) { }
 
     static fromPrimitives(data: TaxType): TaxTypeEntity {
@@ -25,6 +29,8 @@ export class TaxTypeEntity implements TaxType {
             data.name,
             data.description,
             data.is_active,
+            data.operation,
+            data.operation_label,
         );
     }
 
@@ -36,6 +42,8 @@ export class TaxTypeEntity implements TaxType {
             name: this.name,
             description: this.description,
             is_active: this.is_active,
+            operation: this.operation,
+            operation_label: this.operation_label,
         };
     }
 }
