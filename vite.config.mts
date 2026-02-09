@@ -1,11 +1,18 @@
-import { defineConfig } from 'vite';
+/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config'; // 👈 CAMBIO CLAVE
 import react from '@vitejs/plugin-react';
 import svgrPlugin from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from "@tailwindcss/vite";
 
+
 // https://vitejs.dev/config/
 export default defineConfig({
+	test: {
+		globals: true,
+		environment: 'jsdom',
+		setupFiles: './src/test/setup.ts',
+	},
 	plugins: [
 		react({
 			jsxImportSource: '@emotion/react'
@@ -76,4 +83,6 @@ export default defineConfig({
 			}
 		}
 	}
+
+
 });
