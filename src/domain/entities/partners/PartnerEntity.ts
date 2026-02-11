@@ -1,4 +1,4 @@
-import { CreatePartnerDTO, PartnerType } from "./DTOs/PartnerDTOs";
+import { CreatePartnerDTO, PartnerType, PartnerRole } from "./DTOs/PartnerDTOs";
 import { AddressEntity } from "../addresses/Address";
 import { ContactEntity } from "../contacts/Contact";
 import { BankAccountEntity } from "../bank_accounts/BankAccount";
@@ -12,6 +12,7 @@ export interface Partner {
     comercial_name: string;
     vat_number: string;
     cif: string;
+    role: PartnerRole;
     payment_method_id: number;
     type: PartnerType;
     address: IAddress[];
@@ -26,6 +27,7 @@ export class PartnerEntity implements Partner {
     private _comercial_name: string;
     private _vat_number: string;
     private _cif: string;
+    private _role: PartnerRole;
     private _payment_method_id: number;
     private _type: PartnerType;
     private _address: AddressEntity[];
@@ -39,6 +41,7 @@ export class PartnerEntity implements Partner {
         comercial_name: string,
         vat_number: string,
         cif: string,
+        role: PartnerRole,
         payment_method_id: number,
         type: PartnerType,
         address: AddressEntity[],
@@ -51,6 +54,7 @@ export class PartnerEntity implements Partner {
         this._comercial_name = comercial_name;
         this._vat_number = vat_number;
         this._cif = cif;
+        this._role = role;
         this._payment_method_id = payment_method_id;
         this._type = type;
         this._address = address;
@@ -82,6 +86,10 @@ export class PartnerEntity implements Partner {
         return this._cif;
     }
 
+    get role(): PartnerRole {
+        return this._role;
+    }
+
     get payment_method_id(): number {
         return this._payment_method_id;
     }
@@ -110,6 +118,7 @@ export class PartnerEntity implements Partner {
             data.comercial_name,
             data.vat_number,
             data.cif,
+            data.role || 'prospect',
             data.payment_method_id,
             data.type,
             data.address.map(addr => AddressEntity.fromPrimitives(addr)),
@@ -126,6 +135,7 @@ export class PartnerEntity implements Partner {
             data.comercial_name,
             data.vat_number,
             data.cif,
+            data.role,
             data.payment_method_id,
             data.type,
             data.address ? data.address.map(addr => AddressEntity.create(addr)) : [],
@@ -142,6 +152,7 @@ export class PartnerEntity implements Partner {
             data.comercial_name || "",
             data.vat_number || "",
             data.cif || "",
+            data.role || 'prospect',
             data.payment_method_id || 0,
             data.type || 'prospect',
             data.address ? data.address.map(addr => AddressEntity.fromPrimitives(addr)) : [],
@@ -158,6 +169,7 @@ export class PartnerEntity implements Partner {
             comercial_name: this._comercial_name,
             vat_number: this._vat_number,
             cif: this._cif,
+            role: this._role,
             payment_method_id: this._payment_method_id,
             type: this._type,
             address: this._address.map(addr => addr.toPlainObject()),

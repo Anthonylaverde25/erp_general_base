@@ -13,6 +13,7 @@ export class PartnerMapper {
             dto.comercial_name,
             dto.vat_number,
             dto.cif,
+            dto.role || 'prospect',
             dto.payment_method_id,
             dto.type,
             Array.isArray(dto.address)
