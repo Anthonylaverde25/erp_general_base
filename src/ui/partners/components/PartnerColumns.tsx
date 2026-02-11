@@ -131,17 +131,60 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
         }
     },
     {
+        accessorKey: 'role',
+        header: 'Role',
+        size: 150,
+        enableResizing: true,
+        enableColumnFilter: true,
+        Cell: ({ row }) => {
+            const role = row.original.role || 'prospect';
+
+            // Common props for consistency with Type column
+            const chipProps = {
+                size: "small" as const,
+                variant: "filled" as const,
+                sx: { textTransform: 'capitalize' }
+            };
+
+            if (role === 'client_supplier') {
+                return (
+                    <Chip
+                        {...chipProps}
+                        label="Cliente / Proveedor"
+                    />
+                );
+            }
+
+            let label = 'Prospecto';
+
+            switch (role) {
+                case 'client':
+                    label = 'Cliente';
+                    break;
+                case 'supplier':
+                    label = 'Proveedor';
+                    break;
+                case 'prospect':
+                    label = 'Prospecto';
+                    break;
+            }
+
+            return (
+                <Chip
+                    {...chipProps}
+                    label={label}
+                />
+            );
+        }
+    },
+    {
         accessorKey: 'type',
         header: 'Type',
         size: 130,
         enableResizing: true,
         enableColumnFilter: true,
         Cell: ({ row }) => {
-            const types = ['company', 'person', 'prospect'];
-            let type = row.original.type;
-            if (!type || !types.includes(type)) {
-                type = types[row.original.id % 3] as any;
-            }
+            const type = row.original.type;
 
             let label: string = type;
             switch (type) {

@@ -1,10 +1,10 @@
 import { CreateAddressDTO } from "@/domain/entities/addresses/DTOs/CreateAddressDTO";
 import { CreateContactDTO } from "@/domain/entities/contacts/DTOs/CreateContactDTO";
-import { ICreateBankAccount } from "@/types/bank_account.types";
+import { IBankAccount, ICreateBankAccount, IUpdateBankAccount } from "@/types/bank_account.types";
 
 export type PartnerType = 'company' | 'person' | 'public_organism' | 'prospect';
 
-export type PartnerRole = 'client' | 'supplier' | 'both' | 'prospect';
+export type PartnerRole = 'client' | 'supplier' | 'client_supplier' | 'prospect';
 
 export interface PartnerDTO {
     id: number;
@@ -19,10 +19,12 @@ export interface PartnerDTO {
     website?: string;
     address: any[]; // We will map this in the mapper
     contact: any[]; // We will map this in the mapper
-    bank_accounts: any[]; // We will map this in the mapper
+    bank_accounts: IBankAccount[]; // We will map this in the mapper
+    roles?: { role: string; status: string }[];
 }
 
 export interface CreatePartnerDTO {
+    company_id: number;
     name: string;
     comercial_name: string;
     vat_number: string;
@@ -37,6 +39,7 @@ export interface CreatePartnerDTO {
 }
 
 export interface UpdatePartnerDTO {
+    company_id?: number;
     name?: string;
     comercial_name?: string;
     vat_number?: string;
@@ -47,5 +50,5 @@ export interface UpdatePartnerDTO {
     website?: string;
     address?: CreateAddressDTO[];
     contact?: CreateContactDTO[];
-    bank_accounts?: ICreateBankAccount[];
+    bank_accounts?: (ICreateBankAccount | IUpdateBankAccount)[];
 }

@@ -12,6 +12,7 @@ export class UpdatePartnerUseCase {
     ) { }
 
     async execute(id: number, data: UpdatePartnerDTO): Promise<{ partner: PartnerEntity; message: string }> {
-        return await this.repository.update(id, data);
+        const partner = PartnerEntity.update(id, data as any);
+        return await this.repository.update(id, partner);
     }
 }

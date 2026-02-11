@@ -1,55 +1,104 @@
-import { Box, Tabs, Tab } from "@mui/material";
+import { Box, Tabs, Tab, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
 import { useIndexPartners } from "@/features/partners/hooks/useIndexPartners";
 import { PartnerEntity } from "@/domain/entities/partners/PartnerEntity";
 import PartnerTable from "./PartnerTable";
 import { useState, useMemo } from "react";
+import UpdatePartnerModal from "./modals/UpdatePartnerModal";
+import { PartnerType } from "@/domain/entities/partners/DTOs/PartnerDTOs";
 
 export default function PartnersTabView() {
     const { data: partners, isLoading } = useIndexPartners();
     const [currentTab, setCurrentTab] = useState('all');
+    const [filteredGeneralType, setFilteredGeneralType] = useState<string>('all');
+
+    const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
     const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
         setCurrentTab(newValue);
     };
 
+    const handleTypeChange = (event: SelectChangeEvent) => {
+        setFilteredGeneralType(event.target.value);
+    };
+
     const filteredPartners = useMemo(() => {
         if (!partners) return [];
+
+        let result = partners;
+
+        // Filter by Tab (Role)
         switch (currentTab) {
             case 'client':
-                return partners.filter(p => p.role === 'client' || p.role === 'both');
+                result = result.filter(p => p.role === 'client' || p.role === 'client_supplier');
+                break;
             case 'supplier':
-                return partners.filter(p => p.role === 'supplier' || p.role === 'both');
-            case 'both':
-                return partners.filter(p => p.role === 'both');
+                result = result.filter(p => p.role === 'supplier' || p.role === 'client_supplier');
+                break;
+            case 'client_supplier':
+                result = result.filter(p => p.role === 'client_supplier');
+                break;
             case 'prospect':
-                return partners.filter(p => p.role === 'prospect');
+                result = result.filter(p => p.role === 'prospect');
+                break;
             default:
-                return partners;
+                // 'all' tab, no initial role filter
+                break;
         }
-    }, [partners, currentTab]);
+
+        // Filter by Select (Type)
+        if (filteredGeneralType !== 'all') {
+            result = result.filter(p => p.type === filteredGeneralType);
+        }
+
+        return result;
+    }, [partners, currentTab, filteredGeneralType]);
 
     const handleEdit = (partner: PartnerEntity) => {
-        console.log("Edit partner", partner);
+        setSelectedPartnerId(partner.id);
+        setIsUpdateModalOpen(true);
+    };
+
+    const handleCloseUpdateModal = () => {
+        setIsUpdateModalOpen(false);
+        setSelectedPartnerId(null);
     };
 
     return (
         <Box className="flex flex-col w-full h-full overflow-hidden">
-            <Box className="p-1" sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
+            <Box className="p-4 flex items-center gap-4" sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
                 <Tabs
                     value={currentTab}
                     onChange={handleTabChange}
-                    variant="fullWidth"
+                    variant="scrollable"
+                    scrollButtons="auto"
                     indicatorColor="secondary"
                     textColor="secondary"
                     aria-label="filter partners by role"
-                    className="p-3"
+                    className="min-h-[48px]"
                 >
                     <Tab label="Todos" value="all" />
                     <Tab label="Clientes" value="client" />
                     <Tab label="Proveedores" value="supplier" />
-                    <Tab label="Ambos" value="both" />
+                    <Tab label="Ambos" value="client_supplier" />
                     <Tab label="Prospectos" value="prospect" />
                 </Tabs>
+
+                <FormControl variant="filled" size="small" sx={{ minWidth: 200 }}>
+                    <InputLabel id="partner-type-select-label">Tipo de Socio</InputLabel>
+                    <Select
+                        labelId="partner-type-select-label"
+                        id="partner-type-select"
+                        value={filteredGeneralType}
+                        label="Tipo de Socio"
+                        onChange={handleTypeChange}
+                    >
+                        <MenuItem value="all">Todos</MenuItem>
+                        <MenuItem value="company">Empresa</MenuItem>
+                        <MenuItem value="person">Persona</MenuItem>
+                        <MenuItem value="public_organism">Organismo Público</MenuItem>
+                    </Select>
+                </FormControl>
             </Box>
 
             <Box className="flex-1 overflow-hidden">
@@ -60,6 +109,14 @@ export default function PartnersTabView() {
                     onDelete={(id) => console.log("Delete partner", id)}
                 />
             </Box>
+
+            {selectedPartnerId && (
+                <UpdatePartnerModal
+                    open={isUpdateModalOpen}
+                    onClose={handleCloseUpdateModal}
+                    partnerId={selectedPartnerId}
+                />
+            )}
         </Box>
     );
 }

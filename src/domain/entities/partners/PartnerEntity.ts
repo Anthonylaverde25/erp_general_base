@@ -110,7 +110,24 @@ export class PartnerEntity implements Partner {
         return this._bank_accounts;
     }
 
-    static fromPrimitives(data: Partner): PartnerEntity {
+    static fromPrimitives(data: any): PartnerEntity {
+        let role: PartnerRole = 'prospect';
+
+        if (data.roles && Array.isArray(data.roles)) {
+            const roles = data.roles.map((r: any) => r.role);
+            if (roles.includes('client') && roles.includes('supplier')) {
+                role = 'client_supplier';
+            } else if (roles.includes('client')) {
+                role = 'client';
+            } else if (roles.includes('supplier')) {
+                role = 'supplier';
+            } else if (roles.includes('prospect')) {
+                role = 'prospect';
+            }
+        } else if (data.role) {
+            role = data.role;
+        }
+
         return new PartnerEntity(
             data.id,
             data.company_id,
@@ -118,19 +135,19 @@ export class PartnerEntity implements Partner {
             data.comercial_name,
             data.vat_number,
             data.cif,
-            data.role || 'prospect',
+            role,
             data.payment_method_id,
             data.type,
-            data.address.map(addr => AddressEntity.fromPrimitives(addr)),
-            data.contact.map(cnt => ContactEntity.fromPrimitives(cnt)),
-            data.bank_accounts ? data.bank_accounts.map(acc => BankAccountEntity.fromPrimitives(acc)) : []
+            data.address ? data.address.map((addr: any) => AddressEntity.fromPrimitives(addr)) : [],
+            data.contact ? data.contact.map((cnt: any) => ContactEntity.fromPrimitives(cnt)) : [],
+            data.bank_accounts ? data.bank_accounts.map((acc: any) => BankAccountEntity.fromPrimitives(acc)) : []
         );
     }
 
     static create(data: CreatePartnerDTO): PartnerEntity {
         return new PartnerEntity(
             0,
-            0,
+            data.company_id,
             data.name,
             data.comercial_name,
             data.vat_number,

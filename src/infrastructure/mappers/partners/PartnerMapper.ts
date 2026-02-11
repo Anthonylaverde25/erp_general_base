@@ -6,6 +6,21 @@ import { BankAccountEntity } from "@/domain/entities/bank_accounts/BankAccount";
 
 export class PartnerMapper {
     static fromDTO(dto: PartnerDTO): PartnerEntity {
+        let role = dto.role || 'prospect';
+
+        if (dto.roles && Array.isArray(dto.roles)) {
+            const roles = dto.roles.map((r: any) => r.role);
+            if (roles.includes('client') && roles.includes('supplier')) {
+                role = 'client_supplier';
+            } else if (roles.includes('client')) {
+                role = 'client';
+            } else if (roles.includes('supplier')) {
+                role = 'supplier';
+            } else if (roles.includes('prospect')) {
+                role = 'prospect';
+            }
+        }
+
         return new PartnerEntity(
             dto.id,
             dto.company_id,
@@ -13,7 +28,7 @@ export class PartnerMapper {
             dto.comercial_name,
             dto.vat_number,
             dto.cif,
-            dto.role || 'prospect',
+            role,
             dto.payment_method_id,
             dto.type,
             Array.isArray(dto.address)

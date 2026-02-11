@@ -6,7 +6,7 @@ export const partnerSchema = z.object({
     vat_number: z.string().optional(),
     cif: z.string().optional(),
     type: z.enum(['company', 'person', 'public_organism', 'prospect']),
-    role: z.enum(['client', 'supplier', 'both', 'prospect']),
+    role: z.enum(['client', 'supplier', 'client_supplier', 'prospect']),
     payment_method_id: z.string().nonempty('Requerido'),
     website: z.string().url('URL inválida').optional().or(z.literal('')),
 
@@ -23,6 +23,7 @@ export const partnerSchema = z.object({
 
     // Bank Accounts
     bank_accounts: z.array(z.object({
+        id: z.number().optional(),
         name: z.string().optional(), // Using name for Bank Name
         account_holder: z.string().optional(),
         account_number: z.string().optional(), // IBAN

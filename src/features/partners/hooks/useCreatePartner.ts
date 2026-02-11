@@ -10,11 +10,26 @@ export function useCreatePartner() {
     const queryClient = useQueryClient();
     const useCase = container.get<CreatePartnerUseCase>(TYPES.CreatePartnerUseCase);
 
-    return useMutation<{ partner: PartnerEntity; message: string }, Error, CreatePartnerDTO>({
+    const mutation = useMutation<{ partner: PartnerEntity; message: string }, Error, CreatePartnerDTO>({
         mutationFn: async (data: CreatePartnerDTO) => await useCase.execute(data),
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ["partners"] });
             toast.success(data.message);
         },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || "Error al crear socio");
+            console.error(error);
+        },
     });
+
+    const handleCreatePartner = async (data: CreatePartnerDTO) => {
+        return await mutation.mutateAsync(data);
+    };
+
+    return {
+        handleCreatePartner,
+        isLoading: mutation.isPending,
+        isError: mutation.isError,
+        error: mutation.error
+    };
 }

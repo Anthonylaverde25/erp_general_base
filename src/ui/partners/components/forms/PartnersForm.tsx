@@ -26,9 +26,10 @@ import { useCreatePartner } from '@/features/partners/hooks/useCreatePartner';
 import { useUpdatePartner } from '@/features/partners/hooks/useUpdatePartner';
 import useIndexPaymentMethods from '@/features/payment_methods/hooks/useIndexPaymentMethods';
 import { CreatePartnerDTO, PartnerType } from '@/domain/entities/partners/DTOs/PartnerDTOs';
-import { CreateAddressDTO } from '@/domain/entities/addresses/DTOs/CreateAddressDTO';
-import { CreateContactDTO } from '@/domain/entities/contacts/DTOs/CreateContactDTO';
+import useActiveCompany from "@/features/companies/useActiveCompany";
+
 import { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
+import { mapPartnerFormToDTO } from './PartnerForm.utils';
 
 interface PartnersFormProps {
     data?: PartnerEntity | null;
@@ -37,9 +38,10 @@ interface PartnersFormProps {
 }
 
 export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
-    const createPartner = useCreatePartner();
-    const updatePartner = useUpdatePartner();
+    const { handleCreatePartner, isLoading: isCreating } = useCreatePartner();
+    const { handleUpdatePartner, isLoading: isUpdating } = useUpdatePartner();
     const { paymentMethods } = useIndexPaymentMethods();
+    const activeCompany = useActiveCompany();
     const [tabValue, setTabValue] = useState(0);
 
     const {
@@ -71,62 +73,24 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
         setTabValue(newValue);
     };
 
-    const onSubmit = (values: PartnerFormType) => {
-        const address: CreateAddressDTO[] = [];
-        if (values.address_street || values.address_city) {
-            address.push({
-                street: values.address_street || '',
-                city: values.address_city || '',
-                state: values.address_state || '',
-                postal_code: values.address_postal_code || '',
-                country: values.address_country || '',
-                default: true
-            });
+    const onSubmit = async (values: PartnerFormType) => {
+        if (!activeCompany?.id) {
+            console.error("No active company found");
+            return;
         }
+        const dto = mapPartnerFormToDTO(values, activeCompany.id);
+        console.log('creando partner', dto);
 
-        const contact: CreateContactDTO[] = [];
-        if (values.contact_email || values.contact_phone) {
-            contact.push({
-                email: values.contact_email || '',
-                phone: values.contact_phone || '',
-                default: true
-            });
-        }
-
-        const dto: CreatePartnerDTO = {
-            name: values.name,
-            comercial_name: values.comercial_name || '',
-            vat_number: values.vat_number || '',
-            cif: values.cif || '',
-            type: values.type as PartnerType,
-            role: values.role,
-            payment_method_id: Number(values.payment_method_id),
-            website: values.website || '',
-            address: address.length > 0 ? address : undefined,
-            contact: contact.length > 0 ? contact : undefined,
-            bank_accounts: values.bank_accounts?.map(acc => ({
-                name: acc.name || '',
-                account_holder: acc.account_holder || '',
-                account_number: acc.account_number || '',
-                swift: acc.swift || '',
-                is_default: acc.is_default
-            }))
-        };
-
-        if (data) {
-            updatePartner.mutate({ id: data.id, data: dto as any }, {
-                onSuccess: () => {
-                    onSuccess?.();
-                    onCancel();
-                }
-            });
-        } else {
-            createPartner.mutate(dto, {
-                onSuccess: () => {
-                    onSuccess?.();
-                    onCancel();
-                }
-            });
+        try {
+            if (data) {
+                await handleUpdatePartner(data.id, dto);
+            } else {
+                await handleCreatePartner(dto);
+            }
+            onSuccess?.();
+            onCancel();
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -142,7 +106,7 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
         variant: "filled" as const,
     };
 
-    const isLoading = createPartner.isPending || updatePartner.isPending;
+    const isLoading = isCreating || isUpdating;
 
     return (
         <Fade in={true}>
@@ -289,7 +253,7 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
                             >
                                 <ToggleButton value="client">Cliente</ToggleButton>
                                 <ToggleButton value="supplier">Proveedor</ToggleButton>
-                                <ToggleButton value="both">Cliente/Proveedor</ToggleButton>
+                                <ToggleButton value="client_supplier">Cliente/Proveedor</ToggleButton>
                                 <ToggleButton value="prospect">Prospecto</ToggleButton>
                             </ToggleButtonGroup>
                         )}
