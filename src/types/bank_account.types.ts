@@ -10,6 +10,7 @@ export interface IBankAccount {
   account_holder: string;
   account_number: string;
   swift: string;
+  is_default?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -22,6 +23,7 @@ export interface ICreateBankAccount {
   account_holder: string;
   account_number: string;
   swift: string;
+  is_default?: boolean;
 }
 
 /**
@@ -33,4 +35,5 @@ export interface IUpdateBankAccount {
   account_holder: string;
   account_number: string;
   swift: string;
+  is_default?: boolean;
 }

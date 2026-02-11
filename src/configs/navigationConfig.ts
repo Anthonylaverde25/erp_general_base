@@ -19,12 +19,12 @@ const navigationConfig: FuseNavItemType[] = [
 		url: '/'
 	},
 	{
-		id: 'contacts',
-		title: 'Contacts',
-		translate: 'CONTACTS',
+		id: 'partners',
+		title: 'partners',
+		translate: 'PARTNERS',
 		type: 'item',
 		icon: 'lucide:users',
-		url: '/contacts'
+		url: '/partners'
 	},
 	{
 		id: 'operations',

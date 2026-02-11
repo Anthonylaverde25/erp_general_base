@@ -111,6 +111,14 @@ const SettingsAppNavigation: FuseNavItemType = {
       url: "/apps/settings/families",
       subtitle: "Organiza tus productos en familias",
     },
+    {
+      id: "apps.settings.partners",
+      icon: "lucide:users",
+      title: "Partners",
+      type: "item",
+      url: "/apps/settings/partners",
+      subtitle: "Gestiona tus socios comerciales",
+    },
   ],
 };
 

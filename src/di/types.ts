@@ -102,4 +102,11 @@ export const TYPES = {
   ShowFamilyUseCase: Symbol.for("ShowFamilyUseCase"),
   IFamilyActionRepository: Symbol.for("IFamilyActionRepository"),
   ToggleFamilyStatusUseCase: Symbol.for("ToggleFamilyStatusUseCase"),
+
+  // Partners
+  PartnerRepository: Symbol.for("PartnerRepository"),
+  IndexPartnersUseCase: Symbol.for("IndexPartnersUseCase"),
+  ShowPartnerUseCase: Symbol.for("ShowPartnerUseCase"),
+  CreatePartnerUseCase: Symbol.for("CreatePartnerUseCase"),
+  UpdatePartnerUseCase: Symbol.for("UpdatePartnerUseCase"),
 };

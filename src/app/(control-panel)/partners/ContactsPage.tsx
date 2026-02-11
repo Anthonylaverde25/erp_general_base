@@ -3,8 +3,9 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import Button from '@mui/material/Button';
 import { Link } from 'react-router';
 import { styled } from '@mui/material/styles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CreateContactModal } from './CreateContactModal';
+import axiosInstance from '@/lib/@axios';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
     '& .FusePageSimple-header': {
@@ -17,6 +18,14 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 
 function ContactsPage() {
     const [openModal, setOpenModal] = useState(false);
+
+    useEffect(() => {
+        const fetch = async () => {
+            const { data: { partners } } = await axiosInstance.get('/partners');
+            console.log('partners', partners);
+        }
+        fetch();
+    }, [])
 
     return (
         <>
