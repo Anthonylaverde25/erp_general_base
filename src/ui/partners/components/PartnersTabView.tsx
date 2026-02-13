@@ -76,7 +76,6 @@ export default function PartnersTabView() {
 
     const handleCloseDrawer = () => {
         setDrawerOpen(false);
-        setDrawerPartner(null);
     };
 
     return (
