@@ -5,6 +5,7 @@ import PartnerTable from "./PartnerTable";
 import { useState, useMemo } from "react";
 import UpdatePartnerModal from "./modals/UpdatePartnerModal";
 import { PartnerType } from "@/domain/entities/partners/DTOs/PartnerDTOs";
+import PartnerDetailDrawer from "./PartnerDetailDrawer";
 
 export default function PartnersTabView() {
     const { data: partners, isLoading } = useIndexPartners();
@@ -13,6 +14,10 @@ export default function PartnersTabView() {
 
     const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
     const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+
+    // Drawer state
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [drawerPartner, setDrawerPartner] = useState<PartnerEntity | null>(null);
 
     const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
         setCurrentTab(newValue);
@@ -64,6 +69,16 @@ export default function PartnersTabView() {
         setSelectedPartnerId(null);
     };
 
+    const handleRowClick = (partner: PartnerEntity) => {
+        setDrawerPartner(partner);
+        setDrawerOpen(true);
+    };
+
+    const handleCloseDrawer = () => {
+        setDrawerOpen(false);
+        setDrawerPartner(null);
+    };
+
     return (
         <Box className="flex flex-col w-full h-full overflow-hidden">
             <Box className="p-4 flex items-center gap-4" sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
@@ -107,6 +122,7 @@ export default function PartnersTabView() {
                     isLoading={isLoading}
                     onEdit={handleEdit}
                     onDelete={(id) => console.log("Delete partner", id)}
+                    onRowClick={handleRowClick}
                 />
             </Box>
 
@@ -117,6 +133,12 @@ export default function PartnersTabView() {
                     partnerId={selectedPartnerId}
                 />
             )}
+
+            <PartnerDetailDrawer
+                open={drawerOpen}
+                onClose={handleCloseDrawer}
+                partner={drawerPartner}
+            />
         </Box>
     );
 }

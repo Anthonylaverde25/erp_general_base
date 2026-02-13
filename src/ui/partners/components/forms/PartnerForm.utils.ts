@@ -4,6 +4,7 @@ import { CreateAddressDTO } from '@/domain/entities/addresses/DTOs/CreateAddress
 import { CreateContactDTO } from '@/domain/entities/contacts/DTOs/CreateContactDTO';
 
 export const mapPartnerFormToDTO = (values: PartnerFormType, companyId: number): CreatePartnerDTO | UpdatePartnerDTO => {
+    console.log('values desde el dto', values)
     const address: CreateAddressDTO[] = [];
     if (values.address_street || values.address_city) {
         address.push({
@@ -44,6 +45,8 @@ export const mapPartnerFormToDTO = (values: PartnerFormType, companyId: number):
             account_number: acc.account_number || '',
             swift: acc.swift || '',
             is_default: acc.is_default
-        }))
+        })),
+        sale_tax_ids: values.sale_tax_ids && values.sale_tax_ids.length > 0 ? values.sale_tax_ids : undefined,
+        purchase_tax_ids: values.purchase_tax_ids && values.purchase_tax_ids.length > 0 ? values.purchase_tax_ids : undefined,
     };
 };

@@ -21,25 +21,24 @@ export class PartnerRepositoryCrud implements IPartnerRepository {
         return PartnerMapper.fromDTO(partner);
     }
 
-    async create(data: PartnerEntity): Promise<{ partner: PartnerEntity; message: string }> {
-        const payload = data.toPlainObject();
+    async create(data: CreatePartnerDTO): Promise<{ partner: PartnerEntity; message: string }> {
         const {
             data: { partner, message },
-        } = await axiosInstance.post("partners", payload);
+        } = await axiosInstance.post("partners", data);
         return {
             partner: PartnerMapper.fromDTO(partner),
             message,
         };
     }
 
-    async update(id: number, data: PartnerEntity): Promise<{ partner: PartnerEntity; message: string }> {
-        const payload = data.toPlainObject();
+    async update(id: number, data: UpdatePartnerDTO): Promise<{ partner: PartnerEntity; message: string }> {
         const {
             data: { partner, message },
-        } = await axiosInstance.put(`partners/${id}`, payload);
+        } = await axiosInstance.put(`partners/${id}`, data);
         return {
             partner: PartnerMapper.fromDTO(partner),
             message,
         };
     }
 }
+

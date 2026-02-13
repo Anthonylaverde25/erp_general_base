@@ -13,8 +13,11 @@ import {
     ToggleButton,
     ToggleButtonGroup,
     Stack,
-    Fade
+    Fade,
+    Checkbox,
+    Chip
 } from '@mui/material';
+
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { Save, Close } from '@mui/icons-material';
 
@@ -25,8 +28,9 @@ import PartnerFormTabPanel from '@/ui/partners/components/PartnerFormTabPanel';
 import { useCreatePartner } from '@/features/partners/hooks/useCreatePartner';
 import { useUpdatePartner } from '@/features/partners/hooks/useUpdatePartner';
 import useIndexPaymentMethods from '@/features/payment_methods/hooks/useIndexPaymentMethods';
-import { CreatePartnerDTO, PartnerType } from '@/domain/entities/partners/DTOs/PartnerDTOs';
+import { CreatePartnerDTO, UpdatePartnerDTO, PartnerType } from '@/domain/entities/partners/DTOs/PartnerDTOs';
 import useActiveCompany from "@/features/companies/useActiveCompany";
+import { useIndexTaxRates } from '@/features/tax_rates/hooks/useIndexTaxRates';
 
 import { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import { mapPartnerFormToDTO } from './PartnerForm.utils';
@@ -43,6 +47,9 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
     const { paymentMethods } = useIndexPaymentMethods();
     const activeCompany = useActiveCompany();
     const [tabValue, setTabValue] = useState(0);
+    const { data: taxRates } = useIndexTaxRates();
+
+    console.log('taxes para ser selecionados', taxRates)
 
     const {
         control,
@@ -62,6 +69,10 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
     });
 
     const bankAccounts = useWatch({ control, name: 'bank_accounts' });
+    const watchedRole = useWatch({ control, name: 'role' });
+
+    const showSaleTaxes = watchedRole === 'client' || watchedRole === 'client_supplier';
+    const showPurchaseTaxes = watchedRole === 'supplier' || watchedRole === 'client_supplier';
 
     useEffect(() => {
         if (data) {
@@ -74,6 +85,7 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
     };
 
     const onSubmit = async (values: PartnerFormType) => {
+        console.log('valores del formulario', values)
         if (!activeCompany?.id) {
             console.error("No active company found");
             return;
@@ -83,9 +95,9 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
 
         try {
             if (data) {
-                await handleUpdatePartner(data.id, dto);
+                await handleUpdatePartner(data.id, dto as UpdatePartnerDTO);
             } else {
-                await handleCreatePartner(dto);
+                await handleCreatePartner(dto as CreatePartnerDTO);
             }
             onSuccess?.();
             onCancel();
@@ -538,30 +550,131 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
                     </PartnerFormTabPanel>
 
                     <PartnerFormTabPanel value={tabValue} index={2}>
-                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-                            <div className="col-span-12 sm:col-span-6">
-                                <Controller
-                                    name="payment_method_id"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <TextField
-                                            {...field}
-                                            {...textFieldProps}
-                                            select
-                                            label="Método de Pago Predeterminado"
-                                            error={!!errors.payment_method_id}
-                                            helperText={errors.payment_method_id?.message}
-                                            disabled={isLoading}
-                                        >
-                                            {paymentMethods?.map((pm: any) => (
-                                                <MenuItem key={pm.id} value={String(pm.id)}>
-                                                    {pm.name}
-                                                </MenuItem>
-                                            ))}
-                                        </TextField>
-                                    )}
-                                />
+                        <div className="space-y-6">
+                            <div>
+                                <Typography variant="subtitle2" className="mb-3 font-bold text-gray-700 dark:text-gray-300 uppercase">
+                                    Método de Pago
+                                </Typography>
+                                <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                                    <div className="col-span-12 sm:col-span-6">
+                                        <Controller
+                                            name="payment_method_id"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <TextField
+                                                    {...field}
+                                                    {...textFieldProps}
+                                                    select
+                                                    label="Método de Pago Predeterminado"
+                                                    error={!!errors.payment_method_id}
+                                                    helperText={errors.payment_method_id?.message}
+                                                    disabled={isLoading}
+                                                >
+                                                    {paymentMethods?.map((pm: any) => (
+                                                        <MenuItem key={pm.id} value={String(pm.id)}>
+                                                            {pm.name}
+                                                        </MenuItem>
+                                                    ))}
+                                                </TextField>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
                             </div>
+
+                            {(showSaleTaxes || showPurchaseTaxes) && (
+                                <>
+                                    <Divider />
+                                    <Typography variant="subtitle2" className="mb-3 font-bold text-gray-700 dark:text-gray-300 uppercase">
+                                        Impuestos
+                                    </Typography>
+                                    <div className={`grid gap-4 ${showSaleTaxes && showPurchaseTaxes ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
+                                        {showSaleTaxes && (
+                                            <div>
+                                                <Controller
+                                                    name="sale_tax_ids"
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <TextField
+                                                            {...textFieldProps}
+                                                            select
+                                                            label="Impuestos de Venta"
+                                                            disabled={isLoading}
+                                                            value={field.value || []}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                field.onChange(typeof val === 'string' ? val.split(',').map(Number) : val);
+                                                            }}
+                                                            SelectProps={{
+                                                                multiple: true,
+                                                                renderValue: (selected) => (
+                                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                                        {(selected as number[]).map((id) => {
+                                                                            const tax = (taxRates || []).find((t) => t.id === id);
+                                                                            return tax ? (
+                                                                                <Chip key={id} label={`${tax.name} (${tax.percentage}%)`} size="small" />
+                                                                            ) : null;
+                                                                        })}
+                                                                    </Box>
+                                                                )
+                                                            }}
+                                                        >
+                                                            {(taxRates || []).map((tax) => (
+                                                                <MenuItem key={tax.id} value={tax.id}>
+                                                                    <Checkbox checked={(field.value || []).includes(tax.id)} size="small" />
+                                                                    {tax.name} ({tax.percentage}%)
+                                                                </MenuItem>
+                                                            ))}
+                                                        </TextField>
+                                                    )}
+                                                />
+                                            </div>
+                                        )}
+
+                                        {showPurchaseTaxes && (
+                                            <div>
+                                                <Controller
+                                                    name="purchase_tax_ids"
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <TextField
+                                                            {...textFieldProps}
+                                                            select
+                                                            label="Impuestos de Compra"
+                                                            disabled={isLoading}
+                                                            value={field.value || []}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                field.onChange(typeof val === 'string' ? val.split(',').map(Number) : val);
+                                                            }}
+                                                            SelectProps={{
+                                                                multiple: true,
+                                                                renderValue: (selected) => (
+                                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                                        {(selected as number[]).map((id) => {
+                                                                            const tax = (taxRates || []).find((t) => t.id === id);
+                                                                            return tax ? (
+                                                                                <Chip key={id} label={`${tax.name} (${tax.percentage}%)`} size="small" />
+                                                                            ) : null;
+                                                                        })}
+                                                                    </Box>
+                                                                )
+                                                            }}
+                                                        >
+                                                            {(taxRates || []).map((tax) => (
+                                                                <MenuItem key={tax.id} value={tax.id}>
+                                                                    <Checkbox checked={(field.value || []).includes(tax.id)} size="small" />
+                                                                    {tax.name} ({tax.percentage}%)
+                                                                </MenuItem>
+                                                            ))}
+                                                        </TextField>
+                                                    )}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </PartnerFormTabPanel>
                 </Box>

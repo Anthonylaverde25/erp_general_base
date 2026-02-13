@@ -13,17 +13,15 @@ export default function PartnerFormTabPanel(props: PartnerFormTabPanelProps) {
     return (
         <div
             role="tabpanel"
-            hidden={value !== index}
             id={`partner-tabpanel-${index}`}
             aria-labelledby={`partner-tab-${index}`}
             {...other}
             className="h-full overflow-y-auto p-6"
+            style={{ display: value === index ? 'block' : 'none' }}
         >
-            {value === index && (
-                <Box>
-                    {children}
-                </Box>
-            )}
+            <Box>
+                {children}
+            </Box>
         </div>
     );
 }

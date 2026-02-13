@@ -31,7 +31,11 @@ export const partnerSchema = z.object({
         is_default: z.boolean().optional(),
     })).optional(),
 
-    image: z.any().optional()
+    image: z.any().optional(),
+
+    // Tax IDs
+    sale_tax_ids: z.array(z.number()).optional(),
+    purchase_tax_ids: z.array(z.number()).optional(),
 });
 
 export type PartnerFormType = z.infer<typeof partnerSchema>;

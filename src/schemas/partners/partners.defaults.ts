@@ -17,7 +17,9 @@ export const defaultCreatePartnerValues: PartnerFormType = {
     contact_email: '',
     contact_phone: '',
     bank_accounts: [],
-    image: undefined
+    image: undefined,
+    sale_tax_ids: [],
+    purchase_tax_ids: [],
 };
 
 export const defaultUpdatePartnerValues = (data?: any): PartnerFormType => {
@@ -51,6 +53,8 @@ export const defaultUpdatePartnerValues = (data?: any): PartnerFormType => {
             swift: acc.swift,
             is_default: acc.is_default
         })) || [],
-        image: data?.image || undefined
+        image: data?.image || undefined,
+        sale_tax_ids: data?.sale_taxes?.map((t: any) => t.id) || [],
+        purchase_tax_ids: data?.purchase_taxes?.map((t: any) => t.id) || [],
     };
 };

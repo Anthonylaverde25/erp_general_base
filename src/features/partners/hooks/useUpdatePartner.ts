@@ -11,6 +11,7 @@ export function useUpdatePartner() {
     const useCase = container.get<UpdatePartnerUseCase>(TYPES.UpdatePartnerUseCase);
 
     const mutation = useMutation<{ partner: PartnerEntity; message: string }, Error, { id: number; data: UpdatePartnerDTO }>({
+
         mutationFn: async ({ id, data }) => await useCase.execute(id, data),
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries({ queryKey: ["partners"] });

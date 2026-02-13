@@ -1,4 +1,5 @@
-import { Button, Typography, Box, Stack, useTheme } from "@mui/material";
+import { Button, ButtonGroup, Typography, Box, Stack, useTheme } from "@mui/material";
+import { Link } from "react-router";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 
@@ -27,20 +28,29 @@ function PartnersHeader(props: PartnersHeaderProps) {
                         Manage your business partners
                     </Typography>
                 </Box>
-                <Button
-                    className="btn-primary"
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    startIcon={
-                        <FuseSvgIcon size={20}>
-                            heroicons-outline:plus
-                        </FuseSvgIcon>
-                    }
-                    onClick={onCreate}
-                >
-                    Create Partner
-                </Button>
+                <ButtonGroup variant="contained" color="secondary" aria-label="create partner button group">
+                    <Button
+                        startIcon={
+                            <FuseSvgIcon size={20}>
+                                heroicons-outline:plus
+                            </FuseSvgIcon>
+                        }
+                        onClick={onCreate}
+                    >
+                        Create Partner
+                    </Button>
+                    <Button
+                        component={Link}
+                        to="create"
+                        startIcon={
+                            <FuseSvgIcon size={20}>
+                                heroicons-outline:plus-circle
+                            </FuseSvgIcon>
+                        }
+                    >
+                        Create Partner 2
+                    </Button>
+                </ButtonGroup>
             </Stack>
         </Box>
     );

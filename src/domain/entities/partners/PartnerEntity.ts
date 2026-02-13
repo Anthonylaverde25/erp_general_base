@@ -1,4 +1,4 @@
-import { CreatePartnerDTO, PartnerType, PartnerRole } from "./DTOs/PartnerDTOs";
+import { CreatePartnerDTO, PartnerType, PartnerRole, PartnerTax } from "./DTOs/PartnerDTOs";
 import { AddressEntity } from "../addresses/Address";
 import { ContactEntity } from "../contacts/Contact";
 import { BankAccountEntity } from "../bank_accounts/BankAccount";
@@ -18,6 +18,8 @@ export interface Partner {
     address: IAddress[];
     contact: IContact[];
     bank_accounts: IBankAccount[];
+    sale_taxes: PartnerTax[];
+    purchase_taxes: PartnerTax[];
 }
 
 export class PartnerEntity implements Partner {
@@ -33,6 +35,8 @@ export class PartnerEntity implements Partner {
     private _address: AddressEntity[];
     private _contact: ContactEntity[];
     private _bank_accounts: BankAccountEntity[];
+    private _sale_taxes: PartnerTax[];
+    private _purchase_taxes: PartnerTax[];
 
     constructor(
         id: number,
@@ -46,7 +50,9 @@ export class PartnerEntity implements Partner {
         type: PartnerType,
         address: AddressEntity[],
         contact: ContactEntity[],
-        bank_accounts: BankAccountEntity[]
+        bank_accounts: BankAccountEntity[],
+        sale_taxes: PartnerTax[],
+        purchase_taxes: PartnerTax[]
     ) {
         this._id = id;
         this._company_id = company_id;
@@ -60,6 +66,8 @@ export class PartnerEntity implements Partner {
         this._address = address;
         this._contact = contact;
         this._bank_accounts = bank_accounts;
+        this._sale_taxes = sale_taxes;
+        this._purchase_taxes = purchase_taxes;
     }
 
     get id(): number {
@@ -110,6 +118,14 @@ export class PartnerEntity implements Partner {
         return this._bank_accounts;
     }
 
+    get sale_taxes(): PartnerTax[] {
+        return this._sale_taxes;
+    }
+
+    get purchase_taxes(): PartnerTax[] {
+        return this._purchase_taxes;
+    }
+
     static fromPrimitives(data: any): PartnerEntity {
         let role: PartnerRole = 'prospect';
 
@@ -140,7 +156,9 @@ export class PartnerEntity implements Partner {
             data.type,
             data.address ? data.address.map((addr: any) => AddressEntity.fromPrimitives(addr)) : [],
             data.contact ? data.contact.map((cnt: any) => ContactEntity.fromPrimitives(cnt)) : [],
-            data.bank_accounts ? data.bank_accounts.map((acc: any) => BankAccountEntity.fromPrimitives(acc)) : []
+            data.bank_accounts ? data.bank_accounts.map((acc: any) => BankAccountEntity.fromPrimitives(acc)) : [],
+            data.sale_taxes || [],
+            data.purchase_taxes || []
         );
     }
 
@@ -157,7 +175,9 @@ export class PartnerEntity implements Partner {
             data.type,
             data.address ? data.address.map(addr => AddressEntity.create(addr)) : [],
             data.contact ? data.contact.map(cnt => ContactEntity.create(cnt)) : [],
-            data.bank_accounts ? data.bank_accounts.map(acc => BankAccountEntity.create(acc)) : []
+            data.bank_accounts ? data.bank_accounts.map(acc => BankAccountEntity.create(acc)) : [],
+            [], // sale_taxes not available on create DTO directly as objects usually
+            []  // purchase_taxes not available on create DTO directly as objects usually
         );
     }
 
@@ -174,7 +194,9 @@ export class PartnerEntity implements Partner {
             data.type || 'prospect',
             data.address ? data.address.map(addr => AddressEntity.fromPrimitives(addr)) : [],
             data.contact ? data.contact.map(cnt => ContactEntity.fromPrimitives(cnt)) : [],
-            data.bank_accounts ? data.bank_accounts.map(acc => BankAccountEntity.fromPrimitives(acc)) : []
+            data.bank_accounts ? data.bank_accounts.map(acc => BankAccountEntity.fromPrimitives(acc)) : [],
+            [], // sale_taxes update not usually passing full objects here
+            []  // purchase_taxes update not usually passing full objects here
         );
     }
 
@@ -192,6 +214,8 @@ export class PartnerEntity implements Partner {
             address: this._address.map(addr => addr.toPlainObject()),
             contact: this._contact.map(cnt => cnt.toPlainObject()),
             bank_accounts: this._bank_accounts.map(acc => acc.toPlainObject()),
+            sale_taxes: this._sale_taxes,
+            purchase_taxes: this._purchase_taxes,
         };
     }
 }

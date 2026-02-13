@@ -50,11 +50,9 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
                         <Typography variant="body2" fontWeight={600}>
                             {name}
                         </Typography>
-                        {partner.comercial_name && (
-                            <Typography variant="caption" color="text.secondary">
-                                {partner.comercial_name}
-                            </Typography>
-                        )}
+                        <Typography variant="caption" color="text.secondary">
+                            {partner.comercial_name || 'Nombre comercial | No aplica'}
+                        </Typography>
                     </Box>
                 </Box>
             );
@@ -92,12 +90,19 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
         enableColumnFilter: true,
         Cell: ({ row }) => {
             const address = row.original.address && row.original.address.length > 0 ? row.original.address[0] : null;
-            if (!address) return <Typography variant="body2" color="text.secondary">-</Typography>;
+
+            if (!address) {
+                return (
+                    <Box>
+                        <Typography variant="body2" color="text.secondary">Dirección | No aplica</Typography>
+                    </Box>
+                );
+            }
 
             return (
                 <Box>
                     <Typography variant="body2" className="truncate">
-                        {address.street}
+                        {address.street || 'Calle desconocida'}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" className="truncate block">
                         {address.city} {address.postal_code}, {address.country}
@@ -114,18 +119,23 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
         enableColumnFilter: true,
         Cell: ({ row }) => {
             const contact = row.original.contact && row.original.contact.length > 0 ? row.original.contact[0] : null;
-            if (!contact) return <Typography variant="body2" color="text.secondary">-</Typography>;
+
+            if (!contact) {
+                return (
+                    <Box>
+                        <Typography variant="body2" color="text.secondary">Contacto | No aplica</Typography>
+                    </Box>
+                );
+            }
 
             return (
                 <Box>
                     <Typography variant="body2" className="truncate">
-                        {contact.email}
+                        {contact.email || 'Email | No aplica'}
                     </Typography>
-                    {contact.phone && (
-                        <Typography variant="caption" color="text.secondary">
-                            {contact.phone}
-                        </Typography>
-                    )}
+                    <Typography variant="caption" color="text.secondary">
+                        {contact.phone || 'Teléfono | No aplica'}
+                    </Typography>
                 </Box>
             );
         }

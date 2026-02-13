@@ -10,21 +10,16 @@ interface PartnerTableProps {
     isLoading?: boolean;
     onEdit: (partner: PartnerEntity) => void;
     onDelete?: (id: number) => void;
+    onRowClick?: (partner: PartnerEntity) => void;
 }
 
 export default function PartnerTable(props: PartnerTableProps) {
-    const { partners, isLoading, onEdit, onDelete } = props;
+    const { partners, isLoading, onEdit, onDelete, onRowClick } = props;
 
     const columns = useMemo(() => PartnerColumns, []);
 
     if (isLoading) {
-        return null; // Or a loading spinner, but DataTable might handle empty state. 
-        // The user's example used `if (isLoading) return <FuseLoading />;`
-        // But since I don't see FuseLoading imported in my context immediately, 
-        // and DataTable handles `state: { isLoading }` (passed via ...rest or defaults),
-        // I will pass isLoading to DataTable.
-        // Actually, looking at DataTable implementation, it passes `...rest` to `useMaterialReactTable`.
-        // `MaterialReactTable` handles `state.isLoading`.
+        return null;
     }
 
     return (
@@ -35,17 +30,21 @@ export default function PartnerTable(props: PartnerTableProps) {
             state={{ isLoading }}
             enablePagination
             initialState={{
-                density: 'compact', // Preserving DataTable default
-                showColumnFilters: false, // Default
-                pagination: { pageSize: 15, pageIndex: 0 }, // Adjusted to match default 15 roughly, or keep 10
-                showGlobalFilter: true, // User request
-                columnPinning: { left: [], right: ['mrt-row-actions'] } // Preserving sticky actions
+                density: 'compact',
+                showColumnFilters: false,
+                pagination: { pageSize: 15, pageIndex: 0 },
+                showGlobalFilter: true,
+                columnPinning: { left: [], right: ['mrt-row-actions'] }
             }}
             muiPaginationProps={{
                 rowsPerPageOptions: [5, 10, 25],
                 variant: 'outlined',
-                showRowsPerPage: true // Explicitly show
+                showRowsPerPage: true
             }}
+            muiTableBodyRowProps={({ row }) => ({
+                onClick: () => onRowClick?.(row.original),
+                sx: { cursor: onRowClick ? 'pointer' : 'default' }
+            })}
             renderRowActionMenuItems={({ closeMenu, row }) => [
                 <MenuItem
                     key="edit"
@@ -77,3 +76,4 @@ export default function PartnerTable(props: PartnerTableProps) {
         />
     );
 }
+

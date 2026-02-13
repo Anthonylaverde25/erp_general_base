@@ -39,7 +39,9 @@ export class PartnerMapper {
                 : [],
             Array.isArray(dto.bank_accounts)
                 ? dto.bank_accounts.map((acc) => BankAccountEntity.fromPrimitives(acc))
-                : []
+                : [],
+            dto.sale_taxes || [],
+            dto.purchase_taxes || []
         );
     }
 
