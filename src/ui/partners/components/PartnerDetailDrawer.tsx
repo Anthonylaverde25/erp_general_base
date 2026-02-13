@@ -29,10 +29,12 @@ import {
     Business,
     Badge,
     Storefront,
-    LocalShipping
+    LocalShipping,
+    Star
 } from '@mui/icons-material';
 import { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import { PartnerTax } from '@/domain/entities/partners/DTOs/PartnerDTOs';
+import useIndexPaymentMethods from '@/features/payment_methods/hooks/useIndexPaymentMethods';
 
 interface PartnerDetailDrawerProps {
     open: boolean;
@@ -191,14 +193,29 @@ function TaxChips({ taxes, color }: { taxes: PartnerTax[]; color: string }) {
 
 /* ── Main Component ──────────────────────────────────────────────────── */
 
+import { useState, useEffect } from 'react';
+
+// ... (existing content)
+
 export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerDetailDrawerProps) {
     const navigate = useNavigate();
+    const { paymentMethods } = useIndexPaymentMethods();
+
+    const [showAllContacts, setShowAllContacts] = useState(false);
+    const [showAllAddresses, setShowAllAddresses] = useState(false);
+
+    useEffect(() => {
+        if (open) {
+            setShowAllContacts(false);
+            setShowAllAddresses(false);
+        }
+    }, [open, partner?.id]);
 
     if (!partner) return null;
 
     const name = partner.name || 'Sin nombre';
-    const defaultAddress = partner.address && partner.address.length > 0 ? partner.address[0] : null;
-    const defaultContact = partner.contact && partner.contact.length > 0 ? partner.contact[0] : null;
+    const defaultAddress = partner.address?.find(a => a.default) || (partner.address && partner.address.length > 0 ? partner.address[0] : null);
+    const defaultContact = partner.contact?.find(c => c.default) || (partner.contact && partner.contact.length > 0 ? partner.contact[0] : null);
     const defaultBank = partner.bank_accounts && partner.bank_accounts.length > 0 ? partner.bank_accounts[0] : null;
 
     const showSaleTaxes = partner.role === 'client' || partner.role === 'client_supplier';
@@ -212,6 +229,8 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
         navigate(`/partners/${partner.id}`);
         onClose();
     };
+
+    const paymentMethodName = paymentMethods?.find(pm => pm.id === partner.payment_method_id)?.name;
 
     return (
         <Drawer
@@ -413,66 +432,88 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
                         <TableBody>
                             <InfoRow label="CIF" value={partner.cif} mono copyable />
                             <InfoRow label="NIF / VAT" value={partner.vat_number} mono copyable />
-                            <InfoRow label="Método de Pago" value={partner.payment_method_id ? `#${partner.payment_method_id}` : undefined} />
+                            <InfoRow label="Método de Pago" value={paymentMethodName || (partner.payment_method_id ? `#${partner.payment_method_id}` : undefined)} />
                         </TableBody>
                     </Table>
 
                     <Divider />
 
-                    {/* Contacto Principal */}
-                    <SectionHeader title={`Contacto${contactCount > 1 ? ` (1 de ${contactCount})` : ''}`} />
-                    <Table size="small">
-                        <TableBody>
-                            <InfoRow label="Email" value={defaultContact?.email} copyable />
-                            <InfoRow label="Teléfono" value={defaultContact?.phone} copyable />
-                        </TableBody>
-                    </Table>
-
-                    <Divider />
-
-                    {/* Dirección */}
-                    <SectionHeader title={`Dirección${addressCount > 1 ? ` (1 de ${addressCount})` : ''}`} />
-                    {defaultAddress ? (
-                        <Table size="small">
-                            <TableBody>
-                                <InfoRow label="Calle" value={defaultAddress.street} />
-                                <InfoRow label="Ciudad" value={defaultAddress.city} />
-                                <InfoRow label="Provincia" value={defaultAddress.state} />
-                                <InfoRow label="C.P." value={defaultAddress.postal_code} mono />
-                                <InfoRow label="País" value={defaultAddress.country} />
-                            </TableBody>
-                        </Table>
+                    {/* Contactos */}
+                    <SectionHeader title={`Contactos${contactCount > 1 ? ` (${contactCount})` : ''}`} />
+                    {partner.contact && partner.contact.length > 0 ? (
+                        <>
+                            {(showAllContacts ? partner.contact : [partner.contact.find(c => c.default) || partner.contact[0]]).map((contact, index) => (
+                                <Box key={index} sx={{ mb: 2, px: 0 }}>
+                                    <Table size="small">
+                                        <TableBody>
+                                            <InfoRow label="Email" value={contact.email} copyable />
+                                            <InfoRow label="Teléfono" value={contact.phone} copyable />
+                                        </TableBody>
+                                    </Table>
+                                    {contact.default && partner.contact.length > 1 && (
+                                        <Typography variant="caption" color="primary" sx={{ px: 3, display: 'block', mt: 0.5 }}>
+                                            (Principal)
+                                        </Typography>
+                                    )}
+                                </Box>
+                            ))}
+                            {contactCount > 1 && (
+                                <Button
+                                    size="small"
+                                    onClick={() => setShowAllContacts(!showAllContacts)}
+                                    sx={{ mx: 3, mb: 2, textTransform: 'none' }}
+                                >
+                                    {showAllContacts ? 'Ver menos' : `Ver todos (${contactCount})`}
+                                </Button>
+                            )}
+                        </>
                     ) : (
-                        <Typography variant="body2" color="text.disabled" sx={{ px: 3, py: 1 }}>
-                            Sin dirección registrada
+                        <Typography variant="body2" color="text.disabled" sx={{ px: 3, mb: 2 }}>
+                            Sin contactos registrados
                         </Typography>
                     )}
 
                     <Divider />
 
-                    {/* Impuestos */}
-                    {(showSaleTaxes || showPurchaseTaxes) && (
+                    {/* Direcciones */}
+                    <SectionHeader title={`Direcciones${addressCount > 1 ? ` (${addressCount})` : ''}`} />
+                    {partner.address && partner.address.length > 0 ? (
                         <>
-                            <SectionHeader title="Impuestos Asignados" />
-                            {showSaleTaxes && (
-                                <Box sx={{ mb: 0.5 }}>
-                                    <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ px: 3, display: 'block', mb: 0.5 }}>
-                                        Venta
-                                    </Typography>
-                                    <TaxChips taxes={partner.sale_taxes} color="#4caf50" />
+                            {(showAllAddresses ? partner.address : [partner.address.find(a => a.default) || partner.address[0]]).map((address, index) => (
+                                <Box key={index} sx={{ mb: 2, px: 0 }}>
+                                    <Table size="small">
+                                        <TableBody>
+                                            <InfoRow label="Calle" value={address.street} />
+                                            <InfoRow label="Ciudad" value={address.city} />
+                                            <InfoRow label="Provincia" value={address.state} />
+                                            <InfoRow label="C.P." value={address.postal_code} mono />
+                                            <InfoRow label="País" value={address.country} />
+                                        </TableBody>
+                                    </Table>
+                                    {address.default && partner.address.length > 1 && (
+                                        <Typography variant="caption" color="primary" sx={{ px: 3, display: 'block', mt: 0.5 }}>
+                                            (Principal)
+                                        </Typography>
+                                    )}
                                 </Box>
+                            ))}
+                            {addressCount > 1 && (
+                                <Button
+                                    size="small"
+                                    onClick={() => setShowAllAddresses(!showAllAddresses)}
+                                    sx={{ mx: 3, mb: 2, textTransform: 'none' }}
+                                >
+                                    {showAllAddresses ? 'Ver menos' : `Ver todas (${addressCount})`}
+                                </Button>
                             )}
-                            {showPurchaseTaxes && (
-                                <Box sx={{ mb: 0.5 }}>
-                                    <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ px: 3, display: 'block', mb: 0.5 }}>
-                                        Compra
-                                    </Typography>
-                                    <TaxChips taxes={partner.purchase_taxes} color="#2196f3" />
-                                </Box>
-                            )}
-                            <Divider />
                         </>
+                    ) : (
+                        <Typography variant="body2" color="text.disabled" sx={{ px: 3, mb: 2 }}>
+                            Sin dirección registrada
+                        </Typography>
                     )}
+
+                    <Divider />
 
                     {/* Cuentas Bancarias */}
                     <SectionHeader title={`Cuenta Bancaria${bankCount > 1 ? ` (1 de ${bankCount})` : ''}`} />
