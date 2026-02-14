@@ -9,7 +9,6 @@ import {
     IconButton,
     Tooltip,
     Stack,
-    alpha,
     Button,
     Table,
     TableBody,
@@ -21,8 +20,6 @@ import {
     OpenInNew,
     Phone,
     LocationOn,
-    AccountBalance,
-    Receipt,
     WhatsApp,
     Mail,
     ContentCopy,
@@ -30,11 +27,16 @@ import {
     Badge,
     Storefront,
     LocalShipping,
-    Star
+    Description,
+    RequestQuote,
+    NoteAdd,
+    ShoppingCart,
+    PointOfSale
 } from '@mui/icons-material';
 import { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
-import { PartnerTax } from '@/domain/entities/partners/DTOs/PartnerDTOs';
+
 import useIndexPaymentMethods from '@/features/payment_methods/hooks/useIndexPaymentMethods';
+import { useState, useEffect } from 'react';
 
 interface PartnerDetailDrawerProps {
     open: boolean;
@@ -58,12 +60,7 @@ const typeLabels: Record<string, string> = {
     prospect: 'Prospecto'
 };
 
-const roleColors: Record<string, string> = {
-    client: '#4caf50',
-    supplier: '#2196f3',
-    client_supplier: '#9c27b0',
-    prospect: '#9e9e9e'
-};
+
 
 const roleIcons: Record<string, React.ReactNode> = {
     client: <Storefront fontSize="small" />,
@@ -78,7 +75,7 @@ function stringToColor(str: string) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
     const hue = hash % 360;
-    return `hsl(${hue}, 65%, 50%)`;
+    return `hsl(${hue}, 35%, 45%)`;
 }
 
 function getInitials(fullName: string) {
@@ -91,16 +88,19 @@ function getInitials(fullName: string) {
 
 /* ── Reusable sub-components ─────────────────────────────────────────── */
 
-function SectionHeader({ title }: { title: string }) {
+function SectionHeader({ title, action }: { title: string; action?: React.ReactNode }) {
     return (
-        <Typography
-            variant="overline"
-            color="text.secondary"
-            fontWeight={700}
-            sx={{ px: 3, pt: 2, pb: 0.5, display: 'block', letterSpacing: '0.08em' }}
-        >
-            {title}
-        </Typography>
+        <Box className="flex items-center justify-between" sx={{ px: 3, pt: 2, pb: 0.5 }}>
+            <Typography
+                variant="overline"
+                color="text.secondary"
+                fontWeight={700}
+                sx={{ letterSpacing: '0.08em', fontSize: '0.65rem' }}
+            >
+                {title}
+            </Typography>
+            {action}
+        </Box>
     );
 }
 
@@ -167,38 +167,13 @@ function InfoRow({ label, value, mono, copyable }: InfoRowProps) {
     );
 }
 
-function TaxChips({ taxes, color }: { taxes: PartnerTax[]; color: string }) {
-    if (!taxes || taxes.length === 0) {
-        return <Typography variant="body2" color="text.disabled" sx={{ px: 3, py: 1 }}>Sin impuestos asignados</Typography>;
-    }
-    return (
-        <Stack direction="row" flexWrap="wrap" gap={1} sx={{ px: 3, py: 0.5 }}>
-            {taxes.map((tax) => (
-                <Chip
-                    key={tax.id}
-                    label={`${tax.name} (${tax.percentage}%)`}
-                    size="small"
-                    sx={{
-                        bgcolor: alpha(color, 0.1),
-                        color: color,
-                        fontWeight: 500,
-                        borderColor: alpha(color, 0.3),
-                        border: '1px solid'
-                    }}
-                />
-            ))}
-        </Stack>
-    );
-}
+
 
 /* ── Main Component ──────────────────────────────────────────────────── */
 
-import { useState, useEffect } from 'react';
-
-// ... (existing content)
-
 export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerDetailDrawerProps) {
     const navigate = useNavigate();
+
     const { paymentMethods } = useIndexPaymentMethods();
 
     const [showAllContacts, setShowAllContacts] = useState(false);
@@ -216,14 +191,13 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
     const name = partner.name || 'Sin nombre';
     const defaultAddress = partner.address?.find(a => a.default) || (partner.address && partner.address.length > 0 ? partner.address[0] : null);
     const defaultContact = partner.contact?.find(c => c.default) || (partner.contact && partner.contact.length > 0 ? partner.contact[0] : null);
-    const defaultBank = partner.bank_accounts && partner.bank_accounts.length > 0 ? partner.bank_accounts[0] : null;
 
-    const showSaleTaxes = partner.role === 'client' || partner.role === 'client_supplier';
-    const showPurchaseTaxes = partner.role === 'supplier' || partner.role === 'client_supplier';
+    // Removed unused defaultBank variable
+
+
 
     const addressCount = partner.address?.length || 0;
     const contactCount = partner.contact?.length || 0;
-    const bankCount = partner.bank_accounts?.length || 0;
 
     const handleGoToProfile = () => {
         navigate(`/partners/${partner.id}`);
@@ -231,6 +205,8 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
     };
 
     const paymentMethodName = paymentMethods?.find(pm => pm.id === partner.payment_method_id)?.name;
+
+
 
     return (
         <Drawer
@@ -245,7 +221,7 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
                     display: 'flex',
                     flexDirection: 'column',
                     height: '100%',
-                    bgcolor: 'background.default'
+                    bgcolor: 'background.default',
                 }}
                 role="presentation"
             >
@@ -256,18 +232,18 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
                         pb: 2,
                         borderBottom: '1px solid',
                         borderColor: 'divider',
-                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1e2a2a' : '#e0eded'
+                        bgcolor: 'background.paper',
                     }}
                 >
                     {/* Toolbar */}
                     <Box className="flex items-center justify-between" sx={{ mb: 2 }}>
                         <Tooltip title="Ver Perfil Completo">
-                            <IconButton onClick={handleGoToProfile} color="primary">
-                                <OpenInNew />
+                            <IconButton onClick={handleGoToProfile} size="small">
+                                <OpenInNew fontSize="small" />
                             </IconButton>
                         </Tooltip>
-                        <IconButton onClick={onClose}>
-                            <Close />
+                        <IconButton onClick={onClose} size="small">
+                            <Close fontSize="small" />
                         </IconButton>
                     </Box>
 
@@ -275,11 +251,11 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
                     <Box className="flex items-center gap-3">
                         <Avatar
                             sx={{
-                                width: 48,
-                                height: 48,
+                                width: 44,
+                                height: 44,
                                 bgcolor: stringToColor(name),
-                                fontSize: '1rem',
-                                fontWeight: 700
+                                fontSize: '0.95rem',
+                                fontWeight: 700,
                             }}
                         >
                             {getInitials(name)}
@@ -289,7 +265,7 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
                                 {name}
                             </Typography>
                             {partner.comercial_name && (
-                                <Typography variant="body2" color="text.secondary" className="truncate" lineHeight={1.3}>
+                                <Typography variant="body2" color="text.secondary" className="truncate" lineHeight={1.3} sx={{ fontSize: '0.8rem' }}>
                                     {partner.comercial_name}
                                 </Typography>
                             )}
@@ -302,131 +278,46 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
                             icon={roleIcons[partner.role] as React.ReactElement || undefined}
                             label={roleLabels[partner.role] || partner.role}
                             size="small"
-                            sx={{
-                                bgcolor: alpha(roleColors[partner.role] || '#666', 0.12),
-                                color: roleColors[partner.role] || '#666',
-                                fontWeight: 600,
-                                fontSize: '0.75rem'
-                            }}
+                            variant="outlined"
+                            sx={{ fontWeight: 600, fontSize: '0.7rem', height: 24, borderRadius: 0.5 }}
                         />
                         <Chip
                             label={typeLabels[partner.type] || partner.type}
                             size="small"
                             variant="outlined"
-                            sx={{ fontSize: '0.75rem' }}
+                            sx={{ fontSize: '0.7rem', height: 24, borderRadius: 0.5 }}
                         />
                     </Stack>
 
-                    {/* Quick Actions */}
-                    <Stack direction="row" gap={1} sx={{ mt: 2 }}>
-                        <Button
-                            variant="outlined"
-                            size="small"
-                            disabled={!defaultContact?.phone}
-                            onClick={() => {
-                                if (defaultContact?.phone) {
-                                    const phone = defaultContact.phone.replace(/\D/g, '');
-                                    window.open(`https://wa.me/${phone}`, '_blank');
-                                }
-                            }}
-                            startIcon={<WhatsApp sx={{ fontSize: 16 }} />}
-                            sx={{
-                                textTransform: 'none',
-                                borderColor: 'rgba(0,0,0,0.2)',
-                                color: 'text.primary',
-                                bgcolor: 'background.paper',
-                                fontSize: '0.75rem',
-                                py: 0.5,
-                                px: 1.5,
-                                minWidth: 0,
-                                '&:hover': { bgcolor: 'action.hover' }
-                            }}
-                        >
-                            WhatsApp
-                        </Button>
-
-                        <Button
-                            variant="outlined"
-                            size="small"
-                            disabled={!defaultContact?.email}
-                            onClick={() => {
-                                if (defaultContact?.email) {
-                                    window.location.href = `mailto:${defaultContact.email}`;
-                                }
-                            }}
-                            startIcon={<Mail sx={{ fontSize: 16 }} />}
-                            sx={{
-                                textTransform: 'none',
-                                borderColor: 'rgba(0,0,0,0.2)',
-                                color: 'text.primary',
-                                bgcolor: 'background.paper',
-                                fontSize: '0.75rem',
-                                py: 0.5,
-                                px: 1.5,
-                                minWidth: 0,
-                                '&:hover': { bgcolor: 'action.hover' }
-                            }}
-                        >
-                            Email
-                        </Button>
-
-                        <Button
-                            variant="outlined"
-                            size="small"
-                            disabled={!defaultContact?.phone}
-                            onClick={() => {
-                                if (defaultContact?.phone) {
-                                    window.location.href = `tel:${defaultContact.phone}`;
-                                }
-                            }}
-                            startIcon={<Phone sx={{ fontSize: 16 }} />}
-                            sx={{
-                                textTransform: 'none',
-                                borderColor: 'rgba(0,0,0,0.2)',
-                                color: 'text.primary',
-                                bgcolor: 'background.paper',
-                                fontSize: '0.75rem',
-                                py: 0.5,
-                                px: 1.5,
-                                minWidth: 0,
-                                '&:hover': { bgcolor: 'action.hover' }
-                            }}
-                        >
-                            Llamar
-                        </Button>
-
-                        <Button
-                            variant="outlined"
-                            size="small"
-                            disabled={!defaultAddress}
-                            onClick={() => {
-                                if (defaultAddress) {
-                                    const q = `${defaultAddress.street}, ${defaultAddress.city}, ${defaultAddress.state}, ${defaultAddress.country}`;
-                                    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`, '_blank');
-                                }
-                            }}
-                            startIcon={<LocationOn sx={{ fontSize: 16 }} />}
-                            sx={{
-                                textTransform: 'none',
-                                borderColor: 'rgba(0,0,0,0.2)',
-                                color: 'text.primary',
-                                bgcolor: 'background.paper',
-                                fontSize: '0.75rem',
-                                py: 0.5,
-                                px: 1.5,
-                                minWidth: 0,
-                                '&:hover': { bgcolor: 'action.hover' }
-                            }}
-                        >
-                            Mapa
-                        </Button>
+                    {/* Quick Contact Actions */}
+                    <Stack direction="row" gap={0.75} sx={{ mt: 2 }}>
+                        <Button variant="outlined" size="small" disabled={!defaultContact?.phone}
+                            onClick={() => defaultContact?.phone && window.open(`https://wa.me/${defaultContact.phone.replace(/\D/g, '')}`, '_blank')}
+                            startIcon={<WhatsApp sx={{ fontSize: 15 }} />}
+                            sx={{ textTransform: 'none', borderColor: 'divider', color: 'text.primary', fontSize: '0.7rem', py: 0.4, px: 1.25, minWidth: 0, borderRadius: 0.5 }}
+                        >WhatsApp</Button>
+                        <Button variant="outlined" size="small" disabled={!defaultContact?.email}
+                            onClick={() => defaultContact?.email && (window.location.href = `mailto:${defaultContact.email}`)}
+                            startIcon={<Mail sx={{ fontSize: 15 }} />}
+                            sx={{ textTransform: 'none', borderColor: 'divider', color: 'text.primary', fontSize: '0.7rem', py: 0.4, px: 1.25, minWidth: 0, borderRadius: 0.5 }}
+                        >Email</Button>
+                        <Button variant="outlined" size="small" disabled={!defaultContact?.phone}
+                            onClick={() => defaultContact?.phone && (window.location.href = `tel:${defaultContact.phone}`)}
+                            startIcon={<Phone sx={{ fontSize: 15 }} />}
+                            sx={{ textTransform: 'none', borderColor: 'divider', color: 'text.primary', fontSize: '0.7rem', py: 0.4, px: 1.25, minWidth: 0, borderRadius: 0.5 }}
+                        >Llamar</Button>
+                        <Button variant="outlined" size="small" disabled={!defaultAddress}
+                            onClick={() => { if (defaultAddress) { const q = `${defaultAddress.street}, ${defaultAddress.city}, ${defaultAddress.state}, ${defaultAddress.country}`; window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`, '_blank'); } }}
+                            startIcon={<LocationOn sx={{ fontSize: 15 }} />}
+                            sx={{ textTransform: 'none', borderColor: 'divider', color: 'text.primary', fontSize: '0.7rem', py: 0.4, px: 1.25, minWidth: 0, borderRadius: 0.5 }}
+                        >Mapa</Button>
                     </Stack>
                 </Box>
 
                 {/* ── Body – scrollable ─────────────────────────────────── */}
                 <Box className="flex-1 overflow-y-auto">
 
-                    {/* Datos Fiscales */}
+                    {/* ── 1. Datos Fiscales ──────────────────────────────── */}
                     <SectionHeader title="Datos Fiscales" />
                     <Table size="small">
                         <TableBody>
@@ -438,7 +329,25 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
 
                     <Divider />
 
-                    {/* Contactos */}
+                    {/* ── 2. Crear Nuevo ─────────────────────────────────── */}
+                    <SectionHeader title="Crear Nuevo" />
+                    <Stack direction="row" gap={0.5} sx={{ px: 3, pb: 1.5, pt: 0.5 }} flexWrap="wrap">
+                        {[
+                            { icon: <Description sx={{ fontSize: 14 }} />, label: 'Factura' },
+                            { icon: <RequestQuote sx={{ fontSize: 14 }} />, label: 'Presupuesto' },
+                            { icon: <NoteAdd sx={{ fontSize: 14 }} />, label: 'Nota' },
+                            { icon: <PointOfSale sx={{ fontSize: 14 }} />, label: 'Venta' },
+                            { icon: <ShoppingCart sx={{ fontSize: 14 }} />, label: 'Compra' },
+                        ].map((item, idx) => (
+                            <Button key={idx} size="small" startIcon={item.icon}
+                                sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.7rem', color: 'text.secondary', py: 0.5, px: 1.25, minWidth: 0, borderRadius: 0.5, border: '1px solid', borderColor: 'divider', '&:hover': { bgcolor: 'action.hover', color: 'text.primary' } }}
+                            >{item.label}</Button>
+                        ))}
+                    </Stack>
+
+                    <Divider />
+
+                    {/* ── 3. Contactos ───────────────────────────────────── */}
                     <SectionHeader title={`Contactos${contactCount > 1 ? ` (${contactCount})` : ''}`} />
                     {partner.contact && partner.contact.length > 0 ? (
                         <>
@@ -461,21 +370,21 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
                                 <Button
                                     size="small"
                                     onClick={() => setShowAllContacts(!showAllContacts)}
-                                    sx={{ mx: 3, mb: 2, textTransform: 'none' }}
+                                    sx={{ mx: 3, mb: 2, textTransform: 'none', fontSize: '0.75rem' }}
                                 >
                                     {showAllContacts ? 'Ver menos' : `Ver todos (${contactCount})`}
                                 </Button>
                             )}
                         </>
                     ) : (
-                        <Typography variant="body2" color="text.disabled" sx={{ px: 3, mb: 2 }}>
+                        <Typography variant="body2" color="text.disabled" sx={{ px: 3, mb: 2, fontSize: '0.8rem' }}>
                             Sin contactos registrados
                         </Typography>
                     )}
 
                     <Divider />
 
-                    {/* Direcciones */}
+                    {/* ── 4. Direcciones ─────────────────────────────────── */}
                     <SectionHeader title={`Direcciones${addressCount > 1 ? ` (${addressCount})` : ''}`} />
                     {partner.address && partner.address.length > 0 ? (
                         <>
@@ -501,42 +410,50 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
                                 <Button
                                     size="small"
                                     onClick={() => setShowAllAddresses(!showAllAddresses)}
-                                    sx={{ mx: 3, mb: 2, textTransform: 'none' }}
+                                    sx={{ mx: 3, mb: 2, textTransform: 'none', fontSize: '0.75rem' }}
                                 >
                                     {showAllAddresses ? 'Ver menos' : `Ver todas (${addressCount})`}
                                 </Button>
                             )}
                         </>
                     ) : (
-                        <Typography variant="body2" color="text.disabled" sx={{ px: 3, mb: 2 }}>
+                        <Typography variant="body2" color="text.disabled" sx={{ px: 3, mb: 2, fontSize: '0.8rem' }}>
                             Sin dirección registrada
                         </Typography>
                     )}
 
                     <Divider />
 
-                    {/* Cuentas Bancarias */}
-                    <SectionHeader title={`Cuenta Bancaria${bankCount > 1 ? ` (1 de ${bankCount})` : ''}`} />
-                    {defaultBank ? (
-                        <Table size="small">
-                            <TableBody>
-                                <InfoRow label="Banco" value={defaultBank.name || 'Sin nombre'} />
-                                <InfoRow label="Nº Cuenta" value={defaultBank.account_number} mono copyable />
-                                <InfoRow label="SWIFT" value={defaultBank.swift} mono copyable />
-                                <InfoRow label="Titular" value={defaultBank.account_holder} />
-                            </TableBody>
-                        </Table>
-                    ) : (
-                        <Typography variant="body2" color="text.disabled" sx={{ px: 3, py: 1 }}>
-                            Sin cuenta bancaria registrada
-                        </Typography>
-                    )}
+                    {/* ── 5. Ventas y Compras Statistics ─────────────────── */}
+                    <SectionHeader title="Ventas y Compras" />
+                    <Table size="small">
+                        <TableBody>
+                            <TableRow>
+                                <TableCell sx={{ py: 0.6, px: 3, borderColor: 'divider' }}><Typography variant="caption" color="text.secondary" fontWeight={500}>Total Ventas</Typography></TableCell>
+                                <TableCell sx={{ py: 0.6, px: 1.5, borderColor: 'divider' }}><Typography variant="body2" fontWeight={600}>0,00€</Typography></TableCell>
+                                <TableCell sx={{ py: 0.6, px: 1.5, borderColor: 'divider' }}><Typography variant="caption" color="text.secondary" fontWeight={500}>Total Compras</Typography></TableCell>
+                                <TableCell sx={{ py: 0.6, px: 1.5, borderColor: 'divider' }}><Typography variant="body2" fontWeight={600}>0,00€</Typography></TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell sx={{ py: 0.6, px: 3, borderColor: 'divider' }}><Typography variant="caption" color="text.secondary" fontWeight={500}>Promedio Ventas</Typography></TableCell>
+                                <TableCell sx={{ py: 0.6, px: 1.5, borderColor: 'divider' }}><Typography variant="body2" fontWeight={600}>0,00€</Typography></TableCell>
+                                <TableCell sx={{ py: 0.6, px: 1.5, borderColor: 'divider' }}><Typography variant="caption" color="text.secondary" fontWeight={500}>Promedio Compras</Typography></TableCell>
+                                <TableCell sx={{ py: 0.6, px: 1.5, borderColor: 'divider' }}><Typography variant="body2" fontWeight={600}>0,00€</Typography></TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell sx={{ py: 0.6, px: 3, borderBottom: 0 }}><Typography variant="caption" color="text.secondary" fontWeight={500}>Pendiente Cobro</Typography></TableCell>
+                                <TableCell sx={{ py: 0.6, px: 1.5, borderBottom: 0 }}><Typography variant="body2" fontWeight={600}>0,00€</Typography></TableCell>
+                                <TableCell sx={{ py: 0.6, px: 1.5, borderBottom: 0 }}><Typography variant="caption" color="text.secondary" fontWeight={500}>Pendiente Pago</Typography></TableCell>
+                                <TableCell sx={{ py: 0.6, px: 1.5, borderBottom: 0 }}><Typography variant="body2" fontWeight={600}>0,00€</Typography></TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
 
                     {/* Summary counters */}
                     <Divider />
                     <Box sx={{ px: 3, py: 1.5 }}>
-                        <Typography variant="caption" color="text.disabled">
-                            {addressCount} dirección{addressCount !== 1 ? 'es' : ''} · {contactCount} contacto{contactCount !== 1 ? 's' : ''} · {bankCount} cuenta{bankCount !== 1 ? 's' : ''}
+                        <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.65rem' }}>
+                            {addressCount} dirección{addressCount !== 1 ? 'es' : ''} · {contactCount} contacto{contactCount !== 1 ? 's' : ''}
                         </Typography>
                     </Box>
                 </Box>
