@@ -31,6 +31,8 @@ export class PartnerMapper {
             role,
             dto.payment_method_id,
             dto.type,
+            dto.credit_available ?? false,
+            dto.grouped_billing ?? false,
             Array.isArray(dto.address)
                 ? dto.address.map((addr) => AddressEntity.fromPrimitives(addr))
                 : [],

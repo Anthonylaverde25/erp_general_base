@@ -324,6 +324,8 @@ export default function PartnerDetailDrawer({ open, onClose, partner }: PartnerD
                             <InfoRow label="CIF" value={partner.cif} mono copyable />
                             <InfoRow label="NIF / VAT" value={partner.vat_number} mono copyable />
                             <InfoRow label="Método de Pago" value={paymentMethodName || (partner.payment_method_id ? `#${partner.payment_method_id}` : undefined)} />
+                            <InfoRow label="Crédito" value={partner.credit_available ? 'Sí' : 'No'} />
+                            <InfoRow label="Fact. Agrupada" value={partner.grouped_billing ? 'Sí' : 'No'} />
                         </TableBody>
                     </Table>
 

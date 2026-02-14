@@ -214,5 +214,37 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
                 />
             );
         }
+    },
+    {
+        accessorKey: 'credit_available',
+        header: 'Crédito',
+        size: 100,
+        enableResizing: true,
+        enableColumnFilter: true,
+        Cell: ({ row }) => (
+            <Chip
+                label={row.original.credit_available ? 'Sí' : 'No'}
+                size="small"
+                variant="filled"
+                color={row.original.credit_available ? 'success' : 'default'}
+                sx={{ fontSize: '0.75rem' }}
+            />
+        )
+    },
+    {
+        accessorKey: 'grouped_billing',
+        header: 'Fact. Agrupada',
+        size: 120,
+        enableResizing: true,
+        enableColumnFilter: true,
+        Cell: ({ row }) => (
+            <Chip
+                label={row.original.grouped_billing ? 'Sí' : 'No'}
+                size="small"
+                variant="filled"
+                color={row.original.grouped_billing ? 'success' : 'default'}
+                sx={{ fontSize: '0.75rem' }}
+            />
+        )
     }
 ];

@@ -8,6 +8,8 @@ export const defaultCreatePartnerValues: PartnerFormType = {
     type: 'company',
     role: 'client',
     payment_method_id: '',
+    credit_available: false,
+    grouped_billing: false,
     website: '',
     address_street: '',
     address_city: '',
@@ -34,6 +36,8 @@ export const defaultUpdatePartnerValues = (data?: any): PartnerFormType => {
         type: data?.type || 'company',
         role: data?.role || 'client',
         payment_method_id: String(data?.payment_method_id || ''),
+        credit_available: data?.credit_available ?? false,
+        grouped_billing: data?.grouped_billing ?? false,
         website: data?.website || '',
 
         address_street: defaultAddress?.street || '',

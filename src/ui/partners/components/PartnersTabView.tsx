@@ -7,9 +7,15 @@ import UpdatePartnerModal from "./modals/UpdatePartnerModal";
 import { PartnerType } from "@/domain/entities/partners/DTOs/PartnerDTOs";
 import PartnerDetailDrawer from "./PartnerDetailDrawer";
 
-export default function PartnersTabView() {
+
+interface PartnersTabViewProps {
+    currentTab: string;
+    onTabChange: (event: React.SyntheticEvent, newValue: string) => void;
+}
+
+export default function PartnersTabView({ currentTab, onTabChange }: PartnersTabViewProps) {
     const { data: partners, isLoading } = useIndexPartners();
-    const [currentTab, setCurrentTab] = useState('all');
+    // const [currentTab, setCurrentTab] = useState('all'); // Moved to parent
     const [filteredGeneralType, setFilteredGeneralType] = useState<string>('all');
 
     const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
@@ -19,9 +25,12 @@ export default function PartnersTabView() {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [drawerPartner, setDrawerPartner] = useState<PartnerEntity | null>(null);
 
+    // handleTabChange is now passed as prop
+    /*
     const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
         setCurrentTab(newValue);
     };
+    */
 
     const handleTypeChange = (event: SelectChangeEvent) => {
         setFilteredGeneralType(event.target.value);
@@ -83,7 +92,7 @@ export default function PartnersTabView() {
             <Box className="p-4 flex items-center gap-4" sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
                 <Tabs
                     value={currentTab}
-                    onChange={handleTabChange}
+                    onChange={onTabChange}
                     variant="scrollable"
                     scrollButtons="auto"
                     indicatorColor="secondary"

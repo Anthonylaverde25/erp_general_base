@@ -5,11 +5,22 @@ import PageBreadcrumb from "@/components/PageBreadcrumb";
 
 interface PartnersHeaderProps {
     onCreate?: () => void;
+    selectedTab?: string;
 }
 
+const TAB_TITLES: Record<string, string> = {
+    'all': 'Socios | Todos',
+    'client': 'Socios | Clientes',
+    'supplier': 'Socios | Proveedores',
+    'client_supplier': 'Socios | Clientes-Proveedores',
+    'prospect': 'Socios | Prospectos',
+};
+
 function PartnersHeader(props: PartnersHeaderProps) {
-    const { onCreate } = props;
+    const { onCreate, selectedTab = 'all' } = props;
     const theme = useTheme();
+
+    const title = TAB_TITLES[selectedTab] || 'Socios';
 
     return (
         <Box className='container' sx={{ p: 3, borderBottom: `1px solid ${theme.palette.divider}` }}>
@@ -22,7 +33,7 @@ function PartnersHeader(props: PartnersHeaderProps) {
             >
                 <Box>
                     <Typography variant="h2" className="text-3xl font-bold tracking-tight">
-                        Partners
+                        {title}
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary">
                         Manage your business partners

@@ -1,5 +1,5 @@
 import FusePageCarded from "@fuse/core/FusePageCarded";
-import { lazy } from "react";
+import { lazy, useState, SyntheticEvent } from "react";
 import styled from "styled-components";
 
 const PartnersTabView = lazy(
@@ -15,19 +15,27 @@ const Root = styled(FusePageCarded)(() => ({
 
 
 import PartnersHeader from "../components/PartnersHeader";
-import { useState } from "react";
+// import { lazy, useState, SyntheticEvent } from "react"; // Moved to top
 import { CreatePartnerModal } from "@/app/(control-panel)/partners/CreatePartnerModal";
 
 export default function PartnersPage() {
     const [openCreateModal, setOpenCreateModal] = useState(false);
+    const [currentTab, setCurrentTab] = useState('all');
 
     const handleCreate = () => {
         setOpenCreateModal(true);
     };
 
+    const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
+        setCurrentTab(newValue);
+    };
+
     return (
         <>
-            <Root header={<PartnersHeader onCreate={handleCreate} />} content={<PartnersTabView />} />
+            <Root
+                header={<PartnersHeader onCreate={handleCreate} selectedTab={currentTab} />}
+                content={<PartnersTabView currentTab={currentTab} onTabChange={handleTabChange} />}
+            />
             <CreatePartnerModal open={openCreateModal} handleClose={() => setOpenCreateModal(false)} />
         </>
     );

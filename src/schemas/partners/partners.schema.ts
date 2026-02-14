@@ -8,6 +8,8 @@ export const partnerSchema = z.object({
     type: z.enum(['company', 'person', 'public_organism', 'prospect']),
     role: z.enum(['client', 'supplier', 'client_supplier', 'prospect']),
     payment_method_id: z.string().nonempty('Requerido'),
+    credit_available: z.boolean().optional(),
+    grouped_billing: z.boolean().optional(),
     website: z.string().url('URL inválida').optional().or(z.literal('')),
 
     // Address fields

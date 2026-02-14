@@ -176,6 +176,12 @@ export default function PartnerProfileSidebar({ partner }: PartnerProfileSidebar
 
                         <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>VAT:</Typography>
                         <Typography variant="body2" fontWeight={500} sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{partner.vat_number || '—'}</Typography>
+
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>Crédito:</Typography>
+                        <Typography variant="body2" fontWeight={500} sx={{ fontSize: '0.85rem' }}>{partner.credit_available ? 'Sí' : 'No'}</Typography>
+
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>Fact. Agrupada:</Typography>
+                        <Typography variant="body2" fontWeight={500} sx={{ fontSize: '0.85rem' }}>{partner.grouped_billing ? 'Sí' : 'No'}</Typography>
                     </Box>
                 </Box>
             </Box>
