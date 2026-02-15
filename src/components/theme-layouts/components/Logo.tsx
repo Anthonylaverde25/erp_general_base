@@ -30,8 +30,8 @@ function Logo(props: LogoProps) {
 		<Root className={clsx('flex flex-shrink-0 flex-grow items-center gap-3', className)}>
 			<div className="flex flex-1 items-center gap-2 bg-amber-600">
 				<img
-					className="logo-icon h-6 w-6"
-					src="/assets/images/logo/logo.svg"
+					className="logo-icon h-8 w-8"
+					src="/assets/images/logo/erp-logo.png"
 					alt="logo"
 				/>
 				<div className="logo-text flex flex-auto flex-col gap-0.5">
