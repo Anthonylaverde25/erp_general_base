@@ -10,6 +10,7 @@ export const partnerSchema = z.object({
     payment_method_id: z.string().nonempty('Requerido'),
     credit_available: z.boolean().optional(),
     grouped_billing: z.boolean().optional(),
+    currency_id: z.string().optional(),
     website: z.string().url('URL inválida').optional().or(z.literal('')),
 
     // Address fields

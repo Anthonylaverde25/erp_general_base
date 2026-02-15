@@ -46,7 +46,7 @@ export default function PartnerProfilePage() {
                 <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper' }}>
                     {/* ── TAB: Resumen ─────────────────────────────────── */}
                     {tabValue === 0 && (
-                        <Box className="flex" sx={{ height: '100%' }}>
+                        <Box className="flex flex-col md:flex-row" sx={{ height: { xs: 'auto', md: '100%' } }}>
                             <PartnerProfileSidebar partner={partner} />
                             <PartnerProfileOverview partner={partner} />
                         </Box>

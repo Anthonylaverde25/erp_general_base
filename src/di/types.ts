@@ -109,4 +109,8 @@ export const TYPES = {
   ShowPartnerUseCase: Symbol.for("ShowPartnerUseCase"),
   CreatePartnerUseCase: Symbol.for("CreatePartnerUseCase"),
   UpdatePartnerUseCase: Symbol.for("UpdatePartnerUseCase"),
+
+  // Currencies
+  ICurrencyRepository: Symbol.for("ICurrencyRepository"),
+  IndexCurrenciesUseCase: Symbol.for("IndexCurrenciesUseCase"),
 };

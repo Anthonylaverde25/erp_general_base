@@ -47,9 +47,9 @@ export default function PartnerProfileOverview({ partner }: PartnerProfileOvervi
     const theme = useTheme();
 
     return (
-        <Box sx={{ flex: 1, p: 3, overflowY: 'auto', bgcolor: 'background.paper' }}>
+        <Box sx={{ flex: 1, p: 3, overflowY: { xs: 'visible', md: 'auto' }, bgcolor: 'background.paper' }}>
             {/* Quick Actions */}
-            <Box className="flex items-center justify-end gap-2 mb-4 mt-2">
+            <Box className="flex flex-wrap items-center justify-end gap-2 mb-4 mt-2">
                 {[
                     { icon: <Description fontSize="small" />, label: 'Factura' },
                     { icon: <RequestQuote fontSize="small" />, label: 'Presupuesto' },
@@ -61,6 +61,8 @@ export default function PartnerProfileOverview({ partner }: PartnerProfileOvervi
                         key={item.label}
                         size="small"
                         startIcon={item.icon}
+                        variant="outlined"
+                        color="inherit"
                         sx={{
                             textTransform: 'none',
                             fontWeight: 600,
@@ -69,13 +71,12 @@ export default function PartnerProfileOverview({ partner }: PartnerProfileOvervi
                             py: 0.5,
                             px: 1.5,
                             borderRadius: 0.5,
-                            border: '1px solid',
                             borderColor: 'divider',
                             bgcolor: 'transparent',
                             '&:hover': {
                                 bgcolor: 'action.hover',
                                 color: 'text.primary',
-                                borderColor: 'text.primary'
+                                borderColor: 'divider'
                             }
                         }}
                     >
@@ -90,13 +91,12 @@ export default function PartnerProfileOverview({ partner }: PartnerProfileOvervi
                 sx={{
                     mb: 3,
                     overflow: 'hidden',
-                    border: '1px solid',
                     borderColor: 'divider',
                 }}
             >
-                <Box className="flex" sx={{ minHeight: 350 }}>
+                <Box className="flex flex-col md:flex-row" sx={{ minHeight: 350 }}>
                     {/* Chart area */}
-                    <Box sx={{ flex: 1, p: 3, borderRight: 1, borderColor: 'divider' }}>
+                    <Box sx={{ flex: 1, p: 3, borderRight: { xs: 0, md: 1 }, borderBottom: { xs: 1, md: 0 }, borderColor: 'divider' }}>
                         {/* Legend */}
                         <Box className="flex items-center justify-between" sx={{ mb: 2.5 }}>
                             <Box className="flex items-center gap-4">
@@ -162,7 +162,7 @@ export default function PartnerProfileOverview({ partner }: PartnerProfileOvervi
                     </Box>
 
                     {/* Financial stats */}
-                    <Box sx={{ width: 280, flexShrink: 0, p: 2.5, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <Box sx={{ width: { xs: '100%', md: 280 }, flexShrink: 0, p: 2.5, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                         <Typography variant="overline" fontWeight={700} sx={{ fontSize: '0.6rem', letterSpacing: '0.1em', color: 'text.secondary', mb: 1.5, display: 'block' }}>
                             Resumen Financiero
                         </Typography>
@@ -195,13 +195,11 @@ export default function PartnerProfileOverview({ partner }: PartnerProfileOvervi
                 </Box>
             </Paper>
 
-            {/* Próximas actividades */}
             <Paper
                 variant="outlined"
                 sx={{
                     p: 3,
                     mb: 3,
-                    border: '1px solid',
                     borderColor: 'divider',
                 }}
             >
@@ -224,13 +222,11 @@ export default function PartnerProfileOverview({ partner }: PartnerProfileOvervi
             </Paper>
 
             {/* Bottom row: Oportunidades + Notas */}
-            <Box className="grid grid-cols-2 gap-3">
-                {/* Oportunidades abiertas */}
+            <Box className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <Paper
                     variant="outlined"
                     sx={{
                         p: 3,
-                        border: '1px solid',
                         borderColor: 'divider',
                     }}
                 >
@@ -250,12 +246,10 @@ export default function PartnerProfileOverview({ partner }: PartnerProfileOvervi
                     </Box>
                 </Paper>
 
-                {/* Notas */}
                 <Paper
                     variant="outlined"
                     sx={{
                         p: 3,
-                        border: '1px solid',
                         borderColor: 'divider',
                     }}
                 >

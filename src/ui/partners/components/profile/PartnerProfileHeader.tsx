@@ -52,9 +52,9 @@ export default function PartnerProfileHeader({ partner, tabValue, onTabChange }:
             {/* HEADER ZONE */}
             <Box
                 sx={{
-                    px: 3,
-                    pt: 2,
-                    pb: 2,
+                    px: { xs: 2, md: 3 },
+                    pt: { xs: 2, md: 2 },
+                    pb: { xs: 2, md: 2 },
                     background: `linear-gradient(180deg, ${alpha(accentColor, 0.08)}, transparent)`
                 }}
             >
@@ -64,28 +64,27 @@ export default function PartnerProfileHeader({ partner, tabValue, onTabChange }:
                 </Box>
 
                 {/* Identity row */}
-                <Stack direction="row" spacing={2} alignItems="center" mt={2}>
-
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mt: 2, alignItems: { xs: 'flex-start', sm: 'center' } }}>
 
                     <Avatar
                         sx={{
-                            width: 56,
-                            height: 56,
+                            width: { xs: 48, sm: 56 },
+                            height: { xs: 48, sm: 56 },
                             bgcolor: alpha(accentColor, 0.15),
                             color: accentColor,
-                            fontSize: 28,
+                            fontSize: { xs: 24, sm: 28 },
                             fontWeight: 700
                         }}
                     >
                         {typeIcons[partner.type] || typeIcons['company']}
                     </Avatar>
 
-                    <Box className='flex w-full justify-between'>
+                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, width: '100%', justifyContent: 'space-between', gap: 2 }}>
                         <Box>
                             <Typography
                                 variant="h5"
                                 fontWeight={700}
-                                sx={{ lineHeight: 1.1 }}
+                                sx={{ lineHeight: 1.1, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
                             >
                                 {name}
                             </Typography>
@@ -99,7 +98,7 @@ export default function PartnerProfileHeader({ partner, tabValue, onTabChange }:
                                 </Typography>
                             )}
 
-                            <Stack className='' direction="row" spacing={1} mt={1}>
+                            <Stack direction="row" spacing={1} mt={1} flexWrap="wrap" useFlexGap>
                                 <Chip
                                     label={roleLabels[partner.role] || partner.role}
                                     size="small"
@@ -118,27 +117,25 @@ export default function PartnerProfileHeader({ partner, tabValue, onTabChange }:
                             </Stack>
                         </Box>
 
-                        <Box className='flex items-center gap-2'>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, alignSelf: { xs: 'flex-start', sm: 'center' } }}>
                             <PartnerCreateActionMenu />
                             <Tooltip title="Copiar ID">
-                                <IconButton>
-                                    <ContentCopy fontSize="medium" />
+                                <IconButton size="small">
+                                    <ContentCopy fontSize="small" />
                                 </IconButton>
                             </Tooltip>
 
-                            <IconButton>
-                                <MoreVert fontSize="medium" />
+                            <IconButton size="small">
+                                <MoreVert fontSize="small" />
                             </IconButton>
                         </Box>
-
-
                     </Box>
-                </Stack>
+                </Box>
             </Box>
 
             {/* <Divider /> */}
 
-            <Box className='flex items-center gap-2 px-3 pb-3'>
+            <Box className='flex items-center gap-2 px-3 pb-3' sx={{ flexWrap: 'wrap' }}>
                 {['Resumen', 'Impuestos', 'Archivos'].map((label, index) => {
                     const isActive = tabValue === index;
                     return (

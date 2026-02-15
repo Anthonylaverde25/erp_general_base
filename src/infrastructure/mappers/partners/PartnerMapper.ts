@@ -33,6 +33,7 @@ export class PartnerMapper {
             dto.type,
             dto.credit_available ?? false,
             dto.grouped_billing ?? false,
+            dto.currency_id ?? null,
             Array.isArray(dto.address)
                 ? dto.address.map((addr) => AddressEntity.fromPrimitives(addr))
                 : [],

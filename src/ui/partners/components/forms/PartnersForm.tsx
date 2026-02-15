@@ -33,6 +33,7 @@ import useIndexPaymentMethods from '@/features/payment_methods/hooks/useIndexPay
 import { CreatePartnerDTO, UpdatePartnerDTO, PartnerType } from '@/domain/entities/partners/DTOs/PartnerDTOs';
 import useActiveCompany from "@/features/companies/useActiveCompany";
 import { useIndexTaxRates } from '@/features/tax_rates/hooks/useIndexTaxRates';
+import useIndexCurrencies from '@/features/currencies/hooks/useIndexCurrencies';
 
 import { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import { mapPartnerFormToDTO } from './PartnerForm.utils';
@@ -51,6 +52,7 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
     const activeCompany = useActiveCompany();
     const [tabValue, setTabValue] = useState(0);
     const { data: taxRates } = useIndexTaxRates();
+    const { currencies } = useIndexCurrencies();
     const [publicOrganisms, setPublicOrganisms] = useState<PublicOrganism[]>([]);
     const [organismModalOpen, setOrganismModalOpen] = useState(false);
 
@@ -635,6 +637,30 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
                                                         {paymentMethods?.map((pm: any) => (
                                                             <MenuItem key={pm.id} value={String(pm.id)}>
                                                                 {pm.name}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </TextField>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className="col-span-12 sm:col-span-6">
+                                            <Controller
+                                                name="currency_id"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <TextField
+                                                        {...field}
+                                                        {...textFieldProps}
+                                                        select
+                                                        label="Moneda"
+                                                        disabled={isLoading}
+                                                    >
+                                                        <MenuItem value="">
+                                                            <em>Sin especificar</em>
+                                                        </MenuItem>
+                                                        {currencies?.map((currency) => (
+                                                            <MenuItem key={currency.id} value={String(currency.id)}>
+                                                                {currency.name} ({currency.symbol})
                                                             </MenuItem>
                                                         ))}
                                                     </TextField>

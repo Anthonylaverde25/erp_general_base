@@ -24,6 +24,7 @@ export interface PartnerDTO {
     type: PartnerType;
     credit_available: boolean;
     grouped_billing: boolean;
+    currency_id?: number | null;
     website?: string;
     address: any[]; // We will map this in the mapper
     contact: any[]; // We will map this in the mapper
@@ -44,6 +45,7 @@ export interface CreatePartnerDTO {
     type: PartnerType;
     credit_available: boolean;
     grouped_billing: boolean;
+    currency_id?: number | null;
     website?: string;
     address?: CreateAddressDTO[];
     contact?: CreateContactDTO[];
@@ -63,6 +65,7 @@ export interface UpdatePartnerDTO {
     type?: PartnerType;
     credit_available?: boolean;
     grouped_billing?: boolean;
+    currency_id?: number | null;
     website?: string;
     address?: CreateAddressDTO[];
     contact?: CreateContactDTO[];

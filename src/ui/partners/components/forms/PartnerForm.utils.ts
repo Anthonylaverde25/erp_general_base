@@ -37,6 +37,7 @@ export const mapPartnerFormToDTO = (values: PartnerFormType, companyId: number):
         payment_method_id: Number(values.payment_method_id),
         credit_available: values.credit_available ?? false,
         grouped_billing: values.grouped_billing ?? false,
+        currency_id: values.currency_id ? Number(values.currency_id) : undefined,
         website: values.website || '',
         address: address.length > 0 ? address : undefined,
         contact: contact.length > 0 ? contact : undefined,

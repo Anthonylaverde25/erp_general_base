@@ -17,6 +17,7 @@ export interface Partner {
     type: PartnerType;
     credit_available: boolean;
     grouped_billing: boolean;
+    currency_id?: number | null;
     address: IAddress[];
     contact: IContact[];
     bank_accounts: IBankAccount[];
@@ -36,6 +37,7 @@ export class PartnerEntity implements Partner {
     private _type: PartnerType;
     private _credit_available: boolean;
     private _grouped_billing: boolean;
+    private _currency_id?: number | null;
     private _address: AddressEntity[];
     private _contact: ContactEntity[];
     private _bank_accounts: BankAccountEntity[];
@@ -54,6 +56,7 @@ export class PartnerEntity implements Partner {
         type: PartnerType,
         credit_available: boolean,
         grouped_billing: boolean,
+        currency_id: number | null | undefined,
         address: AddressEntity[],
         contact: ContactEntity[],
         bank_accounts: BankAccountEntity[],
@@ -71,6 +74,7 @@ export class PartnerEntity implements Partner {
         this._type = type;
         this._credit_available = credit_available;
         this._grouped_billing = grouped_billing;
+        this._currency_id = currency_id;
         this._address = address;
         this._contact = contact;
         this._bank_accounts = bank_accounts;
@@ -120,6 +124,10 @@ export class PartnerEntity implements Partner {
 
     get grouped_billing(): boolean {
         return this._grouped_billing;
+    }
+
+    get currency_id(): number | null | undefined {
+        return this._currency_id;
     }
 
     get address(): AddressEntity[] {
@@ -172,6 +180,7 @@ export class PartnerEntity implements Partner {
             data.type,
             data.credit_available ?? false,
             data.grouped_billing ?? false,
+            data.currency_id ?? null,
             data.address ? data.address.map((addr: any) => AddressEntity.fromPrimitives(addr)) : [],
             data.contact ? data.contact.map((cnt: any) => ContactEntity.fromPrimitives(cnt)) : [],
             data.bank_accounts ? data.bank_accounts.map((acc: any) => BankAccountEntity.fromPrimitives(acc)) : [],
@@ -193,6 +202,7 @@ export class PartnerEntity implements Partner {
             data.type,
             data.credit_available ?? false,
             data.grouped_billing ?? false,
+            data.currency_id ?? null,
             data.address ? data.address.map(addr => AddressEntity.create(addr)) : [],
             data.contact ? data.contact.map(cnt => ContactEntity.create(cnt)) : [],
             data.bank_accounts ? data.bank_accounts.map(acc => BankAccountEntity.create(acc)) : [],
@@ -214,6 +224,7 @@ export class PartnerEntity implements Partner {
             data.type || 'prospect',
             data.credit_available ?? false,
             data.grouped_billing ?? false,
+            data.currency_id ?? null,
             data.address ? data.address.map(addr => AddressEntity.fromPrimitives(addr)) : [],
             data.contact ? data.contact.map(cnt => ContactEntity.fromPrimitives(cnt)) : [],
             data.bank_accounts ? data.bank_accounts.map(acc => BankAccountEntity.fromPrimitives(acc)) : [],
@@ -235,6 +246,7 @@ export class PartnerEntity implements Partner {
             type: this._type,
             credit_available: this._credit_available,
             grouped_billing: this._grouped_billing,
+            currency_id: this._currency_id,
             address: this._address.map(addr => addr.toPlainObject()),
             contact: this._contact.map(cnt => cnt.toPlainObject()),
             bank_accounts: this._bank_accounts.map(acc => acc.toPlainObject()),
