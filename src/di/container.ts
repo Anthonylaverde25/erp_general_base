@@ -15,6 +15,7 @@ import { registerTaxRatesModule } from "./modules/tax_rates.module";
 import { registerFamilyModule } from "./modules/family.module";
 import { registerPartnerModule } from "./modules/partner.module";
 import { registerCurrenciesModule } from "./modules/currencies.module";
+import { registerItemModule } from "./modules/item.module";
 
 const container = new Container();
 
@@ -34,5 +35,6 @@ registerTaxRatesModule(container);
 registerFamilyModule(container);
 registerPartnerModule(container);
 registerCurrenciesModule(container);
+registerItemModule(container);
 
 export { container };

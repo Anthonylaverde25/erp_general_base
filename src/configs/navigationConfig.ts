@@ -27,6 +27,14 @@ const navigationConfig: FuseNavItemType[] = [
 		url: '/partners'
 	},
 	{
+		id: 'items',
+		title: 'Items',
+		translate: 'ITEMS',
+		type: 'item',
+		icon: 'heroicons-outline:cube',
+		url: '/items'
+	},
+	{
 		id: 'operations',
 		title: 'Operations',
 		translate: 'OPERATIONS',

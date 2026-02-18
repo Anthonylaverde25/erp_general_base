@@ -113,4 +113,11 @@ export const TYPES = {
   // Currencies
   ICurrencyRepository: Symbol.for("ICurrencyRepository"),
   IndexCurrenciesUseCase: Symbol.for("IndexCurrenciesUseCase"),
+
+  // Items
+  ItemRepository: Symbol.for("ItemRepository"),
+  IndexItemsUseCase: Symbol.for("IndexItemsUseCase"),
+  ShowItemUseCase: Symbol.for("ShowItemUseCase"),
+  CreateItemUseCase: Symbol.for("CreateItemUseCase"),
+  UpdateItemUseCase: Symbol.for("UpdateItemUseCase"),
 };
