@@ -1,4 +1,5 @@
 import { CreateItemDTO, ItemType, ItemTaxRate } from "./DTOs/ItemDTOs";
+import { CategoryEntity } from "../categories/CategoryEntity";
 
 export interface Item {
     id: number;
@@ -6,12 +7,13 @@ export interface Item {
     name: string;
     type: ItemType;
     unit_name: string;
-    category_name: string;
+    category: CategoryEntity;
     sale_price: number;
     is_active: boolean;
     tax_rates: ItemTaxRate[];
     description?: string;
     purchase_price?: number;
+
 }
 
 export class ItemEntity implements Item {
@@ -20,7 +22,7 @@ export class ItemEntity implements Item {
     private _name: string;
     private _type: ItemType;
     private _unit_name: string;
-    private _category_name: string;
+    private _category: CategoryEntity;
     private _sale_price: number;
     private _is_active: boolean;
     private _tax_rates: ItemTaxRate[];
@@ -33,7 +35,7 @@ export class ItemEntity implements Item {
         name: string,
         type: ItemType,
         unit_name: string,
-        category_name: string,
+        category: CategoryEntity,
         sale_price: number,
         is_active: boolean,
         tax_rates: ItemTaxRate[],
@@ -45,7 +47,7 @@ export class ItemEntity implements Item {
         this._name = name;
         this._type = type;
         this._unit_name = unit_name;
-        this._category_name = category_name;
+        this._category = category;
         this._sale_price = sale_price;
         this._is_active = is_active;
         this._tax_rates = tax_rates;
@@ -58,7 +60,7 @@ export class ItemEntity implements Item {
     get name(): string { return this._name; }
     get type(): ItemType { return this._type; }
     get unit_name(): string { return this._unit_name; }
-    get category_name(): string { return this._category_name; }
+    get category(): CategoryEntity { return this._category; }
     get sale_price(): number { return this._sale_price; }
     get is_active(): boolean { return this._is_active; }
     get tax_rates(): ItemTaxRate[] { return this._tax_rates; }
@@ -72,7 +74,7 @@ export class ItemEntity implements Item {
             data.name,
             data.type,
             data.unit_name,
-            data.category_name,
+            CategoryEntity.fromPrimitives(data.category),
             Number(data.sale_price),
             Boolean(data.is_active),
             data.tax_rates || [],
@@ -88,7 +90,7 @@ export class ItemEntity implements Item {
             data.name,
             data.type,
             "", // unit_name not available on create DTO
-            "", // category_name not available on create DTO
+            CategoryEntity.create({ name: "" }), // Placeholder category
             data.sale_price,
             data.is_active,
             [], // tax_rates not available on create DTO
@@ -104,7 +106,7 @@ export class ItemEntity implements Item {
             name: this._name,
             type: this._type,
             unit_name: this._unit_name,
-            category_name: this._category_name,
+            category: this._category.toPlainObject(), // Fix type mapping
             sale_price: this._sale_price,
             is_active: this._is_active,
             tax_rates: this._tax_rates,

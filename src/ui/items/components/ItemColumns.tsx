@@ -95,14 +95,14 @@ export const ItemColumns: MRT_ColumnDef<ItemEntity>[] = [
         }
     },
     {
-        accessorKey: 'category_name',
+        accessorKey: 'category.name', // Access nested property
         header: 'Category',
         size: 150,
         enableResizing: true,
         enableColumnFilter: true,
         Cell: ({ row }) => (
             <Typography variant="body2">
-                {row.original.category_name || '-'}
+                {row.original.category?.name || '-'}
             </Typography>
         )
     },

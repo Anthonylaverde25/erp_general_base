@@ -10,6 +10,7 @@ import { registerStoreModule } from "./modules/store.module";
 import { registerDocumentTypeModule } from "./modules/document_type.module";
 import { registerNumberSeriesModule } from "./modules/number_series.module";
 import { registerTaxTypesModule } from "./modules/tax_types.module";
+import { registerCategoryModule } from "./modules/categories.module";
 
 import { registerTaxRatesModule } from "./modules/tax_rates.module";
 import { registerFamilyModule } from "./modules/family.module";
@@ -31,6 +32,7 @@ registerStoreModule(container);
 registerDocumentTypeModule(container);
 registerNumberSeriesModule(container);
 registerTaxTypesModule(container);
+registerCategoryModule(container);
 registerTaxRatesModule(container);
 registerFamilyModule(container);
 registerPartnerModule(container);

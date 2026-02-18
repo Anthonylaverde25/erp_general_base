@@ -4,11 +4,23 @@ import PageBreadcrumb from "@/components/PageBreadcrumb";
 
 interface ItemsHeaderProps {
     onCreate?: () => void;
+    currentTab?: string;
 }
 
 function ItemsHeader(props: ItemsHeaderProps) {
-    const { onCreate } = props;
+    const { onCreate, currentTab } = props;
     const theme = useTheme();
+
+    const getButtonText = () => {
+        switch (currentTab) {
+            case 'physical':
+                return 'Crear Producto';
+            case 'service':
+                return 'Crear Servicio';
+            default:
+                return 'Crear Item';
+        }
+    };
 
     return (
         <Box className='container' sx={{ p: 3, borderBottom: `1px solid ${theme.palette.divider}` }}>
@@ -37,7 +49,7 @@ function ItemsHeader(props: ItemsHeaderProps) {
                     }
                     onClick={onCreate}
                 >
-                    Create Item
+                    {getButtonText()}
                 </Button>
             </Stack>
         </Box>
