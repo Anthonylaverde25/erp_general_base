@@ -1,15 +1,19 @@
-export const useIndexUnits = () => {
-    // Placeholder implementation
-    const units = [
-        { id: 1, name: 'Unidad' },
-        { id: 2, name: 'Kg' },
-        { id: 3, name: 'Litro' },
-        { id: 4, name: 'Metro' },
-    ];
-    const isLoading = false;
+import { useQuery } from "@tanstack/react-query";
+import { container } from "@/di/container";
+import { TYPES } from "@/di/types";
+import { IndexUnitsUseCase } from "@/application/useCases/units/IndexUnitsUseCase";
+import { UnitEntity } from "@/domain/entities/units/UnitEntity";
+import useActiveCompany from "@/features/companies/useActiveCompany";
 
-    return {
-        units,
-        isLoading
-    };
-};
+export function useIndexUnits() {
+    const useCase = container.get<IndexUnitsUseCase>(TYPES.IndexUnitsUseCase);
+    const activeCompany = useActiveCompany();
+
+    const { data: units = [], isLoading } = useQuery<UnitEntity[], Error>({
+        queryKey: ["units", activeCompany?.id],
+        queryFn: () => useCase.execute(),
+        enabled: !!activeCompany?.id,
+    });
+
+    return { units, isLoading };
+}

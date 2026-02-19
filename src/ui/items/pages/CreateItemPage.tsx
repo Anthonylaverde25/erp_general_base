@@ -38,6 +38,7 @@ function CreateItemPage() {
 
     const { handleCreateItem, isLoading: isCreating } = useCreateItem();
     const { categories } = useIndexCategories();
+    console.log('categories', categories)
     const { units } = useIndexUnits();
     const { data: taxRates } = useIndexTaxRates();
     const { data: families = [] } = useIndexFamilies();

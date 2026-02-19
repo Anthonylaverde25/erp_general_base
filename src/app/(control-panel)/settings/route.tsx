@@ -43,6 +43,14 @@ const FamiliesPage = lazy(
 const PartnersPage = lazy(
   () => import("@/ui/partners/pages/PartnersPage"),
 );
+const CategoriesPage = lazy(
+  () => import("@/ui/categories/pages/CategoriesPage"),
+);
+const SubcategoriesPage = lazy(
+  () => import("@/ui/categories/pages/SubcategoriesPage"),
+);
+const UnitTypesPage = lazy(() => import("@/ui/unit_types/pages/UnitTypesPage"));
+const UnitsPage = lazy(() => import("@/ui/units/pages/UnitsPage"));
 
 /**
  * The Settings App Route.
@@ -114,6 +122,22 @@ const Route: FuseRouteItemType = {
     {
       path: "partners",
       element: <PartnersPage />,
+    },
+    {
+      path: "categories",
+      element: <CategoriesPage />,
+    },
+    {
+      path: "subcategories",
+      element: <SubcategoriesPage />,
+    },
+    {
+      path: "unit-types",
+      element: <UnitTypesPage />,
+    },
+    {
+      path: "units",
+      element: <UnitsPage />,
     },
     {
       path: "",

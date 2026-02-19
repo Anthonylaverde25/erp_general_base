@@ -124,4 +124,23 @@ export const TYPES = {
   // Categories
   CategoryRepository: Symbol.for("CategoryRepository"),
   IndexCategoriesUseCase: Symbol.for("IndexCategoriesUseCase"),
+  CreateCategoryUseCase: Symbol.for("CreateCategoryUseCase"),
+  UpdateCategoryUseCase: Symbol.for("UpdateCategoryUseCase"),
+  ShowCategoryUseCase: Symbol.for("ShowCategoryUseCase"),
+  CategoryActionRepository: Symbol.for("CategoryActionRepository"),
+  ToggleCategoryStatusUseCase: Symbol.for("ToggleCategoryStatusUseCase"),
+
+  // Unit Types
+  UnitTypeRepository: Symbol.for("UnitTypeRepository"),
+  IndexUnitTypesUseCase: Symbol.for("IndexUnitTypesUseCase"),
+  CreateUnitTypeUseCase: Symbol.for("CreateUnitTypeUseCase"),
+  UpdateUnitTypeUseCase: Symbol.for("UpdateUnitTypeUseCase"),
+  DeleteUnitTypeUseCase: Symbol.for("DeleteUnitTypeUseCase"),
+
+  // Units
+  UnitRepository: Symbol.for("UnitRepository"),
+  IndexUnitsUseCase: Symbol.for("IndexUnitsUseCase"),
+  CreateUnitUseCase: Symbol.for("CreateUnitUseCase"),
+  UpdateUnitUseCase: Symbol.for("UpdateUnitUseCase"),
+  DeleteUnitUseCase: Symbol.for("DeleteUnitUseCase"),
 };

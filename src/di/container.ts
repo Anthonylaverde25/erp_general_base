@@ -39,4 +39,9 @@ registerPartnerModule(container);
 registerCurrenciesModule(container);
 registerItemModule(container);
 
+import { UnitTypeModule } from "./modules/unit_types.module";
+import { UnitsModule } from "./modules/units.module";
+UnitTypeModule(container);
+UnitsModule(container);
+
 export { container };
