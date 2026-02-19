@@ -7,7 +7,8 @@ export class UnitEntity {
         public readonly unit_type_id: number,
         public readonly code: string,
         public readonly name: string,
-        public readonly unit_type_name?: string
+        public readonly unit_type_name?: string,
+        public readonly unit_type_applicability?: 'physical' | 'service' | 'both'
     ) { }
 
     static fromPrimitives(data: UnitDTO): UnitEntity {
@@ -17,7 +18,8 @@ export class UnitEntity {
             data.unit_type_id,
             data.code,
             data.name,
-            data.unit_type?.name
+            data.unit_type?.name,
+            data.unit_type?.applicability
         );
     }
 
@@ -38,7 +40,11 @@ export class UnitEntity {
             unit_type_id: this.unit_type_id,
             code: this.code,
             name: this.name,
-            unit_type: this.unit_type_name ? { id: this.unit_type_id, name: this.unit_type_name } : undefined
+            unit_type: this.unit_type_name ? {
+                id: this.unit_type_id,
+                name: this.unit_type_name,
+                applicability: this.unit_type_applicability || 'both'
+            } : undefined
         };
     }
 }

@@ -8,7 +8,9 @@ export class UnitTypeMapper {
             company_id: dto.company_id,
             name: dto.name,
             description: dto.description,
+            applicability: dto.applicability,
             is_active: Boolean(dto.is_active),
+            units: dto.units
         });
     }
 
@@ -24,6 +26,7 @@ export class UnitTypeMapper {
         return {
             name: data.name,
             description: data.description,
+            applicability: data.applicability,
             is_active: data.is_active,
         };
     }
@@ -32,6 +35,7 @@ export class UnitTypeMapper {
         return {
             name: data.name,
             description: data.description,
+            applicability: data.applicability,
             is_active: data.is_active,
         };
     }

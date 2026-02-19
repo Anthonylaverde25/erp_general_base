@@ -11,7 +11,8 @@ export class UnitMapper {
             name: dto.name,
             unit_type: dto.unit_type ? {
                 id: dto.unit_type.id,
-                name: dto.unit_type.name
+                name: dto.unit_type.name,
+                applicability: dto.unit_type.applicability
             } : undefined
         });
     }

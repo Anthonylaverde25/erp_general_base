@@ -1,4 +1,5 @@
-import { CreateUnitTypeDTO, UnitTypeDTO } from "./DTOs/UnitTypeDTOs";
+import { CreateUnitTypeDTO, UnitTypeDTO, UnitTypeApplicability } from "./DTOs/UnitTypeDTOs";
+import { UnitEntity } from "../units/UnitEntity";
 
 export class UnitTypeEntity {
     constructor(
@@ -6,7 +7,9 @@ export class UnitTypeEntity {
         public readonly company_id: number,
         public readonly name: string,
         public readonly description: string | null,
-        public readonly is_active: boolean
+        public readonly applicability: UnitTypeApplicability,
+        public readonly is_active: boolean,
+        public readonly units: UnitEntity[] = []
     ) { }
 
     static fromPrimitives(data: UnitTypeDTO): UnitTypeEntity {
@@ -15,7 +18,9 @@ export class UnitTypeEntity {
             data.company_id,
             data.name,
             data.description,
-            data.is_active
+            data.applicability,
+            data.is_active,
+            data.units ? data.units.map(u => UnitEntity.fromPrimitives(u)) : []
         );
     }
 
@@ -25,7 +30,9 @@ export class UnitTypeEntity {
             0, // Temporary Company ID
             data.name,
             data.description || null,
-            data.is_active ?? true
+            data.applicability,
+            data.is_active ?? true,
+            []
         );
     }
 
@@ -35,7 +42,9 @@ export class UnitTypeEntity {
             company_id: this.company_id,
             name: this.name,
             description: this.description,
-            is_active: this.is_active
+            applicability: this.applicability,
+            is_active: this.is_active,
+            units: this.units.map(u => u.toPlainObject())
         };
     }
 }

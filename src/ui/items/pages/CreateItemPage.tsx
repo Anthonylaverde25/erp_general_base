@@ -14,7 +14,8 @@ import {
     Checkbox,
     FormControlLabel,
     Switch,
-    IconButton
+    IconButton,
+    ListSubheader
 } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { Save, CloudUpload } from '@mui/icons-material';
@@ -25,7 +26,8 @@ import { itemSchema, ItemFormType } from '@/schemas/items/items.schema';
 import { defaultCreateItemValues } from '@/schemas/items/items.defaults';
 import { useCreateItem } from '@/features/items/hooks/useCreateItem';
 import { useIndexCategories } from '@/features/categories/hooks/useIndexCategories';
-import { useIndexUnits } from '@/features/units/hooks/useIndexUnits';
+// import { useIndexUnits } from '@/features/units/hooks/useIndexUnits'; // Removed
+import { useIndexUnitTypes } from '@/features/unit_types/hooks/useIndexUnitTypes';
 import { useIndexTaxRates } from '@/features/tax_rates/hooks/useIndexTaxRates';
 import { useIndexFamilies } from '@/features/families/hooks/useIndexFamilies';
 import { mapItemFormToDTO } from "../components/forms/ItemForm.utils";
@@ -38,8 +40,8 @@ function CreateItemPage() {
 
     const { handleCreateItem, isLoading: isCreating } = useCreateItem();
     const { categories } = useIndexCategories();
-    console.log('categories', categories)
-    const { units } = useIndexUnits();
+    // console.log('categories', categories)
+    const { unitTypes } = useIndexUnitTypes();
     const { data: taxRates } = useIndexTaxRates();
     const { data: families = [] } = useIndexFamilies();
 
@@ -317,7 +319,7 @@ function CreateItemPage() {
                                         />
                                     </div>
 
-                                    <div className="col-span-12 sm:col-span-6">
+                                    <div className="col-span-12">
                                         <Controller
                                             name="unit_id"
                                             control={control}
@@ -330,15 +332,38 @@ function CreateItemPage() {
                                                     error={!!errors.unit_id}
                                                     helperText={errors.unit_id?.message}
                                                     disabled={isLoading}
+                                                    required
+                                                    SelectProps={{
+                                                        MenuProps: {
+                                                            PaperProps: {
+                                                                sx: {
+                                                                    maxHeight: 400,
+                                                                    minWidth: 450
+                                                                }
+                                                            }
+                                                        }
+                                                    }}
                                                 >
                                                     <MenuItem value="">
                                                         <em>Sin unidad</em>
                                                     </MenuItem>
-                                                    {units.map((unit) => (
-                                                        <MenuItem key={unit.id} value={String(unit.id)}>
-                                                            {unit.name}
-                                                        </MenuItem>
-                                                    ))}
+                                                    {unitTypes.filter(type => {
+                                                        const typeApplicability = type.applicability;
+                                                        if (typeApplicability === 'both') return true;
+                                                        return typeApplicability === itemType;
+                                                    }).map((type) => {
+                                                        if (!type.units || type.units.length === 0) return null;
+                                                        return [
+                                                            <ListSubheader key={`header-${type.id}`} className="font-bold text-primary bg-transparent">
+                                                                {type.name}
+                                                            </ListSubheader>,
+                                                            ...type.units.map(unit => (
+                                                                <MenuItem key={unit.id} value={String(unit.id)} className="pl-8">
+                                                                    {unit.name} ({unit.code})
+                                                                </MenuItem>
+                                                            ))
+                                                        ];
+                                                    })}
                                                 </TextField>
                                             )}
                                         />

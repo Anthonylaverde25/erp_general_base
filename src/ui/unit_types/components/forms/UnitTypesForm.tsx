@@ -56,6 +56,7 @@ export function UnitTypesForm({ mode, data, onCancel, onSuccess }: UnitTypesForm
             const createData: CreateUnitTypeDTO = {
                 name: values.name,
                 description: values.description,
+                applicability: values.applicability,
                 is_active: values.is_active,
             };
             createUnitType.mutate(createData, {

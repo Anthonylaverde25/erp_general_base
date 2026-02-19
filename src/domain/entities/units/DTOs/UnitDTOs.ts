@@ -7,6 +7,7 @@ export interface UnitDTO {
     unit_type?: {
         id: number;
         name: string;
+        applicability: 'physical' | 'service' | 'both';
     };
 }
 
