@@ -1,13 +1,15 @@
 import { CreateItemDTO, ItemDTO, ItemType, ItemTaxRate } from "./DTOs/ItemDTOs";
 import { CategoryEntity } from "../categories/CategoryEntity";
+import { CategoryDTO } from "../categories/DTOs/CategoryDTOs";
 
 export interface Item {
     id: number;
     sku: string;
     name: string;
+    image?: string;
     type: ItemType;
     unit_name: string;
-    category: CategoryEntity;
+    category: CategoryDTO;
     sale_price: number;
     is_active: boolean;
     tax_rates: ItemTaxRate[];
@@ -20,6 +22,7 @@ export class ItemEntity implements Item {
     private _id: number;
     private _sku: string;
     private _name: string;
+    private _image?: string;
     private _type: ItemType;
     private _unit_name: string;
     private _category: CategoryEntity;
@@ -33,6 +36,7 @@ export class ItemEntity implements Item {
         id: number,
         sku: string,
         name: string,
+        image: string | undefined,
         type: ItemType,
         unit_name: string,
         category: CategoryEntity,
@@ -45,6 +49,7 @@ export class ItemEntity implements Item {
         this._id = id;
         this._sku = sku;
         this._name = name;
+        this._image = image;
         this._type = type;
         this._unit_name = unit_name;
         this._category = category;
@@ -58,6 +63,7 @@ export class ItemEntity implements Item {
     get id(): number { return this._id; }
     get sku(): string { return this._sku; }
     get name(): string { return this._name; }
+    get image(): string | undefined { return this._image; }
     get type(): ItemType { return this._type; }
     get unit_name(): string { return this._unit_name; }
     get category(): CategoryEntity { return this._category; }
@@ -76,6 +82,7 @@ export class ItemEntity implements Item {
             data.id,
             data.sku,
             data.name,
+            data.image,
             data.type,
             data.unit_name,
             category,
@@ -92,6 +99,7 @@ export class ItemEntity implements Item {
             0,
             data.sku,
             data.name,
+            undefined,
             data.type,
             "", // unit_name not available on create DTO
             CategoryEntity.create({ name: "" }), // Placeholder category
@@ -108,6 +116,7 @@ export class ItemEntity implements Item {
             id: this._id,
             sku: this._sku,
             name: this._name,
+            image: this._image,
             type: this._type,
             unit_name: this._unit_name,
             category: this._category.toPlainObject(), // Fix type mapping

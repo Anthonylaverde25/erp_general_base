@@ -35,6 +35,7 @@ export const ItemColumns: MRT_ColumnDef<ItemEntity>[] = [
             return (
                 <Box className="flex items-center gap-3 py-1">
                     <Avatar
+                        src={item.image}
                         sx={{
                             width: 38,
                             height: 38,

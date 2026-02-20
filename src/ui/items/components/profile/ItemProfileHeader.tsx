@@ -1,4 +1,4 @@
-import { Box, Button, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { Avatar, Box, Button, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { ContentCopy, MoreVert, Refresh } from '@mui/icons-material';
 import PageBreadcrumb from '@/components/PageBreadcrumb';
 import { ItemEntity } from '@/domain/entities/items/ItemEntity';
@@ -10,6 +10,23 @@ interface ItemProfileHeaderProps {
 }
 
 export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemProfileHeaderProps) {
+	const getInitials = (text: string) => {
+		const parts = text.trim().split(' ');
+		if (parts.length >= 2) {
+			return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+		}
+		return text.substring(0, 2).toUpperCase();
+	};
+
+	const stringToColor = (str: string) => {
+		let hash = 0;
+		for (let i = 0; i < str.length; i += 1) {
+			hash = str.charCodeAt(i) + ((hash << 5) - hash);
+		}
+		const hue = hash % 360;
+		return `hsl(${hue}, 65%, 50%)`;
+	};
+
 	return (
 		<Box sx={{ width: '100%', borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
 			<Box
@@ -38,7 +55,22 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 						mt: 2
 					}}
 				>
-					<Box>
+					<Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
+						<Avatar
+							src={item.image}
+							variant="rounded"
+							sx={{
+								width: 56,
+								height: 56,
+								bgcolor: stringToColor(item.name || 'item'),
+								fontWeight: 700,
+								fontSize: '1rem',
+								flexShrink: 0
+							}}
+						>
+							{getInitials(item.name || 'Item')}
+						</Avatar>
+						<Box>
 						<Typography
 							variant="h5"
 							fontWeight={700}
@@ -71,6 +103,7 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 								sx={{ color: item.is_active ? '#15803d' : '#b91c1c' }}
 							/>
 						</Stack>
+						</Box>
 					</Box>
 
 					<Box
