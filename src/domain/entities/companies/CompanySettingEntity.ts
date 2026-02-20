@@ -6,6 +6,7 @@ export class CompanySettingEntity implements ICompanySetting {
     private _maxStorageMb: number;
     private _currency: string;
     private _timezone: string;
+    private _defaultStoreId?: number | null;
 
     constructor(props: ICompanySetting) {
         this._id = props.id;
@@ -13,6 +14,7 @@ export class CompanySettingEntity implements ICompanySetting {
         this._maxStorageMb = props.maxStorageMb;
         this._currency = props.currency;
         this._timezone = props.timezone;
+        this._defaultStoreId = props.defaultStoreId;
     }
 
 
@@ -36,6 +38,10 @@ export class CompanySettingEntity implements ICompanySetting {
         return this._timezone;
     }
 
+    get defaultStoreId(): number | null | undefined {
+        return this._defaultStoreId;
+    }
+
     set id(id: number) {
         this._id = id;
     }
@@ -54,6 +60,10 @@ export class CompanySettingEntity implements ICompanySetting {
 
     set timezone(timezone: string) {
         this._timezone = timezone;
+    }
+
+    set defaultStoreId(defaultStoreId: number | null | undefined) {
+        this._defaultStoreId = defaultStoreId;
     }
 
 

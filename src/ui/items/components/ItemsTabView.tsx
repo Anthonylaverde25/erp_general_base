@@ -1,8 +1,9 @@
 import { Box, Tabs, Tab } from "@mui/material";
 import { useIndexItems } from "@/features/items/hooks/useIndexItems";
 import ItemTable from "./ItemTable";
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { ItemEntity } from "@/domain/entities/items/ItemEntity";
+import { useNavigate } from "react-router";
 
 interface ItemsTabViewProps {
     currentTab: string;
@@ -10,6 +11,7 @@ interface ItemsTabViewProps {
 }
 
 export default function ItemsTabView({ currentTab, onTabChange }: ItemsTabViewProps) {
+    const navigate = useNavigate();
     const { data: items, isLoading } = useIndexItems();
 
     const filteredItems = useMemo(() => {
@@ -32,15 +34,17 @@ export default function ItemsTabView({ currentTab, onTabChange }: ItemsTabViewPr
     }, [items, currentTab]);
 
     const handleEdit = (item: ItemEntity) => {
-        console.log("Edit item", item);
+        // pending: wire edit flow
+        void item;
     };
 
     const handleDelete = (id: number) => {
-        console.log("Delete item", id);
+        // pending: wire delete flow
+        void id;
     };
 
     const handleRowClick = (item: ItemEntity) => {
-        console.log("Row click", item);
+        navigate(`/items/${item.id}`);
     };
 
     return (

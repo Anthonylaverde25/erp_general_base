@@ -1,4 +1,4 @@
-import { CreateItemDTO, ItemType, ItemTaxRate } from "./DTOs/ItemDTOs";
+import { CreateItemDTO, ItemDTO, ItemType, ItemTaxRate } from "./DTOs/ItemDTOs";
 import { CategoryEntity } from "../categories/CategoryEntity";
 
 export interface Item {
@@ -67,14 +67,18 @@ export class ItemEntity implements Item {
     get description(): string | undefined { return this._description; }
     get purchase_price(): number | undefined { return this._purchase_price; }
 
-    static fromPrimitives(data: any): ItemEntity {
+    static fromPrimitives(data: ItemDTO): ItemEntity {
+        const category = data.category
+            ? CategoryEntity.fromPrimitives(data.category)
+            : CategoryEntity.create({ name: data.category_name || "Sin categoría" });
+
         return new ItemEntity(
             data.id,
             data.sku,
             data.name,
             data.type,
             data.unit_name,
-            CategoryEntity.fromPrimitives(data.category),
+            category,
             Number(data.sale_price),
             Boolean(data.is_active),
             data.tax_rates || [],

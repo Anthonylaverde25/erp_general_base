@@ -38,6 +38,6 @@ export interface ICompanySetting {
     maxStorageMb: number,
     currency: string,
     timezone: string,
+    defaultStoreId?: number | null,
 }
-
 

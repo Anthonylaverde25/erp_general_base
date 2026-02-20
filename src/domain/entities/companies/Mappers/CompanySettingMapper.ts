@@ -8,7 +8,8 @@ export class CompanySettingMapper {
             maxUsers: dto.max_users,
             maxStorageMb: dto.max_storage_mb,
             currency: dto.currency,
-            timezone: dto.time_zone
+            timezone: dto.time_zone,
+            defaultStoreId: dto.default_store_id
         });
     }
 

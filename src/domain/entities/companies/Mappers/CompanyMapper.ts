@@ -3,6 +3,8 @@ import { ICompany } from "@/types/company.types";
 
 export class CompanyMapper {
     static fromDetailDTO(dto: ICompany): CompanyEntity {
+        const normalizedSettings = dto.settings ?? (dto as any).company_setting;
+
         return new CompanyEntity({
             id: dto.id,
             name: dto.name,
@@ -15,7 +17,7 @@ export class CompanyMapper {
             website: dto.website,
             logo_url: dto.logo_url,
             favicon_url: dto.favicon_url,
-            settings: dto.settings
+            settings: normalizedSettings
         });
     }
 
