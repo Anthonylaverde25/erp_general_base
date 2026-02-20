@@ -44,6 +44,7 @@ export interface ItemDTO {
 	description?: string;
 	store_id?: number | null;
 	partner_id?: number | null;
+	partner_name?: string | null;
 	physical_profile?: {
 		barcode?: string;
 		weight?: number;

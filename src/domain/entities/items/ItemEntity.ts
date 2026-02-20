@@ -22,6 +22,7 @@ export interface Item {
     purchase_price?: number;
     store_id?: number | null;
     partner_id?: number | null;
+    partner_name?: string | null;
     physical_profile?: {
         barcode?: string;
         weight?: number;
@@ -54,6 +55,7 @@ export class ItemEntity implements Item {
     private _purchase_price?: number;
     private _store_id?: number | null;
     private _partner_id?: number | null;
+    private _partner_name?: string | null;
     private _physical_profile?: {
         barcode?: string;
         weight?: number;
@@ -85,6 +87,7 @@ export class ItemEntity implements Item {
         purchase_price?: number,
         store_id?: number | null,
         partner_id?: number | null,
+        partner_name?: string | null,
         physical_profile?: {
             barcode?: string;
             weight?: number;
@@ -115,6 +118,7 @@ export class ItemEntity implements Item {
         this._purchase_price = purchase_price;
         this._store_id = store_id;
         this._partner_id = partner_id;
+        this._partner_name = partner_name;
         this._physical_profile = physical_profile;
         this._service_profile = service_profile;
     }
@@ -138,6 +142,7 @@ export class ItemEntity implements Item {
     get purchase_price(): number | undefined { return this._purchase_price; }
     get store_id(): number | null | undefined { return this._store_id; }
     get partner_id(): number | null | undefined { return this._partner_id; }
+    get partner_name(): string | null | undefined { return this._partner_name; }
     get physical_profile():
         | {
             barcode?: string;
@@ -184,6 +189,7 @@ export class ItemEntity implements Item {
             data.purchase_price ? Number(data.purchase_price) : undefined,
             data.store_id,
             data.partner_id,
+            data.partner_name,
             data.physical_profile,
             data.service_profile
         );
@@ -210,6 +216,7 @@ export class ItemEntity implements Item {
             data.purchase_price,
             data.store_id,
             data.partner_id,
+            null,
             data.physical_profile,
             data.service_profile
         );
@@ -236,6 +243,7 @@ export class ItemEntity implements Item {
             purchase_price: this._purchase_price,
             store_id: this._store_id,
             partner_id: this._partner_id,
+            partner_name: this._partner_name,
             physical_profile: this._physical_profile,
             service_profile: this._service_profile
         };
