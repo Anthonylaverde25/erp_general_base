@@ -1,21 +1,19 @@
-import { Controller, type Control, type FieldErrors } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { TextField, type TextFieldProps } from '@mui/material';
 import type { ItemFormType } from '@/schemas/items/items.schema';
 import CreateItemSection from './CreateItemSection';
 
 type CreateItemDescriptionSectionProps = {
-	control: Control<ItemFormType>;
-	errors: FieldErrors<ItemFormType>;
 	isLoading: boolean;
 	textFieldProps: TextFieldProps;
 };
 
-function CreateItemDescriptionSection({
-	control,
-	errors,
-	isLoading,
-	textFieldProps
-}: CreateItemDescriptionSectionProps) {
+function CreateItemDescriptionSection({ isLoading, textFieldProps }: CreateItemDescriptionSectionProps) {
+	const {
+		control,
+		formState: { errors }
+	} = useFormContext<ItemFormType>();
+
 	return (
 		<CreateItemSection
 			title="Descripción Adicional"

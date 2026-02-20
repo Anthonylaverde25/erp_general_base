@@ -67,7 +67,7 @@ export class ItemRepositoryCrud implements IItemRepository {
     formData.append(key, String(value));
   }
 
-  private buildFormData(payload: CreateItemDTO): FormData {
+  private buildFormData(payload: CreateItemDTO | UpdateItemDTO): FormData {
     const formData = new FormData();
 
     Object.entries(payload).forEach(([key, value]) => {
@@ -95,9 +95,7 @@ export class ItemRepositoryCrud implements IItemRepository {
     itemData: CreateItemDTO,
   ): Promise<{ item: ItemEntity; message: string }> {
     const useMultipart = this.hasFile(itemData);
-    const requestData = useMultipart
-      ? this.buildFormData(itemData)
-      : itemData;
+    const requestData = useMultipart ? this.buildFormData(itemData) : itemData;
 
     const {
       data: { item, message },
@@ -120,13 +118,26 @@ export class ItemRepositoryCrud implements IItemRepository {
     id: number,
     itemData: UpdateItemDTO,
   ): Promise<{ item: ItemEntity; message: string }> {
-    const { data } = await axiosInstance.put<{
+    const useMultipart = this.hasFile(itemData);
+    const requestData = useMultipart ? this.buildFormData(itemData) : itemData;
+
+    const {
+      data: { item, message },
+    } = await axiosInstance.put<{
       item: ItemDTO;
       message: string;
-    }>(`${this.baseUrl}/${id}`, itemData);
+    }>(
+      `${this.baseUrl}/${id}`,
+      requestData,
+      useMultipart
+        ? {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        : undefined,
+    );
     return {
-      item: ItemMapper.toDomain(data.item),
-      message: data.message,
+      item: ItemMapper.toDomain(item),
+      message,
     };
   }
 

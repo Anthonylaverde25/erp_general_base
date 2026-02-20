@@ -34,8 +34,7 @@ export default function ItemsTabView({ currentTab, onTabChange }: ItemsTabViewPr
     }, [items, currentTab]);
 
     const handleEdit = (item: ItemEntity) => {
-        // pending: wire edit flow
-        void item;
+        navigate(`/items/${item.id}/edit`);
     };
 
     const handleDelete = (id: number) => {

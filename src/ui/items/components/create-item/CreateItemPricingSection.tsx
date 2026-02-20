@@ -1,26 +1,23 @@
-import { Controller, type Control, type FieldErrors, type UseFormSetValue, useWatch } from 'react-hook-form';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { Box, Checkbox, Chip, InputAdornment, MenuItem, TextField, type TextFieldProps } from '@mui/material';
 import type { TaxRateEntity } from '@/domain/entities/tax_rates/TaxRateEntity';
 import type { ItemFormType } from '@/schemas/items/items.schema';
+import { toast } from 'sonner';
 import CreateItemSection from './CreateItemSection';
 
 type CreateItemPricingSectionProps = {
-	control: Control<ItemFormType>;
-	errors: FieldErrors<ItemFormType>;
 	isLoading: boolean;
 	textFieldProps: TextFieldProps;
 	taxRates: TaxRateEntity[];
-	setValue: UseFormSetValue<ItemFormType>;
 };
 
-function CreateItemPricingSection({
-	control,
-	errors,
-	isLoading,
-	textFieldProps,
-	taxRates,
-	setValue
-}: CreateItemPricingSectionProps) {
+function CreateItemPricingSection({ isLoading, textFieldProps, taxRates }: CreateItemPricingSectionProps) {
+	const {
+		control,
+		setValue,
+		formState: { errors }
+	} = useFormContext<ItemFormType>();
+
 	const purchasePrice = useWatch({ control, name: 'purchase_price' });
 	const salePrice = useWatch({ control, name: 'sale_price' });
 
@@ -32,6 +29,50 @@ function CreateItemPricingSection({
 		}
 
 		setValue('profit_margin', undefined);
+	};
+
+	const normalizeTaxIds = (value: unknown): number[] => {
+		if (typeof value === 'string') {
+			return value
+				.split(',')
+				.map((id) => Number(id))
+				.filter((id) => Number.isFinite(id));
+		}
+
+		if (Array.isArray(value)) {
+			return value
+				.map((id) => Number(id))
+				.filter((id) => Number.isFinite(id));
+		}
+
+		return [];
+	};
+
+	const validateUniqueTaxTypeSelection = (selectedTaxIds: number[]): number[] => {
+		const seenTaxTypeIds = new Set<number>();
+		let hasDuplicatesByTaxType = false;
+
+		const uniqueByType = selectedTaxIds.filter((taxRateId) => {
+			const taxRate = taxRates.find((tax) => tax.id === taxRateId);
+
+			if (!taxRate) {
+				return false;
+			}
+
+			if (seenTaxTypeIds.has(taxRate.tax_type_id)) {
+				hasDuplicatesByTaxType = true;
+				return false;
+			}
+
+			seenTaxTypeIds.add(taxRate.tax_type_id);
+			return true;
+		});
+
+		if (hasDuplicatesByTaxType) {
+			toast.error('Solo puedes seleccionar un impuesto por tipo (IVA, retención, etc.).');
+		}
+
+		return uniqueByType;
 	};
 
 	return (
@@ -97,8 +138,9 @@ function CreateItemPricingSection({
 								disabled={isLoading}
 								value={field.value || []}
 								onChange={(event) => {
-									const value = event.target.value;
-									field.onChange(typeof value === 'string' ? value.split(',').map(Number) : value);
+									const selectedTaxIds = normalizeTaxIds(event.target.value);
+									const uniqueByTaxTypeIds = validateUniqueTaxTypeSelection(selectedTaxIds);
+									field.onChange(uniqueByTaxTypeIds);
 								}}
 								SelectProps={{
 									multiple: true,

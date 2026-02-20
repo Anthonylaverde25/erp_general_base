@@ -9,9 +9,12 @@ type CreateItemPageHeaderProps = {
 	isValid: boolean;
 	onCancel: () => void;
 	onSave: () => void;
+	mode?: 'create' | 'edit';
 };
 
-function CreateItemPageHeader({ itemType, isLoading, isValid, onCancel, onSave }: CreateItemPageHeaderProps) {
+function CreateItemPageHeader({ itemType, isLoading, isValid, onCancel, onSave, mode = 'create' }: CreateItemPageHeaderProps) {
+	const isEditMode = mode === 'edit';
+
 	return (
 		<div className="bg-background-default flex w-full flex-1 flex-col items-center justify-between space-y-2 border-b p-6 sm:flex-row sm:space-y-0 sm:px-8">
 			<div className="flex flex-col items-start">
@@ -28,15 +31,25 @@ function CreateItemPageHeader({ itemType, isLoading, isValid, onCancel, onSave }
 							variant="h2"
 							className="text-text-primary text-2xl font-bold tracking-tight"
 						>
-							{itemType === 'service' ? 'Nuevo Servicio' : 'Nuevo Producto'}
+							{itemType === 'service'
+								? isEditMode
+									? 'Editar Servicio'
+									: 'Nuevo Servicio'
+								: isEditMode
+									? 'Editar Producto'
+									: 'Nuevo Producto'}
 						</Typography>
 						<Typography
 							variant="body2"
 							className="text-text-secondary"
 						>
 							{itemType === 'service'
-								? 'Información necesaria para registrar un nuevo servicio.'
-								: 'Información necesaria para registrar un nuevo producto físico.'}
+								? isEditMode
+									? 'Actualiza la información del servicio.'
+									: 'Información necesaria para registrar un nuevo servicio.'
+								: isEditMode
+									? 'Actualiza la información del producto físico.'
+									: 'Información necesaria para registrar un nuevo producto físico.'}
 						</Typography>
 					</div>
 				</div>
@@ -59,7 +72,13 @@ function CreateItemPageHeader({ itemType, isLoading, isValid, onCancel, onSave }
 					startIcon={isLoading ? undefined : <Save />}
 					className="px-6 shadow-none hover:shadow-sm"
 				>
-					{isLoading ? 'Guardando...' : `Guardar ${itemType === 'service' ? 'Servicio' : 'Producto'}`}
+					{isLoading
+						? isEditMode
+							? 'Actualizando...'
+							: 'Guardando...'
+						: isEditMode
+							? `Actualizar ${itemType === 'service' ? 'Servicio' : 'Producto'}`
+							: `Guardar ${itemType === 'service' ? 'Servicio' : 'Producto'}`}
 				</Button>
 			</div>
 		</div>

@@ -12,7 +12,10 @@ interface ItemProfileOverviewProps {
 export default function ItemProfileOverview({
   item,
 }: ItemProfileOverviewProps) {
-  const stockActual = 48;
+  const stockActual = item.inventory.reduce(
+    (total, inventoryItem) => total + (inventoryItem.available_quantity || 0),
+    0,
+  );
   const unidadesVendidasMes = 126;
   const rotacionMensual = 2.6;
   const chartData = [

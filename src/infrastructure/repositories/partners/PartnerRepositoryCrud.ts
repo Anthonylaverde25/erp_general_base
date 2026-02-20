@@ -14,6 +14,13 @@ export class PartnerRepositoryCrud implements IPartnerRepository {
         return PartnerMapper.fromDTOList(partners);
     }
 
+    async indexSuppliers(): Promise<PartnerEntity[]> {
+        const {
+            data: { partners },
+        } = await axiosInstance.get("partners/suppliers");
+        return PartnerMapper.fromDTOList(partners);
+    }
+
     async show(id: number): Promise<PartnerEntity> {
         const {
             data: { partner },
@@ -41,4 +48,3 @@ export class PartnerRepositoryCrud implements IPartnerRepository {
         };
     }
 }
-

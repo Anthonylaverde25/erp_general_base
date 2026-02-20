@@ -1,18 +1,20 @@
-import { Controller, type Control, type FieldErrors, useWatch } from 'react-hook-form';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { FormControlLabel, MenuItem, Switch, TextField, type TextFieldProps } from '@mui/material';
 import type { StoreEntity } from '@/domain/entities/stores/StoreEntity';
 import type { ItemFormType } from '@/schemas/items/items.schema';
 import CreateItemSection from './CreateItemSection';
 
 type CreateItemStockSectionProps = {
-	control: Control<ItemFormType>;
-	errors: FieldErrors<ItemFormType>;
 	isLoading: boolean;
 	textFieldProps: TextFieldProps;
 	stores: StoreEntity[];
 };
 
-function CreateItemStockSection({ control, errors, isLoading, textFieldProps, stores }: CreateItemStockSectionProps) {
+function CreateItemStockSection({ isLoading, textFieldProps, stores }: CreateItemStockSectionProps) {
+	const {
+		control,
+		formState: { errors }
+	} = useFormContext<ItemFormType>();
 	const isInventoriable = useWatch({ control, name: 'is_inventoriable' });
 
 	return (

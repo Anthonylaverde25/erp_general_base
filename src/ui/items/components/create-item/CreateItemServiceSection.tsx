@@ -1,23 +1,19 @@
-import { Controller, type Control, type FieldError, type FieldErrors } from 'react-hook-form';
+import { Controller, type FieldError, useFormContext } from 'react-hook-form';
 import { FormControlLabel, Switch, TextField, type TextFieldProps } from '@mui/material';
 import type { ItemFormType } from '@/schemas/items/items.schema';
 import CreateItemSection from './CreateItemSection';
 
 type CreateItemServiceSectionProps = {
-	control: Control<ItemFormType>;
-	errors: FieldErrors<ItemFormType>;
 	isLoading: boolean;
 	textFieldProps: TextFieldProps;
-	parseOptionalNumber: (value: string) => number | undefined;
 };
 
-function CreateItemServiceSection({
-	control,
-	errors,
-	isLoading,
-	textFieldProps,
-	parseOptionalNumber
-}: CreateItemServiceSectionProps) {
+function CreateItemServiceSection({ isLoading, textFieldProps }: CreateItemServiceSectionProps) {
+	const {
+		control,
+		formState: { errors }
+	} = useFormContext<ItemFormType>();
+	const parseOptionalNumber = (value: string) => (value === '' ? undefined : Number(value));
 	const estimatedTimeError = (errors as Record<string, FieldError | undefined>).estimated_time;
 
 	return (

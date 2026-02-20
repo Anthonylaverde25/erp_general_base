@@ -3,6 +3,7 @@ import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
 
 const ItemsPage = lazy(() => import('@/ui/items/pages/ItemsPage'));
 const CreateItemPage = lazy(() => import('@/ui/items/pages/CreateItemPage'));
+const UpdateItemPage = lazy(() => import('@/ui/items/pages/UpdateItemPage'));
 const ItemDetailPage = lazy(() => import('@/ui/items/pages/ItemDetailPage'));
 
 /**
@@ -18,6 +19,10 @@ const route: FuseRouteItemType = {
         {
             path: 'create',
             element: <CreateItemPage />
+        },
+        {
+            path: ':id/edit',
+            element: <UpdateItemPage />
         },
         {
             path: ':id',

@@ -1,24 +1,19 @@
-import { Controller, type Control } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { MenuItem, TextField, Typography, type TextFieldProps } from '@mui/material';
 import type { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import type { ItemFormType } from '@/schemas/items/items.schema';
 import CreateItemSection from './CreateItemSection';
 
 type CreateItemTrackingSectionProps = {
-	control: Control<ItemFormType>;
 	isLoading: boolean;
 	textFieldProps: TextFieldProps;
 	partners: PartnerEntity[];
-	parseOptionalNumber: (value: string) => number | undefined;
 };
 
-function CreateItemTrackingSection({
-	control,
-	isLoading,
-	textFieldProps,
-	partners,
-	parseOptionalNumber
-}: CreateItemTrackingSectionProps) {
+function CreateItemTrackingSection({ isLoading, textFieldProps, partners }: CreateItemTrackingSectionProps) {
+	const { control } = useFormContext<ItemFormType>();
+	const parseOptionalNumber = (value: string) => (value === '' ? undefined : Number(value));
+
 	return (
 		<CreateItemSection
 			title="Seguimiento del Producto"
@@ -135,7 +130,7 @@ function CreateItemTrackingSection({
 
 				<div className="col-span-1 sm:col-span-2">
 					<Controller
-						name="default_supplier_id"
+						name="partner_id"
 						control={control}
 						render={({ field }) => (
 							<TextField
@@ -149,18 +144,14 @@ function CreateItemTrackingSection({
 								<MenuItem value="">
 									<em>Sin proveedor</em>
 								</MenuItem>
-								{partners
-									.filter(
-										(partner) => partner.role === 'supplier' || partner.role === 'client_supplier'
-									)
-									.map((partner) => (
-										<MenuItem
-											key={partner.id}
-											value={String(partner.id)}
-										>
-											{partner.name}
-										</MenuItem>
-									))}
+								{partners.map((partner) => (
+									<MenuItem
+										key={partner.id}
+										value={String(partner.id)}
+									>
+										{partner.name}
+									</MenuItem>
+								))}
 							</TextField>
 						)}
 					/>

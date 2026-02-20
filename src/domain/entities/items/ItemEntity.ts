@@ -1,4 +1,4 @@
-import { CreateItemDTO, ItemDTO, ItemType, ItemTaxRate } from "./DTOs/ItemDTOs";
+import { CreateItemDTO, ItemDTO, ItemInventory, ItemType, ItemTaxRate } from "./DTOs/ItemDTOs";
 import { CategoryEntity } from "../categories/CategoryEntity";
 import { CategoryDTO } from "../categories/DTOs/CategoryDTOs";
 
@@ -8,14 +8,30 @@ export interface Item {
     name: string;
     image?: string;
     type: ItemType;
+    unit_id?: number;
     unit_name: string;
+    category_id?: number;
+    family_id?: number;
+    subcategory_id?: number;
     category: CategoryDTO;
     sale_price: number;
     is_active: boolean;
     tax_rates: ItemTaxRate[];
+    inventory: ItemInventory[];
     description?: string;
     purchase_price?: number;
-
+    store_id?: number | null;
+    partner_id?: number | null;
+    physical_profile?: {
+        barcode?: string;
+        weight?: number;
+        dimensions?: Record<string, unknown>;
+        is_inventoriable?: boolean;
+    } | null;
+    service_profile?: {
+        estimated_time?: number;
+        req_scheduling?: boolean;
+    } | null;
 }
 
 export class ItemEntity implements Item {
@@ -24,13 +40,30 @@ export class ItemEntity implements Item {
     private _name: string;
     private _image?: string;
     private _type: ItemType;
+    private _unit_id?: number;
     private _unit_name: string;
+    private _category_id?: number;
+    private _family_id?: number;
+    private _subcategory_id?: number;
     private _category: CategoryEntity;
     private _sale_price: number;
     private _is_active: boolean;
     private _tax_rates: ItemTaxRate[];
+    private _inventory: ItemInventory[];
     private _description?: string;
     private _purchase_price?: number;
+    private _store_id?: number | null;
+    private _partner_id?: number | null;
+    private _physical_profile?: {
+        barcode?: string;
+        weight?: number;
+        dimensions?: Record<string, unknown>;
+        is_inventoriable?: boolean;
+    } | null;
+    private _service_profile?: {
+        estimated_time?: number;
+        req_scheduling?: boolean;
+    } | null;
 
     constructor(
         id: number,
@@ -38,26 +71,52 @@ export class ItemEntity implements Item {
         name: string,
         image: string | undefined,
         type: ItemType,
+        unit_id: number | undefined,
         unit_name: string,
+        category_id: number | undefined,
+        family_id: number | undefined,
+        subcategory_id: number | undefined,
         category: CategoryEntity,
         sale_price: number,
         is_active: boolean,
         tax_rates: ItemTaxRate[],
+        inventory: ItemInventory[],
         description?: string,
-        purchase_price?: number
+        purchase_price?: number,
+        store_id?: number | null,
+        partner_id?: number | null,
+        physical_profile?: {
+            barcode?: string;
+            weight?: number;
+            dimensions?: Record<string, unknown>;
+            is_inventoriable?: boolean;
+        } | null,
+        service_profile?: {
+            estimated_time?: number;
+            req_scheduling?: boolean;
+        } | null
     ) {
         this._id = id;
         this._sku = sku;
         this._name = name;
         this._image = image;
         this._type = type;
+        this._unit_id = unit_id;
         this._unit_name = unit_name;
+        this._category_id = category_id;
+        this._family_id = family_id;
+        this._subcategory_id = subcategory_id;
         this._category = category;
         this._sale_price = sale_price;
         this._is_active = is_active;
         this._tax_rates = tax_rates;
+        this._inventory = inventory;
         this._description = description;
         this._purchase_price = purchase_price;
+        this._store_id = store_id;
+        this._partner_id = partner_id;
+        this._physical_profile = physical_profile;
+        this._service_profile = service_profile;
     }
 
     get id(): number { return this._id; }
@@ -65,13 +124,40 @@ export class ItemEntity implements Item {
     get name(): string { return this._name; }
     get image(): string | undefined { return this._image; }
     get type(): ItemType { return this._type; }
+    get unit_id(): number | undefined { return this._unit_id; }
     get unit_name(): string { return this._unit_name; }
+    get category_id(): number | undefined { return this._category_id; }
+    get family_id(): number | undefined { return this._family_id; }
+    get subcategory_id(): number | undefined { return this._subcategory_id; }
     get category(): CategoryEntity { return this._category; }
     get sale_price(): number { return this._sale_price; }
     get is_active(): boolean { return this._is_active; }
     get tax_rates(): ItemTaxRate[] { return this._tax_rates; }
+    get inventory(): ItemInventory[] { return this._inventory; }
     get description(): string | undefined { return this._description; }
     get purchase_price(): number | undefined { return this._purchase_price; }
+    get store_id(): number | null | undefined { return this._store_id; }
+    get partner_id(): number | null | undefined { return this._partner_id; }
+    get physical_profile():
+        | {
+            barcode?: string;
+            weight?: number;
+            dimensions?: Record<string, unknown>;
+            is_inventoriable?: boolean;
+        }
+        | null
+        | undefined {
+        return this._physical_profile;
+    }
+    get service_profile():
+        | {
+            estimated_time?: number;
+            req_scheduling?: boolean;
+        }
+        | null
+        | undefined {
+        return this._service_profile;
+    }
 
     static fromPrimitives(data: ItemDTO): ItemEntity {
         const category = data.category
@@ -84,13 +170,22 @@ export class ItemEntity implements Item {
             data.name,
             data.image,
             data.type,
+            data.unit_id,
             data.unit_name,
+            data.category_id,
+            data.family_id,
+            data.subcategory_id,
             category,
             Number(data.sale_price),
             Boolean(data.is_active),
             data.tax_rates || [],
+            data.inventory || [],
             data.description,
-            data.purchase_price ? Number(data.purchase_price) : undefined
+            data.purchase_price ? Number(data.purchase_price) : undefined,
+            data.store_id,
+            data.partner_id,
+            data.physical_profile,
+            data.service_profile
         );
     }
 
@@ -101,13 +196,22 @@ export class ItemEntity implements Item {
             data.name,
             undefined,
             data.type,
+            data.unit_id,
             "", // unit_name not available on create DTO
+            data.category_id,
+            data.family_id,
+            data.subcategory_id,
             CategoryEntity.create({ name: "" }), // Placeholder category
             data.sale_price,
             data.is_active,
             [], // tax_rates not available on create DTO
+            [],
             data.description,
-            data.purchase_price
+            data.purchase_price,
+            data.store_id,
+            data.partner_id,
+            data.physical_profile,
+            data.service_profile
         );
     }
 
@@ -118,13 +222,22 @@ export class ItemEntity implements Item {
             name: this._name,
             image: this._image,
             type: this._type,
+            unit_id: this._unit_id,
             unit_name: this._unit_name,
+            category_id: this._category_id,
+            family_id: this._family_id,
+            subcategory_id: this._subcategory_id,
             category: this._category.toPlainObject(), // Fix type mapping
             sale_price: this._sale_price,
             is_active: this._is_active,
             tax_rates: this._tax_rates,
+            inventory: this._inventory,
             description: this._description,
-            purchase_price: this._purchase_price
+            purchase_price: this._purchase_price,
+            store_id: this._store_id,
+            partner_id: this._partner_id,
+            physical_profile: this._physical_profile,
+            service_profile: this._service_profile
         };
     }
 }

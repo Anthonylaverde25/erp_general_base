@@ -106,6 +106,7 @@ export const TYPES = {
   // Partners
   PartnerRepository: Symbol.for("PartnerRepository"),
   IndexPartnersUseCase: Symbol.for("IndexPartnersUseCase"),
+  IndexSupplierPartnersUseCase: Symbol.for("IndexSupplierPartnersUseCase"),
   ShowPartnerUseCase: Symbol.for("ShowPartnerUseCase"),
   CreatePartnerUseCase: Symbol.for("CreatePartnerUseCase"),
   UpdatePartnerUseCase: Symbol.for("UpdatePartnerUseCase"),

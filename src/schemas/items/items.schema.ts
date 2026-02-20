@@ -15,7 +15,7 @@ const baseItemSchema = z.object({
 	tax_rate_ids: z.array(z.number()).optional(),
 	image: z.any().optional(),
 	store_id: z.string().nullable().optional(),
-	default_supplier_id: z.string().nullable().optional(),
+	partner_id: z.string().nullable().optional(),
 	barcode: z.string().optional(),
 	is_inventoriable: z.boolean().optional(),
 	initial_stock: z.number().min(0).optional(),

@@ -22,6 +22,10 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 	const purchasePrice = item.purchase_price ?? 0;
 	const salePrice = item.sale_price ?? 0;
 	const margin = purchasePrice > 0 ? ((salePrice - purchasePrice) / purchasePrice) * 100 : 0;
+	const totalAvailable = item.inventory.reduce(
+		(total, inventoryItem) => total + (inventoryItem.available_quantity || 0),
+		0
+	);
 
 	const actionBtnSx = {
 		flex: '1 1 auto',
@@ -161,6 +165,51 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 						heroicons-outline:cube
 					</FuseSvgIcon>
 				</Button>
+			</Paper>
+
+			<Paper
+				elevation={0}
+				variant="outlined"
+				sx={{ borderRadius: '14px', p: 2, mb: 1.5, borderColor: 'divider' }}
+			>
+				<Typography sx={{ fontSize: 13, fontWeight: 600, color: '#666', mb: 1 }}>
+					Inventario por almacén
+				</Typography>
+				<Typography sx={{ fontFamily: 'monospace', fontSize: 18, fontWeight: 700, color: '#004D1A', mb: 1 }}>
+					Total disponible: {totalAvailable}
+				</Typography>
+				{item.inventory.length > 0 ? (
+					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+						{item.inventory.map((inventoryItem) => (
+							<Box
+								key={inventoryItem.id}
+								className="flex items-center justify-between"
+							>
+								<Typography
+									variant="caption"
+									color="text.secondary"
+									sx={{ fontSize: '0.75rem' }}
+								>
+									{inventoryItem.store_name}
+								</Typography>
+								<Typography
+									variant="body2"
+									fontWeight={700}
+									sx={{ fontSize: '0.85rem' }}
+								>
+									{inventoryItem.available_quantity}
+								</Typography>
+							</Box>
+						))}
+					</Box>
+				) : (
+					<Typography
+						variant="caption"
+						color="text.secondary"
+					>
+						Sin movimientos de inventario registrados.
+					</Typography>
+				)}
 			</Paper>
 
 			<Box sx={{ flex: 1 }} />

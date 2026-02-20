@@ -19,6 +19,13 @@ export default function ItemOverviewInventoryChart({
 	chartData
 }: ItemOverviewInventoryChartProps) {
 	const theme = useTheme();
+	const lastInventoryCountAt = item.inventory
+		.map((inventoryItem) => inventoryItem.last_count_at)
+		.filter((date): date is string => Boolean(date))
+		.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0];
+	const formattedLastInventoryCount = lastInventoryCountAt
+		? new Date(lastInventoryCountAt).toLocaleDateString('es-ES')
+		: 'N/A';
 
 	return (
 		<Paper
@@ -141,7 +148,7 @@ export default function ItemOverviewInventoryChart({
 						{[
 							{ label: 'Stock actual', value: `${stockActual} uds` },
 							{ label: 'Stock mínimo', value: '20 uds' },
-							{ label: 'Último movimiento', value: '15 Feb 2026' },
+							{ label: 'Último conteo', value: formattedLastInventoryCount },
 							{ label: 'Unidades vendidas (mes)', value: `${unidadesVendidasMes} uds` },
 							{ label: 'Rotación mensual', value: `${rotacionMensual}x` },
 							{ label: 'SKU', value: item.sku },

@@ -8,6 +8,18 @@ export interface ItemTaxRate {
 	rate: number;
 }
 
+export interface ItemInventory {
+	id: number;
+	store_id: number;
+	store_name: string;
+	item_id: number;
+	item_name?: string | null;
+	quantity_on_hand: number;
+	quantity_reserved: number;
+	available_quantity: number;
+	last_count_at?: string | null;
+}
+
 export interface ItemDTO {
 	id: number;
 	company_id?: number;
@@ -19,6 +31,7 @@ export interface ItemDTO {
 	unit_name: string;
 	category_id?: number;
 	category_name?: string;
+	subcategory_id?: number;
 	family_id?: number;
 	family_name?: string;
 	category?: CategoryDTO;
@@ -27,12 +40,19 @@ export interface ItemDTO {
 	is_active: boolean;
 	attributes?: Record<string, unknown>;
 	tax_rates: ItemTaxRate[];
+	inventory?: ItemInventory[];
 	description?: string;
+	store_id?: number | null;
+	partner_id?: number | null;
 	physical_profile?: {
 		barcode?: string;
 		weight?: number;
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
+	} | null;
+	service_profile?: {
+		estimated_time?: number;
+		req_scheduling?: boolean;
 	} | null;
 }
 
@@ -53,7 +73,7 @@ export interface CreateItemDTO {
 	store_id?: number | null;
 	initial_stock?: number;
 	quantity?: number;
-	default_supplier_id?: number | null;
+	partner_id?: number | null;
 	physical_profile?: {
 		barcode?: string;
 		weight?: number;
@@ -81,5 +101,15 @@ export interface UpdateItemDTO {
 	tax_rate_ids?: number[];
 	image?: File | null;
 	store_id?: number | null;
-	default_supplier_id?: number | null;
+	partner_id?: number | null;
+	physical_profile?: {
+		barcode?: string;
+		weight?: number;
+		dimensions?: Record<string, unknown>;
+		is_inventoriable?: boolean;
+	};
+	service_profile?: {
+		estimated_time?: number;
+		req_scheduling?: boolean;
+	};
 }

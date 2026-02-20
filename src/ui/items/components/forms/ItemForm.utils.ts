@@ -1,5 +1,6 @@
 import { ItemFormType } from '@/schemas/items/items.schema';
-import { CreateItemDTO } from '@/domain/entities/items/DTOs/ItemDTOs';
+import { CreateItemDTO, UpdateItemDTO } from '@/domain/entities/items/DTOs/ItemDTOs';
+import { ItemEntity } from '@/domain/entities/items/ItemEntity';
 
 const buildDimensions = (values: ItemFormType): Record<string, unknown> | undefined => {
 	const hasAnyDimension =
@@ -44,7 +45,7 @@ export const mapItemFormToDTO = (values: ItemFormType): CreateItemDTO => {
 		store_id: values.store_id ? Number(values.store_id) : undefined,
 		initial_stock: initialStock,
 		quantity: initialStock,
-		default_supplier_id: values.default_supplier_id ? Number(values.default_supplier_id) : undefined
+		partner_id: values.partner_id ? Number(values.partner_id) : undefined
 	};
 
 	if (values.type === 'physical') {
@@ -67,4 +68,47 @@ export const mapItemFormToDTO = (values: ItemFormType): CreateItemDTO => {
 			req_scheduling: typeof values.req_scheduling !== 'undefined' ? Boolean(values.req_scheduling) : undefined
 		}
 	};
+};
+
+export const mapItemFormToUpdateDTO = (values: ItemFormType): UpdateItemDTO => {
+	const createPayload = mapItemFormToDTO(values);
+
+	return {
+		...createPayload
+	};
+};
+
+export const mapItemToFormValues = (item: ItemEntity): ItemFormType => {
+	const dimensions = item.physical_profile?.dimensions as
+		| { length?: number; width?: number; height?: number; unit?: string }
+		| undefined;
+
+	return {
+		sku: item.sku,
+		name: item.name,
+		type: item.type,
+		unit_id: item.unit_id ? String(item.unit_id) : '',
+		category_id: item.category_id ? String(item.category_id) : '',
+		family_id: item.family_id ? String(item.family_id) : '',
+		subcategory_id: item.subcategory_id ? String(item.subcategory_id) : '',
+		sale_price: item.sale_price ?? 0,
+		purchase_price: item.purchase_price ?? 0,
+		description: item.description ?? '',
+		is_active: item.is_active ?? true,
+		tax_rate_ids: item.tax_rates?.map((taxRate) => taxRate.id) ?? [],
+		image: null,
+		store_id: item.store_id != null ? String(item.store_id) : '',
+		partner_id: item.partner_id != null ? String(item.partner_id) : '',
+		barcode: item.physical_profile?.barcode ?? '',
+		weight: item.physical_profile?.weight ?? 0,
+		dimension_length: dimensions?.length,
+		dimension_width: dimensions?.width,
+		dimension_height: dimensions?.height,
+		dimension_unit: dimensions?.unit ?? 'cm',
+		is_inventoriable: item.physical_profile?.is_inventoriable ?? true,
+		initial_stock: undefined,
+		quantity: undefined,
+		estimated_time: item.service_profile?.estimated_time,
+		req_scheduling: item.service_profile?.req_scheduling ?? false
+	} as ItemFormType;
 };
