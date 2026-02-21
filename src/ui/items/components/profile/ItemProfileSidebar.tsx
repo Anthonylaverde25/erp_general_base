@@ -5,9 +5,12 @@ import {
 	History,
 	NotificationsActive,
 	PersonAddAlt1,
-	Save
+	Save,
+	Star,
+	StarBorder
 } from '@mui/icons-material';
 import {
+	Autocomplete,
 	Box,
 	Button,
 	Chip,
@@ -17,13 +20,15 @@ import {
 	DialogTitle,
 	Divider,
 	FormControlLabel,
-	MenuItem,
+	IconButton,
+
 	Paper,
 	Switch,
 	TextField,
+	Tooltip,
 	Typography
 } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ItemEntity } from '@/domain/entities/items/ItemEntity';
 import { useUpdateItem } from '@/features/items/hooks/useUpdateItem';
@@ -59,7 +64,8 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 	const [alarmEnabled, setAlarmEnabled] = useState(false);
 	const [minStockAlert, setMinStockAlert] = useState('');
 	const [noteText, setNoteText] = useState('');
-	const [supplierId, setSupplierId] = useState<string>('');
+	const [selectedPartnerIds, setSelectedPartnerIds] = useState<number[]>([]);
+	const [defaultPartnerId, setDefaultPartnerId] = useState<number | null>(null);
 
 	// Sync alarm state from item data
 	useEffect(() => {
@@ -72,8 +78,18 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 	}, [item.physical_profile?.has_stock_alert, item.physical_profile?.stock_min]);
 
 	useEffect(() => {
-		setSupplierId(item.partner_id != null ? String(item.partner_id) : '');
-	}, [item.partner_id]);
+		if (item.partners.length > 0) {
+			setSelectedPartnerIds(item.partners.map(p => p.id));
+			const defaultP = item.partners.find(p => p.is_default);
+			setDefaultPartnerId(defaultP?.id ?? item.partners[0]?.id ?? null);
+		} else if (item.partner_id) {
+			setSelectedPartnerIds([item.partner_id]);
+			setDefaultPartnerId(item.partner_id);
+		} else {
+			setSelectedPartnerIds([]);
+			setDefaultPartnerId(null);
+		}
+	}, [item.partner_id, item.partners]);
 
 	const purchasePrice = item.purchase_price ?? 0;
 	const salePrice = item.sale_price ?? 0;
@@ -83,17 +99,7 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 		0
 	);
 
-	const selectedSupplierName = useMemo(() => {
-		if (item.partner_name) {
-			return item.partner_name;
-		}
 
-		if (item.partner_id == null) {
-			return null;
-		}
-
-		return suppliers.find((supplier) => supplier.id === item.partner_id)?.name || null;
-	}, [item.partner_id, item.partner_name, suppliers]);
 
 	const actionBtnSx = {
 		flex: '1 1 auto',
@@ -109,9 +115,13 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 	} as const;
 
 	const handleSaveSupplier = async () => {
+		// Reorder so default is first
+		const orderedIds = defaultPartnerId
+			? [defaultPartnerId, ...selectedPartnerIds.filter(id => id !== defaultPartnerId)]
+			: selectedPartnerIds;
 		await handleUpdateItem({
 			id: item.id,
-			data: { partner_id: supplierId ? Number(supplierId) : null }
+			data: { partner_ids: orderedIds }
 		});
 		setSupplierOpen(false);
 	};
@@ -232,16 +242,30 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 					sx={{ borderRadius: '14px', p: 2, mb: 1.5, borderColor: 'divider' }}
 				>
 					<Typography sx={{ fontSize: 13, fontWeight: 600, color: '#666', mb: 1 }}>
-						Proveedor
+						Proveedores
 					</Typography>
-					{selectedSupplierName ? (
-						<Chip
-							label={selectedSupplierName}
-							size="small"
-							color="success"
-							variant="outlined"
-							sx={{ mb: 1.25 }}
-						/>
+					{item.partners.length > 0 ? (
+						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, mb: 1.25 }}>
+							{item.partners.map((partner) => (
+								<Box
+									key={partner.id}
+									className="flex items-center gap-1"
+								>
+									<Chip
+										label={partner.name}
+										size="small"
+										color={partner.is_default ? 'primary' : 'default'}
+										variant={partner.is_default ? 'filled' : 'outlined'}
+										icon={partner.is_default ? <Star sx={{ fontSize: 14 }} /> : undefined}
+									/>
+									{partner.is_default && (
+										<Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+											Por defecto
+										</Typography>
+									)}
+								</Box>
+							))}
+						</Box>
 					) : (
 						<Typography
 							variant="caption"
@@ -258,7 +282,7 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 						sx={{ textTransform: 'none', fontWeight: 600 }}
 						onClick={() => setSupplierOpen(true)}
 					>
-						{selectedSupplierName ? 'Cambiar proveedor' : 'Asignar proveedor'}
+						{item.partners.length > 0 ? 'Gestionar proveedores' : 'Asignar proveedor'}
 					</Button>
 				</Paper>
 
@@ -484,36 +508,99 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 				open={supplierOpen}
 				onClose={() => setSupplierOpen(false)}
 				fullWidth
-				maxWidth="xs"
+				maxWidth="sm"
 			>
-				<DialogTitle>Asignar proveedor</DialogTitle>
+				<DialogTitle>Gestionar proveedores</DialogTitle>
 				<DialogContent dividers>
-					<TextField
-						fullWidth
-						select
-						size="small"
-						label="Proveedor"
-						value={supplierId}
-						onChange={(event) => setSupplierId(event.target.value)}
-					>
-						<MenuItem value="">
-							<em>Sin proveedor</em>
-						</MenuItem>
-						{suppliers.map((supplier) => (
-							<MenuItem
-								key={supplier.id}
-								value={String(supplier.id)}
-							>
-								{supplier.name}
-							</MenuItem>
-						))}
-					</TextField>
+					<Autocomplete
+						multiple
+						disablePortal
+						options={suppliers}
+						getOptionLabel={(option) => option.name}
+						isOptionEqualToValue={(option, value) => option.id === value.id}
+						value={suppliers.filter((s) => selectedPartnerIds.includes(s.id))}
+						onChange={(_, newValue) => {
+							const newIds = newValue.map((s) => s.id);
+							setSelectedPartnerIds(newIds);
+							// If default was removed, set first as default
+							if (defaultPartnerId && !newIds.includes(defaultPartnerId)) {
+								setDefaultPartnerId(newIds[0] ?? null);
+							}
+						}}
+						renderTags={(value, getTagProps) =>
+							value.map((option, index) => (
+								<Chip
+									{...getTagProps({ index })}
+									key={option.id}
+									label={option.name}
+									size="small"
+									color={defaultPartnerId === option.id ? 'primary' : 'default'}
+									variant={defaultPartnerId === option.id ? 'filled' : 'outlined'}
+								/>
+							))
+						}
+						renderInput={(params) => (
+							<TextField
+								{...params}
+								size="small"
+								label="Proveedores"
+								placeholder="Buscar proveedor..."
+							/>
+						)}
+					/>
+
+					{selectedPartnerIds.length > 0 && (
+						<Box sx={{ mt: 2 }}>
+							<Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+								Proveedor por defecto
+							</Typography>
+							<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+								{selectedPartnerIds.map((pId) => {
+									const partner = suppliers.find((s) => s.id === pId);
+									if (!partner) return null;
+									const isDefault = defaultPartnerId === pId;
+									return (
+										<Box
+											key={pId}
+											sx={{
+												display: 'flex',
+												alignItems: 'center',
+												gap: 1,
+												p: 1,
+												borderRadius: 1,
+												border: '1px solid',
+												borderColor: isDefault ? 'primary.main' : 'divider',
+												bgcolor: isDefault ? 'primary.50' : 'transparent',
+											}}
+										>
+											<Tooltip title={isDefault ? 'Proveedor por defecto' : 'Marcar como predeterminado'}>
+												<IconButton
+													size="small"
+													onClick={() => setDefaultPartnerId(pId)}
+													color={isDefault ? 'primary' : 'default'}
+												>
+													{isDefault ? <Star /> : <StarBorder />}
+												</IconButton>
+											</Tooltip>
+											<Typography variant="body2" fontWeight={isDefault ? 700 : 400}>
+												{partner.name}
+											</Typography>
+											{isDefault && (
+												<Chip label="Por defecto" size="small" color="primary" variant="outlined" sx={{ ml: 'auto' }} />
+											)}
+										</Box>
+									);
+								})}
+							</Box>
+						</Box>
+					)}
+
 					<Typography
 						variant="caption"
 						color="text.secondary"
 						sx={{ mt: 1.25, display: 'block' }}
 					>
-						Puedes asignar proveedor o dejarlo sin aplicar para este ítem.
+						Selecciona uno o más proveedores y marca la ★ para elegir el proveedor por defecto.
 					</Typography>
 				</DialogContent>
 				<DialogActions>
@@ -523,7 +610,7 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 						onClick={handleSaveSupplier}
 						disabled={isUpdating}
 					>
-						{isUpdating ? 'Guardando...' : 'Guardar proveedor'}
+						{isUpdating ? 'Guardando...' : 'Guardar proveedores'}
 					</Button>
 				</DialogActions>
 			</Dialog>

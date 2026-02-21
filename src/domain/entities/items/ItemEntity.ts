@@ -2,6 +2,7 @@ import {
   CreateItemDTO,
   ItemDTO,
   ItemInventory,
+  ItemPartner,
   ItemType,
   ItemTaxRate,
   UpdateItemDTO,
@@ -129,6 +130,7 @@ export class ItemEntity implements Item {
   private _store_id?: number | null;
   private _partner_id?: number | null;
   private _partner_name?: string | null;
+  private _partners: ItemPartner[];
   private _physical_profile?: {
     barcode?: string;
     weight?: number;
@@ -166,6 +168,7 @@ export class ItemEntity implements Item {
     store_id?: number | null,
     partner_id?: number | null,
     partner_name?: string | null,
+    partners?: ItemPartner[],
     physical_profile?: {
       barcode?: string;
       weight?: number;
@@ -202,6 +205,7 @@ export class ItemEntity implements Item {
     this._store_id = store_id;
     this._partner_id = partner_id;
     this._partner_name = partner_name;
+    this._partners = partners ?? [];
     this._physical_profile = physical_profile;
     this._service_profile = service_profile;
     this._createData = createData;
@@ -271,6 +275,9 @@ export class ItemEntity implements Item {
   get partner_name(): string | null | undefined {
     return this._partner_name;
   }
+  get partners(): ItemPartner[] {
+    return this._partners;
+  }
   get physical_profile():
     | {
       barcode?: string;
@@ -321,6 +328,7 @@ export class ItemEntity implements Item {
       data.store_id,
       data.partner_id,
       data.partner_name,
+      data.partners ?? [],
       data.physical_profile,
       data.service_profile,
     );
@@ -371,6 +379,7 @@ export class ItemEntity implements Item {
       data.store_id,
       data.partner_ids?.[0] ?? null,
       null,
+      [], // partners
       data.physical_profile,
       data.service_profile,
       createData,
@@ -420,6 +429,7 @@ export class ItemEntity implements Item {
       data.store_id,
       data.partner_ids?.[0] ?? null,
       null,
+      [], // partners
       data.physical_profile,
       data.service_profile,
       undefined,
