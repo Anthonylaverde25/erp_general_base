@@ -292,44 +292,26 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 					sx={{ borderRadius: '14px', p: 2, mb: 1.5, borderColor: 'divider' }}
 				>
 					<Typography sx={{ fontSize: 13, fontWeight: 600, color: '#666', mb: 1 }}>
-						Inventario por almacén
+						Stock total
 					</Typography>
-					<Typography sx={{ fontFamily: 'monospace', fontSize: 18, fontWeight: 700, color: '#004D1A', mb: 1 }}>
-						Total disponible: {totalAvailable}
+					<Typography sx={{ fontFamily: 'monospace', fontSize: 22, fontWeight: 700, color: totalAvailable > 0 ? '#004D1A' : '#B71C1C', mb: 1 }}>
+						{totalAvailable} {item.unit_name || 'uds'}
 					</Typography>
-					{item.inventory.length > 0 ? (
-						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-							{item.inventory.map((inventoryItem) => (
-								<Box
-									key={inventoryItem.id}
-									className="flex items-center justify-between"
-								>
-									<Typography
-										variant="caption"
-										color="text.secondary"
-										sx={{ fontSize: '0.75rem' }}
-									>
-										{inventoryItem.store_name}
-									</Typography>
-									<Typography
-										variant="body2"
-										fontWeight={700}
-										sx={{ fontSize: '0.85rem' }}
-									>
-										{inventoryItem.available_quantity}
-									</Typography>
-								</Box>
-							))}
-						</Box>
-					) : (
-						<Typography
-							variant="caption"
-							color="text.secondary"
-						>
-							Sin movimientos de inventario registrados.
+					{item.physical_profile?.stock_min != null && (
+						<Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.25 }}>
+							Stock mínimo: {item.physical_profile.stock_min}
 						</Typography>
 					)}
+					<Button
+						fullWidth
+						variant="outlined"
+						startIcon={<FuseSvgIcon size={18}>heroicons-outline:arrow-path</FuseSvgIcon>}
+						sx={{ textTransform: 'none', fontWeight: 600 }}
+					>
+						Actualizar stock
+					</Button>
 				</Paper>
+
 
 				<Box sx={{ flex: 1 }} />
 				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -376,7 +358,7 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 						</FuseSvgIcon>
 					</Button>
 				</Box>
-			</Box>
+			</Box >
 
 			<Dialog
 				open={historyOpen}

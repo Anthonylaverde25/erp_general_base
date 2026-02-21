@@ -33,8 +33,7 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 				sx={{
 					px: { xs: 2, md: 3 },
 					pt: { xs: 2, md: 2 },
-					pb: { xs: 2, md: 2 },
-					background: 'linear-gradient(180deg, rgba(29,78,216,.08), transparent)'
+					pb: { xs: 2, md: 2 }
 				}}
 			>
 				<Box
@@ -71,38 +70,38 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 							{getInitials(item.name || 'Item')}
 						</Avatar>
 						<Box>
-						<Typography
-							variant="h5"
-							fontWeight={700}
-							sx={{ lineHeight: 1.1, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
-						>
-							{item.name}
-						</Typography>
-						<Typography
-							variant="body2"
-							color="text.secondary"
-						>
-							SKU: {item.sku} · Unidad: {item.unit_name || 'N/A'}
-						</Typography>
-						<Stack
-							direction="row"
-							spacing={1}
-							mt={1}
-							flexWrap="wrap"
-							useFlexGap
-						>
-							<Chip
-								label={item.type === 'physical' ? 'Producto Físico' : 'Servicio'}
-								size="small"
-								sx={{ bgcolor: 'rgba(29,78,216,.12)', color: '#1d4ed8', fontWeight: 600 }}
-							/>
-							<Chip
-								label={item.is_active ? 'Activo' : 'Inactivo'}
-								size="small"
-								variant="outlined"
-								sx={{ color: item.is_active ? '#15803d' : '#b91c1c' }}
-							/>
-						</Stack>
+							<Typography
+								variant="h5"
+								fontWeight={700}
+								sx={{ lineHeight: 1.1, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+							>
+								{item.name}
+							</Typography>
+							<Typography
+								variant="body2"
+								color="text.secondary"
+							>
+								SKU: {item.sku} · Unidad: {item.unit_name || 'N/A'}
+							</Typography>
+							<Stack
+								direction="row"
+								spacing={1}
+								mt={1}
+								flexWrap="wrap"
+								useFlexGap
+							>
+								<Chip
+									label={item.type === 'physical' ? 'Producto Físico' : 'Servicio'}
+									size="small"
+									sx={{ bgcolor: 'rgba(29,78,216,.12)', color: '#1d4ed8', fontWeight: 600 }}
+								/>
+								<Chip
+									label={item.is_active ? 'Activo' : 'Inactivo'}
+									size="small"
+									variant="outlined"
+									sx={{ color: item.is_active ? '#15803d' : '#b91c1c' }}
+								/>
+							</Stack>
 						</Box>
 					</Box>
 
