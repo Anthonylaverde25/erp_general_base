@@ -27,6 +27,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ItemEntity } from '@/domain/entities/items/ItemEntity';
 import { useUpdateItem } from '@/features/items/hooks/useUpdateItem';
+import { useUpdateStockAlert } from '@/features/items/hooks/useUpdateStockAlert';
 import { useIndexSupplierPartners } from '@/features/partners/hooks/useIndexSupplierPartners';
 
 interface ItemProfileSidebarProps {
@@ -47,6 +48,7 @@ function Metric({ label, value, valueColor }: { label: string; value: string; va
 export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 	const navigate = useNavigate();
 	const { handleUpdateItem, isLoading: isUpdating } = useUpdateItem();
+	const { handleUpdateStockAlert, isLoading: isUpdatingAlert } = useUpdateStockAlert();
 	const { data: suppliers = [] } = useIndexSupplierPartners();
 
 	const [historyOpen, setHistoryOpen] = useState(false);
@@ -55,9 +57,19 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 	const [supplierOpen, setSupplierOpen] = useState(false);
 
 	const [alarmEnabled, setAlarmEnabled] = useState(false);
-	const [minStockAlert, setMinStockAlert] = useState('20');
+	const [minStockAlert, setMinStockAlert] = useState('');
 	const [noteText, setNoteText] = useState('');
 	const [supplierId, setSupplierId] = useState<string>('');
+
+	// Sync alarm state from item data
+	useEffect(() => {
+		setAlarmEnabled(item.physical_profile?.has_stock_alert ?? false);
+		setMinStockAlert(
+			item.physical_profile?.stock_min != null
+				? String(item.physical_profile.stock_min)
+				: ''
+		);
+	}, [item.physical_profile?.has_stock_alert, item.physical_profile?.stock_min]);
 
 	useEffect(() => {
 		setSupplierId(item.partner_id != null ? String(item.partner_id) : '');
@@ -104,6 +116,17 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 		setSupplierOpen(false);
 	};
 
+	const handleSaveStockAlert = async () => {
+		await handleUpdateStockAlert({
+			id: item.id,
+			data: {
+				has_stock_alert: alarmEnabled,
+				stock_min: minStockAlert !== '' ? Number(minStockAlert) : null
+			}
+		});
+		setAlarmOpen(false);
+	};
+
 	return (
 		<>
 			<Box
@@ -119,7 +142,7 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 					flexDirection: 'column'
 				}}
 			>
-			<Box className="mb-2 flex flex-wrap gap-2">
+				<Box className="mb-2 flex flex-wrap gap-2">
 					<Button
 						size="small"
 						variant="outlined"
@@ -159,49 +182,49 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 						onClick={() => setNoteOpen(true)}
 					>
 						Nota
-				</Button>
-			</Box>
+					</Button>
+				</Box>
 
-			<Divider sx={{ my: 2, borderColor: 'divider' }} />
+				<Divider sx={{ my: 2, borderColor: 'divider' }} />
 
-			<Paper
-				elevation={0}
-				variant="outlined"
-				sx={{
-					height: 62,
-					display: 'flex',
-					alignItems: 'center',
-					gap: 1.5,
-					px: 2,
-					borderRadius: '8px',
-					bgcolor: 'whitesmoke',
-					mb: 1.5,
-					borderColor: 'divider'
-				}}
-			>
-				<Metric
-					label="Compra"
-					value={`$${Math.round(purchasePrice).toLocaleString('en-US')}`}
-				/>
-				<Divider
-					orientation="vertical"
-					flexItem
-				/>
-				<Metric
-					label="Venta"
-					value={`$${Math.round(salePrice).toLocaleString('en-US')}`}
-					valueColor="#1D4ED8"
-				/>
-				<Divider
-					orientation="vertical"
-					flexItem
-				/>
-				<Metric
-					label="Margen"
-					value={`${margin.toFixed(1)}%`}
-					valueColor="#004D1A"
-				/>
-			</Paper>
+				<Paper
+					elevation={0}
+					variant="outlined"
+					sx={{
+						height: 62,
+						display: 'flex',
+						alignItems: 'center',
+						gap: 1.5,
+						px: 2,
+						borderRadius: '8px',
+						bgcolor: 'whitesmoke',
+						mb: 1.5,
+						borderColor: 'divider'
+					}}
+				>
+					<Metric
+						label="Compra"
+						value={`$${Math.round(purchasePrice).toLocaleString('en-US')}`}
+					/>
+					<Divider
+						orientation="vertical"
+						flexItem
+					/>
+					<Metric
+						label="Venta"
+						value={`$${Math.round(salePrice).toLocaleString('en-US')}`}
+						valueColor="#1D4ED8"
+					/>
+					<Divider
+						orientation="vertical"
+						flexItem
+					/>
+					<Metric
+						label="Margen"
+						value={`${margin.toFixed(1)}%`}
+						valueColor="#004D1A"
+					/>
+				</Paper>
 
 				<Paper
 					elevation={0}
@@ -284,11 +307,11 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 					)}
 				</Paper>
 
-			<Box sx={{ flex: 1 }} />
-			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-				<Button
-					fullWidth
-					variant="contained"
+				<Box sx={{ flex: 1 }} />
+				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+					<Button
+						fullWidth
+						variant="contained"
 						sx={{ textTransform: 'none', fontWeight: 600 }}
 					>
 						Ver ficha tecnica
@@ -296,26 +319,26 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 							sx={{ ml: 1 }}
 							size={16}
 						>
-						heroicons-outline:document-text
-					</FuseSvgIcon>
-				</Button>
-				<Button
-					fullWidth
-					variant="outlined"
-					color="inherit"
-					sx={{ textTransform: 'none', fontWeight: 600 }}
-				>
-					Crear presupuesto
-					<FuseSvgIcon
-						sx={{ ml: 1 }}
-						size={16}
+							heroicons-outline:document-text
+						</FuseSvgIcon>
+					</Button>
+					<Button
+						fullWidth
+						variant="outlined"
+						color="inherit"
+						sx={{ textTransform: 'none', fontWeight: 600 }}
 					>
-						heroicons-outline:document-plus
-					</FuseSvgIcon>
-				</Button>
-				<Button
-					fullWidth
-					variant="outlined"
+						Crear presupuesto
+						<FuseSvgIcon
+							sx={{ ml: 1 }}
+							size={16}
+						>
+							heroicons-outline:document-plus
+						</FuseSvgIcon>
+					</Button>
+					<Button
+						fullWidth
+						variant="outlined"
 						color="inherit"
 						sx={{ textTransform: 'none', fontWeight: 600 }}
 						onClick={() => setNoteOpen(true)}
@@ -416,9 +439,10 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 					<Button onClick={() => setAlarmOpen(false)}>Cancelar</Button>
 					<Button
 						variant="contained"
-						onClick={() => setAlarmOpen(false)}
+						onClick={handleSaveStockAlert}
+						disabled={isUpdatingAlert}
 					>
-						Guardar
+						{isUpdatingAlert ? 'Guardando...' : 'Guardar'}
 					</Button>
 				</DialogActions>
 			</Dialog>

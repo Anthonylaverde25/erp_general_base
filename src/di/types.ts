@@ -117,10 +117,12 @@ export const TYPES = {
 
   // Items
   ItemRepository: Symbol.for("ItemRepository"),
+  IItemActionRepository: Symbol.for("IItemActionRepository"),
   IndexItemsUseCase: Symbol.for("IndexItemsUseCase"),
   ShowItemUseCase: Symbol.for("ShowItemUseCase"),
   CreateItemUseCase: Symbol.for("CreateItemUseCase"),
   UpdateItemUseCase: Symbol.for("UpdateItemUseCase"),
+  UpdateStockAlertUseCase: Symbol.for("UpdateStockAlertUseCase"),
 
   // Categories
   CategoryRepository: Symbol.for("CategoryRepository"),

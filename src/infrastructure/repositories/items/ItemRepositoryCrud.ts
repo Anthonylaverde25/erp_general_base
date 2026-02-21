@@ -7,6 +7,7 @@ import {
 } from "@/domain/entities/items/DTOs/ItemDTOs";
 import { ItemEntity } from "@/domain/entities/items/ItemEntity";
 import { ItemMapper } from "@/infrastructure/mappers/items/ItemMapper";
+import { ItemWriteMapper } from "@/infrastructure/mappers/items/ItemWriteMapper";
 import { injectable } from "inversify";
 
 @injectable()
@@ -92,10 +93,11 @@ export class ItemRepositoryCrud implements IItemRepository {
   }
 
   async create(
-    itemData: CreateItemDTO,
+    itemData: ItemEntity,
   ): Promise<{ item: ItemEntity; message: string }> {
-    const useMultipart = this.hasFile(itemData);
-    const requestData = useMultipart ? this.buildFormData(itemData) : itemData;
+    const payload = ItemWriteMapper.toCreateDTO(itemData.toCreateData());
+    const useMultipart = this.hasFile(payload);
+    const requestData = useMultipart ? this.buildFormData(payload) : payload;
 
     const {
       data: { item, message },
@@ -116,10 +118,11 @@ export class ItemRepositoryCrud implements IItemRepository {
 
   async update(
     id: number,
-    itemData: UpdateItemDTO,
+    itemData: ItemEntity,
   ): Promise<{ item: ItemEntity; message: string }> {
-    const useMultipart = this.hasFile(itemData);
-    const requestData = useMultipart ? this.buildFormData(itemData) : itemData;
+    const payload = ItemWriteMapper.toUpdateDTO(itemData.toUpdateData());
+    const useMultipart = this.hasFile(payload);
+    const requestData = useMultipart ? this.buildFormData(payload) : payload;
 
     const {
       data: { item, message },

@@ -71,6 +71,18 @@ export const ItemColumns: MRT_ColumnDef<ItemEntity>[] = [
         )
     },
     {
+        accessorKey: 'physical_profile.barcode',
+        header: 'Cód. Barras',
+        size: 130,
+        enableResizing: true,
+        enableColumnFilter: true,
+        Cell: ({ row }) => (
+            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                {row.original.physical_profile?.barcode || '-'}
+            </Typography>
+        )
+    },
+    {
         accessorKey: 'type',
         header: 'Type',
         size: 130,
@@ -130,6 +142,51 @@ export const ItemColumns: MRT_ColumnDef<ItemEntity>[] = [
                 ${row.original.sale_price.toFixed(2)}
             </Typography>
         )
+    },
+    {
+        accessorKey: 'total_stock',
+        header: 'Stock Total',
+        size: 100,
+        enableResizing: true,
+        enableColumnFilter: true,
+        Cell: ({ row }) => {
+            if (row.original.type !== 'physical' || !row.original.physical_profile?.is_inventoriable) {
+                return <Typography variant="body2" color="text.secondary">-</Typography>;
+            }
+            const stock = row.original.total_stock ?? 0;
+            return (
+                <Typography variant="body2" fontWeight={500} color={stock > 0 ? 'success.main' : 'error.main'}>
+                    {stock}
+                </Typography>
+            );
+        }
+    },
+    {
+        accessorKey: 'physical_profile.is_inventoriable',
+        header: 'Inventariable',
+        size: 130,
+        enableResizing: true,
+        enableColumnFilter: true,
+        Cell: ({ row }) => {
+            if (row.original.type !== 'physical') {
+                return <Typography variant="body2" color="text.secondary">-</Typography>;
+            }
+            const isInventoriable = row.original.physical_profile?.is_inventoriable;
+            const stockMin = row.original.physical_profile?.stock_min;
+
+            return (
+                <Box className="flex flex-col">
+                    <Typography variant="body2" fontWeight={500}>
+                        {isInventoriable ? 'Sí' : 'No'}
+                    </Typography>
+                    {isInventoriable && (stockMin !== undefined && stockMin !== null) && (
+                        <Typography variant="caption" color="text.secondary">
+                            Min: {stockMin}
+                        </Typography>
+                    )}
+                </Box>
+            );
+        }
     },
     {
         accessorKey: 'is_active',

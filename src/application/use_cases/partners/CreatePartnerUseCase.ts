@@ -12,7 +12,7 @@ export class CreatePartnerUseCase {
     ) { }
 
     async execute(data: CreatePartnerDTO): Promise<{ partner: PartnerEntity; message: string }> {
-        return await this.repository.create(data);
+        const partner = PartnerEntity.create(data);
+        return await this.repository.create(partner);
     }
 }
-

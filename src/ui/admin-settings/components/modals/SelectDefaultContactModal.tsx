@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
     Box,
     Typography,
-    IconButton,
     List,
     ListItem,
     ListItemButton,
@@ -15,6 +9,7 @@ import {
     Stack
 } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
+import { AppFormModal } from '@/components/modals/AppFormModal';
 import { IContact } from '@/types/company.types';
 import { Email, Phone } from '@mui/icons-material';
 import { useChangeDefaultContact } from '@/features/companies/hooks/useChangeDefaultContact';
@@ -53,37 +48,14 @@ export default function SelectDefaultContactModal({
     };
 
     return (
-        <Dialog
-            open={open}
+        <AppFormModal
+            isOpen={open}
             onClose={onClose}
-            maxWidth="sm"
-            fullWidth
-            PaperProps={{
-                sx: {
-                    borderRadius: 1,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                }
-            }}
+            title="Seleccionar Contacto Predeterminado"
+            onConfirm={handleSave}
+            isConfirmDisabled={selectedId === undefined}
         >
-            <DialogTitle
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    pb: 2,
-                    borderBottom: 1,
-                    borderColor: 'divider'
-                }}
-            >
-                <Typography variant="h6" fontWeight={600}>
-                    Seleccionar Contacto Predeterminado
-                </Typography>
-                <IconButton onClick={onClose} size="small">
-                    <FuseSvgIcon size={20}>heroicons-outline:x-mark</FuseSvgIcon>
-                </IconButton>
-            </DialogTitle>
-
-            <DialogContent sx={{ p: 0, mt: 2 }}>
+            <Box sx={{ mt: 2 }}>
                 <List sx={{ py: 0 }}>
                     {items.map((item, index) => {
                         const isSelected = selectedId === item.id;
@@ -159,32 +131,7 @@ export default function SelectDefaultContactModal({
                         );
                     })}
                 </List>
-            </DialogContent>
-
-            <DialogActions
-                sx={{
-                    px: 3,
-                    py: 2,
-                    borderTop: 1,
-                    borderColor: 'divider'
-                }}
-            >
-                <Button
-                    onClick={onClose}
-                    variant="outlined"
-                    color="inherit"
-                >
-                    Cancelar
-                </Button>
-                <Button
-                    onClick={handleSave}
-                    variant="contained"
-                    color="primary"
-                    disabled={selectedId === undefined}
-                >
-                    Guardar
-                </Button>
-            </DialogActions>
-        </Dialog>
+            </Box>
+        </AppFormModal>
     );
 }

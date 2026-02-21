@@ -2,6 +2,12 @@ import { CategoryDTO } from '@/domain/entities/categories/DTOs/CategoryDTOs';
 
 export type ItemType = 'physical' | 'service';
 
+export interface ItemPartner {
+	id: number;
+	name: string;
+	is_default: boolean;
+}
+
 export interface ItemTaxRate {
 	id: number;
 	name: string;
@@ -41,15 +47,19 @@ export interface ItemDTO {
 	attributes?: Record<string, unknown>;
 	tax_rates: ItemTaxRate[];
 	inventory?: ItemInventory[];
+	total_stock?: number;
 	description?: string;
 	store_id?: number | null;
 	partner_id?: number | null;
 	partner_name?: string | null;
+	partners?: ItemPartner[];
 	physical_profile?: {
 		barcode?: string;
 		weight?: number;
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
+		stock_min?: number;
+		has_stock_alert?: boolean;
 	} | null;
 	service_profile?: {
 		estimated_time?: number;
@@ -74,12 +84,14 @@ export interface CreateItemDTO {
 	store_id?: number | null;
 	initial_stock?: number;
 	quantity?: number;
-	partner_id?: number | null;
+	partner_ids?: number[];
 	physical_profile?: {
 		barcode?: string;
 		weight?: number;
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
+		stock_min?: number;
+		has_stock_alert?: boolean;
 	};
 	service_profile?: {
 		estimated_time?: number;
@@ -102,12 +114,14 @@ export interface UpdateItemDTO {
 	tax_rate_ids?: number[];
 	image?: File | null;
 	store_id?: number | null;
-	partner_id?: number | null;
+	partner_ids?: number[];
 	physical_profile?: {
 		barcode?: string;
 		weight?: number;
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
+		stock_min?: number;
+		has_stock_alert?: boolean;
 	};
 	service_profile?: {
 		estimated_time?: number;

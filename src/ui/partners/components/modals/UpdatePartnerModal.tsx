@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@mui/material";
+import { AppFormModal } from "@/components/modals/AppFormModal";
 import { PartnersForm } from "../forms/PartnersForm";
 import { useShowPartner } from "@/features/partners/hooks/useShowPartner";
 
@@ -17,20 +17,22 @@ export default function UpdatePartnerModal({
     const { partner, isLoading } = useShowPartner(partnerId);
 
     return (
-        <Dialog
-            open={open}
+        <AppFormModal
+            isOpen={open}
             onClose={onClose}
             key={partnerId}
             maxWidth="md"
-            fullWidth
+            title="Editar Socio"
+            hideCancel
+            actions={<></>}
         >
-            <DialogContent>
+            <div className="p-0">
                 {isLoading || !partner ? (
                     <div className="p-4 text-center">Cargando...</div>
                 ) : (
                     <PartnersForm data={partner} onCancel={onClose} onSuccess={onClose} />
                 )}
-            </DialogContent>
-        </Dialog>
+            </div>
+        </AppFormModal>
     );
 }

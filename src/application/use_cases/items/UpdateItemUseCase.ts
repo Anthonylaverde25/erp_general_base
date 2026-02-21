@@ -9,6 +9,7 @@ export class UpdateItemUseCase {
     constructor(@inject(TYPES.ItemRepository) private readonly itemRepository: IItemRepository) { }
 
     async execute(id: number, data: UpdateItemDTO): Promise<{ item: ItemEntity; message: string }> {
-        return this.itemRepository.update(id, data);
+        const item = ItemEntity.update(id, data);
+        return this.itemRepository.update(id, item);
     }
 }

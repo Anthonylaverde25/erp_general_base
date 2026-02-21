@@ -5,12 +5,13 @@ import type { ItemFormType } from '@/schemas/items/items.schema';
 import CreateItemSection from './CreateItemSection';
 
 type CreateItemStockSectionProps = {
+	mode: 'create' | 'edit';
 	isLoading: boolean;
 	textFieldProps: TextFieldProps;
 	stores: StoreEntity[];
 };
 
-function CreateItemStockSection({ isLoading, textFieldProps, stores }: CreateItemStockSectionProps) {
+function CreateItemStockSection({ mode, isLoading, textFieldProps, stores }: CreateItemStockSectionProps) {
 	const {
 		control,
 		formState: { errors }
@@ -84,11 +85,54 @@ function CreateItemStockSection({ isLoading, textFieldProps, stores }: CreateIte
 							label="Cantidad Inicial"
 							type="number"
 							error={!!errors.quantity}
-							helperText={errors.quantity?.message}
-							disabled={!(isInventoriable ?? true) || isLoading}
+							helperText={
+								mode === 'edit'
+									? 'El stock inicial no es editable una vez creado el item'
+									: errors.quantity?.message
+							}
+							disabled={mode === 'edit' || !(isInventoriable ?? true) || isLoading}
 							onChange={(event) =>
 								field.onChange(event.target.value === '' ? undefined : Number(event.target.value))
 							}
+						/>
+					)}
+				/>
+
+				<Controller
+					name="stock_min"
+					control={control}
+					render={({ field }) => (
+						<TextField
+							{...field}
+							value={field.value ?? ''}
+							{...textFieldProps}
+							label="Stock Mínimo (Opcional)"
+							type="number"
+							error={!!errors.stock_min}
+							helperText={errors.stock_min?.message}
+							disabled={!(isInventoriable ?? true) || isLoading}
+							onChange={(event) =>
+								field.onChange(event.target.value === '' ? null : Number(event.target.value))
+							}
+						/>
+					)}
+				/>
+
+				<Controller
+					name="has_stock_alert"
+					control={control}
+					render={({ field }) => (
+						<FormControlLabel
+							control={
+								<Switch
+									checked={field.value ?? false}
+									onChange={(event) => field.onChange(event.target.checked)}
+									disabled={!(isInventoriable ?? true) || isLoading}
+									color="secondary"
+								/>
+							}
+							label="Activar Alertas de Stock"
+							sx={{ mt: 1 }}
 						/>
 					)}
 				/>

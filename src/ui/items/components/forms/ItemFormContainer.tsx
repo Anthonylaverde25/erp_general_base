@@ -81,8 +81,8 @@ function ItemFormContainer({
 			selectedCategory?.children?.length
 				? selectedCategory.children
 				: categories.filter(
-						(category) => selectedCategoryId && category.parent_id === Number(selectedCategoryId)
-					),
+					(category) => selectedCategoryId && category.parent_id === Number(selectedCategoryId)
+				),
 		[categories, selectedCategory, selectedCategoryId]
 	);
 
@@ -184,6 +184,7 @@ function ItemFormContainer({
 
 							{itemType === 'physical' && (
 								<CreateItemStockSection
+									mode={mode}
 									isLoading={isSubmitting}
 									textFieldProps={textFieldProps}
 									stores={stores}

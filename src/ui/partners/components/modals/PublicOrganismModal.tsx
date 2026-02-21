@@ -1,20 +1,15 @@
 import { useState } from 'react';
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
     TextField,
     MenuItem,
     Button,
     Typography,
-    IconButton,
-    Divider,
     Fade,
-    Box
+    Box,
+    IconButton
 } from '@mui/material';
-import { Close } from '@mui/icons-material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
+import { AppFormModal } from '@/components/modals/AppFormModal';
 
 export interface PublicOrganism {
     id: string;
@@ -100,39 +95,27 @@ export default function PublicOrganismModal({
     const isFormValid = form.nombre.trim() !== '';
 
     return (
-        <Dialog
-            open={open}
+        <AppFormModal
+            isOpen={open}
             onClose={onClose}
-            maxWidth="sm"
-            fullWidth
-            PaperProps={{
-                sx: { borderRadius: 3, overflow: 'hidden' }
-            }}
+            title="Organismos Públicos"
+            subtitle="Gestione los organismos públicos asociados a este socio"
+            actions={
+                <>
+                    <Typography variant="caption" color="text.secondary" sx={{ mr: 'auto' }}>
+                        {organisms.length} organismo{organisms.length !== 1 ? 's' : ''} asociado{organisms.length !== 1 ? 's' : ''}
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={onClose}
+                    >
+                        Aceptar
+                    </Button>
+                </>
+            }
         >
-            <DialogTitle
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    pb: 1
-                }}
-            >
-                <div>
-                    <Typography variant="h6" fontWeight={700}>
-                        Organismos Públicos
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                        Gestione los organismos públicos asociados a este socio
-                    </Typography>
-                </div>
-                <IconButton onClick={onClose} size="small">
-                    <Close fontSize="small" />
-                </IconButton>
-            </DialogTitle>
-
-            <Divider />
-
-            <DialogContent sx={{ p: 0 }}>
+            <Box sx={{ p: 0 }}>
                 {/* LIST OF EXISTING ORGANISMS */}
                 {organisms.length > 0 && (
                     <Box sx={{ p: 2, pb: 0 }}>
@@ -314,22 +297,7 @@ export default function PublicOrganismModal({
                         <Typography variant="caption" className="mt-1">Haga clic para añadir uno</Typography>
                     </Box>
                 )}
-            </DialogContent>
-
-            <Divider />
-
-            <DialogActions sx={{ px: 3, py: 2 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ mr: 'auto' }}>
-                    {organisms.length} organismo{organisms.length !== 1 ? 's' : ''} asociado{organisms.length !== 1 ? 's' : ''}
-                </Typography>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={onClose}
-                >
-                    Aceptar
-                </Button>
-            </DialogActions>
-        </Dialog>
+            </Box>
+        </AppFormModal>
     );
 }

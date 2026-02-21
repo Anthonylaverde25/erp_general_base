@@ -69,6 +69,7 @@ export default function ItemsTabView({ currentTab, onTabChange }: ItemsTabViewPr
                 <ItemTable
                     items={filteredItems}
                     isLoading={isLoading}
+                    currentTab={currentTab}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onRowClick={handleRowClick}

@@ -1,5 +1,5 @@
 import { Controller, useFormContext } from 'react-hook-form';
-import { MenuItem, TextField, Typography, type TextFieldProps } from '@mui/material';
+import { Autocomplete, Chip, MenuItem, TextField, Typography, type TextFieldProps } from '@mui/material';
 import type { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import type { ItemFormType } from '@/schemas/items/items.schema';
 import CreateItemSection from './CreateItemSection';
@@ -130,29 +130,39 @@ function CreateItemTrackingSection({ isLoading, textFieldProps, partners }: Crea
 
 				<div className="col-span-1 sm:col-span-2">
 					<Controller
-						name="partner_id"
+						name="partner_ids"
 						control={control}
 						render={({ field }) => (
-							<TextField
-								{...textFieldProps}
-								select
-								label="Proveedor por defecto"
+							<Autocomplete
+								multiple
+								options={partners}
+								getOptionLabel={(option) => option.name}
+								value={partners.filter((p) =>
+									(field.value ?? []).includes(String(p.id))
+								)}
+								onChange={(_, newValue) => {
+									field.onChange(newValue.map((p) => String(p.id)));
+								}}
 								disabled={isLoading}
-								value={field.value ?? ''}
-								onChange={(event) => field.onChange(event.target.value)}
-							>
-								<MenuItem value="">
-									<em>Sin proveedor</em>
-								</MenuItem>
-								{partners.map((partner) => (
-									<MenuItem
-										key={partner.id}
-										value={String(partner.id)}
-									>
-										{partner.name}
-									</MenuItem>
-								))}
-							</TextField>
+								renderTags={(value, getTagProps) =>
+									value.map((option, index) => (
+										<Chip
+											{...getTagProps({ index })}
+											key={option.id}
+											label={option.name}
+											size="small"
+										/>
+									))
+								}
+								renderInput={(params) => (
+									<TextField
+										{...params}
+										{...textFieldProps}
+										label="Proveedores"
+										placeholder="Buscar proveedor..."
+									/>
+								)}
+							/>
 						)}
 					/>
 				</div>
@@ -162,3 +172,4 @@ function CreateItemTrackingSection({ isLoading, textFieldProps, partners }: Crea
 }
 
 export default CreateItemTrackingSection;
+

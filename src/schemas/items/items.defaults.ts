@@ -15,7 +15,7 @@ export const defaultCreateItemValues = {
 	tax_rate_ids: [],
 	image: null,
 	store_id: '',
-	partner_id: '',
+	partner_ids: [],
 	// Product tracking defaults
 	barcode: '',
 	weight: 0,

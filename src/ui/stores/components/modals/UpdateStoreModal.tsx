@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@mui/material";
+import { AppFormModal } from "@/components/modals/AppFormModal";
 import UpdateStoreForm from "../forms/UpdateStoreForm";
 
 interface UpdateStoreModalProps {
@@ -13,14 +13,21 @@ export default function UpdateStoreModal({
     storeId,
 }: UpdateStoreModalProps) {
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogContent>
+        <AppFormModal
+            isOpen={open}
+            onClose={onClose}
+            title="Editar Almacén"
+            maxWidth="sm"
+            hideCancel
+            actions={<></>}
+        >
+            <div className="p-0">
                 <UpdateStoreForm
                     storeId={storeId}
                     onCancel={onClose}
                     onSuccess={onClose}
                 />
-            </DialogContent>
-        </Dialog>
+            </div>
+        </AppFormModal>
     );
 }

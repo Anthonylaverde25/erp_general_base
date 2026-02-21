@@ -24,7 +24,7 @@ function CreateItemPage() {
         barcode: undefined,
         is_inventoriable: undefined,
         store_id: undefined,
-        partner_id: undefined,
+        partner_ids: undefined,
         initial_stock: undefined,
         quantity: undefined,
         dimension_length: undefined,
@@ -32,7 +32,9 @@ function CreateItemPage() {
         dimension_height: undefined,
         dimension_unit: undefined,
         weight: undefined,
-      };
+        stock_min: undefined,
+        has_stock_alert: undefined,
+      } as ItemFormType;
     }
 
     return {

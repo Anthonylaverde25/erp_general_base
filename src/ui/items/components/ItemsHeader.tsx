@@ -22,6 +22,17 @@ function ItemsHeader(props: ItemsHeaderProps) {
         }
     };
 
+    const getTitleText = () => {
+        switch (currentTab) {
+            case 'physical':
+                return 'Items | Artículos';
+            case 'service':
+                return 'Items | Servicios';
+            default:
+                return 'Items';
+        }
+    };
+
     return (
         <Box className='container' sx={{ p: 3, borderBottom: `1px solid ${theme.palette.divider}` }}>
             <PageBreadcrumb className="mb-4" />
@@ -33,7 +44,7 @@ function ItemsHeader(props: ItemsHeaderProps) {
             >
                 <Box>
                     <Typography variant="h2" className="text-3xl font-bold tracking-tight">
-                        Items
+                        {getTitleText()}
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary">
                         Manage your inventory items

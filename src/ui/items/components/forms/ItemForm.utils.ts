@@ -45,7 +45,7 @@ export const mapItemFormToDTO = (values: ItemFormType): CreateItemDTO => {
 		store_id: values.store_id ? Number(values.store_id) : undefined,
 		initial_stock: initialStock,
 		quantity: initialStock,
-		partner_id: values.partner_id ? Number(values.partner_id) : undefined
+		partner_ids: values.partner_ids?.map(Number).filter(Boolean)
 	};
 
 	if (values.type === 'physical') {
@@ -56,7 +56,9 @@ export const mapItemFormToDTO = (values: ItemFormType): CreateItemDTO => {
 				weight: values.weight !== undefined ? Number(values.weight) : undefined,
 				dimensions: buildDimensions(values),
 				is_inventoriable:
-					typeof values.is_inventoriable !== 'undefined' ? Boolean(values.is_inventoriable) : undefined
+					typeof values.is_inventoriable !== 'undefined' ? Boolean(values.is_inventoriable) : undefined,
+				stock_min: values.stock_min !== undefined && values.stock_min !== null ? Number(values.stock_min) : undefined,
+				has_stock_alert: typeof values.has_stock_alert !== 'undefined' ? Boolean(values.has_stock_alert) : undefined
 			}
 		};
 	}
@@ -97,8 +99,7 @@ export const mapItemToFormValues = (item: ItemEntity): ItemFormType => {
 		is_active: item.is_active ?? true,
 		tax_rate_ids: item.tax_rates?.map((taxRate) => taxRate.id) ?? [],
 		image: null,
-		store_id: item.store_id != null ? String(item.store_id) : '',
-		partner_id: item.partner_id != null ? String(item.partner_id) : '',
+		partner_ids: item.partner_id != null ? [String(item.partner_id)] : [],
 		barcode: item.physical_profile?.barcode ?? '',
 		weight: item.physical_profile?.weight ?? 0,
 		dimension_length: dimensions?.length,
@@ -106,8 +107,11 @@ export const mapItemToFormValues = (item: ItemEntity): ItemFormType => {
 		dimension_height: dimensions?.height,
 		dimension_unit: dimensions?.unit ?? 'cm',
 		is_inventoriable: item.physical_profile?.is_inventoriable ?? true,
-		initial_stock: undefined,
+		stock_min: item.physical_profile?.stock_min ?? null,
+		has_stock_alert: item.physical_profile?.has_stock_alert ?? false,
+		initial_stock: item.inventory?.[0]?.quantity_on_hand !== undefined ? item.inventory[0].quantity_on_hand : undefined,
 		quantity: undefined,
+		store_id: item.inventory?.[0]?.store_id ? String(item.inventory[0].store_id) : (item.store_id != null ? String(item.store_id) : ''),
 		estimated_time: item.service_profile?.estimated_time,
 		req_scheduling: item.service_profile?.req_scheduling ?? false
 	} as ItemFormType;

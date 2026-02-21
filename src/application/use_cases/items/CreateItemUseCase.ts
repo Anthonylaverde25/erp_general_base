@@ -6,9 +6,16 @@ import { TYPES } from "@/di/types";
 
 @injectable()
 export class CreateItemUseCase {
-    constructor(@inject(TYPES.ItemRepository) private readonly itemRepository: IItemRepository) { }
+  constructor(
+    @inject(TYPES.ItemRepository)
+    private readonly itemRepository: IItemRepository,
+  ) {}
 
-    async execute(data: CreateItemDTO): Promise<{ item: ItemEntity; message: string }> {
-        return this.itemRepository.create(data);
-    }
+  async execute(
+    data: CreateItemDTO,
+  ): Promise<{ item: ItemEntity; message: string }> {
+    const item = ItemEntity.create(data);
+
+    return this.itemRepository.create(item);
+  }
 }

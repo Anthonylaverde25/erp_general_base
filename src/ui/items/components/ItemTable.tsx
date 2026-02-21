@@ -8,13 +8,14 @@ import DataTable from '@/components/data-table/DataTable';
 interface ItemTableProps {
     items: ItemEntity[] | undefined;
     isLoading?: boolean;
+    currentTab?: string;
     onEdit: (item: ItemEntity) => void;
     onDelete?: (id: number) => void;
     onRowClick?: (item: ItemEntity) => void;
 }
 
 export default function ItemTable(props: ItemTableProps) {
-    const { items, isLoading, onEdit, onDelete, onRowClick } = props;
+    const { items, isLoading, currentTab, onEdit, onDelete, onRowClick } = props;
 
     const columns = useMemo(() => ItemColumns, []);
 
@@ -26,14 +27,26 @@ export default function ItemTable(props: ItemTableProps) {
         <DataTable
             data={items || []}
             columns={columns}
-            state={{ isLoading }}
+            state={{
+                isLoading,
+                columnVisibility: {
+                    'physical_profile.barcode': currentTab !== 'service',
+                    'total_stock': currentTab !== 'service',
+                    'physical_profile.is_inventoriable': currentTab !== 'service',
+                }
+            }}
             enablePagination
             initialState={{
                 density: 'compact',
                 showColumnFilters: false,
                 pagination: { pageSize: 15, pageIndex: 0 },
                 showGlobalFilter: true,
-                columnPinning: { left: [], right: ['mrt-row-actions'] }
+                columnPinning: { left: [], right: ['mrt-row-actions'] },
+                columnVisibility: {
+                    'physical_profile.barcode': currentTab !== 'service',
+                    'total_stock': currentTab !== 'service',
+                    'physical_profile.is_inventoriable': currentTab !== 'service',
+                }
             }}
             muiPaginationProps={{
                 rowsPerPageOptions: [5, 10, 25],

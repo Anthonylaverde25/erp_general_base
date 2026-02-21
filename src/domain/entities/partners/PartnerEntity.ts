@@ -4,6 +4,50 @@ import { ContactEntity } from "../contacts/Contact";
 import { BankAccountEntity } from "../bank_accounts/BankAccount";
 import { IAddress, IContact } from "@/types/company.types";
 import { IBankAccount } from "@/types/bank_account.types";
+import { CreateAddressDTO } from "../addresses/DTOs/CreateAddressDTO";
+import { CreateContactDTO } from "../contacts/DTOs/CreateContactDTO";
+import { ICreateBankAccount, IUpdateBankAccount } from "@/types/bank_account.types";
+import { UpdatePartnerDTO } from "./DTOs/PartnerDTOs";
+
+export interface CreatePartnerWriteData {
+    companyId: number;
+    name: string;
+    comercialName: string;
+    vatNumber: string;
+    cif: string;
+    role: PartnerRole;
+    paymentMethodId: number;
+    type: PartnerType;
+    creditAvailable: boolean;
+    groupedBilling: boolean;
+    currencyId?: number | null;
+    website?: string;
+    address?: CreateAddressDTO[];
+    contact?: CreateContactDTO[];
+    bankAccounts?: ICreateBankAccount[];
+    saleTaxIds?: number[];
+    purchaseTaxIds?: number[];
+}
+
+export interface UpdatePartnerWriteData {
+    companyId?: number;
+    name?: string;
+    comercialName?: string;
+    vatNumber?: string;
+    cif?: string;
+    role?: PartnerRole;
+    paymentMethodId?: number;
+    type?: PartnerType;
+    creditAvailable?: boolean;
+    groupedBilling?: boolean;
+    currencyId?: number | null;
+    website?: string;
+    address?: CreateAddressDTO[];
+    contact?: CreateContactDTO[];
+    bankAccounts?: (ICreateBankAccount | IUpdateBankAccount)[];
+    saleTaxIds?: number[];
+    purchaseTaxIds?: number[];
+}
 
 export interface Partner {
     id: number;
@@ -43,6 +87,8 @@ export class PartnerEntity implements Partner {
     private _bank_accounts: BankAccountEntity[];
     private _sale_taxes: PartnerTax[];
     private _purchase_taxes: PartnerTax[];
+    private _createData?: CreatePartnerWriteData;
+    private _updateData?: UpdatePartnerWriteData;
 
     constructor(
         id: number,
@@ -61,7 +107,9 @@ export class PartnerEntity implements Partner {
         contact: ContactEntity[],
         bank_accounts: BankAccountEntity[],
         sale_taxes: PartnerTax[],
-        purchase_taxes: PartnerTax[]
+        purchase_taxes: PartnerTax[],
+        createData?: CreatePartnerWriteData,
+        updateData?: UpdatePartnerWriteData
     ) {
         this._id = id;
         this._company_id = company_id;
@@ -80,6 +128,8 @@ export class PartnerEntity implements Partner {
         this._bank_accounts = bank_accounts;
         this._sale_taxes = sale_taxes;
         this._purchase_taxes = purchase_taxes;
+        this._createData = createData;
+        this._updateData = updateData;
     }
 
     get id(): number {
@@ -190,6 +240,26 @@ export class PartnerEntity implements Partner {
     }
 
     static create(data: CreatePartnerDTO): PartnerEntity {
+        const createData: CreatePartnerWriteData = {
+            companyId: data.company_id,
+            name: data.name,
+            comercialName: data.comercial_name,
+            vatNumber: data.vat_number,
+            cif: data.cif,
+            role: data.role,
+            paymentMethodId: data.payment_method_id,
+            type: data.type,
+            creditAvailable: data.credit_available ?? false,
+            groupedBilling: data.grouped_billing ?? false,
+            currencyId: data.currency_id ?? null,
+            website: data.website,
+            address: data.address,
+            contact: data.contact,
+            bankAccounts: data.bank_accounts,
+            saleTaxIds: data.sale_tax_ids,
+            purchaseTaxIds: data.purchase_tax_ids,
+        };
+
         return new PartnerEntity(
             0,
             data.company_id,
@@ -207,11 +277,32 @@ export class PartnerEntity implements Partner {
             data.contact ? data.contact.map(cnt => ContactEntity.create(cnt)) : [],
             data.bank_accounts ? data.bank_accounts.map(acc => BankAccountEntity.create(acc)) : [],
             [], // sale_taxes not available on create DTO directly as objects usually
-            []  // purchase_taxes not available on create DTO directly as objects usually
+            [],  // purchase_taxes not available on create DTO directly as objects usually
+            createData
         );
     }
 
-    static update(id: number, data: Partial<Partner>): PartnerEntity {
+    static update(id: number, data: UpdatePartnerDTO): PartnerEntity {
+        const updateData: UpdatePartnerWriteData = {
+            companyId: data.company_id,
+            name: data.name,
+            comercialName: data.comercial_name,
+            vatNumber: data.vat_number,
+            cif: data.cif,
+            role: data.role,
+            paymentMethodId: data.payment_method_id,
+            type: data.type,
+            creditAvailable: data.credit_available,
+            groupedBilling: data.grouped_billing,
+            currencyId: data.currency_id,
+            website: data.website,
+            address: data.address,
+            contact: data.contact,
+            bankAccounts: data.bank_accounts,
+            saleTaxIds: data.sale_tax_ids,
+            purchaseTaxIds: data.purchase_tax_ids,
+        };
+
         return new PartnerEntity(
             id,
             data.company_id || 0,
@@ -225,12 +316,64 @@ export class PartnerEntity implements Partner {
             data.credit_available ?? false,
             data.grouped_billing ?? false,
             data.currency_id ?? null,
-            data.address ? data.address.map(addr => AddressEntity.fromPrimitives(addr)) : [],
-            data.contact ? data.contact.map(cnt => ContactEntity.fromPrimitives(cnt)) : [],
-            data.bank_accounts ? data.bank_accounts.map(acc => BankAccountEntity.fromPrimitives(acc)) : [],
+            data.address ? data.address.map(addr => AddressEntity.create(addr)) : [],
+            data.contact ? data.contact.map(cnt => ContactEntity.create(cnt)) : [],
+            data.bank_accounts ? data.bank_accounts.map(acc => BankAccountEntity.create(acc as ICreateBankAccount)) : [],
             [], // sale_taxes update not usually passing full objects here
-            []  // purchase_taxes update not usually passing full objects here
+            [], // purchase_taxes update not usually passing full objects here
+            undefined,
+            updateData
         );
+    }
+
+    toCreateData(): CreatePartnerWriteData {
+        if (this._createData) {
+            return this._createData;
+        }
+
+        return {
+            companyId: this._company_id,
+            name: this._name,
+            comercialName: this._comercial_name,
+            vatNumber: this._vat_number,
+            cif: this._cif,
+            role: this._role,
+            paymentMethodId: this._payment_method_id,
+            type: this._type,
+            creditAvailable: this._credit_available,
+            groupedBilling: this._grouped_billing,
+            currencyId: this._currency_id,
+            address: this._address.map((addr) => addr.toPlainObject() as CreateAddressDTO),
+            contact: this._contact.map((cnt) => cnt.toPlainObject() as CreateContactDTO),
+            bankAccounts: this._bank_accounts.map((acc) => acc.toPlainObject() as ICreateBankAccount),
+            saleTaxIds: this._sale_taxes.map((tax) => tax.id),
+            purchaseTaxIds: this._purchase_taxes.map((tax) => tax.id),
+        };
+    }
+
+    toUpdateData(): UpdatePartnerWriteData {
+        if (this._updateData) {
+            return this._updateData;
+        }
+
+        return {
+            companyId: this._company_id,
+            name: this._name,
+            comercialName: this._comercial_name,
+            vatNumber: this._vat_number,
+            cif: this._cif,
+            role: this._role,
+            paymentMethodId: this._payment_method_id,
+            type: this._type,
+            creditAvailable: this._credit_available,
+            groupedBilling: this._grouped_billing,
+            currencyId: this._currency_id,
+            address: this._address.map((addr) => addr.toPlainObject() as CreateAddressDTO),
+            contact: this._contact.map((cnt) => cnt.toPlainObject() as CreateContactDTO),
+            bankAccounts: this._bank_accounts.map((acc) => acc.toPlainObject() as ICreateBankAccount),
+            saleTaxIds: this._sale_taxes.map((tax) => tax.id),
+            purchaseTaxIds: this._purchase_taxes.map((tax) => tax.id),
+        };
     }
 
     toPlainObject(): Partner {

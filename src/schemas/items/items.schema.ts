@@ -15,7 +15,7 @@ const baseItemSchema = z.object({
 	tax_rate_ids: z.array(z.number()).optional(),
 	image: z.any().optional(),
 	store_id: z.string().nullable().optional(),
-	partner_id: z.string().nullable().optional(),
+	partner_ids: z.array(z.string()).optional(),
 	barcode: z.string().optional(),
 	is_inventoriable: z.boolean().optional(),
 	initial_stock: z.number().min(0).optional(),
@@ -30,7 +30,9 @@ const physicalItemSchema = baseItemSchema.extend({
 	dimension_width: z.number().min(0).optional(),
 	dimension_height: z.number().min(0).optional(),
 	dimension_unit: z.string().optional(),
-	is_inventoriable: z.boolean().optional()
+	is_inventoriable: z.boolean().optional(),
+	stock_min: z.number().min(0).nullable().optional(),
+	has_stock_alert: z.boolean().optional()
 	// Estos campos NO existen en físico
 });
 
@@ -40,6 +42,8 @@ const serviceItemSchema = baseItemSchema.extend({
 	req_scheduling: z.boolean().optional(),
 	barcode: z.undefined().optional(),
 	is_inventoriable: z.undefined().optional(),
+	stock_min: z.undefined().optional(),
+	has_stock_alert: z.undefined().optional(),
 	store_id: z.undefined().optional(),
 	initial_stock: z.undefined().optional(),
 	quantity: z.undefined().optional(),
