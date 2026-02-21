@@ -1,18 +1,22 @@
 'use client';
 
-import Breadcrumbs, { BreadcrumbsProps } from '@mui/material/Breadcrumbs';
 import { FuseNavItemType } from '@fuse/core/FuseNavigation/types/FuseNavItemType';
 import usePathname from '@fuse/hooks/usePathname';
-
-import Typography from '@mui/material/Typography';
-import clsx from 'clsx';
 import Link from '@fuse/core/Link';
+import { cn } from '@/lib/utils';
 import useNavigationItems from './theme-layouts/components/navigation/hooks/useNavigationItems';
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
 
-type PageBreadcrumbProps = BreadcrumbsProps & {
+type PageBreadcrumbProps = {
 	className?: string;
 	skipHome?: boolean;
-	borderColor?: string;
 };
 
 // Function to get the navigation item based on URL
@@ -34,14 +38,7 @@ function getNavigationItem(url: string, navigationItems: FuseNavItemType[]): Fus
 }
 
 function PageBreadcrumb(props: PageBreadcrumbProps) {
-	const {
-		className,
-		skipHome = false,
-		color = 'action.active',
-		borderColor = 'divider',
-		maxItems = 4,
-		...rest
-	} = props;
+	const { className, skipHome = false } = props;
 	const pathname = usePathname();
 	const { data: navigation } = useNavigationItems();
 
@@ -61,28 +58,35 @@ function PageBreadcrumb(props: PageBreadcrumbProps) {
 		);
 
 	return (
-		<Breadcrumbs
-			classes={{ ol: 'list-none m-0 p-0' }}
-			className={clsx('flex w-fit rounded-sm border-1 px-2', className)}
-			sx={{ borderColor: borderColor + '!important' }}
-			aria-label="breadcrumb"
-			color={color}
-			maxItems={maxItems}
-			{...rest}
-		>
-			{crumbs.map((item, index) => (
-				<Typography
-					component={item.url ? Link : 'span'}
-					to={item.url}
-					key={index}
-					className="text-md block max-w-32 truncate font-medium tracking-tight capitalize"
-					role="button"
-					color="inherit"
-				>
-					{item.title}
-				</Typography>
-			))}
-		</Breadcrumbs>
+		<Breadcrumb className={cn(className)}>
+			<BreadcrumbList>
+				{crumbs.map((item, index) => {
+					const isLast = index === crumbs.length - 1;
+
+					return (
+						<BreadcrumbItem key={index}>
+							{isLast ? (
+								<BreadcrumbPage className="max-w-32 truncate capitalize">
+									{item.title}
+								</BreadcrumbPage>
+							) : (
+								<>
+									<BreadcrumbLink asChild>
+										<Link
+											to={item.url}
+											className="max-w-32 truncate capitalize"
+										>
+											{item.title}
+										</Link>
+									</BreadcrumbLink>
+									<BreadcrumbSeparator />
+								</>
+							)}
+						</BreadcrumbItem>
+					);
+				})}
+			</BreadcrumbList>
+		</Breadcrumb>
 	);
 }
 
