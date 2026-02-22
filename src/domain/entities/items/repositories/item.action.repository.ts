@@ -6,9 +6,19 @@ export interface RegisterStockMovementDTO {
     destination_store_id: number;
     quantity: number;
     type: string;
+    reason?: string;
+    reference?: string | null;
+    notes?: string | null;
+}
+
+export interface AdjustStockEntryDTO {
+    item_id: number;
+    destination_store_id: number;
+    quantity: number;
     reason: string;
     reference?: string | null;
     notes?: string | null;
+    client_timestamp: string;
 }
 
 export interface IItemActionRepository {
@@ -20,4 +30,8 @@ export interface IItemActionRepository {
     registerStockMovement(
         data: RegisterStockMovementDTO
     ): Promise<{ message: string }>;
+
+    adjustStockEntry(
+        data: AdjustStockEntryDTO
+    ): Promise<{ message: string; server_timestamp: string }>;
 }

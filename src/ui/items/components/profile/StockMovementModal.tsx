@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -10,16 +10,20 @@ import {
     Box,
     Typography,
     CircularProgress,
+    Divider,
 } from '@mui/material';
-import { Inventory2 } from '@mui/icons-material';
-import { useRegisterStockMovement } from '@/features/items/hooks/useRegisterStockMovement';
+import { Inventory2, AccessTime } from '@mui/icons-material';
+import { useAdjustStockEntry } from '@/features/items/hooks/useAdjustStockEntry';
 import useIndexStores from '@/features/stores/hooks/useIndexStores';
+import useActiveCompany from '@/features/companies/useActiveCompany';
 
 interface StockMovementModalProps {
     open: boolean;
     onClose: () => void;
     itemId: number;
     itemName: string;
+    totalStock?: number;
+    inventoryStocks?: { store_id: number; quantity_on_hand: number }[];
 }
 
 const REASONS = [
@@ -30,27 +34,56 @@ const REASONS = [
     { value: 'other', label: 'Otro' },
 ];
 
-export default function StockMovementModal({ open, onClose, itemId, itemName }: StockMovementModalProps) {
-    const { handleRegisterStockMovement, isLoading } = useRegisterStockMovement();
+
+export default function StockMovementModal({
+    open,
+    onClose,
+    itemId,
+    itemName,
+    totalStock,
+    inventoryStocks = [],
+}: StockMovementModalProps) {
+    const { handleAdjustStockEntry, isLoading } = useAdjustStockEntry();
     const { stores, isLoading: storesLoading } = useIndexStores();
+    const activeCompany = useActiveCompany();
 
     const [quantity, setQuantity] = useState<string>('');
     const [storeId, setStoreId] = useState<string>('');
     const [reason, setReason] = useState<string>('adjustment');
     const [notes, setNotes] = useState<string>('');
+    const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
+    // Pre-seleccionar almacén por defecto de la empresa
+    useEffect(() => {
+        if (!storeId && activeCompany?.settings?.defaultStoreId) {
+            setStoreId(String(activeCompany.settings.defaultStoreId));
+        }
+    }, [activeCompany?.settings?.defaultStoreId, storeId]);
+
+    // Actualizar reloj en tiempo real
+    useEffect(() => {
+        if (!open) return;
+        const interval = setInterval(() => setCurrentTime(new Date()), 1000);
+        return () => clearInterval(interval);
+    }, [open]);
+
+    // Stock del almacén seleccionado
+    const storeStock = useMemo(() => {
+        if (!storeId) return null;
+        const found = inventoryStocks.find((s) => s.store_id === Number(storeId));
+        return found ? found.quantity_on_hand : 0;
+    }, [storeId, inventoryStocks]);
 
     const handleSubmit = async () => {
         if (!quantity || !storeId) return;
 
-        await handleRegisterStockMovement({
+        await handleAdjustStockEntry({
             item_id: itemId,
-            source_store_id: null,
             destination_store_id: Number(storeId),
             quantity: Number(quantity),
-            type: 'entry',
             reason,
-            reference: null,
             notes: notes || null,
+            client_timestamp: new Date().toISOString(),
         });
 
         handleClose();
@@ -64,7 +97,24 @@ export default function StockMovementModal({ open, onClose, itemId, itemName }: 
         onClose();
     };
 
+    // Resetear storeId al abrir para que aplique el default
+    useEffect(() => {
+        if (open && activeCompany?.settings?.defaultStoreId) {
+            setStoreId(String(activeCompany.settings.defaultStoreId));
+        }
+    }, [open, activeCompany?.settings?.defaultStoreId]);
+
     const isValid = Number(quantity) > 0 && storeId;
+
+    const formatDateTime = (date: Date) => {
+        return date.toLocaleString('es-AR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
 
     return (
         <Dialog
@@ -100,10 +150,46 @@ export default function StockMovementModal({ open, onClose, itemId, itemName }: 
             </DialogTitle>
             <DialogContent sx={{ pt: 2.5, pb: 1 }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+                    {/* Información de stock */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                            Stock Total: <Typography component="span" fontWeight={600} color="text.primary">{totalStock ?? '—'}</Typography>
+                        </Typography>
+                        {storeId && (
+                            <Typography variant="body2" color="text.secondary">
+                                En almacén: <Typography component="span" fontWeight={600} color="text.primary">{storeStock ?? 0}</Typography>
+                            </Typography>
+                        )}
+                    </Box>
+
+                    {/* Fecha de movimiento (no editable) */}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            p: 1,
+                            bgcolor: 'grey.50',
+                            borderRadius: 1,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                        }}
+                    >
+                        <AccessTime sx={{ fontSize: 18, color: 'text.secondary' }} />
+                        <Box>
+                            <Typography variant="caption" color="text.secondary">
+                                Fecha de movimiento
+                            </Typography>
+                            <Typography variant="body2" fontWeight={600}>
+                                {formatDateTime(currentTime)}
+                            </Typography>
+                        </Box>
+                    </Box>
+
                     <TextField
                         select
-                        label="Almacén"
-                        size="small"
+                        label="Almacén de destino"
+                        variant="filled"
                         fullWidth
                         value={storeId}
                         onChange={(e) => setStoreId(e.target.value)}
@@ -119,7 +205,7 @@ export default function StockMovementModal({ open, onClose, itemId, itemName }: 
                     <TextField
                         label="Cantidad"
                         type="number"
-                        size="small"
+                        variant="filled"
                         fullWidth
                         value={quantity}
                         onChange={(e) => setQuantity(e.target.value)}
@@ -129,7 +215,7 @@ export default function StockMovementModal({ open, onClose, itemId, itemName }: 
                     <TextField
                         select
                         label="Motivo"
-                        size="small"
+                        variant="filled"
                         fullWidth
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
@@ -143,7 +229,7 @@ export default function StockMovementModal({ open, onClose, itemId, itemName }: 
 
                     <TextField
                         label="Observaciones"
-                        size="small"
+                        variant="filled"
                         fullWidth
                         multiline
                         rows={2}
@@ -171,7 +257,7 @@ export default function StockMovementModal({ open, onClose, itemId, itemName }: 
                         textTransform: 'none',
                         fontWeight: 600,
                         bgcolor: '#1b1b1b',
-                        '&:hover': { bgcolor: '#333' },
+                        '&:hover': { bgcolor: '#333' }
                     }}
                     startIcon={
                         isLoading ? <CircularProgress size={16} color="inherit" /> : <Inventory2 sx={{ fontSize: 16 }} />

@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/@axios";
 import { injectable } from "inversify";
-import { IItemActionRepository, RegisterStockMovementDTO } from "@/domain/entities/items/repositories/item.action.repository";
+import { IItemActionRepository, RegisterStockMovementDTO, AdjustStockEntryDTO } from "@/domain/entities/items/repositories/item.action.repository";
 import { ItemEntity } from "@/domain/entities/items/ItemEntity";
 import { ItemMapper } from "@/infrastructure/mappers/items/ItemMapper";
 import { ItemDTO } from "@/domain/entities/items/DTOs/ItemDTOs";
@@ -36,6 +36,21 @@ export class ItemRepositoryAction implements IItemActionRepository {
         );
         return {
             message: message || "Movimiento de stock registrado",
+        };
+    }
+
+    async adjustStockEntry(
+        data: AdjustStockEntryDTO
+    ): Promise<{ message: string; server_timestamp: string }> {
+        const {
+            data: { message, server_timestamp },
+        } = await axiosInstance.post<{ message: string; server_timestamp: string }>(
+            "/stock-movements/adjust-entry",
+            data
+        );
+        return {
+            message: message || "Entrada de stock registrada",
+            server_timestamp,
         };
     }
 }

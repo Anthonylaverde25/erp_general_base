@@ -15,27 +15,17 @@ export default function ItemOverviewActions() {
 			{ACTIONS.map((action) => (
 				<Button
 					key={action.label}
+					variant="contained"
+					color="secondary"
 					size="small"
-					startIcon={action.icon}
-					variant="outlined"
-					color="inherit"
+					disableElevation
 					sx={{
 						textTransform: 'none',
 						fontWeight: 600,
-						fontSize: '0.75rem',
-						color: 'text.secondary',
-						py: 0.5,
-						px: 1.5,
-						borderRadius: 0.5,
-						borderColor: 'divider',
-						bgcolor: 'transparent',
-						'&:hover': {
-							bgcolor: 'action.hover',
-							color: 'text.primary',
-							borderColor: 'divider'
-						}
+						gap: 1,
 					}}
 				>
+					{action.icon}
 					{action.label}
 				</Button>
 			))}

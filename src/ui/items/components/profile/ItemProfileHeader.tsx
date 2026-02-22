@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, Box, Button, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { Avatar, Box, Chip, IconButton, Stack, Tooltip, Typography, Button } from '@mui/material';
 import { ContentCopy, Inventory2, MoreVert, Refresh } from '@mui/icons-material';
 import PageBreadcrumb from '@/components/PageBreadcrumb';
 import { ItemEntity } from '@/domain/entities/items/ItemEntity';
@@ -119,27 +119,25 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 					>
 						{item.type === 'physical' && (
 							<Button
-								size="small"
 								variant="contained"
-								sx={{
-									textTransform: 'none',
-									fontWeight: 600,
-									bgcolor: '#1b1b1b',
-									'&:hover': { bgcolor: '#333' },
-								}}
-								startIcon={<Inventory2 sx={{ fontSize: 16 }} />}
+								color="primary"
+								size="small"
+								disableElevation
+								sx={{ textTransform: 'none', fontWeight: 600, gap: 1 }}
 								onClick={() => setStockModalOpen(true)}
 							>
+								<Inventory2 sx={{ fontSize: 18 }} />
 								Agregar Stock
 							</Button>
 						)}
 						<Button
+							variant="contained"
+							color="secondary"
 							size="small"
-							variant="outlined"
-							color="inherit"
-							sx={{ textTransform: 'none', fontWeight: 600 }}
-							startIcon={<Refresh sx={{ fontSize: 16 }} />}
+							disableElevation
+							sx={{ textTransform: 'none', fontWeight: 600, gap: 1 }}
 						>
+							<Refresh sx={{ fontSize: 18 }} />
 							Actualizar
 						</Button>
 						<Tooltip title="Copiar SKU">
@@ -155,8 +153,7 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 			</Box>
 
 			<Box
-				className="flex items-center gap-2 px-3 pb-3"
-				sx={{ flexWrap: 'wrap' }}
+				className="flex flex-wrap items-center gap-2 px-3 pb-3"
 			>
 				{['Resumen', 'Movimientos', 'Actividad'].map((label, index) => {
 					const isActive = tabValue === index;
@@ -164,23 +161,17 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 						<Button
 							key={label}
 							onClick={(e) => onTabChange(e, index)}
+							variant={isActive ? "contained" : "text"}
 							size="small"
+							disableElevation
 							sx={{
 								textTransform: 'none',
 								fontWeight: 600,
-								fontSize: '0.75rem',
-								color: isActive ? '#ffffff' : 'text.secondary',
-								py: 0.5,
-								px: 1.5,
-								borderRadius: 0.5,
-								border: '1px solid',
-								borderColor: isActive ? '#1b1b1b' : 'divider',
-								bgcolor: isActive ? '#1b1b1b' : 'transparent',
+								bgcolor: isActive ? 'text.primary' : 'transparent',
+								color: isActive ? 'background.paper' : 'text.secondary',
 								'&:hover': {
-									bgcolor: isActive ? '#333333' : 'action.hover',
-									color: isActive ? '#ffffff' : 'text.primary',
-									borderColor: isActive ? '#1b1b1b' : 'divider'
-								}
+									bgcolor: isActive ? 'text.primary' : 'action.hover',
+								},
 							}}
 						>
 							{label}
@@ -195,6 +186,7 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 					onClose={() => setStockModalOpen(false)}
 					itemId={item.id}
 					itemName={item.name}
+					totalStock={item.total_stock}
 				/>
 			)}
 		</Box>

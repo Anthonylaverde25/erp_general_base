@@ -10,6 +10,7 @@ import { UpdateItemUseCase } from "@/application/use_cases/items/UpdateItemUseCa
 import { ShowItemUseCase } from "@/application/use_cases/items/ShowItemUseCase";
 import { UpdateStockAlertUseCase } from "@/application/use_cases/items/UpdateStockAlertUseCase";
 import { RegisterStockMovementUseCase } from "@/application/use_cases/items/RegisterStockMovementUseCase";
+import { AdjustStockEntryUseCase } from "@/application/use_cases/items/AdjustStockEntryUseCase";
 
 export function registerItemModule(container: Container) {
     // Repositories
@@ -30,5 +31,6 @@ export function registerItemModule(container: Container) {
     container.bind<ShowItemUseCase>(TYPES.ShowItemUseCase).to(ShowItemUseCase);
     container.bind<UpdateStockAlertUseCase>(TYPES.UpdateStockAlertUseCase).to(UpdateStockAlertUseCase);
     container.bind<RegisterStockMovementUseCase>(TYPES.RegisterStockMovementUseCase).to(RegisterStockMovementUseCase);
+    container.bind<AdjustStockEntryUseCase>(TYPES.AdjustStockEntryUseCase).to(AdjustStockEntryUseCase);
 }
 

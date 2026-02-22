@@ -1,5 +1,5 @@
-import { Button, Typography, Box, Stack, useTheme } from "@mui/material";
-import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
+import { Typography, Box, Stack, useTheme, Button } from "@mui/material";
+import { Add } from "@mui/icons-material";
 import PageBreadcrumb from "@/components/PageBreadcrumb";
 
 interface ItemsHeaderProps {
@@ -51,15 +51,13 @@ function ItemsHeader(props: ItemsHeaderProps) {
                     </Typography>
                 </Box>
                 <Button
-                    variant="contained"
-                    color="secondary"
-                    startIcon={
-                        <FuseSvgIcon size={20}>
-                            heroicons-outline:plus
-                        </FuseSvgIcon>
-                    }
                     onClick={onCreate}
+                    variant="contained"
+                    size="small"
+                    disableElevation
+                    sx={{ textTransform: 'none', fontWeight: 600, gap: 1 }}
                 >
+                    <Add sx={{ fontSize: 18 }} />
                     {getButtonText()}
                 </Button>
             </Stack>

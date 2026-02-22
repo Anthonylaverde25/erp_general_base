@@ -28,3 +28,9 @@ Use this pattern for models like `Item`:
 Important:
 - The use case and repository contract operate with `Entity`.
 - DTO flattening stays in write data + infrastructure mapper.
+
+
+### Design criteria for UI components
+
+- For the buttons in our development, we will use the buttons  provided by Material UI.
+- For the required tabs, we will use the Shadcn tabs.
