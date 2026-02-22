@@ -6,10 +6,10 @@ import { RoleEntity } from '@/domain/entities/roles/Role';
 
 @injectable()
 export class CreateRoleUseCase {
-    constructor(@inject(TYPES.IRoleCrudRepository) private repository: IRoleCrudRepository) { }
+	constructor(@inject(TYPES.IRoleCrudRepository) private repository: IRoleCrudRepository) {}
 
-    async execute(data: ICreateRole): Promise<{ role: RoleEntity; message: string }> {
-        const role = RoleEntity.create(data);
-        return this.repository.create(role);
-    }
+	async execute(data: ICreateRole): Promise<{ role: RoleEntity; message: string }> {
+		const role = RoleEntity.create(data);
+		return this.repository.create(role);
+	}
 }

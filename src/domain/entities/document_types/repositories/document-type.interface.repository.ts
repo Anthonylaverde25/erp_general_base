@@ -1,6 +1,6 @@
-import { DocumentTypeEntity } from "../DocumentTypeEntity";
+import { DocumentTypeEntity } from '../DocumentTypeEntity';
 
 export interface IDocumentTypeRepository {
-    index(): Promise<DocumentTypeEntity[]>;
-    indexByCategory(category: string): Promise<DocumentTypeEntity[]>;
+	index(): Promise<DocumentTypeEntity[]>;
+	indexByCategory(category: string): Promise<DocumentTypeEntity[]>;
 }

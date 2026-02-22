@@ -45,7 +45,6 @@ mockSetup().then(() => {
 	root.render(
 		<>
 			<RouterProvider router={router} />
-
 		</>
 	);
 });

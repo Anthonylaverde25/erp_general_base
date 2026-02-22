@@ -5,13 +5,25 @@ import type { IPaymentMethodRepository } from '@/domain/entities/payment_methods
 import { PaymentMethodEntity } from '@/domain/entities/payment_methods/PaymentMethod';
 
 @injectable()
-export class UpdatePaymentMethodUseCase implements IUseCase<{ id: number, data: Partial<PaymentMethodEntity> }, { paymentMethod: PaymentMethodEntity, message: string }> {
-    constructor(
-        @inject(TYPES.IPaymentMethodRepository)
-        private readonly repository: IPaymentMethodRepository
-    ) { }
+export class UpdatePaymentMethodUseCase
+	implements
+		IUseCase<
+			{ id: number; data: Partial<PaymentMethodEntity> },
+			{ paymentMethod: PaymentMethodEntity; message: string }
+		>
+{
+	constructor(
+		@inject(TYPES.IPaymentMethodRepository)
+		private readonly repository: IPaymentMethodRepository
+	) {}
 
-    async execute({ id, data }: { id: number, data: Partial<PaymentMethodEntity> }): Promise<{ paymentMethod: PaymentMethodEntity, message: string }> {
-        return await this.repository.update(id, data);
-    }
+	async execute({
+		id,
+		data
+	}: {
+		id: number;
+		data: Partial<PaymentMethodEntity>;
+	}): Promise<{ paymentMethod: PaymentMethodEntity; message: string }> {
+		return await this.repository.update(id, data);
+	}
 }

@@ -6,12 +6,12 @@ import type { ICompanyCrudRepository } from '@/domain/entities/companies/reposit
 
 @injectable()
 export class IndexCompanyUseCase implements IUseCase<void, CompanyEntity[]> {
-    constructor(
-        @inject(TYPES.ICompanyCrudRepository)
-        private readonly repository: ICompanyCrudRepository
-    ) { }
+	constructor(
+		@inject(TYPES.ICompanyCrudRepository)
+		private readonly repository: ICompanyCrudRepository
+	) {}
 
-    async execute(): Promise<CompanyEntity[]> {
-        return await this.repository.index();
-    }
+	async execute(): Promise<CompanyEntity[]> {
+		return await this.repository.index();
+	}
 }

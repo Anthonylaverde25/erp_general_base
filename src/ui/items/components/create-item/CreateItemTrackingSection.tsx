@@ -137,9 +137,7 @@ function CreateItemTrackingSection({ isLoading, textFieldProps, partners }: Crea
 								multiple
 								options={partners}
 								getOptionLabel={(option) => option.name}
-								value={partners.filter((p) =>
-									(field.value ?? []).includes(String(p.id))
-								)}
+								value={partners.filter((p) => (field.value ?? []).includes(String(p.id)))}
 								onChange={(_, newValue) => {
 									field.onChange(newValue.map((p) => String(p.id)));
 								}}
@@ -172,4 +170,3 @@ function CreateItemTrackingSection({ isLoading, textFieldProps, partners }: Crea
 }
 
 export default CreateItemTrackingSection;
-

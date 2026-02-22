@@ -16,5 +16,5 @@ export const registerUserModule = (container: Container) => {
 	container.bind<IndexUserUseCase>(TYPES.IndexUserUseCase).to(IndexUserUseCase);
 	container.bind<CreateUserUseCase>(TYPES.CreateUserUseCase).to(CreateUserUseCase);
 	container.bind<UpdateUserUseCase>(TYPES.UpdateUserUseCase).to(UpdateUserUseCase);
-	container.bind<ShowUserUseCase>(TYPES.ShowUserUseCase).to(ShowUserUseCase)
+	container.bind<ShowUserUseCase>(TYPES.ShowUserUseCase).to(ShowUserUseCase);
 };

@@ -7,37 +7,41 @@ import { StoreMapper } from '@/domain/entities/stores/Mappers/StoreMapper';
 
 @injectable()
 export class StoreRepositoryCrud implements IStoreRepository {
-    async index(): Promise<StoreEntity[]> {
-        const { data: { stores } } = await axiosInstance.get(`stores`);
-        return StoreMapper.fromDetailDTOList(stores);
-    }
+	async index(): Promise<StoreEntity[]> {
+		const {
+			data: { stores }
+		} = await axiosInstance.get(`stores`);
+		return StoreMapper.fromDetailDTOList(stores);
+	}
 
-    async create(data: CreateStoreDTO): Promise<{ store: StoreEntity; message: string }> {
-        const {
-            data: { store, message }
-        } = await axiosInstance.post(`stores`, data);
-        return {
-            store: StoreMapper.fromDetailDTO(store),
-            message
-        };
-    }
+	async create(data: CreateStoreDTO): Promise<{ store: StoreEntity; message: string }> {
+		const {
+			data: { store, message }
+		} = await axiosInstance.post(`stores`, data);
+		return {
+			store: StoreMapper.fromDetailDTO(store),
+			message
+		};
+	}
 
-    async show(id: number): Promise<StoreEntity> {
-        const {
-            data: { stores }
-        } = await axiosInstance.get(`stores/${id}`);
-        return StoreEntity.fromPrimitives(stores);
-    }
+	async show(id: number): Promise<StoreEntity> {
+		const {
+			data: { stores }
+		} = await axiosInstance.get(`stores/${id}`);
+		return StoreEntity.fromPrimitives(stores);
+	}
 
-    async update(id: number, data: Partial<StoreEntity>): Promise<{ store: StoreEntity; message: string; }> {
-        const { data: { store, message } } = await axiosInstance.put(`stores/${id}`, data);
-        return {
-            store: StoreMapper.fromDetailDTO(store),
-            message
-        };
-    }
+	async update(id: number, data: Partial<StoreEntity>): Promise<{ store: StoreEntity; message: string }> {
+		const {
+			data: { store, message }
+		} = await axiosInstance.put(`stores/${id}`, data);
+		return {
+			store: StoreMapper.fromDetailDTO(store),
+			message
+		};
+	}
 
-    async delete(id: number): Promise<void> {
-        await axiosInstance.delete(`stores/${id}`);
-    }
+	async delete(id: number): Promise<void> {
+		await axiosInstance.delete(`stores/${id}`);
+	}
 }

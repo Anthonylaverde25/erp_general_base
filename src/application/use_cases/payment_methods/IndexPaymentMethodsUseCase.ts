@@ -6,12 +6,12 @@ import { PaymentMethodEntity } from '@/domain/entities/payment_methods/PaymentMe
 
 @injectable()
 export class IndexPaymentMethodsUseCase implements IUseCase<void, PaymentMethodEntity[]> {
-    constructor(
-        @inject(TYPES.IPaymentMethodRepository)
-        private readonly repository: IPaymentMethodRepository
-    ) { }
+	constructor(
+		@inject(TYPES.IPaymentMethodRepository)
+		private readonly repository: IPaymentMethodRepository
+	) {}
 
-    async execute(): Promise<PaymentMethodEntity[]> {
-        return await this.repository.index();
-    }
+	async execute(): Promise<PaymentMethodEntity[]> {
+		return await this.repository.index();
+	}
 }

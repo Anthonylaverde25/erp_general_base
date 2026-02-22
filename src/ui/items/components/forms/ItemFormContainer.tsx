@@ -66,10 +66,7 @@ function ItemFormContainer({
 	const selectedCategoryId = watch('category_id');
 	const selectedStoreId = watch('store_id');
 
-	const mainCategories = useMemo(
-		() => categories.filter((category) => category.parent_id === null),
-		[categories]
-	);
+	const mainCategories = useMemo(() => categories.filter((category) => category.parent_id === null), [categories]);
 
 	const selectedCategory = useMemo(
 		() => categories.find((category) => String(category.id) === selectedCategoryId),
@@ -81,8 +78,8 @@ function ItemFormContainer({
 			selectedCategory?.children?.length
 				? selectedCategory.children
 				: categories.filter(
-					(category) => selectedCategoryId && category.parent_id === Number(selectedCategoryId)
-				),
+						(category) => selectedCategoryId && category.parent_id === Number(selectedCategoryId)
+					),
 		[categories, selectedCategory, selectedCategoryId]
 	);
 

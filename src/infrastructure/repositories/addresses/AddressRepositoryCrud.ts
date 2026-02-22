@@ -8,40 +8,42 @@ import { AddressMapper } from '@/domain/entities/addresses/Mappers/AddressMapper
 
 @injectable()
 export class AddressRepositoryCrud implements IAddressRepository {
-    async create(companyId: number, data: CreateAddressDTO): Promise<{ address: AddressEntity; message: string }> {
-        const {
-            data: { address, message }
-        } = await axiosInstance.post(`companies/${companyId}/addresses`, data);
-        return {
-            address: AddressMapper.fromDetailDTO(address),
-            message
-        };
-    }
+	async create(companyId: number, data: CreateAddressDTO): Promise<{ address: AddressEntity; message: string }> {
+		const {
+			data: { address, message }
+		} = await axiosInstance.post(`companies/${companyId}/addresses`, data);
+		return {
+			address: AddressMapper.fromDetailDTO(address),
+			message
+		};
+	}
 
-    async show(id: IAddress['id']): Promise<AddressEntity> {
-        const {
-            data: { address }
-        } = await axiosInstance.get(`addresses/${id}`);
-        return AddressEntity.create(address);
-    }
+	async show(id: IAddress['id']): Promise<AddressEntity> {
+		const {
+			data: { address }
+		} = await axiosInstance.get(`addresses/${id}`);
+		return AddressEntity.create(address);
+	}
 
-    async update(id: IAddress['id'], data: Partial<AddressEntity>): Promise<{ address: AddressEntity; message: string; }> {
-        const payload = data.toPlainObject();
-        try {
+	async update(
+		id: IAddress['id'],
+		data: Partial<AddressEntity>
+	): Promise<{ address: AddressEntity; message: string }> {
+		const payload = data.toPlainObject();
+		try {
+			const {
+				data: { address, message }
+			} = await axiosInstance.put(`addresses/${id}`, payload);
+			return {
+				address: AddressMapper.fromDetailDTO(address),
+				message
+			};
+		} catch (error) {
+			throw error;
+		}
+	}
 
-            const { data: { address, message } } = await axiosInstance.put(`addresses/${id}`, payload);
-            return {
-                address: AddressMapper.fromDetailDTO(address),
-                message
-            };
-        } catch (error) {
-            throw error;
-        }
-    }
-
-
-
-    async delete(id: number): Promise<void> {
-        await axiosInstance.delete(`addresses/${id}`);
-    }
+	async delete(id: number): Promise<void> {
+		await axiosInstance.delete(`addresses/${id}`);
+	}
 }

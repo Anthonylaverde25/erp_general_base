@@ -6,14 +6,16 @@ import { CreatePaymentMethodDTO } from '@/domain/entities/payment_methods/DTOs/C
 import { PaymentMethodEntity } from '@/domain/entities/payment_methods/PaymentMethod';
 
 @injectable()
-export class CreatePaymentMethodUseCase implements IUseCase<CreatePaymentMethodDTO, { paymentMethod: PaymentMethodEntity, message: string }> {
-    constructor(
-        @inject(TYPES.IPaymentMethodRepository)
-        private readonly repository: IPaymentMethodRepository
-    ) { }
+export class CreatePaymentMethodUseCase
+	implements IUseCase<CreatePaymentMethodDTO, { paymentMethod: PaymentMethodEntity; message: string }>
+{
+	constructor(
+		@inject(TYPES.IPaymentMethodRepository)
+		private readonly repository: IPaymentMethodRepository
+	) {}
 
-    async execute(data: CreatePaymentMethodDTO): Promise<{ paymentMethod: PaymentMethodEntity, message: string }> {
-        const paymentMethod = PaymentMethodEntity.create(data);
-        return await this.repository.create(paymentMethod);
-    }
+	async execute(data: CreatePaymentMethodDTO): Promise<{ paymentMethod: PaymentMethodEntity; message: string }> {
+		const paymentMethod = PaymentMethodEntity.create(data);
+		return await this.repository.create(paymentMethod);
+	}
 }

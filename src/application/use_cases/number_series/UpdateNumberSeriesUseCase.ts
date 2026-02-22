@@ -5,12 +5,15 @@ import { NumberSeriesEntity, NumberSeries } from '@/domain/entities/number_serie
 
 @injectable()
 export class UpdateNumberSeriesUseCase {
-    constructor(
-        @inject(TYPES.INumberSeriesRepository)
-        private numberSeriesRepository: INumberSeriesRepository
-    ) { }
+	constructor(
+		@inject(TYPES.INumberSeriesRepository)
+		private numberSeriesRepository: INumberSeriesRepository
+	) {}
 
-    async execute(id: NumberSeries['id'], data: Partial<NumberSeriesEntity>): Promise<{ number_series: NumberSeriesEntity; message: string }> {
-        return await this.numberSeriesRepository.update(id, data);
-    }
+	async execute(
+		id: NumberSeries['id'],
+		data: Partial<NumberSeriesEntity>
+	): Promise<{ number_series: NumberSeriesEntity; message: string }> {
+		return await this.numberSeriesRepository.update(id, data);
+	}
 }

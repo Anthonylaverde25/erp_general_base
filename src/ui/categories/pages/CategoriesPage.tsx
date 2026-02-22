@@ -1,9 +1,7 @@
-import { lazy } from "react";
+import { lazy } from 'react';
 
-const CategoriesTabView = lazy(
-    () => import("../components/CategoriesTabView"),
-);
+const CategoriesTabView = lazy(() => import('../components/CategoriesTabView'));
 
 export default function CategoriesPage() {
-    return <CategoriesTabView />;
+	return <CategoriesTabView />;
 }

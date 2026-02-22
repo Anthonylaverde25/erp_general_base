@@ -8,42 +8,48 @@ import { PaymentMethodMapper } from '@/domain/entities/payment_methods/Mappers/P
 
 @injectable()
 export class PaymentMethodRepositoryCrud implements IPaymentMethodRepository {
-    async index(): Promise<PaymentMethodEntity[]> {
-        const { data: { payment_methods } } = await axiosInstance.get(`payment-methods`);
-        return PaymentMethodMapper.fromDetailDTOList(payment_methods);
-    }
+	async index(): Promise<PaymentMethodEntity[]> {
+		const {
+			data: { payment_methods }
+		} = await axiosInstance.get(`payment-methods`);
+		return PaymentMethodMapper.fromDetailDTOList(payment_methods);
+	}
 
-    async create(data: CreatePaymentMethodDTO): Promise<{ paymentMethod: PaymentMethodEntity; message: string }> {
-        const {
-            data: { payment_method, message }
-        } = await axiosInstance.post(`payment-methods`, data);
-        return {
-            paymentMethod: PaymentMethodMapper.fromDetailDTO(payment_method),
-            message
-        };
-    }
+	async create(data: CreatePaymentMethodDTO): Promise<{ paymentMethod: PaymentMethodEntity; message: string }> {
+		const {
+			data: { payment_method, message }
+		} = await axiosInstance.post(`payment-methods`, data);
+		return {
+			paymentMethod: PaymentMethodMapper.fromDetailDTO(payment_method),
+			message
+		};
+	}
 
-    async show(id: PaymentMethod['id']): Promise<PaymentMethodEntity> {
-        const {
-            data: { payment_method }
-        } = await axiosInstance.get(`payment-methods/${id}`);
-        return PaymentMethodEntity.fromPrimitives(payment_method);
-    }
+	async show(id: PaymentMethod['id']): Promise<PaymentMethodEntity> {
+		const {
+			data: { payment_method }
+		} = await axiosInstance.get(`payment-methods/${id}`);
+		return PaymentMethodEntity.fromPrimitives(payment_method);
+	}
 
-    async update(id: PaymentMethod['id'], data: Partial<PaymentMethodEntity>): Promise<{ paymentMethod: PaymentMethodEntity; message: string; }> {
-        try {
+	async update(
+		id: PaymentMethod['id'],
+		data: Partial<PaymentMethodEntity>
+	): Promise<{ paymentMethod: PaymentMethodEntity; message: string }> {
+		try {
+			const {
+				data: { payment_method, message }
+			} = await axiosInstance.put(`payment-methods/${id}`, data);
+			return {
+				paymentMethod: PaymentMethodMapper.fromDetailDTO(payment_method),
+				message
+			};
+		} catch (error) {
+			throw error;
+		}
+	}
 
-            const { data: { payment_method, message } } = await axiosInstance.put(`payment-methods/${id}`, data);
-            return {
-                paymentMethod: PaymentMethodMapper.fromDetailDTO(payment_method),
-                message
-            };
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async delete(id: number): Promise<void> {
-        await axiosInstance.delete(`payment-methods/${id}`);
-    }
+	async delete(id: number): Promise<void> {
+		await axiosInstance.delete(`payment-methods/${id}`);
+	}
 }

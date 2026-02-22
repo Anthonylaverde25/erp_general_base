@@ -1,21 +1,19 @@
-import type { IItemRepository } from "@/domain/entities/items/repositories/item.repository";
-import { CreateItemDTO } from "@/domain/entities/items/DTOs/ItemDTOs";
-import { ItemEntity } from "@/domain/entities/items/ItemEntity";
-import { injectable, inject } from "inversify";
-import { TYPES } from "@/di/types";
+import type { IItemRepository } from '@/domain/entities/items/repositories/item.repository';
+import { CreateItemDTO } from '@/domain/entities/items/DTOs/ItemDTOs';
+import { ItemEntity } from '@/domain/entities/items/ItemEntity';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '@/di/types';
 
 @injectable()
 export class CreateItemUseCase {
-  constructor(
-    @inject(TYPES.ItemRepository)
-    private readonly itemRepository: IItemRepository,
-  ) {}
+	constructor(
+		@inject(TYPES.ItemRepository)
+		private readonly itemRepository: IItemRepository
+	) {}
 
-  async execute(
-    data: CreateItemDTO,
-  ): Promise<{ item: ItemEntity; message: string }> {
-    const item = ItemEntity.create(data);
+	async execute(data: CreateItemDTO): Promise<{ item: ItemEntity; message: string }> {
+		const item = ItemEntity.create(data);
 
-    return this.itemRepository.create(item);
-  }
+		return this.itemRepository.create(item);
+	}
 }

@@ -6,85 +6,87 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import DataTable from '@/components/data-table/DataTable';
 
 interface ItemTableProps {
-    items: ItemEntity[] | undefined;
-    isLoading?: boolean;
-    currentTab?: string;
-    onEdit: (item: ItemEntity) => void;
-    onDelete?: (id: number) => void;
-    onRowClick?: (item: ItemEntity) => void;
+	items: ItemEntity[] | undefined;
+	isLoading?: boolean;
+	currentTab?: string;
+	onEdit: (item: ItemEntity) => void;
+	onDelete?: (id: number) => void;
+	onRowClick?: (item: ItemEntity) => void;
 }
 
 export default function ItemTable(props: ItemTableProps) {
-    const { items, isLoading, currentTab, onEdit, onDelete, onRowClick } = props;
+	const { items, isLoading, currentTab, onEdit, onDelete, onRowClick } = props;
 
-    const columns = useMemo(() => ItemColumns, []);
+	const columns = useMemo(() => ItemColumns, []);
 
-    if (isLoading) {
-        return null;
-    }
+	if (isLoading) {
+		return null;
+	}
 
-    return (
-        <DataTable
-            data={items || []}
-            columns={columns}
-            state={{
-                isLoading,
-                columnVisibility: {
-                    'physical_profile.barcode': currentTab !== 'service',
-                    'total_stock': currentTab !== 'service',
-                    'physical_profile.is_inventoriable': currentTab !== 'service',
-                }
-            }}
-            enablePagination
-            initialState={{
-                density: 'compact',
-                showColumnFilters: false,
-                pagination: { pageSize: 15, pageIndex: 0 },
-                showGlobalFilter: true,
-                columnPinning: { left: [], right: ['mrt-row-actions'] },
-                columnVisibility: {
-                    'physical_profile.barcode': currentTab !== 'service',
-                    'total_stock': currentTab !== 'service',
-                    'physical_profile.is_inventoriable': currentTab !== 'service',
-                }
-            }}
-            muiPaginationProps={{
-                rowsPerPageOptions: [5, 10, 25],
-                variant: 'outlined',
-                showRowsPerPage: true
-            }}
-            muiTableBodyRowProps={({ row }) => ({
-                onClick: () => onRowClick?.(row.original),
-                sx: { cursor: onRowClick ? 'pointer' : 'default' }
-            })}
-            renderRowActionMenuItems={({ closeMenu, row }) => [
-                <MenuItem
-                    key="edit"
-                    onClick={() => {
-                        onEdit(row.original);
-                        closeMenu();
-                    }}
-                >
-                    <ListItemIcon>
-                        <FuseSvgIcon>heroicons-outline:pencil-square</FuseSvgIcon>
-                    </ListItemIcon>
-                    Edit
-                </MenuItem>,
-                ...(onDelete ? [
-                    <MenuItem
-                        key="delete"
-                        onClick={() => {
-                            onDelete(row.original.id);
-                            closeMenu();
-                        }}
-                    >
-                        <ListItemIcon>
-                            <FuseSvgIcon>heroicons-outline:trash</FuseSvgIcon>
-                        </ListItemIcon>
-                        Delete
-                    </MenuItem>
-                ] : [])
-            ]}
-        />
-    );
+	return (
+		<DataTable
+			data={items || []}
+			columns={columns}
+			state={{
+				isLoading,
+				columnVisibility: {
+					'physical_profile.barcode': currentTab !== 'service',
+					total_stock: currentTab !== 'service',
+					'physical_profile.is_inventoriable': currentTab !== 'service'
+				}
+			}}
+			enablePagination
+			initialState={{
+				density: 'compact',
+				showColumnFilters: false,
+				pagination: { pageSize: 15, pageIndex: 0 },
+				showGlobalFilter: true,
+				columnPinning: { left: [], right: ['mrt-row-actions'] },
+				columnVisibility: {
+					'physical_profile.barcode': currentTab !== 'service',
+					total_stock: currentTab !== 'service',
+					'physical_profile.is_inventoriable': currentTab !== 'service'
+				}
+			}}
+			muiPaginationProps={{
+				rowsPerPageOptions: [5, 10, 25],
+				variant: 'outlined',
+				showRowsPerPage: true
+			}}
+			muiTableBodyRowProps={({ row }) => ({
+				onClick: () => onRowClick?.(row.original),
+				sx: { cursor: onRowClick ? 'pointer' : 'default' }
+			})}
+			renderRowActionMenuItems={({ closeMenu, row }) => [
+				<MenuItem
+					key="edit"
+					onClick={() => {
+						onEdit(row.original);
+						closeMenu();
+					}}
+				>
+					<ListItemIcon>
+						<FuseSvgIcon>heroicons-outline:pencil-square</FuseSvgIcon>
+					</ListItemIcon>
+					Edit
+				</MenuItem>,
+				...(onDelete
+					? [
+							<MenuItem
+								key="delete"
+								onClick={() => {
+									onDelete(row.original.id);
+									closeMenu();
+								}}
+							>
+								<ListItemIcon>
+									<FuseSvgIcon>heroicons-outline:trash</FuseSvgIcon>
+								</ListItemIcon>
+								Delete
+							</MenuItem>
+						]
+					: [])
+			]}
+		/>
+	);
 }

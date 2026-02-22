@@ -1,4 +1,4 @@
 import '@testing-library/jest-dom';
-toBeInTheDocument()
-toHaveTextContent()
-toBeVisible()
+toBeInTheDocument();
+toHaveTextContent();
+toBeVisible();

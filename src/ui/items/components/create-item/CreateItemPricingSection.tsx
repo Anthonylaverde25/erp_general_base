@@ -40,9 +40,7 @@ function CreateItemPricingSection({ isLoading, textFieldProps, taxRates }: Creat
 		}
 
 		if (Array.isArray(value)) {
-			return value
-				.map((id) => Number(id))
-				.filter((id) => Number.isFinite(id));
+			return value.map((id) => Number(id)).filter((id) => Number.isFinite(id));
 		}
 
 		return [];

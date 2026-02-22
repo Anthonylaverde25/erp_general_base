@@ -1,7 +1,6 @@
 import { IRole } from '@/types/role.types';
 import { ICreateUser, IUpdateUser, IUser } from '@/types/user.types';
 
-
 export class UserEntity implements IUser {
 	private _id: number | null;
 	private _name: string;

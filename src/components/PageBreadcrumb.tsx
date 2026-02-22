@@ -66,9 +66,7 @@ function PageBreadcrumb(props: PageBreadcrumbProps) {
 					return (
 						<BreadcrumbItem key={index}>
 							{isLast ? (
-								<BreadcrumbPage className="max-w-32 truncate capitalize">
-									{item.title}
-								</BreadcrumbPage>
+								<BreadcrumbPage className="max-w-32 truncate capitalize">{item.title}</BreadcrumbPage>
 							) : (
 								<>
 									<BreadcrumbLink asChild>

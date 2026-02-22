@@ -1,9 +1,7 @@
-import { lazy } from "react";
+import { lazy } from 'react';
 
-const StoresTabView = lazy(
-    () => import("../components/StoresTabView"),
-);
+const StoresTabView = lazy(() => import('../components/StoresTabView'));
 
 export default function StoresPage() {
-    return <StoresTabView />;
+	return <StoresTabView />;
 }

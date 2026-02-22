@@ -2,150 +2,148 @@
 // Símbolos únicos para identificar las dependencias en el contenedor IoC
 
 export const TYPES = {
-  IUserCrudRepository: Symbol.for("IUserCrudRepository"),
+	IUserCrudRepository: Symbol.for('IUserCrudRepository'),
 
-  // Use Cases - User
-  IndexUserUseCase: Symbol.for("IndexUserUseCase"),
-  CreateUserUseCase: Symbol.for("CreateUserUseCase"),
-  ShowUserUseCase: Symbol.for("ShowUserUseCase"),
-  UpdateUserUseCase: Symbol.for("UpdateUserUseCase"),
+	// Use Cases - User
+	IndexUserUseCase: Symbol.for('IndexUserUseCase'),
+	CreateUserUseCase: Symbol.for('CreateUserUseCase'),
+	ShowUserUseCase: Symbol.for('ShowUserUseCase'),
+	UpdateUserUseCase: Symbol.for('UpdateUserUseCase'),
 
-  // Roles
-  IRoleCrudRepository: Symbol.for("IRoleCrudRepository"),
-  IndexRoleUseCase: Symbol.for("IndexRoleUseCase"),
-  CreateRoleUseCase: Symbol.for("CreateRoleUseCase"),
-  UpdateRoleUseCase: Symbol.for("UpdateRoleUseCase"),
-  ShowRoleUseCase: Symbol.for("ShowRoleUseCase"),
+	// Roles
+	IRoleCrudRepository: Symbol.for('IRoleCrudRepository'),
+	IndexRoleUseCase: Symbol.for('IndexRoleUseCase'),
+	CreateRoleUseCase: Symbol.for('CreateRoleUseCase'),
+	UpdateRoleUseCase: Symbol.for('UpdateRoleUseCase'),
+	ShowRoleUseCase: Symbol.for('ShowRoleUseCase'),
 
-  // Bank Accounts
-  IBankAccountCrudRepository: Symbol.for("IBankAccountCrudRepository"),
-  IndexBankAccountUseCase: Symbol.for("IndexBankAccountUseCase"),
-  CreateBankAccountUseCase: Symbol.for("CreateBankAccountUseCase"),
-  UpdateBankAccountUseCase: Symbol.for("UpdateBankAccountUseCase"),
-  ShowBankAccountUseCase: Symbol.for("ShowBankAccountUseCase"),
+	// Bank Accounts
+	IBankAccountCrudRepository: Symbol.for('IBankAccountCrudRepository'),
+	IndexBankAccountUseCase: Symbol.for('IndexBankAccountUseCase'),
+	CreateBankAccountUseCase: Symbol.for('CreateBankAccountUseCase'),
+	UpdateBankAccountUseCase: Symbol.for('UpdateBankAccountUseCase'),
+	ShowBankAccountUseCase: Symbol.for('ShowBankAccountUseCase'),
 
-  // Companies
-  ICompanyCrudRepository: Symbol.for("ICompanyCrudRepository"),
-  ICompanyActionRepository: Symbol.for("ICompanyActionRepository"),
-  IndexCompanyUseCase: Symbol.for("IndexCompanyUseCase"),
-  ShowCompanyUseCase: Symbol.for("ShowCompanyUseCase"),
-  ChangeCompanyUseCase: Symbol.for("ChangeCompanyUseCase"),
-  UpdateCompanyUseCase: Symbol.for("UpdateCompanyUseCase"),
-  CreateAddressUseCase: Symbol.for("CreateAddressUseCase"),
-  ChangeDefaultAddressUseCase: Symbol.for("ChangeDefaultAddressUseCase"),
-  ChangeDefaultContactUseCase: Symbol.for("ChangeDefaultContactUseCase"),
+	// Companies
+	ICompanyCrudRepository: Symbol.for('ICompanyCrudRepository'),
+	ICompanyActionRepository: Symbol.for('ICompanyActionRepository'),
+	IndexCompanyUseCase: Symbol.for('IndexCompanyUseCase'),
+	ShowCompanyUseCase: Symbol.for('ShowCompanyUseCase'),
+	ChangeCompanyUseCase: Symbol.for('ChangeCompanyUseCase'),
+	UpdateCompanyUseCase: Symbol.for('UpdateCompanyUseCase'),
+	CreateAddressUseCase: Symbol.for('CreateAddressUseCase'),
+	ChangeDefaultAddressUseCase: Symbol.for('ChangeDefaultAddressUseCase'),
+	ChangeDefaultContactUseCase: Symbol.for('ChangeDefaultContactUseCase'),
 
-  // Addresses
-  IAddressRepository: Symbol.for("IAddressRepository"),
-  ShowAddressUseCase: Symbol.for("ShowAddressUseCase"),
-  UpdateAddressUseCase: Symbol.for("UpdateAddressUseCase"),
-  DeleteAddressUseCase: Symbol.for("DeleteAddressUseCase"),
+	// Addresses
+	IAddressRepository: Symbol.for('IAddressRepository'),
+	ShowAddressUseCase: Symbol.for('ShowAddressUseCase'),
+	UpdateAddressUseCase: Symbol.for('UpdateAddressUseCase'),
+	DeleteAddressUseCase: Symbol.for('DeleteAddressUseCase'),
 
-  // Contacts
-  IContactRepository: Symbol.for("IContactRepository"),
-  ShowContactUseCase: Symbol.for("ShowContactUseCase"),
-  UpdateContactUseCase: Symbol.for("UpdateContactUseCase"),
-  CreateContactUseCase: Symbol.for("CreateContactUseCase"),
-  DeleteContactUseCase: Symbol.for("DeleteContactUseCase"),
-  RemoveAddressUseCase: Symbol.for("RemoveAddressUseCase"),
+	// Contacts
+	IContactRepository: Symbol.for('IContactRepository'),
+	ShowContactUseCase: Symbol.for('ShowContactUseCase'),
+	UpdateContactUseCase: Symbol.for('UpdateContactUseCase'),
+	CreateContactUseCase: Symbol.for('CreateContactUseCase'),
+	DeleteContactUseCase: Symbol.for('DeleteContactUseCase'),
+	RemoveAddressUseCase: Symbol.for('RemoveAddressUseCase'),
 
-  // Payment Methods
-  IPaymentMethodRepository: Symbol.for("IPaymentMethodRepository"),
-  IndexPaymentMethodsUseCase: Symbol.for("IndexPaymentMethodsUseCase"),
-  CreatePaymentMethodUseCase: Symbol.for("CreatePaymentMethodUseCase"),
-  ShowPaymentMethodUseCase: Symbol.for("ShowPaymentMethodUseCase"),
-  UpdatePaymentMethodUseCase: Symbol.for("UpdatePaymentMethodUseCase"),
-  DeletePaymentMethodUseCase: Symbol.for("DeletePaymentMethodUseCase"),
-  IPaymentMethodActionRepository: Symbol.for("IPaymentMethodActionRepository"),
-  TogglePaymentMethodStatusUseCase: Symbol.for("TogglePaymentMethodStatusUseCase"),
+	// Payment Methods
+	IPaymentMethodRepository: Symbol.for('IPaymentMethodRepository'),
+	IndexPaymentMethodsUseCase: Symbol.for('IndexPaymentMethodsUseCase'),
+	CreatePaymentMethodUseCase: Symbol.for('CreatePaymentMethodUseCase'),
+	ShowPaymentMethodUseCase: Symbol.for('ShowPaymentMethodUseCase'),
+	UpdatePaymentMethodUseCase: Symbol.for('UpdatePaymentMethodUseCase'),
+	DeletePaymentMethodUseCase: Symbol.for('DeletePaymentMethodUseCase'),
+	IPaymentMethodActionRepository: Symbol.for('IPaymentMethodActionRepository'),
+	TogglePaymentMethodStatusUseCase: Symbol.for('TogglePaymentMethodStatusUseCase'),
 
+	// Stores
+	IStoreRepository: Symbol.for('IStoreRepository'),
+	IndexStoresUseCase: Symbol.for('IndexStoresUseCase'),
+	CreateStoreUseCase: Symbol.for('CreateStoreUseCase'),
+	ShowStoreUseCase: Symbol.for('ShowStoreUseCase'),
+	UpdateStoreUseCase: Symbol.for('UpdateStoreUseCase'),
+	DeleteStoreUseCase: Symbol.for('DeleteStoreUseCase'),
+	IStoreActionRepository: Symbol.for('IStoreActionRepository'),
+	ToggleStoreStatusUseCase: Symbol.for('ToggleStoreStatusUseCase'),
 
-  // Stores
-  IStoreRepository: Symbol.for("IStoreRepository"),
-  IndexStoresUseCase: Symbol.for("IndexStoresUseCase"),
-  CreateStoreUseCase: Symbol.for("CreateStoreUseCase"),
-  ShowStoreUseCase: Symbol.for("ShowStoreUseCase"),
-  UpdateStoreUseCase: Symbol.for("UpdateStoreUseCase"),
-  DeleteStoreUseCase: Symbol.for("DeleteStoreUseCase"),
-  IStoreActionRepository: Symbol.for("IStoreActionRepository"),
-  ToggleStoreStatusUseCase: Symbol.for("ToggleStoreStatusUseCase"),
+	// Document Types
+	IDocumentTypeRepository: Symbol.for('IDocumentTypeRepository'),
+	IndexDocumentTypesUseCase: Symbol.for('IndexDocumentTypesUseCase'),
+	IndexDocumentTypesByCategoryUseCase: Symbol.for('IndexDocumentTypesByCategoryUseCase'),
 
+	// Number Series
+	INumberSeriesRepository: Symbol.for('INumberSeriesRepository'),
+	IndexNumberSeriesUseCase: Symbol.for('IndexNumberSeriesUseCase'),
+	CreateNumberSeriesUseCase: Symbol.for('CreateNumberSeriesUseCase'),
+	UpdateNumberSeriesUseCase: Symbol.for('UpdateNumberSeriesUseCase'),
 
-  // Document Types
-  IDocumentTypeRepository: Symbol.for("IDocumentTypeRepository"),
-  IndexDocumentTypesUseCase: Symbol.for("IndexDocumentTypesUseCase"),
-  IndexDocumentTypesByCategoryUseCase: Symbol.for("IndexDocumentTypesByCategoryUseCase"),
+	// Tax Types
+	ITaxTypeRepository: Symbol.for('ITaxTypeRepository'),
+	IndexTaxTypesUseCase: Symbol.for('IndexTaxTypesUseCase'),
+	CreateTaxTypeUseCase: Symbol.for('CreateTaxTypeUseCase'),
+	UpdateTaxTypeUseCase: Symbol.for('UpdateTaxTypeUseCase'),
+	ToggleTaxTypeStatusUseCase: Symbol.for('ToggleTaxTypeStatusUseCase'),
 
-  // Number Series
-  INumberSeriesRepository: Symbol.for("INumberSeriesRepository"),
-  IndexNumberSeriesUseCase: Symbol.for("IndexNumberSeriesUseCase"),
-  CreateNumberSeriesUseCase: Symbol.for("CreateNumberSeriesUseCase"),
-  UpdateNumberSeriesUseCase: Symbol.for("UpdateNumberSeriesUseCase"),
+	// Tax Rates
+	ITaxRateRepository: Symbol.for('ITaxRateRepository'),
+	IndexTaxRatesUseCase: Symbol.for('IndexTaxRatesUseCase'),
+	CreateTaxRateUseCase: Symbol.for('CreateTaxRateUseCase'),
+	UpdateTaxRateUseCase: Symbol.for('UpdateTaxRateUseCase'),
+	// Families
+	FamilyRepository: Symbol.for('FamilyRepository'),
+	IndexFamiliesUseCase: Symbol.for('IndexFamiliesUseCase'),
+	CreateFamilyUseCase: Symbol.for('CreateFamilyUseCase'),
+	UpdateFamilyUseCase: Symbol.for('UpdateFamilyUseCase'),
+	ShowFamilyUseCase: Symbol.for('ShowFamilyUseCase'),
+	IFamilyActionRepository: Symbol.for('IFamilyActionRepository'),
+	ToggleFamilyStatusUseCase: Symbol.for('ToggleFamilyStatusUseCase'),
 
-  // Tax Types
-  ITaxTypeRepository: Symbol.for("ITaxTypeRepository"),
-  IndexTaxTypesUseCase: Symbol.for("IndexTaxTypesUseCase"),
-  CreateTaxTypeUseCase: Symbol.for("CreateTaxTypeUseCase"),
-  UpdateTaxTypeUseCase: Symbol.for("UpdateTaxTypeUseCase"),
-  ToggleTaxTypeStatusUseCase: Symbol.for("ToggleTaxTypeStatusUseCase"),
+	// Partners
+	PartnerRepository: Symbol.for('PartnerRepository'),
+	IndexPartnersUseCase: Symbol.for('IndexPartnersUseCase'),
+	IndexSupplierPartnersUseCase: Symbol.for('IndexSupplierPartnersUseCase'),
+	ShowPartnerUseCase: Symbol.for('ShowPartnerUseCase'),
+	CreatePartnerUseCase: Symbol.for('CreatePartnerUseCase'),
+	UpdatePartnerUseCase: Symbol.for('UpdatePartnerUseCase'),
 
-  // Tax Rates
-  ITaxRateRepository: Symbol.for("ITaxRateRepository"),
-  IndexTaxRatesUseCase: Symbol.for("IndexTaxRatesUseCase"),
-  CreateTaxRateUseCase: Symbol.for("CreateTaxRateUseCase"),
-  UpdateTaxRateUseCase: Symbol.for("UpdateTaxRateUseCase"),
-  // Families
-  FamilyRepository: Symbol.for("FamilyRepository"),
-  IndexFamiliesUseCase: Symbol.for("IndexFamiliesUseCase"),
-  CreateFamilyUseCase: Symbol.for("CreateFamilyUseCase"),
-  UpdateFamilyUseCase: Symbol.for("UpdateFamilyUseCase"),
-  ShowFamilyUseCase: Symbol.for("ShowFamilyUseCase"),
-  IFamilyActionRepository: Symbol.for("IFamilyActionRepository"),
-  ToggleFamilyStatusUseCase: Symbol.for("ToggleFamilyStatusUseCase"),
+	// Currencies
+	ICurrencyRepository: Symbol.for('ICurrencyRepository'),
+	IndexCurrenciesUseCase: Symbol.for('IndexCurrenciesUseCase'),
 
-  // Partners
-  PartnerRepository: Symbol.for("PartnerRepository"),
-  IndexPartnersUseCase: Symbol.for("IndexPartnersUseCase"),
-  IndexSupplierPartnersUseCase: Symbol.for("IndexSupplierPartnersUseCase"),
-  ShowPartnerUseCase: Symbol.for("ShowPartnerUseCase"),
-  CreatePartnerUseCase: Symbol.for("CreatePartnerUseCase"),
-  UpdatePartnerUseCase: Symbol.for("UpdatePartnerUseCase"),
+	// Items
+	ItemRepository: Symbol.for('ItemRepository'),
+	IItemActionRepository: Symbol.for('IItemActionRepository'),
+	IndexItemsUseCase: Symbol.for('IndexItemsUseCase'),
+	ShowItemUseCase: Symbol.for('ShowItemUseCase'),
+	CreateItemUseCase: Symbol.for('CreateItemUseCase'),
+	UpdateItemUseCase: Symbol.for('UpdateItemUseCase'),
+	UpdateStockAlertUseCase: Symbol.for('UpdateStockAlertUseCase'),
+	RegisterStockMovementUseCase: Symbol.for('RegisterStockMovementUseCase'),
+	AdjustStockEntryUseCase: Symbol.for('AdjustStockEntryUseCase'),
 
-  // Currencies
-  ICurrencyRepository: Symbol.for("ICurrencyRepository"),
-  IndexCurrenciesUseCase: Symbol.for("IndexCurrenciesUseCase"),
+	// Categories
+	CategoryRepository: Symbol.for('CategoryRepository'),
+	IndexCategoriesUseCase: Symbol.for('IndexCategoriesUseCase'),
+	CreateCategoryUseCase: Symbol.for('CreateCategoryUseCase'),
+	UpdateCategoryUseCase: Symbol.for('UpdateCategoryUseCase'),
+	ShowCategoryUseCase: Symbol.for('ShowCategoryUseCase'),
+	CategoryActionRepository: Symbol.for('CategoryActionRepository'),
+	ToggleCategoryStatusUseCase: Symbol.for('ToggleCategoryStatusUseCase'),
 
-  // Items
-  ItemRepository: Symbol.for("ItemRepository"),
-  IItemActionRepository: Symbol.for("IItemActionRepository"),
-  IndexItemsUseCase: Symbol.for("IndexItemsUseCase"),
-  ShowItemUseCase: Symbol.for("ShowItemUseCase"),
-  CreateItemUseCase: Symbol.for("CreateItemUseCase"),
-  UpdateItemUseCase: Symbol.for("UpdateItemUseCase"),
-  UpdateStockAlertUseCase: Symbol.for("UpdateStockAlertUseCase"),
-  RegisterStockMovementUseCase: Symbol.for("RegisterStockMovementUseCase"),
-  AdjustStockEntryUseCase: Symbol.for("AdjustStockEntryUseCase"),
+	// Unit Types
+	UnitTypeRepository: Symbol.for('UnitTypeRepository'),
+	IndexUnitTypesUseCase: Symbol.for('IndexUnitTypesUseCase'),
+	CreateUnitTypeUseCase: Symbol.for('CreateUnitTypeUseCase'),
+	UpdateUnitTypeUseCase: Symbol.for('UpdateUnitTypeUseCase'),
+	DeleteUnitTypeUseCase: Symbol.for('DeleteUnitTypeUseCase'),
 
-  // Categories
-  CategoryRepository: Symbol.for("CategoryRepository"),
-  IndexCategoriesUseCase: Symbol.for("IndexCategoriesUseCase"),
-  CreateCategoryUseCase: Symbol.for("CreateCategoryUseCase"),
-  UpdateCategoryUseCase: Symbol.for("UpdateCategoryUseCase"),
-  ShowCategoryUseCase: Symbol.for("ShowCategoryUseCase"),
-  CategoryActionRepository: Symbol.for("CategoryActionRepository"),
-  ToggleCategoryStatusUseCase: Symbol.for("ToggleCategoryStatusUseCase"),
-
-  // Unit Types
-  UnitTypeRepository: Symbol.for("UnitTypeRepository"),
-  IndexUnitTypesUseCase: Symbol.for("IndexUnitTypesUseCase"),
-  CreateUnitTypeUseCase: Symbol.for("CreateUnitTypeUseCase"),
-  UpdateUnitTypeUseCase: Symbol.for("UpdateUnitTypeUseCase"),
-  DeleteUnitTypeUseCase: Symbol.for("DeleteUnitTypeUseCase"),
-
-  // Units
-  UnitRepository: Symbol.for("UnitRepository"),
-  IndexUnitsUseCase: Symbol.for("IndexUnitsUseCase"),
-  CreateUnitUseCase: Symbol.for("CreateUnitUseCase"),
-  UpdateUnitUseCase: Symbol.for("UpdateUnitUseCase"),
-  DeleteUnitUseCase: Symbol.for("DeleteUnitUseCase"),
+	// Units
+	UnitRepository: Symbol.for('UnitRepository'),
+	IndexUnitsUseCase: Symbol.for('IndexUnitsUseCase'),
+	CreateUnitUseCase: Symbol.for('CreateUnitUseCase'),
+	UpdateUnitUseCase: Symbol.for('UpdateUnitUseCase'),
+	DeleteUnitUseCase: Symbol.for('DeleteUnitUseCase')
 };

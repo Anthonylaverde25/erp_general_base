@@ -10,64 +10,66 @@ import UpdateUserModal from '@/ui/users/component/modals/UpdateUserModal';
 import { IUser } from '@/types/user.types';
 
 export default function TeamTabView() {
+	const { users, isLoading, isError } = useIndexUser();
 
-    const { users, isLoading, isError } = useIndexUser();
+	const [selectedId, setSelectedId] = useState<IUser['id'] | null>(null);
+	const [updateModalOpen, setUpdateModalOpen] = useState(false);
 
+	const handleEditUser = (id: IUser['id']) => {
+		setSelectedId(id);
+		setUpdateModalOpen(true);
+	};
 
-    const [selectedId, setSelectedId] = useState<IUser['id'] | null>(null);
-    const [updateModalOpen, setUpdateModalOpen] = useState(false);
+	return (
+		<div className="flex w-full flex-col gap-4">
+			<Stack
+				className="mb-5 border-b bg-gray-50/50 p-4"
+				direction="row"
+				justifyContent="space-between"
+				alignItems="center"
+				spacing={1.5}
+			>
+				<div></div>
+				<Stack
+					direction="row"
+					spacing={1.5}
+					alignItems="center"
+				>
+					<Button
+						className="btn-secondary"
+						variant="outlined"
+						color="secondary"
+						size="large"
+						startIcon={<FuseSvgIcon size={16}>heroicons-outline:arrow-down</FuseSvgIcon>}
+					>
+						Invitar usuario
+					</Button>
+					<CreateUserButton />
+				</Stack>
+			</Stack>
 
-    const handleEditUser = (id: IUser['id']) => {
-        setSelectedId(id);
-        setUpdateModalOpen(true);
-    };
+			<TeamTable
+				users={users}
+				onEdit={handleEditUser}
+			/>
 
-    return (
-        <div className="flex w-full flex-col gap-4">
-            <Stack
-                className="mb-5 border-b p-4 bg-gray-50/50"
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                spacing={1.5}
-            >
-                <div></div>
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Button
-                        className='btn-secondary'
-                        variant="outlined"
-                        color="secondary"
-                        size="large"
-                        startIcon={<FuseSvgIcon size={16}>heroicons-outline:arrow-down</FuseSvgIcon>}
-                    >
-                        Invitar usuario
-                    </Button>
-                    <CreateUserButton />
-                </Stack>
-            </Stack>
+			<Box sx={{ my: 4 }}>
+				<TeamTableSimple
+					users={users}
+					onEdit={handleEditUser}
+				/>
+			</Box>
 
-            <TeamTable
-                users={users}
-                onEdit={handleEditUser}
-            />
-
-            <Box sx={{ my: 4 }}>
-                <TeamTableSimple
-                    users={users}
-                    onEdit={handleEditUser}
-                />
-            </Box>
-
-            {selectedId && (
-                <UpdateUserModal
-                    open={updateModalOpen}
-                    onClose={() => {
-                        setUpdateModalOpen(false);
-                        setSelectedId(null);
-                    }}
-                    userId={selectedId}
-                />
-            )}
-        </div>
-    );
+			{selectedId && (
+				<UpdateUserModal
+					open={updateModalOpen}
+					onClose={() => {
+						setUpdateModalOpen(false);
+						setSelectedId(null);
+					}}
+					userId={selectedId}
+				/>
+			)}
+		</div>
+	);
 }

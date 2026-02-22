@@ -7,25 +7,25 @@ import { toast } from 'sonner';
 import { AxiosError } from 'axios';
 
 export const useRegisterStockMovement = () => {
-    const queryClient = useQueryClient();
-    const useCase = container.get<RegisterStockMovementUseCase>(TYPES.RegisterStockMovementUseCase);
+	const queryClient = useQueryClient();
+	const useCase = container.get<RegisterStockMovementUseCase>(TYPES.RegisterStockMovementUseCase);
 
-    const { mutateAsync: handleRegisterStockMovement, isPending: isLoading } = useMutation({
-        mutationFn: (data: RegisterStockMovementDTO) => useCase.execute(data),
-        onSuccess: ({ message }, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['items'] });
-            queryClient.invalidateQueries({ queryKey: ['items', variables.item_id] });
-            toast.success(message);
-        },
-        onError: (error: unknown) => {
-            const axiosError = error as AxiosError<{ message?: string }>;
-            toast.error(axiosError.response?.data?.message || 'Error al registrar movimiento de stock');
-            console.error(error);
-        }
-    });
+	const { mutateAsync: handleRegisterStockMovement, isPending: isLoading } = useMutation({
+		mutationFn: (data: RegisterStockMovementDTO) => useCase.execute(data),
+		onSuccess: ({ message }, variables) => {
+			queryClient.invalidateQueries({ queryKey: ['items'] });
+			queryClient.invalidateQueries({ queryKey: ['items', variables.item_id] });
+			toast.success(message);
+		},
+		onError: (error: unknown) => {
+			const axiosError = error as AxiosError<{ message?: string }>;
+			toast.error(axiosError.response?.data?.message || 'Error al registrar movimiento de stock');
+			console.error(error);
+		}
+	});
 
-    return {
-        handleRegisterStockMovement,
-        isLoading
-    };
+	return {
+		handleRegisterStockMovement,
+		isLoading
+	};
 };

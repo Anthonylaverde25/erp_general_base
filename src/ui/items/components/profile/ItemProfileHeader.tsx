@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, Box, Chip, IconButton, Stack, Tooltip, Typography, Button } from '@mui/material';
+import { Box, IconButton, Tooltip, Typography, Button } from '@mui/material';
 import { ContentCopy, Inventory2, MoreVert, Refresh } from '@mui/icons-material';
 import PageBreadcrumb from '@/components/PageBreadcrumb';
 import { ItemEntity } from '@/domain/entities/items/ItemEntity';
@@ -16,9 +16,11 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 
 	const getInitials = (text: string) => {
 		const parts = text.trim().split(' ');
+
 		if (parts.length >= 2) {
 			return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 		}
+
 		return text.substring(0, 2).toUpperCase();
 	};
 
@@ -59,7 +61,7 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 					}}
 				>
 					<Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
-						<Avatar
+						{/* <Avatar
 							src={item.image}
 							variant="rounded"
 							sx={{
@@ -72,7 +74,7 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 							}}
 						>
 							{getInitials(item.name || 'Item')}
-						</Avatar>
+						</Avatar> */}
 						<Box>
 							<Typography
 								variant="h5"
@@ -87,25 +89,6 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 							>
 								SKU: {item.sku} · Unidad: {item.unit_name || 'N/A'}
 							</Typography>
-							<Stack
-								direction="row"
-								spacing={1}
-								mt={1}
-								flexWrap="wrap"
-								useFlexGap
-							>
-								<Chip
-									label={item.type === 'physical' ? 'Producto Físico' : 'Servicio'}
-									size="small"
-									sx={{ bgcolor: 'rgba(29,78,216,.12)', color: '#1d4ed8', fontWeight: 600 }}
-								/>
-								<Chip
-									label={item.is_active ? 'Activo' : 'Inactivo'}
-									size="small"
-									variant="outlined"
-									sx={{ color: item.is_active ? '#15803d' : '#b91c1c' }}
-								/>
-							</Stack>
 						</Box>
 					</Box>
 
@@ -119,11 +102,27 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 					>
 						{item.type === 'physical' && (
 							<Button
-								variant="contained"
-								color="primary"
+								variant="outlined"
+								color="inherit"
 								size="small"
 								disableElevation
-								sx={{ textTransform: 'none', fontWeight: 600, gap: 1 }}
+								sx={{
+									textTransform: 'none',
+									fontWeight: 600,
+									fontSize: '0.75rem',
+									color: 'text.secondary',
+									py: 0.5,
+									px: 1.5,
+									borderRadius: 0.5,
+									borderColor: 'divider',
+									bgcolor: 'transparent',
+									gap: 1,
+									'&:hover': {
+										bgcolor: 'action.hover',
+										color: 'text.primary',
+										borderColor: 'divider'
+									}
+								}}
 								onClick={() => setStockModalOpen(true)}
 							>
 								<Inventory2 sx={{ fontSize: 18 }} />
@@ -131,11 +130,27 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 							</Button>
 						)}
 						<Button
-							variant="contained"
-							color="secondary"
+							variant="outlined"
+							color="inherit"
 							size="small"
 							disableElevation
-							sx={{ textTransform: 'none', fontWeight: 600, gap: 1 }}
+							sx={{
+								textTransform: 'none',
+								fontWeight: 600,
+								fontSize: '0.75rem',
+								color: 'text.secondary',
+								py: 0.5,
+								px: 1.5,
+								borderRadius: 0.5,
+								borderColor: 'divider',
+								bgcolor: 'transparent',
+								gap: 1,
+								'&:hover': {
+									bgcolor: 'action.hover',
+									color: 'text.primary',
+									borderColor: 'divider'
+								}
+							}}
 						>
 							<Refresh sx={{ fontSize: 18 }} />
 							Actualizar
@@ -152,26 +167,31 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 				</Box>
 			</Box>
 
-			<Box
-				className="flex flex-wrap items-center gap-2 px-3 pb-3"
-			>
+			<Box className="flex flex-wrap items-center gap-2 px-3 pb-3">
 				{['Resumen', 'Movimientos', 'Actividad'].map((label, index) => {
 					const isActive = tabValue === index;
 					return (
 						<Button
 							key={label}
 							onClick={(e) => onTabChange(e, index)}
-							variant={isActive ? "contained" : "text"}
 							size="small"
 							disableElevation
 							sx={{
 								textTransform: 'none',
 								fontWeight: 600,
-								bgcolor: isActive ? 'text.primary' : 'transparent',
-								color: isActive ? 'background.paper' : 'text.secondary',
+								fontSize: '0.75rem',
+								color: isActive ? '#ffffff' : 'text.secondary',
+								py: 0.5,
+								px: 1.5,
+								borderRadius: 0.5,
+								border: '1px solid',
+								borderColor: isActive ? '#1b1b1b' : 'divider',
+								bgcolor: isActive ? '#1b1b1b' : 'transparent',
 								'&:hover': {
-									bgcolor: isActive ? 'text.primary' : 'action.hover',
-								},
+									bgcolor: isActive ? '#333333' : 'action.hover',
+									color: isActive ? '#ffffff' : 'text.primary',
+									borderColor: isActive ? '#1b1b1b' : 'divider'
+								}
 							}}
 						>
 							{label}

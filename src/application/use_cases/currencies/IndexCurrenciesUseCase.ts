@@ -6,12 +6,12 @@ import { CurrencyEntity } from '@/domain/entities/currencies/CurrencyEntity';
 
 @injectable()
 export class IndexCurrenciesUseCase implements IUseCase<void, CurrencyEntity[]> {
-    constructor(
-        @inject(TYPES.ICurrencyRepository)
-        private readonly repository: ICurrencyRepository
-    ) { }
+	constructor(
+		@inject(TYPES.ICurrencyRepository)
+		private readonly repository: ICurrencyRepository
+	) {}
 
-    async execute(): Promise<CurrencyEntity[]> {
-        return await this.repository.index();
-    }
+	async execute(): Promise<CurrencyEntity[]> {
+		return await this.repository.index();
+	}
 }

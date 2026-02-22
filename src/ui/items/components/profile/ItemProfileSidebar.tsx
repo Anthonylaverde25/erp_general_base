@@ -1,14 +1,5 @@
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import {
-	Add,
-	Edit,
-	History,
-	NotificationsActive,
-	PersonAddAlt1,
-	Save,
-	Star,
-	StarBorder
-} from '@mui/icons-material';
+import { Add, Edit, History, NotificationsActive, PersonAddAlt1, Save, Star, StarBorder } from '@mui/icons-material';
 import {
 	Autocomplete,
 	Box,
@@ -21,7 +12,6 @@ import {
 	Divider,
 	FormControlLabel,
 	IconButton,
-
 	Paper,
 	Switch,
 	TextField,
@@ -70,17 +60,13 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 	// Sync alarm state from item data
 	useEffect(() => {
 		setAlarmEnabled(item.physical_profile?.has_stock_alert ?? false);
-		setMinStockAlert(
-			item.physical_profile?.stock_min != null
-				? String(item.physical_profile.stock_min)
-				: ''
-		);
+		setMinStockAlert(item.physical_profile?.stock_min != null ? String(item.physical_profile.stock_min) : '');
 	}, [item.physical_profile?.has_stock_alert, item.physical_profile?.stock_min]);
 
 	useEffect(() => {
 		if (item.partners.length > 0) {
-			setSelectedPartnerIds(item.partners.map(p => p.id));
-			const defaultP = item.partners.find(p => p.is_default);
+			setSelectedPartnerIds(item.partners.map((p) => p.id));
+			const defaultP = item.partners.find((p) => p.is_default);
 			setDefaultPartnerId(defaultP?.id ?? item.partners[0]?.id ?? null);
 		} else if (item.partner_id) {
 			setSelectedPartnerIds([item.partner_id]);
@@ -94,30 +80,35 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 	const purchasePrice = item.purchase_price ?? 0;
 	const salePrice = item.sale_price ?? 0;
 	const margin = purchasePrice > 0 ? ((salePrice - purchasePrice) / purchasePrice) * 100 : 0;
-	const totalAvailable = item.inventory.reduce(
+	const totalAvailable = (item.inventory || []).reduce(
 		(total, inventoryItem) => total + (inventoryItem.available_quantity || 0),
 		0
 	);
-
-
 
 	const actionBtnSx = {
 		flex: '1 1 auto',
 		textTransform: 'none',
 		justifyContent: 'center',
 		fontWeight: 600,
-		fontSize: '0.8rem',
-		color: 'text.primary',
-		borderRadius: 0.5,
+		fontSize: '0.75rem',
+		color: 'text.secondary',
 		py: 0.5,
+		px: 1.5,
+		borderRadius: 0.5,
+		border: '1px solid',
 		borderColor: 'divider',
-		'&:hover': { bgcolor: 'action.hover', borderColor: 'divider' }
+		bgcolor: 'transparent',
+		'&:hover': {
+			bgcolor: 'action.hover',
+			color: 'text.primary',
+			borderColor: 'divider'
+		}
 	} as const;
 
 	const handleSaveSupplier = async () => {
 		// Reorder so default is first
 		const orderedIds = defaultPartnerId
-			? [defaultPartnerId, ...selectedPartnerIds.filter(id => id !== defaultPartnerId)]
+			? [defaultPartnerId, ...selectedPartnerIds.filter((id) => id !== defaultPartnerId)]
 			: selectedPartnerIds;
 		await handleUpdateItem({
 			id: item.id,
@@ -155,7 +146,6 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 				<Box className="mb-2 flex flex-wrap gap-2">
 					<Button
 						size="small"
-						variant="outlined"
 						color="inherit"
 						startIcon={<Edit sx={{ fontSize: 16 }} />}
 						sx={actionBtnSx}
@@ -165,7 +155,6 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 					</Button>
 					<Button
 						size="small"
-						variant="outlined"
 						color="inherit"
 						startIcon={<History sx={{ fontSize: 16 }} />}
 						sx={actionBtnSx}
@@ -175,7 +164,6 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 					</Button>
 					<Button
 						size="small"
-						variant="outlined"
 						color="inherit"
 						startIcon={<NotificationsActive sx={{ fontSize: 16 }} />}
 						sx={actionBtnSx}
@@ -185,7 +173,6 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 					</Button>
 					<Button
 						size="small"
-						variant="outlined"
 						color="inherit"
 						startIcon={<Add sx={{ fontSize: 16 }} />}
 						sx={actionBtnSx}
@@ -241,9 +228,7 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 					variant="outlined"
 					sx={{ borderRadius: '14px', p: 2, mb: 1.5, borderColor: 'divider' }}
 				>
-					<Typography sx={{ fontSize: 13, fontWeight: 600, color: '#666', mb: 1 }}>
-						Proveedores
-					</Typography>
+					<Typography sx={{ fontSize: 13, fontWeight: 600, color: '#666', mb: 1 }}>Proveedores</Typography>
 					{item.partners.length > 0 ? (
 						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, mb: 1.25 }}>
 							{item.partners.map((partner) => (
@@ -259,7 +244,11 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 										icon={partner.is_default ? <Star sx={{ fontSize: 14 }} /> : undefined}
 									/>
 									{partner.is_default && (
-										<Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+										<Typography
+											variant="caption"
+											color="text.secondary"
+											sx={{ fontSize: '0.7rem' }}
+										>
 											Por defecto
 										</Typography>
 									)}
@@ -278,8 +267,24 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 					<Button
 						fullWidth
 						variant="outlined"
+						color="inherit"
 						startIcon={<PersonAddAlt1 />}
-						sx={{ textTransform: 'none', fontWeight: 600 }}
+						sx={{
+							textTransform: 'none',
+							fontWeight: 600,
+							fontSize: '0.75rem',
+							color: 'text.secondary',
+							py: 0.5,
+							px: 1.5,
+							borderRadius: 0.5,
+							borderColor: 'divider',
+							bgcolor: 'transparent',
+							'&:hover': {
+								bgcolor: 'action.hover',
+								color: 'text.primary',
+								borderColor: 'divider'
+							}
+						}}
 						onClick={() => setSupplierOpen(true)}
 					>
 						{item.partners.length > 0 ? 'Gestionar proveedores' : 'Asignar proveedor'}
@@ -291,74 +296,109 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 					variant="outlined"
 					sx={{ borderRadius: '14px', p: 2, mb: 1.5, borderColor: 'divider' }}
 				>
-					<Typography sx={{ fontSize: 13, fontWeight: 600, color: '#666', mb: 1 }}>
-						Stock total
-					</Typography>
-					<Typography sx={{ fontFamily: 'monospace', fontSize: 22, fontWeight: 700, color: totalAvailable > 0 ? '#004D1A' : '#B71C1C', mb: 1 }}>
+					<Typography sx={{ fontSize: 13, fontWeight: 600, color: '#666', mb: 1 }}>Stock total</Typography>
+					<Typography
+						sx={{
+							fontFamily: 'monospace',
+							fontSize: 22,
+							fontWeight: 700,
+							color: totalAvailable > 0 ? '#004D1A' : '#B71C1C',
+							mb: 1
+						}}
+					>
 						{totalAvailable} {item.unit_name || 'uds'}
 					</Typography>
 					{item.physical_profile?.stock_min != null && (
-						<Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.25 }}>
+						<Typography
+							variant="caption"
+							color="text.secondary"
+							sx={{ display: 'block', mb: 1.25 }}
+						>
 							Stock mínimo: {item.physical_profile.stock_min}
 						</Typography>
 					)}
-					<Button
-						fullWidth
-						variant="outlined"
-						startIcon={<FuseSvgIcon size={18}>heroicons-outline:arrow-path</FuseSvgIcon>}
-						sx={{ textTransform: 'none', fontWeight: 600 }}
-					>
-						Actualizar stock
-					</Button>
 				</Paper>
-
 
 				<Box sx={{ flex: 1 }} />
 				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
 					<Button
 						fullWidth
-						variant="contained"
-						sx={{ textTransform: 'none', fontWeight: 600 }}
+						variant="outlined"
+						color="inherit"
+						sx={{
+							textTransform: 'none',
+							fontWeight: 600,
+							fontSize: '0.75rem',
+							color: 'text.secondary',
+							py: 0.5,
+							px: 1.5,
+							borderRadius: 0.5,
+							borderColor: 'divider',
+							bgcolor: 'transparent',
+							justifyContent: 'flex-start',
+							'&:hover': {
+								bgcolor: 'action.hover',
+								color: 'text.primary',
+								borderColor: 'text.secondary'
+							}
+						}}
+						startIcon={<FuseSvgIcon size={18}>heroicons-outline:document-text</FuseSvgIcon>}
 					>
 						Ver ficha tecnica
-						<FuseSvgIcon
-							sx={{ ml: 1 }}
-							size={16}
-						>
-							heroicons-outline:document-text
-						</FuseSvgIcon>
 					</Button>
 					<Button
 						fullWidth
 						variant="outlined"
 						color="inherit"
-						sx={{ textTransform: 'none', fontWeight: 600 }}
+						sx={{
+							textTransform: 'none',
+							fontWeight: 600,
+							fontSize: '0.75rem',
+							color: 'text.secondary',
+							py: 0.5,
+							px: 1.5,
+							borderRadius: 0.5,
+							borderColor: 'divider',
+							bgcolor: 'transparent',
+							justifyContent: 'flex-start',
+							'&:hover': {
+								bgcolor: 'action.hover',
+								color: 'text.primary',
+								borderColor: 'text.secondary'
+							}
+						}}
+						startIcon={<FuseSvgIcon size={18}>heroicons-outline:document-plus</FuseSvgIcon>}
 					>
 						Crear presupuesto
-						<FuseSvgIcon
-							sx={{ ml: 1 }}
-							size={16}
-						>
-							heroicons-outline:document-plus
-						</FuseSvgIcon>
 					</Button>
 					<Button
 						fullWidth
 						variant="outlined"
 						color="inherit"
-						sx={{ textTransform: 'none', fontWeight: 600 }}
+						sx={{
+							textTransform: 'none',
+							fontWeight: 600,
+							fontSize: '0.75rem',
+							color: 'text.secondary',
+							py: 0.5,
+							px: 1.5,
+							borderRadius: 0.5,
+							borderColor: 'divider',
+							bgcolor: 'transparent',
+							justifyContent: 'flex-start',
+							'&:hover': {
+								bgcolor: 'action.hover',
+								color: 'text.primary',
+								borderColor: 'text.secondary'
+							}
+						}}
+						startIcon={<FuseSvgIcon size={18}>heroicons-outline:pencil-square</FuseSvgIcon>}
 						onClick={() => setNoteOpen(true)}
 					>
 						Agregar nota
-						<FuseSvgIcon
-							sx={{ ml: 1 }}
-							size={16}
-						>
-							heroicons-outline:pencil-square
-						</FuseSvgIcon>
 					</Button>
 				</Box>
-			</Box >
+			</Box>
 
 			<Dialog
 				open={historyOpen}
@@ -385,14 +425,18 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 									variant="caption"
 									color="text.secondary"
 								>
-									Disponible: {inventoryItem.available_quantity} · En stock: {inventoryItem.quantity_on_hand}
+									Disponible: {inventoryItem.available_quantity} · En stock:{' '}
+									{inventoryItem.quantity_on_hand}
 								</Typography>
 								<Typography
 									variant="caption"
 									color="text.secondary"
 									sx={{ display: 'block', mt: 0.75 }}
 								>
-									Último conteo: {inventoryItem.last_count_at ? new Date(inventoryItem.last_count_at).toLocaleString('es-ES') : 'N/A'}
+									Último conteo:{' '}
+									{inventoryItem.last_count_at
+										? new Date(inventoryItem.last_count_at).toLocaleString('es-ES')
+										: 'N/A'}
 								</Typography>
 							</Paper>
 						))}
@@ -504,6 +548,7 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 						onChange={(_, newValue) => {
 							const newIds = newValue.map((s) => s.id);
 							setSelectedPartnerIds(newIds);
+
 							// If default was removed, set first as default
 							if (defaultPartnerId && !newIds.includes(defaultPartnerId)) {
 								setDefaultPartnerId(newIds[0] ?? null);
@@ -533,13 +578,20 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 
 					{selectedPartnerIds.length > 0 && (
 						<Box sx={{ mt: 2 }}>
-							<Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+							<Typography
+								variant="caption"
+								fontWeight={600}
+								color="text.secondary"
+								sx={{ mb: 0.5, display: 'block' }}
+							>
 								Proveedor por defecto
 							</Typography>
 							<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
 								{selectedPartnerIds.map((pId) => {
 									const partner = suppliers.find((s) => s.id === pId);
+
 									if (!partner) return null;
+
 									const isDefault = defaultPartnerId === pId;
 									return (
 										<Box
@@ -552,10 +604,14 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 												borderRadius: 1,
 												border: '1px solid',
 												borderColor: isDefault ? 'primary.main' : 'divider',
-												bgcolor: isDefault ? 'primary.50' : 'transparent',
+												bgcolor: isDefault ? 'primary.50' : 'transparent'
 											}}
 										>
-											<Tooltip title={isDefault ? 'Proveedor por defecto' : 'Marcar como predeterminado'}>
+											<Tooltip
+												title={
+													isDefault ? 'Proveedor por defecto' : 'Marcar como predeterminado'
+												}
+											>
 												<IconButton
 													size="small"
 													onClick={() => setDefaultPartnerId(pId)}
@@ -564,11 +620,20 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 													{isDefault ? <Star /> : <StarBorder />}
 												</IconButton>
 											</Tooltip>
-											<Typography variant="body2" fontWeight={isDefault ? 700 : 400}>
+											<Typography
+												variant="body2"
+												fontWeight={isDefault ? 700 : 400}
+											>
 												{partner.name}
 											</Typography>
 											{isDefault && (
-												<Chip label="Por defecto" size="small" color="primary" variant="outlined" sx={{ ml: 'auto' }} />
+												<Chip
+													label="Por defecto"
+													size="small"
+													color="primary"
+													variant="outlined"
+													sx={{ ml: 'auto' }}
+												/>
 											)}
 										</Box>
 									);

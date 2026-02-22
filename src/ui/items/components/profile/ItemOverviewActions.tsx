@@ -15,15 +15,26 @@ export default function ItemOverviewActions() {
 			{ACTIONS.map((action) => (
 				<Button
 					key={action.label}
-					variant="contained"
-					color="secondary"
+					variant="outlined"
+					color="inherit"
 					size="small"
-					disableElevation
 					sx={{
 						textTransform: 'none',
 						fontWeight: 600,
-						gap: 1,
+						fontSize: '0.75rem',
+						color: 'text.secondary',
+						py: 0.5,
+						px: 1.5,
+						borderRadius: 0.5,
+						borderColor: 'divider',
+						bgcolor: 'transparent',
+						'&:hover': {
+							bgcolor: 'action.hover',
+							color: 'text.primary',
+							borderColor: 'divider'
+						}
 					}}
+					className="flex items-center gap-2"
 				>
 					{action.icon}
 					{action.label}

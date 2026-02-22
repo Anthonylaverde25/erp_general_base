@@ -1,6 +1,5 @@
-
 export interface CreateContactDTO {
-    email: string;
-    phone?: string;
-    default?: boolean;
+	email: string;
+	phone?: string;
+	default?: boolean;
 }

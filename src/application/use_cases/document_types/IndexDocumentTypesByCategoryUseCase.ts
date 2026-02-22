@@ -6,12 +6,12 @@ import { DocumentTypeEntity } from '@/domain/entities/document_types/DocumentTyp
 
 @injectable()
 export class IndexDocumentTypesByCategoryUseCase implements IUseCase<string, DocumentTypeEntity[]> {
-    constructor(
-        @inject(TYPES.IDocumentTypeRepository)
-        private readonly repository: IDocumentTypeRepository
-    ) { }
+	constructor(
+		@inject(TYPES.IDocumentTypeRepository)
+		private readonly repository: IDocumentTypeRepository
+	) {}
 
-    async execute(category: string): Promise<DocumentTypeEntity[]> {
-        return await this.repository.indexByCategory(category);
-    }
+	async execute(category: string): Promise<DocumentTypeEntity[]> {
+		return await this.repository.indexByCategory(category);
+	}
 }

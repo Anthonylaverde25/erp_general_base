@@ -6,12 +6,12 @@ import { StoreEntity } from '@/domain/entities/stores/StoreEntity';
 
 @injectable()
 export class IndexStoresUseCase implements IUseCase<void, StoreEntity[]> {
-    constructor(
-        @inject(TYPES.IStoreRepository)
-        private readonly repository: IStoreRepository
-    ) { }
+	constructor(
+		@inject(TYPES.IStoreRepository)
+		private readonly repository: IStoreRepository
+	) {}
 
-    async execute(): Promise<StoreEntity[]> {
-        return await this.repository.index();
-    }
+	async execute(): Promise<StoreEntity[]> {
+		return await this.repository.index();
+	}
 }

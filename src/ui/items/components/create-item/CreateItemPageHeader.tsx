@@ -12,7 +12,14 @@ type CreateItemPageHeaderProps = {
 	mode?: 'create' | 'edit';
 };
 
-function CreateItemPageHeader({ itemType, isLoading, isValid, onCancel, onSave, mode = 'create' }: CreateItemPageHeaderProps) {
+function CreateItemPageHeader({
+	itemType,
+	isLoading,
+	isValid,
+	onCancel,
+	onSave,
+	mode = 'create'
+}: CreateItemPageHeaderProps) {
 	const isEditMode = mode === 'edit';
 
 	return (

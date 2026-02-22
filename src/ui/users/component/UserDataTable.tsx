@@ -9,7 +9,6 @@ import { IUser } from '@/types/user.types';
 export default function UserDataTable(props: MaterialReactTableProps<IUser>) {
 	const { columns, data, ...rest } = props;
 
-
 	if (!data || (Array.isArray(data) && data.length === 0)) {
 		return (
 			<div className="flex h-full items-center justify-center">

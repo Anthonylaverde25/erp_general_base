@@ -7,12 +7,12 @@ import { CreateTaxRateDTO } from '@/domain/entities/tax_rates/DTOs/CreateTaxRate
 
 @injectable()
 export class CreateTaxRateUseCase implements IUseCase<CreateTaxRateDTO, { tax_rate: TaxRateEntity; message: string }> {
-    constructor(
-        @inject(TYPES.ITaxRateRepository)
-        private readonly repository: ITaxRateRepository
-    ) { }
+	constructor(
+		@inject(TYPES.ITaxRateRepository)
+		private readonly repository: ITaxRateRepository
+	) {}
 
-    async execute(data: CreateTaxRateDTO): Promise<{ tax_rate: TaxRateEntity; message: string }> {
-        return await this.repository.create(data);
-    }
+	async execute(data: CreateTaxRateDTO): Promise<{ tax_rate: TaxRateEntity; message: string }> {
+		return await this.repository.create(data);
+	}
 }

@@ -57,8 +57,10 @@ export const mapItemFormToDTO = (values: ItemFormType): CreateItemDTO => {
 				dimensions: buildDimensions(values),
 				is_inventoriable:
 					typeof values.is_inventoriable !== 'undefined' ? Boolean(values.is_inventoriable) : undefined,
-				stock_min: values.stock_min !== undefined && values.stock_min !== null ? Number(values.stock_min) : undefined,
-				has_stock_alert: typeof values.has_stock_alert !== 'undefined' ? Boolean(values.has_stock_alert) : undefined
+				stock_min:
+					values.stock_min !== undefined && values.stock_min !== null ? Number(values.stock_min) : undefined,
+				has_stock_alert:
+					typeof values.has_stock_alert !== 'undefined' ? Boolean(values.has_stock_alert) : undefined
 			}
 		};
 	}
@@ -109,9 +111,14 @@ export const mapItemToFormValues = (item: ItemEntity): ItemFormType => {
 		is_inventoriable: item.physical_profile?.is_inventoriable ?? true,
 		stock_min: item.physical_profile?.stock_min ?? null,
 		has_stock_alert: item.physical_profile?.has_stock_alert ?? false,
-		initial_stock: item.inventory?.[0]?.quantity_on_hand !== undefined ? item.inventory[0].quantity_on_hand : undefined,
+		initial_stock:
+			item.inventory?.[0]?.quantity_on_hand !== undefined ? item.inventory[0].quantity_on_hand : undefined,
 		quantity: undefined,
-		store_id: item.inventory?.[0]?.store_id ? String(item.inventory[0].store_id) : (item.store_id != null ? String(item.store_id) : ''),
+		store_id: item.inventory?.[0]?.store_id
+			? String(item.inventory[0].store_id)
+			: item.store_id != null
+				? String(item.store_id)
+				: '',
 		estimated_time: item.service_profile?.estimated_time,
 		req_scheduling: item.service_profile?.req_scheduling ?? false
 	} as ItemFormType;

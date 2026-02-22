@@ -16,8 +16,6 @@ export const createUserSchema = z
 
 export type CreateUserFormType = z.infer<typeof createUserSchema>;
 
-
-
 export const updateUserSchema = z
 	.object({
 		id: z.number(),
@@ -34,6 +32,7 @@ export const updateUserSchema = z
 			if (data.password && data.password.length > 0 && data.password.length < 8) {
 				return false;
 			}
+
 			return true;
 		},
 		{
@@ -47,6 +46,7 @@ export const updateUserSchema = z
 			if (data.password && data.password.length > 0) {
 				return data.password === data.password_confirmation;
 			}
+
 			return true;
 		},
 		{

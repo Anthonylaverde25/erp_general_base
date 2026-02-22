@@ -11,10 +11,7 @@ import {
 	Chip,
 	Avatar,
 	Card,
-	CardHeader,
-	Divider,
-	IconButton,
-	Tooltip
+	IconButton
 } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 
@@ -37,8 +34,6 @@ export default function RolesTabView() {
 
 	return (
 		<Card className="w-full overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-
-
 			<TableContainer>
 				<Table
 					sx={{ minWidth: 650 }}

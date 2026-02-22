@@ -6,8 +6,10 @@ import { CurrencyMapper } from '@/domain/entities/currencies/Mappers/CurrencyMap
 
 @injectable()
 export class CurrencyRepositoryCrud implements ICurrencyRepository {
-    async index(): Promise<CurrencyEntity[]> {
-        const { data: { currencies } } = await axiosInstance.get('currencies');
-        return CurrencyMapper.fromDetailDTOList(currencies);
-    }
+	async index(): Promise<CurrencyEntity[]> {
+		const {
+			data: { currencies }
+		} = await axiosInstance.get('currencies');
+		return CurrencyMapper.fromDetailDTOList(currencies);
+	}
 }

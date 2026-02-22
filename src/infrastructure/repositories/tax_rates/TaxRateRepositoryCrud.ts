@@ -7,29 +7,31 @@ import { CreateTaxRateDTO } from '@/domain/entities/tax_rates/DTOs/CreateTaxRate
 
 @injectable()
 export class TaxRateRepositoryCrud implements ITaxRateRepository {
-    async index(): Promise<TaxRateEntity[]> {
-        const { data: { tax_rates } } = await axiosInstance.get(`tax-rates`);
-        return TaxRateMapper.fromDetailDTOList(tax_rates);
-    }
+	async index(): Promise<TaxRateEntity[]> {
+		const {
+			data: { tax_rates }
+		} = await axiosInstance.get(`tax-rates`);
+		return TaxRateMapper.fromDetailDTOList(tax_rates);
+	}
 
-    async create(data: CreateTaxRateDTO): Promise<{ tax_rate: TaxRateEntity; message: string }> {
-        const {
-            data: { tax_rate, message }
-        } = await axiosInstance.post(`tax-rates`, data);
-        return {
-            tax_rate: TaxRateMapper.fromDetailDTO(tax_rate),
-            message
-        };
-    }
+	async create(data: CreateTaxRateDTO): Promise<{ tax_rate: TaxRateEntity; message: string }> {
+		const {
+			data: { tax_rate, message }
+		} = await axiosInstance.post(`tax-rates`, data);
+		return {
+			tax_rate: TaxRateMapper.fromDetailDTO(tax_rate),
+			message
+		};
+	}
 
-    async update(id: TaxRate['id'], data: Partial<TaxRate>): Promise<{ tax_rate: TaxRateEntity; message: string }> {
-        const {
-            data: { tax_rate, message }
-        } = await axiosInstance.put(`tax-rates/${id}`, data);
-        console.log('mensaje al actualizar el tax rate', message)
-        return {
-            tax_rate: TaxRateMapper.fromDetailDTO(tax_rate),
-            message
-        };
-    }
+	async update(id: TaxRate['id'], data: Partial<TaxRate>): Promise<{ tax_rate: TaxRateEntity; message: string }> {
+		const {
+			data: { tax_rate, message }
+		} = await axiosInstance.put(`tax-rates/${id}`, data);
+		console.log('mensaje al actualizar el tax rate', message);
+		return {
+			tax_rate: TaxRateMapper.fromDetailDTO(tax_rate),
+			message
+		};
+	}
 }

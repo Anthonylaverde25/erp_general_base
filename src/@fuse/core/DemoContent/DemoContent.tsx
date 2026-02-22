@@ -1,9 +1,6 @@
-import useIndexUser from '@/features/users/hooks/useIndexUsers';
-import { memo, useEffect } from 'react';
-import useAuth from '../FuseAuthProvider/useAuth';
+import { memo } from 'react';
 import useActiveCompany from '@/features/companies/useActiveCompany';
 import useIndexCompanies from '@/features/companies/hooks/useIndexCompanies';
-import axiosInstance from '@/lib/@axios';
 
 /**
  * DemoContent is a React component used to render a demo content on the page.
@@ -11,10 +8,10 @@ import axiosInstance from '@/lib/@axios';
  * It also renders a quote and some content about a person being transformed into a vermin.
  */
 function DemoContent() {
-	const activeCompany = useActiveCompany()
-	const { id, name } = activeCompany || {}
-	const { companies, isLoading, isError, error } = useIndexCompanies()
-	console.log('companies', companies)
+	const activeCompany = useActiveCompany();
+	const { id, name } = activeCompany || {};
+	const { companies, isLoading, isError, error } = useIndexCompanies();
+	console.log('companies', companies);
 	// const { users } = useIndexUser();
 	// const { authState: { user, authStatus, isAuthenticated }, } = useAuth();
 
@@ -24,9 +21,8 @@ function DemoContent() {
 	// 	fetch()
 	// }, [])
 
-
 	// console.log('User:', user, authStatus, isAuthenticated);
-	console.log('Active Company:', id, name)
+	console.log('Active Company:', id, name);
 	return (
 		<div>
 			<img

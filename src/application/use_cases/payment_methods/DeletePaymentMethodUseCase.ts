@@ -5,12 +5,12 @@ import type { IPaymentMethodRepository } from '@/domain/entities/payment_methods
 
 @injectable()
 export class DeletePaymentMethodUseCase implements IUseCase<number, void> {
-    constructor(
-        @inject(TYPES.IPaymentMethodRepository)
-        private readonly repository: IPaymentMethodRepository
-    ) { }
+	constructor(
+		@inject(TYPES.IPaymentMethodRepository)
+		private readonly repository: IPaymentMethodRepository
+	) {}
 
-    async execute(id: number): Promise<void> {
-        return await this.repository.delete(id);
-    }
+	async execute(id: number): Promise<void> {
+		return await this.repository.delete(id);
+	}
 }

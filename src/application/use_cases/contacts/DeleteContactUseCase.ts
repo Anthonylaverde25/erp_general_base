@@ -5,12 +5,12 @@ import type { IContactRepository } from '@/domain/entities/contacts/repositories
 
 @injectable()
 export class DeleteContactUseCase implements IUseCase<number, void> {
-    constructor(
-        @inject(TYPES.IContactRepository)
-        private readonly repository: IContactRepository
-    ) { }
+	constructor(
+		@inject(TYPES.IContactRepository)
+		private readonly repository: IContactRepository
+	) {}
 
-    async execute(id: number): Promise<void> {
-        return await this.repository.delete(id);
-    }
+	async execute(id: number): Promise<void> {
+		return await this.repository.delete(id);
+	}
 }

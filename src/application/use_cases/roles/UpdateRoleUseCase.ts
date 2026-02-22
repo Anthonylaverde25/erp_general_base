@@ -6,10 +6,10 @@ import { RoleEntity } from '@/domain/entities/roles/Role';
 
 @injectable()
 export class UpdateRoleUseCase {
-    constructor(@inject(TYPES.IRoleCrudRepository) private repository: IRoleCrudRepository) { }
+	constructor(@inject(TYPES.IRoleCrudRepository) private repository: IRoleCrudRepository) {}
 
-    async execute(id: number, data: IUpdateRole): Promise<{ role: RoleEntity; message: string }> {
-        const role = RoleEntity.update(id, data);
-        return this.repository.update(id, role);
-    }
+	async execute(id: number, data: IUpdateRole): Promise<{ role: RoleEntity; message: string }> {
+		const role = RoleEntity.update(id, data);
+		return this.repository.update(id, role);
+	}
 }

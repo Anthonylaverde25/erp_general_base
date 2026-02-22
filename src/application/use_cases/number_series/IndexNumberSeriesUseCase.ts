@@ -6,12 +6,12 @@ import { NumberSeriesEntity } from '@/domain/entities/number_series/NumberSeries
 
 @injectable()
 export class IndexNumberSeriesUseCase implements IUseCase<void, NumberSeriesEntity[]> {
-    constructor(
-        @inject(TYPES.INumberSeriesRepository)
-        private readonly repository: INumberSeriesRepository
-    ) { }
+	constructor(
+		@inject(TYPES.INumberSeriesRepository)
+		private readonly repository: INumberSeriesRepository
+	) {}
 
-    async execute(): Promise<NumberSeriesEntity[]> {
-        return await this.repository.index();
-    }
+	async execute(): Promise<NumberSeriesEntity[]> {
+		return await this.repository.index();
+	}
 }

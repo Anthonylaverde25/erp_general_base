@@ -1,9 +1,7 @@
-import { lazy } from "react";
+import { lazy } from 'react';
 
-const UnitsTabView = lazy(
-    () => import("../components/UnitsTabView"),
-);
+const UnitsTabView = lazy(() => import('../components/UnitsTabView'));
 
 export default function UnitsPage() {
-    return <UnitsTabView />;
+	return <UnitsTabView />;
 }

@@ -3,8 +3,6 @@ import { IUser } from '@/types/user.types';
 import { createContext } from 'react';
 import { JwtSignInPayload, JwtSignUpPayload } from '@auth/services/jwt/JwtAuthProvider';
 
-import { ICompany } from '@/types/company.types';
-
 import { PartialDeep } from 'type-fest';
 
 export type JwtAuthContextType = FuseAuthProviderState<IUser> & {

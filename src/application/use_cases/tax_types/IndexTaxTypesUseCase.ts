@@ -6,12 +6,12 @@ import { TaxTypeEntity } from '@/domain/entities/tax_types/TaxTypeEntity';
 
 @injectable()
 export class IndexTaxTypesUseCase implements IUseCase<void, TaxTypeEntity[]> {
-    constructor(
-        @inject(TYPES.ITaxTypeRepository)
-        private readonly repository: ITaxTypeRepository
-    ) { }
+	constructor(
+		@inject(TYPES.ITaxTypeRepository)
+		private readonly repository: ITaxTypeRepository
+	) {}
 
-    async execute(): Promise<TaxTypeEntity[]> {
-        return await this.repository.index();
-    }
+	async execute(): Promise<TaxTypeEntity[]> {
+		return await this.repository.index();
+	}
 }

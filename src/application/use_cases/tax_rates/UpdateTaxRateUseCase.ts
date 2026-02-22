@@ -5,13 +5,21 @@ import type { ITaxRateRepository } from '@/domain/entities/tax_rates/repositorie
 import { TaxRateEntity, TaxRate } from '@/domain/entities/tax_rates/TaxRateEntity';
 
 @injectable()
-export class UpdateTaxRateUseCase implements IUseCase<{ id: number; data: Partial<TaxRate> }, { tax_rate: TaxRateEntity; message: string }> {
-    constructor(
-        @inject(TYPES.ITaxRateRepository)
-        private readonly repository: ITaxRateRepository
-    ) { }
+export class UpdateTaxRateUseCase
+	implements IUseCase<{ id: number; data: Partial<TaxRate> }, { tax_rate: TaxRateEntity; message: string }>
+{
+	constructor(
+		@inject(TYPES.ITaxRateRepository)
+		private readonly repository: ITaxRateRepository
+	) {}
 
-    async execute({ id, data }: { id: number; data: Partial<TaxRate> }): Promise<{ tax_rate: TaxRateEntity; message: string }> {
-        return await this.repository.update(id, data);
-    }
+	async execute({
+		id,
+		data
+	}: {
+		id: number;
+		data: Partial<TaxRate>;
+	}): Promise<{ tax_rate: TaxRateEntity; message: string }> {
+		return await this.repository.update(id, data);
+	}
 }

@@ -7,46 +7,45 @@ import { injectable } from 'inversify';
 
 @injectable()
 export class UserRepositoryCrud implements IUserCrudRepository {
-  async index(): Promise<UserEntity[]> {
-    const {
-      data: { users }
-    } = await axiosInstance.get("users");
-    return UserMapper.fromDetailDTOList(users);
-  }
+	async index(): Promise<UserEntity[]> {
+		const {
+			data: { users }
+		} = await axiosInstance.get('users');
+		return UserMapper.fromDetailDTOList(users);
+	}
 
+	async show(id: IUser['id']): Promise<UserEntity> {
+		const {
+			data: { user }
+		} = await axiosInstance.get(`users/${id}`);
+		return UserMapper.fromDetailDTO(user);
+	}
 
-  async show(id: IUser['id']): Promise<UserEntity> {
-    const {
-      data: { user }
-    } = await axiosInstance.get(`users/${id}`);
-    return UserMapper.fromDetailDTO(user);
-  }
+	async create(data: UserEntity): Promise<{ user: UserEntity; message: string }> {
+		const {
+			data: { user, message }
+		} = await axiosInstance.post('users', data);
 
-  async create(data: UserEntity): Promise<{ user: UserEntity; message: string }> {
-    const {
-      data: { user, message }
-    } = await axiosInstance.post("users", data);
+		return {
+			user: UserMapper.fromDetailDTO(user),
+			message: message
+		};
+	}
 
-    return {
-      user: UserMapper.fromDetailDTO(user),
-      message: message,
-    };
-  }
+	async update(id: number, data: UserEntity): Promise<{ user: UserEntity; message: string }> {
+		const payload = data.toPlainObject();
+		const {
+			data: { user, message }
+		} = await axiosInstance.put(`/users/${id}`, payload);
 
-  async update(id: number, data: UserEntity): Promise<{ user: UserEntity; message: string }> {
-    const payload = data.toPlainObject();
-    const {
-      data: { user, message }
-    } = await axiosInstance.put(`/users/${id}`, payload);
+		return {
+			user: UserMapper.fromDetailDTO(user),
+			message: message || 'Usuario actualizado correctamente'
+		};
+	}
 
-    return {
-      user: UserMapper.fromDetailDTO(user),
-      message: message || 'Usuario actualizado correctamente'
-    };
-  }
-
-  async remove(id: number): Promise<{ message: string }> {
-    const { data } = await axiosInstance.delete(`users/${id}`);
-    return data;
-  }
+	async remove(id: number): Promise<{ message: string }> {
+		const { data } = await axiosInstance.delete(`users/${id}`);
+		return data;
+	}
 }

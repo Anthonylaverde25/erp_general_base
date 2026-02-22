@@ -5,7 +5,6 @@ import api from '@/utils/api';
 import axiosInstance from '@/lib/@axios';
 import { ILoginSuccessResponse } from '@/types/auth.types';
 import { IUser } from '@/types/user.types';
-import { ICompany } from '@/types/company.types';
 
 type AuthResponse = {
 	user: IUser;
@@ -39,7 +38,6 @@ export async function authSignIn(credentials: { email: string; password: string 
 			auth: { user, token }
 		}
 	} = await axiosInstance.post<ILoginSuccessResponse>(`auth/login`, credentials);
-
 
 	return {
 		user,

@@ -8,12 +8,12 @@ import { UpdateAddressUseCase } from '@/application/use_cases/addresses/UpdateAd
 import { DeleteAddressUseCase } from '@/application/use_cases/addresses/DeleteAddressUseCase';
 
 export const registerAddressModule = (container: Container) => {
-    // Repository
-    container.bind<IAddressRepository>(TYPES.IAddressRepository).to(AddressRepositoryCrud).inSingletonScope();
+	// Repository
+	container.bind<IAddressRepository>(TYPES.IAddressRepository).to(AddressRepositoryCrud).inSingletonScope();
 
-    // Use Cases
-    container.bind<CreateAddressUseCase>(TYPES.CreateAddressUseCase).to(CreateAddressUseCase);
-    container.bind<ShowAddressUseCase>(TYPES.ShowAddressUseCase).to(ShowAddressUseCase);
-    container.bind<UpdateAddressUseCase>(TYPES.UpdateAddressUseCase).to(UpdateAddressUseCase);
-    container.bind<DeleteAddressUseCase>(TYPES.DeleteAddressUseCase).to(DeleteAddressUseCase);
+	// Use Cases
+	container.bind<CreateAddressUseCase>(TYPES.CreateAddressUseCase).to(CreateAddressUseCase);
+	container.bind<ShowAddressUseCase>(TYPES.ShowAddressUseCase).to(ShowAddressUseCase);
+	container.bind<UpdateAddressUseCase>(TYPES.UpdateAddressUseCase).to(UpdateAddressUseCase);
+	container.bind<DeleteAddressUseCase>(TYPES.DeleteAddressUseCase).to(DeleteAddressUseCase);
 };

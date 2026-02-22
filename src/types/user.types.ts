@@ -1,5 +1,4 @@
 import { IRole } from './role.types';
-import { ICompany } from './company.types';
 
 /**
  * Tipado general de la entidad user
@@ -24,8 +23,6 @@ export interface IUser {
 	observations?: string;
 	active_company_id?: number;
 }
-
-
 
 /**
  * ICreateUser - Tipo para crear un nuevo usuario

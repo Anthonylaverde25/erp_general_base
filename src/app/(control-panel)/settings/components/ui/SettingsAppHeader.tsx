@@ -34,7 +34,6 @@ function SettingsAppHeader(props: SettingsAppHeaderProps) {
 					</IconButton>
 				)}
 
-
 				<Box>
 					<Typography className="text-3xl leading-none font-bold tracking-tight lg:ml-0">
 						{currentNavigation?.title}

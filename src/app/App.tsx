@@ -64,7 +64,10 @@ function App() {
 													</FuseDialogContextProvider>
 												</NavigationContextProvider>
 											</NavbarContextProvider>
-											<Toaster richColors position="bottom-right" />
+											<Toaster
+												richColors
+												position="bottom-right"
+											/>
 										</MainThemeProvider>
 									</RootThemeProvider>
 								</I18nProvider>

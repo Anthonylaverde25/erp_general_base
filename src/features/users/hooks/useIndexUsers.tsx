@@ -1,4 +1,4 @@
-import { IndexUserUseCase } from "@/application/use_cases/users/IndexUserUseCase";
+import { IndexUserUseCase } from '@/application/use_cases/users/IndexUserUseCase';
 import { container } from '@/di/container';
 import { TYPES } from '@/di/types';
 import useActiveCompany from '@/features/companies/useActiveCompany';
@@ -12,7 +12,7 @@ export default function useIndexUser() {
 		queryKey: ['users', activeCompany?.id],
 		queryFn: () => use_case.execute(),
 		refetchOnWindowFocus: false,
-		placeholderData: (previousData) => previousData,
+		placeholderData: (previousData) => previousData
 	});
 
 	return {

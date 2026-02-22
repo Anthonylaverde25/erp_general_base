@@ -6,26 +6,26 @@ import { toast } from 'sonner';
 import { AxiosError } from 'axios';
 
 export const useUpdateStockAlert = () => {
-    const queryClient = useQueryClient();
-    const useCase = container.get<UpdateStockAlertUseCase>(TYPES.UpdateStockAlertUseCase);
+	const queryClient = useQueryClient();
+	const useCase = container.get<UpdateStockAlertUseCase>(TYPES.UpdateStockAlertUseCase);
 
-    const { mutateAsync: handleUpdateStockAlert, isPending: isLoading } = useMutation({
-        mutationFn: ({ id, data }: { id: number; data: { has_stock_alert: boolean; stock_min: number | null } }) =>
-            useCase.execute(id, data),
-        onSuccess: ({ message }, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['items'] });
-            queryClient.invalidateQueries({ queryKey: ['items', variables.id] });
-            toast.success(message);
-        },
-        onError: (error: unknown) => {
-            const axiosError = error as AxiosError<{ message?: string }>;
-            toast.error(axiosError.response?.data?.message || 'Error al actualizar alarma de stock');
-            console.error(error);
-        }
-    });
+	const { mutateAsync: handleUpdateStockAlert, isPending: isLoading } = useMutation({
+		mutationFn: ({ id, data }: { id: number; data: { has_stock_alert: boolean; stock_min: number | null } }) =>
+			useCase.execute(id, data),
+		onSuccess: ({ message }, variables) => {
+			queryClient.invalidateQueries({ queryKey: ['items'] });
+			queryClient.invalidateQueries({ queryKey: ['items', variables.id] });
+			toast.success(message);
+		},
+		onError: (error: unknown) => {
+			const axiosError = error as AxiosError<{ message?: string }>;
+			toast.error(axiosError.response?.data?.message || 'Error al actualizar alarma de stock');
+			console.error(error);
+		}
+	});
 
-    return {
-        handleUpdateStockAlert,
-        isLoading
-    };
+	return {
+		handleUpdateStockAlert,
+		isLoading
+	};
 };

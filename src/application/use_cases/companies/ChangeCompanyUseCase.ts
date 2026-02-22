@@ -6,12 +6,12 @@ import type { ICompanyActionRepository } from '@/domain/entities/companies/repos
 
 @injectable()
 export class ChangeCompanyUseCase implements IUseCase<CompanyEntity['id'], string> {
-    constructor(
-        @inject(TYPES.ICompanyActionRepository)
-        private readonly repository: ICompanyActionRepository
-    ) { }
+	constructor(
+		@inject(TYPES.ICompanyActionRepository)
+		private readonly repository: ICompanyActionRepository
+	) {}
 
-    async execute(id: CompanyEntity['id']): Promise<string> {
-        return await this.repository.changeCompany(id);
-    }
+	async execute(id: CompanyEntity['id']): Promise<string> {
+		return await this.repository.changeCompany(id);
+	}
 }

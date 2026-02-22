@@ -6,10 +6,10 @@ import { UserEntity } from '@/domain/entities/users/User';
 
 @injectable()
 export class UpdateUserUseCase {
-    constructor(@inject(TYPES.IUserCrudRepository) private repository: IUserCrudRepository) { }
+	constructor(@inject(TYPES.IUserCrudRepository) private repository: IUserCrudRepository) {}
 
-    async execute(id: number, data: IUpdateUser): Promise<{ user: UserEntity; message: string }> {
-        const user = UserEntity.update(id, data);
-        return this.repository.update(id, user);
-    }
+	async execute(id: number, data: IUpdateUser): Promise<{ user: UserEntity; message: string }> {
+		const user = UserEntity.update(id, data);
+		return this.repository.update(id, user);
+	}
 }

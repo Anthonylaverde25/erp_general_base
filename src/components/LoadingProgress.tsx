@@ -1,17 +1,14 @@
-import { Box, LinearProgress, Typography } from "@mui/material";
-
-
+import { LinearProgress, Typography } from '@mui/material';
 
 interface LoadingProgressProps {
-    message: string;
+	message: string;
 }
 
 export default function LoadingProgress({ message }: LoadingProgressProps) {
-    return (
-        <div >
-            <Typography>{message}</Typography>
-            <LinearProgress />
-
-        </div>
-    );
+	return (
+		<div>
+			<Typography>{message}</Typography>
+			<LinearProgress />
+		</div>
+	);
 }

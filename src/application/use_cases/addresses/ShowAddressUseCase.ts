@@ -6,12 +6,12 @@ import { AddressEntity } from '@/domain/entities/addresses/Address';
 
 @injectable()
 export class ShowAddressUseCase implements IUseCase<number, AddressEntity> {
-    constructor(
-        @inject(TYPES.IAddressRepository)
-        private readonly repository: IAddressRepository
-    ) { }
+	constructor(
+		@inject(TYPES.IAddressRepository)
+		private readonly repository: IAddressRepository
+	) {}
 
-    async execute(id: number): Promise<AddressEntity> {
-        return await this.repository.show(id);
-    }
+	async execute(id: number): Promise<AddressEntity> {
+		return await this.repository.show(id);
+	}
 }

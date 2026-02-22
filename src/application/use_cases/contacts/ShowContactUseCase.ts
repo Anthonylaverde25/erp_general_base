@@ -6,12 +6,12 @@ import { ContactEntity } from '@/domain/entities/contacts/Contact';
 
 @injectable()
 export class ShowContactUseCase implements IUseCase<number, ContactEntity> {
-    constructor(
-        @inject(TYPES.IContactRepository)
-        private readonly repository: IContactRepository
-    ) { }
+	constructor(
+		@inject(TYPES.IContactRepository)
+		private readonly repository: IContactRepository
+	) {}
 
-    async execute(id: number): Promise<ContactEntity> {
-        return await this.repository.show(id);
-    }
+	async execute(id: number): Promise<ContactEntity> {
+		return await this.repository.show(id);
+	}
 }

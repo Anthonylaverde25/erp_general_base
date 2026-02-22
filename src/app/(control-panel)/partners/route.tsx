@@ -27,4 +27,3 @@ const route: FuseRouteItemType = {
 };
 
 export default route;
-

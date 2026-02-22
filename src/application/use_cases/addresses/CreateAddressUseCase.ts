@@ -6,13 +6,21 @@ import { CreateAddressDTO } from '@/domain/entities/addresses/DTOs/CreateAddress
 import { AddressEntity } from '@/domain/entities/addresses/Address';
 
 @injectable()
-export class CreateAddressUseCase implements IUseCase<{ companyId: number, data: CreateAddressDTO }, { address: AddressEntity, message: string }> {
-    constructor(
-        @inject(TYPES.IAddressRepository)
-        private readonly repository: IAddressRepository
-    ) { }
+export class CreateAddressUseCase
+	implements IUseCase<{ companyId: number; data: CreateAddressDTO }, { address: AddressEntity; message: string }>
+{
+	constructor(
+		@inject(TYPES.IAddressRepository)
+		private readonly repository: IAddressRepository
+	) {}
 
-    async execute({ companyId, data }: { companyId: number, data: CreateAddressDTO }): Promise<{ address: AddressEntity, message: string }> {
-        return await this.repository.create(companyId, data);
-    }
+	async execute({
+		companyId,
+		data
+	}: {
+		companyId: number;
+		data: CreateAddressDTO;
+	}): Promise<{ address: AddressEntity; message: string }> {
+		return await this.repository.create(companyId, data);
+	}
 }

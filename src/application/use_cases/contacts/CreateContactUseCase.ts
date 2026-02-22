@@ -6,14 +6,22 @@ import { CreateContactDTO } from '@/domain/entities/contacts/DTOs/CreateContactD
 import { ContactEntity } from '@/domain/entities/contacts/Contact';
 
 @injectable()
-export class CreateContactUseCase implements IUseCase<{ companyId: number, data: CreateContactDTO }, { contact: ContactEntity, message: string }> {
-    constructor(
-        @inject(TYPES.IContactRepository)
-        private readonly repository: IContactRepository
-    ) { }
+export class CreateContactUseCase
+	implements IUseCase<{ companyId: number; data: CreateContactDTO }, { contact: ContactEntity; message: string }>
+{
+	constructor(
+		@inject(TYPES.IContactRepository)
+		private readonly repository: IContactRepository
+	) {}
 
-    async execute({ companyId, data }: { companyId: number, data: CreateContactDTO }): Promise<{ contact: ContactEntity, message: string }> {
-        const contact = ContactEntity.create(data);
-        return await this.repository.create(companyId, contact);
-    }
+	async execute({
+		companyId,
+		data
+	}: {
+		companyId: number;
+		data: CreateContactDTO;
+	}): Promise<{ contact: ContactEntity; message: string }> {
+		const contact = ContactEntity.create(data);
+		return await this.repository.create(companyId, contact);
+	}
 }

@@ -5,12 +5,15 @@ import { TaxTypeEntity, TaxType } from '@/domain/entities/tax_types/TaxTypeEntit
 
 @injectable()
 export class UpdateTaxTypeUseCase {
-    constructor(
-        @inject(TYPES.ITaxTypeRepository)
-        private taxTypeRepository: ITaxTypeRepository
-    ) { }
+	constructor(
+		@inject(TYPES.ITaxTypeRepository)
+		private taxTypeRepository: ITaxTypeRepository
+	) {}
 
-    async execute(id: TaxType['id'], data: Partial<TaxTypeEntity>): Promise<{ tax_type: TaxTypeEntity; message: string }> {
-        return await this.taxTypeRepository.update(id, data);
-    }
+	async execute(
+		id: TaxType['id'],
+		data: Partial<TaxTypeEntity>
+	): Promise<{ tax_type: TaxTypeEntity; message: string }> {
+		return await this.taxTypeRepository.update(id, data);
+	}
 }

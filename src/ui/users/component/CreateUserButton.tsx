@@ -9,7 +9,7 @@ export default function CreateUserButton() {
 	return (
 		<>
 			<Button
-				className='btn-primary'
+				className="btn-primary"
 				variant="contained"
 				color="primary"
 				size="large"

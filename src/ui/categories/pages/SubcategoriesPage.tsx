@@ -1,9 +1,7 @@
-import { lazy } from "react";
+import { lazy } from 'react';
 
-const SubcategoriesTabView = lazy(
-    () => import("../components/SubcategoriesTabView"),
-);
+const SubcategoriesTabView = lazy(() => import('../components/SubcategoriesTabView'));
 
 export default function SubcategoriesPage() {
-    return <SubcategoriesTabView />;
+	return <SubcategoriesTabView />;
 }

@@ -1,9 +1,7 @@
-import { lazy } from "react";
+import { lazy } from 'react';
 
-const FamiliesTabView = lazy(
-    () => import("../components/FamiliesTabView"),
-);
+const FamiliesTabView = lazy(() => import('../components/FamiliesTabView'));
 
 export default function FamiliesPage() {
-    return <FamiliesTabView />;
+	return <FamiliesTabView />;
 }

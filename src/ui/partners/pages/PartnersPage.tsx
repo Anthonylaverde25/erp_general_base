@@ -1,43 +1,51 @@
-import FusePageCarded from "@fuse/core/FusePageCarded";
-import { lazy, useState, SyntheticEvent } from "react";
-import styled from "styled-components";
+import FusePageCarded from '@fuse/core/FusePageCarded';
+import { lazy, useState } from 'react';
+import styled from 'styled-components';
 
-const PartnersTabView = lazy(
-    () => import("../components/PartnersTabView"),
-);
-
+const PartnersTabView = lazy(() => import('../components/PartnersTabView'));
 
 const Root = styled(FusePageCarded)(() => ({
-    "& .container": {
-        maxWidth: "100%!important",
-    },
+	'& .container': {
+		maxWidth: '100%!important'
+	}
 }));
 
-
-import PartnersHeader from "../components/PartnersHeader";
+import PartnersHeader from '../components/PartnersHeader';
 // import { lazy, useState, SyntheticEvent } from "react"; // Moved to top
-import { CreatePartnerModal } from "@/app/(control-panel)/partners/CreatePartnerModal";
+import { CreatePartnerModal } from '@/app/(control-panel)/partners/CreatePartnerModal';
 
 export default function PartnersPage() {
-    const [openCreateModal, setOpenCreateModal] = useState(false);
-    const [currentTab, setCurrentTab] = useState('all');
+	const [openCreateModal, setOpenCreateModal] = useState(false);
+	const [currentTab, setCurrentTab] = useState('all');
 
-    const handleCreate = () => {
-        setOpenCreateModal(true);
-    };
+	const handleCreate = () => {
+		setOpenCreateModal(true);
+	};
 
-    const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
-        setCurrentTab(newValue);
-    };
+	const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
+		setCurrentTab(newValue);
+	};
 
-    return (
-        <>
-            <Root
-                header={<PartnersHeader onCreate={handleCreate} selectedTab={currentTab} />}
-                content={<PartnersTabView currentTab={currentTab} onTabChange={handleTabChange} />}
-            />
-            <CreatePartnerModal open={openCreateModal} handleClose={() => setOpenCreateModal(false)} />
-        </>
-    );
+	return (
+		<>
+			<Root
+				header={
+					<PartnersHeader
+						onCreate={handleCreate}
+						selectedTab={currentTab}
+					/>
+				}
+				content={
+					<PartnersTabView
+						currentTab={currentTab}
+						onTabChange={handleTabChange}
+					/>
+				}
+			/>
+			<CreatePartnerModal
+				open={openCreateModal}
+				handleClose={() => setOpenCreateModal(false)}
+			/>
+		</>
+	);
 }
-

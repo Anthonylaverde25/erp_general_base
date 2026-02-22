@@ -1,9 +1,7 @@
-import { lazy } from "react";
+import { lazy } from 'react';
 
-const TaxRatesTabView = lazy(
-    () => import("../components/TaxRatesTabView"),
-);
+const TaxRatesTabView = lazy(() => import('../components/TaxRatesTabView'));
 
 export default function TaxRatesPage() {
-    return <TaxRatesTabView />;
+	return <TaxRatesTabView />;
 }

@@ -10,25 +10,25 @@ const ItemDetailPage = lazy(() => import('@/ui/items/pages/ItemDetailPage'));
  * The Items page route.
  */
 const route: FuseRouteItemType = {
-    path: 'items',
-    children: [
-        {
-            path: '',
-            element: <ItemsPage />
-        },
-        {
-            path: 'create',
-            element: <CreateItemPage />
-        },
-        {
-            path: ':id/edit',
-            element: <UpdateItemPage />
-        },
-        {
-            path: ':id',
-            element: <ItemDetailPage />
-        }
-    ]
+	path: 'items',
+	children: [
+		{
+			path: '',
+			element: <ItemsPage />
+		},
+		{
+			path: 'create',
+			element: <CreateItemPage />
+		},
+		{
+			path: ':id/edit',
+			element: <UpdateItemPage />
+		},
+		{
+			path: ':id',
+			element: <ItemDetailPage />
+		}
+	]
 };
 
 export default route;

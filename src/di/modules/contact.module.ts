@@ -8,12 +8,12 @@ import { UpdateContactUseCase } from '@/application/use_cases/contacts/UpdateCon
 import { DeleteContactUseCase } from '@/application/use_cases/contacts/DeleteContactUseCase';
 
 export const registerContactModule = (container: Container) => {
-    // Repository
-    container.bind<IContactRepository>(TYPES.IContactRepository).to(ContactRepositoryCrud).inSingletonScope();
+	// Repository
+	container.bind<IContactRepository>(TYPES.IContactRepository).to(ContactRepositoryCrud).inSingletonScope();
 
-    // Use Cases
-    container.bind<CreateContactUseCase>(TYPES.CreateContactUseCase).to(CreateContactUseCase);
-    container.bind<ShowContactUseCase>(TYPES.ShowContactUseCase).to(ShowContactUseCase);
-    container.bind<UpdateContactUseCase>(TYPES.UpdateContactUseCase).to(UpdateContactUseCase);
-    container.bind<DeleteContactUseCase>(TYPES.DeleteContactUseCase).to(DeleteContactUseCase);
+	// Use Cases
+	container.bind<CreateContactUseCase>(TYPES.CreateContactUseCase).to(CreateContactUseCase);
+	container.bind<ShowContactUseCase>(TYPES.ShowContactUseCase).to(ShowContactUseCase);
+	container.bind<UpdateContactUseCase>(TYPES.UpdateContactUseCase).to(UpdateContactUseCase);
+	container.bind<DeleteContactUseCase>(TYPES.DeleteContactUseCase).to(DeleteContactUseCase);
 };
