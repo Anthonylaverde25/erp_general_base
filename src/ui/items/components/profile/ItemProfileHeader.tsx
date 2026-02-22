@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Avatar, Box, Button, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
-import { ContentCopy, MoreVert, Refresh } from '@mui/icons-material';
+import { ContentCopy, Inventory2, MoreVert, Refresh } from '@mui/icons-material';
 import PageBreadcrumb from '@/components/PageBreadcrumb';
 import { ItemEntity } from '@/domain/entities/items/ItemEntity';
+import StockMovementModal from './StockMovementModal';
 
 interface ItemProfileHeaderProps {
 	item: ItemEntity;
@@ -10,6 +12,8 @@ interface ItemProfileHeaderProps {
 }
 
 export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemProfileHeaderProps) {
+	const [stockModalOpen, setStockModalOpen] = useState(false);
+
 	const getInitials = (text: string) => {
 		const parts = text.trim().split(' ');
 		if (parts.length >= 2) {
@@ -113,6 +117,22 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 							alignSelf: { xs: 'flex-start', sm: 'center' }
 						}}
 					>
+						{item.type === 'physical' && (
+							<Button
+								size="small"
+								variant="contained"
+								sx={{
+									textTransform: 'none',
+									fontWeight: 600,
+									bgcolor: '#1b1b1b',
+									'&:hover': { bgcolor: '#333' },
+								}}
+								startIcon={<Inventory2 sx={{ fontSize: 16 }} />}
+								onClick={() => setStockModalOpen(true)}
+							>
+								Agregar Stock
+							</Button>
+						)}
 						<Button
 							size="small"
 							variant="outlined"
@@ -168,6 +188,15 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 					);
 				})}
 			</Box>
+
+			{item.type === 'physical' && (
+				<StockMovementModal
+					open={stockModalOpen}
+					onClose={() => setStockModalOpen(false)}
+					itemId={item.id}
+					itemName={item.name}
+				/>
+			)}
 		</Box>
 	);
 }

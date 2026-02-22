@@ -9,6 +9,7 @@ import { CreateItemUseCase } from "@/application/use_cases/items/CreateItemUseCa
 import { UpdateItemUseCase } from "@/application/use_cases/items/UpdateItemUseCase";
 import { ShowItemUseCase } from "@/application/use_cases/items/ShowItemUseCase";
 import { UpdateStockAlertUseCase } from "@/application/use_cases/items/UpdateStockAlertUseCase";
+import { RegisterStockMovementUseCase } from "@/application/use_cases/items/RegisterStockMovementUseCase";
 
 export function registerItemModule(container: Container) {
     // Repositories
@@ -28,5 +29,6 @@ export function registerItemModule(container: Container) {
     container.bind<UpdateItemUseCase>(TYPES.UpdateItemUseCase).to(UpdateItemUseCase);
     container.bind<ShowItemUseCase>(TYPES.ShowItemUseCase).to(ShowItemUseCase);
     container.bind<UpdateStockAlertUseCase>(TYPES.UpdateStockAlertUseCase).to(UpdateStockAlertUseCase);
+    container.bind<RegisterStockMovementUseCase>(TYPES.RegisterStockMovementUseCase).to(RegisterStockMovementUseCase);
 }
 

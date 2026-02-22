@@ -123,6 +123,7 @@ export const TYPES = {
   CreateItemUseCase: Symbol.for("CreateItemUseCase"),
   UpdateItemUseCase: Symbol.for("UpdateItemUseCase"),
   UpdateStockAlertUseCase: Symbol.for("UpdateStockAlertUseCase"),
+  RegisterStockMovementUseCase: Symbol.for("RegisterStockMovementUseCase"),
 
   // Categories
   CategoryRepository: Symbol.for("CategoryRepository"),
