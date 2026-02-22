@@ -64,10 +64,10 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 	}, [item.physical_profile?.has_stock_alert, item.physical_profile?.stock_min]);
 
 	useEffect(() => {
-		if (item.partners.length > 0) {
-			setSelectedPartnerIds(item.partners.map((p) => p.id));
-			const defaultP = item.partners.find((p) => p.is_default);
-			setDefaultPartnerId(defaultP?.id ?? item.partners[0]?.id ?? null);
+		if ((item.partners || []).length > 0) {
+			setSelectedPartnerIds((item.partners || []).map((p) => p.id));
+			const defaultP = (item.partners || []).find((p) => p.is_default);
+			setDefaultPartnerId(defaultP?.id ?? item.partners?.[0]?.id ?? null);
 		} else if (item.partner_id) {
 			setSelectedPartnerIds([item.partner_id]);
 			setDefaultPartnerId(item.partner_id);

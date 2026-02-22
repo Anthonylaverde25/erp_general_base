@@ -1,14 +1,14 @@
 import { lazy } from 'react';
 import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
 
-const ExampleView = lazy(() => import('./components/views/ExampleView'));
+const DashboardView = lazy(() => import('./components/views/DashboardView'));
 
 /**
- * The Example page route.
+ * The Dashboard page route.
  */
 const route: FuseRouteItemType = {
-	path: 'example',
-	element: <ExampleView />
+	path: 'dashboard',
+	element: <DashboardView />
 };
 
 export default route;
