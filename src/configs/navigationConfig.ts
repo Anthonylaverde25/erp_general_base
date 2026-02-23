@@ -35,6 +35,14 @@ const navigationConfig: FuseNavItemType[] = [
 		url: '/items'
 	},
 	{
+		id: 'departments',
+		title: 'Departments',
+		translate: 'DEPARTMENTS',
+		type: 'item',
+		icon: 'lucide:building-2',
+		url: '/departments'
+	},
+	{
 		id: 'operations',
 		title: 'Operations',
 		translate: 'OPERATIONS',
@@ -240,14 +248,6 @@ const navigationConfig: FuseNavItemType[] = [
 						type: 'item',
 						url: '/hr/employees',
 						icon: 'lucide:user'
-					},
-					{
-						id: 'hr.departments',
-						title: 'Departments',
-						translate: 'DEPARTMENTS',
-						type: 'item',
-						url: '/hr/departments',
-						icon: 'lucide:building-2'
 					},
 					{
 						id: 'hr.attendance',

@@ -41,7 +41,10 @@ registerItemModule(container);
 
 import { UnitTypeModule } from './modules/unit_types.module';
 import { UnitsModule } from './modules/units.module';
+import { registerDepartmentModule } from './modules/department.module';
+
 UnitTypeModule(container);
 UnitsModule(container);
+registerDepartmentModule(container);
 
 export { container };

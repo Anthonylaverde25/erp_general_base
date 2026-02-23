@@ -145,5 +145,13 @@ export const TYPES = {
 	IndexUnitsUseCase: Symbol.for('IndexUnitsUseCase'),
 	CreateUnitUseCase: Symbol.for('CreateUnitUseCase'),
 	UpdateUnitUseCase: Symbol.for('UpdateUnitUseCase'),
-	DeleteUnitUseCase: Symbol.for('DeleteUnitUseCase')
+	DeleteUnitUseCase: Symbol.for('DeleteUnitUseCase'),
+
+	// Departments
+	IDepartmentRepository: Symbol.for('IDepartmentRepository'),
+	IndexDepartmentsUseCase: Symbol.for('IndexDepartmentsUseCase'),
+	ShowDepartmentUseCase: Symbol.for('ShowDepartmentUseCase'),
+	CreateDepartmentUseCase: Symbol.for('CreateDepartmentUseCase'),
+	UpdateDepartmentUseCase: Symbol.for('UpdateDepartmentUseCase'),
+	DeleteDepartmentUseCase: Symbol.for('DeleteDepartmentUseCase'),
 };
