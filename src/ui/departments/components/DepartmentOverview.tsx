@@ -9,9 +9,10 @@ import {
     InsertDriveFileOutlined
 } from '@mui/icons-material';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import Paper from '@mui/material/Paper';
 import { useNavigate } from 'react-router';
+import AssignCollaboratorsModal from './AssignCollaboratorsModal';
 
 import useShowDepartment from '@/features/departments/hooks/useShowDepartment';
 
@@ -91,6 +92,7 @@ function EmptyState({ icon, title, description, action }: EmptyStateProps) {
 
 export default function DepartmentOverview({ departmentId }: DepartmentOverviewProps) {
     const navigate = useNavigate();
+    const [isAddCollaboratorModalOpen, setIsAddCollaboratorModalOpen] = useState(false);
     const { department, isLoading } = useShowDepartment(departmentId);
 
     if (!departmentId) {
@@ -218,6 +220,7 @@ export default function DepartmentOverview({ departmentId }: DepartmentOverviewP
                     color="primary"
                     size="small"
                     className="flex items-center gap-2"
+                    onClick={() => setIsAddCollaboratorModalOpen(true)}
                     sx={{
                         ...actionBtnSx,
                         borderColor: 'primary.main',
@@ -389,7 +392,13 @@ export default function DepartmentOverview({ departmentId }: DepartmentOverviewP
                                 title="Sin integrantes registrados"
                                 description="Aún no hay colaboradores asignados a este departamento."
                                 action={
-                                    <Button variant="outlined" size="small" startIcon={<PersonAddOutlined />} sx={{ textTransform: 'none', borderRadius: 2 }}>
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        startIcon={<PersonAddOutlined />}
+                                        sx={{ textTransform: 'none', borderRadius: 2 }}
+                                        onClick={() => setIsAddCollaboratorModalOpen(true)}
+                                    >
                                         Agregar integrante
                                     </Button>
                                 }
@@ -445,6 +454,12 @@ export default function DepartmentOverview({ departmentId }: DepartmentOverviewP
                 </Box>
 
             </Box>
-        </Box>
+
+            <AssignCollaboratorsModal
+                open={isAddCollaboratorModalOpen}
+                onClose={() => setIsAddCollaboratorModalOpen(false)}
+                departmentId={departmentId}
+            />
+        </Box >
     );
 }
