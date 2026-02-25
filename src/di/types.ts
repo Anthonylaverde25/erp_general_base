@@ -161,6 +161,7 @@ export const TYPES = {
 	DeleteFileUseCase: Symbol.for('DeleteFileUseCase'),
 	DownloadFileUseCase: Symbol.for('DownloadFileUseCase'),
 	ViewFileUseCase: Symbol.for('ViewFileUseCase'),
+	PreviewJsonFileUseCase: Symbol.for('PreviewJsonFileUseCase'),
 
 	// Departments
 	IDepartmentRepository: Symbol.for('IDepartmentRepository'),

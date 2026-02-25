@@ -10,7 +10,8 @@ export default function useShowUser(id: IUser['id']) {
 	const query = useQuery({
 		queryKey: ['user', id],
 		queryFn: () => use_case.execute(id),
-		refetchOnWindowFocus: false
+		refetchOnWindowFocus: false,
+		enabled: Boolean(id && id > 0)
 	});
 
 	return {

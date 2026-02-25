@@ -7,6 +7,7 @@ import { UploadFileUseCase } from '@/application/use_cases/files/UploadFileUseCa
 import { DeleteFileUseCase } from '@/application/use_cases/files/DeleteFileUseCase';
 import { DownloadFileUseCase } from '@/application/use_cases/files/DownloadFileUseCase';
 import { ViewFileUseCase } from '@/application/use_cases/files/ViewFileUseCase';
+import { PreviewJsonFileUseCase } from '@/application/use_cases/files/PreviewJsonFileUseCase';
 
 export const registerFilesModule = (container: Container) => {
     container.bind<IFileRepository>(TYPES.FileRepository).to(FileRepositoryImpl).inSingletonScope();
@@ -16,4 +17,5 @@ export const registerFilesModule = (container: Container) => {
     container.bind<DeleteFileUseCase>(TYPES.DeleteFileUseCase).to(DeleteFileUseCase);
     container.bind<DownloadFileUseCase>(TYPES.DownloadFileUseCase).to(DownloadFileUseCase);
     container.bind<ViewFileUseCase>(TYPES.ViewFileUseCase).to(ViewFileUseCase);
+    container.bind<PreviewJsonFileUseCase>(TYPES.PreviewJsonFileUseCase).to(PreviewJsonFileUseCase);
 };

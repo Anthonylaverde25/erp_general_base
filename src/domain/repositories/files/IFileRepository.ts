@@ -6,4 +6,5 @@ export interface IFileRepository {
     delete(id: number): Promise<void>;
     download(id: number): Promise<{ blob: Blob; filename: string }>;
     view(id: number): Promise<{ blob: Blob; filename: string }>;
+    previewJson(id: number): Promise<{ data: any[]; total_rows: number }>;
 }

@@ -66,4 +66,9 @@ export class FileRepositoryImpl implements IFileRepository {
 
         return { blob: response.data, filename };
     }
+
+    async previewJson(id: number): Promise<{ data: any[]; total_rows: number }> {
+        const response = await axiosInstance.get(`${this.endpoint}/${id}/preview-json`);
+        return response.data;
+    }
 }

@@ -13,8 +13,8 @@ export default function useUpdateDepartment() {
     const mutation = useMutation({
         mutationFn: ({ id, data }: { id: number; data: IUpdateDepartment }) => use_case.execute(id, data),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['departments'] });
-            queryClient.invalidateQueries({ queryKey: ['departments', variables.id] });
+            queryClient.invalidateQueries({ queryKey: ['departments', 'index'] });
+            queryClient.invalidateQueries({ queryKey: ['departments', 'show', variables.id] });
             enqueueSnackbar('Departamento actualizado exitosamente', { variant: 'success' });
         },
         onError: (error: any) => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
-    Button, Checkbox, TextField,
+    Button, TextField,
     FormControl, InputLabel, Select, MenuItem,
     ListItemText, CircularProgress
 } from '@mui/material';
@@ -15,29 +15,29 @@ interface User {
     email?: string;
 }
 
-interface AssignCollaboratorsModalProps {
+interface AssignManagerModalProps {
     open: boolean;
     onClose: () => void;
     departmentId: number | null;
 }
 
-export default function AssignCollaboratorsModal({
+export default function AssignManagerModal({
     open,
     onClose,
     departmentId
-}: AssignCollaboratorsModalProps) {
+}: AssignManagerModalProps) {
 
     const { users, isLoading: isLoadingUsers } = useIndexUser();
     const { department, isLoading: isLoadingDepartment } = useShowDepartment(open ? departmentId : null);
     const { updateDepartment, isLoading: isUpdating } = useUpdateDepartment();
 
-    const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+    const [selectedManagerId, setSelectedManagerId] = useState<number | ''>('');
 
     useEffect(() => {
         if (!open) {
-            setSelectedUserIds([]);
-        } else if (department && department.user_ids) {
-            setSelectedUserIds(department.user_ids);
+            setSelectedManagerId('');
+        } else if (department && department.manager_id) {
+            setSelectedManagerId(department.manager_id);
         }
     }, [open, department]);
 
@@ -47,12 +47,12 @@ export default function AssignCollaboratorsModal({
         try {
             await updateDepartment({
                 id: departmentId,
-                data: { user_ids: selectedUserIds }
+                data: { manager_id: selectedManagerId === '' ? null : selectedManagerId }
             });
             onClose();
         } catch (error) {
             // Error is handled in the hook via notistack
-            console.error('Failed to assign collaborators', error);
+            console.error('Failed to assign manager', error);
         }
     };
 
@@ -60,45 +60,36 @@ export default function AssignCollaboratorsModal({
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle>Asignar Integrantes</DialogTitle>
+            <DialogTitle>Asignar Administrador</DialogTitle>
 
             <DialogContent dividers className="min-h-[250px]">
                 <div className="pt-2">
                     <p className="text-sm text-gray-500 mb-4">
-                        Selecciona los usuarios que deseas asignar a este departamento.
+                        Selecciona el usuario que deseas asignar como administrador de este departamento.
                     </p>
 
                     {isLoadingUsers || isLoadingDepartment ? (
                         <CircularProgress />
                     ) : (
                         <FormControl fullWidth>
-                            <InputLabel id="user-select-label">
-                                Usuarios
+                            <InputLabel id="manager-select-label">
+                                Administrador
                             </InputLabel>
 
                             <Select
-                                labelId="user-select-label"
-                                multiple
-                                label="Usuarios"
+                                labelId="manager-select-label"
+                                label="Administrador"
                                 variant="filled"
-                                value={selectedUserIds}
+                                value={selectedManagerId}
                                 onChange={(event) =>
-                                    setSelectedUserIds(event.target.value as number[])
-                                }
-                                renderValue={(selected) =>
-                                    (selected as number[])
-                                        .map(id => {
-                                            const user = users?.find(u => u.id === id);
-                                            return user?.name || user?.email;
-                                        })
-                                        .join(', ')
+                                    setSelectedManagerId(event.target.value as number)
                                 }
                             >
+                                <MenuItem value="">
+                                    <em>Sin administrador</em>
+                                </MenuItem>
                                 {users?.map((user: User) => (
                                     <MenuItem key={user.id} value={user.id}>
-                                        <Checkbox
-                                            checked={selectedUserIds.includes(user.id)}
-                                        />
                                         <ListItemText
                                             primary={user.name || `Usuario ${user.id}`}
                                             secondary={user.email}
@@ -121,7 +112,7 @@ export default function AssignCollaboratorsModal({
                     variant="contained"
                     disabled={isUpdating}
                 >
-                    {isUpdating ? <CircularProgress size={24} color="inherit" /> : 'Asignar'}
+                    {isUpdating ? <CircularProgress size={24} color="inherit" /> : 'Asignar Administrador'}
                 </Button>
             </DialogActions>
         </Dialog>

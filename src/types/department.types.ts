@@ -15,6 +15,7 @@ export interface IDepartment {
     sub_departments?: IDepartment[];
     children?: IDepartment[];
     users?: any[];
+    user_ids?: number[];
 }
 
 export interface ICreateDepartment {
@@ -25,7 +26,7 @@ export interface ICreateDepartment {
     parent_id?: number | null;
     manager_id?: number | null;
     is_active?: boolean;
-    users?: number[]; // Array of user IDs to associate
+    user_ids?: number[]; // Array of user IDs to associate
 }
 
 export interface IUpdateDepartment {
@@ -36,5 +37,5 @@ export interface IUpdateDepartment {
     parent_id?: number | null;
     manager_id?: number | null;
     is_active?: boolean;
-    users?: number[]; // Sync users
+    user_ids?: number[]; // Sync users
 }

@@ -8,7 +8,7 @@ export default function useIndexDepartments() {
     const use_case = container.get<IndexDepartmentsUseCase>(TYPES.IndexDepartmentsUseCase);
     const activeCompany = useActiveCompany()
     const query = useQuery({
-        queryKey: ['departments', activeCompany?.id],
+        queryKey: ['departments', 'index', activeCompany?.id],
         queryFn: async () => use_case.execute()
     });
 

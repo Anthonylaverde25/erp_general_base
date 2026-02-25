@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 export default function useShowDepartment(id: number | null) {
     const use_case = container.get<ShowDepartmentUseCase>(TYPES.ShowDepartmentUseCase);
     const query = useQuery({
-        queryKey: ['departments', id],
+        queryKey: ['departments', 'show', id],
         queryFn: async () => use_case.execute(id as number),
         enabled: !!id
     });
