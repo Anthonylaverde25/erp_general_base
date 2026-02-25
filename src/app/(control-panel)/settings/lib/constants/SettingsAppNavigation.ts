@@ -150,6 +150,14 @@ const SettingsAppNavigation: FuseNavItemType = {
 			type: 'item',
 			url: '/apps/settings/units',
 			subtitle: 'Gestiona las unidades de medida'
+		},
+		{
+			id: 'apps.settings.fileTypes',
+			icon: 'lucide:file-type',
+			title: 'Tipos de Archivos',
+			type: 'item',
+			url: '/apps/settings/file-types',
+			subtitle: 'Administra los tipos de documentos adjuntos'
 		}
 	]
 };

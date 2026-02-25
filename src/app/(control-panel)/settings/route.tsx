@@ -21,6 +21,7 @@ const CategoriesPage = lazy(() => import('@/ui/categories/pages/CategoriesPage')
 const SubcategoriesPage = lazy(() => import('@/ui/categories/pages/SubcategoriesPage'));
 const UnitTypesPage = lazy(() => import('@/ui/unit_types/pages/UnitTypesPage'));
 const UnitsPage = lazy(() => import('@/ui/units/pages/UnitsPage'));
+const FileTypesPage = lazy(() => import('@/ui/file_types/pages/FileTypesPage'));
 
 /**
  * The Settings App Route.
@@ -108,6 +109,10 @@ const Route: FuseRouteItemType = {
 		{
 			path: 'units',
 			element: <UnitsPage />
+		},
+		{
+			path: 'file-types',
+			element: <FileTypesPage />
 		},
 		{
 			path: '',

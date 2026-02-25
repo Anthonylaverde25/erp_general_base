@@ -42,9 +42,13 @@ registerItemModule(container);
 import { UnitTypeModule } from './modules/unit_types.module';
 import { UnitsModule } from './modules/units.module';
 import { registerDepartmentModule } from './modules/department.module';
+import { registerFileTypesModule } from './modules/file_types.module';
+import { registerFilesModule } from './modules/files.module';
 
 UnitTypeModule(container);
 UnitsModule(container);
 registerDepartmentModule(container);
+registerFileTypesModule(container);
+registerFilesModule(container);
 
 export { container };

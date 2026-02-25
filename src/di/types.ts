@@ -147,6 +147,21 @@ export const TYPES = {
 	UpdateUnitUseCase: Symbol.for('UpdateUnitUseCase'),
 	DeleteUnitUseCase: Symbol.for('DeleteUnitUseCase'),
 
+	// File Types
+	FileTypeRepository: Symbol.for('FileTypeRepository'),
+	IndexFileTypesUseCase: Symbol.for('IndexFileTypesUseCase'),
+	CreateFileTypeUseCase: Symbol.for('CreateFileTypeUseCase'),
+	UpdateFileTypeUseCase: Symbol.for('UpdateFileTypeUseCase'),
+	DeleteFileTypeUseCase: Symbol.for('DeleteFileTypeUseCase'),
+
+	// Files (Polymorphic)
+	FileRepository: Symbol.for('FileRepository'),
+	GetFilesByFileableUseCase: Symbol.for('GetFilesByFileableUseCase'),
+	UploadFileUseCase: Symbol.for('UploadFileUseCase'),
+	DeleteFileUseCase: Symbol.for('DeleteFileUseCase'),
+	DownloadFileUseCase: Symbol.for('DownloadFileUseCase'),
+	ViewFileUseCase: Symbol.for('ViewFileUseCase'),
+
 	// Departments
 	IDepartmentRepository: Symbol.for('IDepartmentRepository'),
 	IndexDepartmentsUseCase: Symbol.for('IndexDepartmentsUseCase'),

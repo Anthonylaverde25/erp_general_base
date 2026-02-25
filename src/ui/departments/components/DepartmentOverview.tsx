@@ -13,6 +13,7 @@ import { ReactNode, useState } from 'react';
 import Paper from '@mui/material/Paper';
 import { useNavigate } from 'react-router';
 import AssignCollaboratorsModal from './AssignCollaboratorsModal';
+import DepartmentFilesList from './DepartmentFilesList';
 
 import useShowDepartment from '@/features/departments/hooks/useShowDepartment';
 
@@ -147,11 +148,7 @@ export default function DepartmentOverview({ departmentId }: DepartmentOverviewP
             name: sd.name,
             code: sd.code,
             employees: sd.users?.length || 0
-        })) || [],
-        documents: [
-            { id: 1, name: 'Reporte_Operaciones_Q3.pdf', type: 'pdf', date: '22 Oct 2026' },
-            { id: 2, name: 'Presupuesto_2027_Oficial.xlsx', type: 'excel', date: '15 Oct 2026' }
-        ]
+        })) || []
     };
 
     const actionBtnSx = {
@@ -171,16 +168,6 @@ export default function DepartmentOverview({ departmentId }: DepartmentOverviewP
             borderColor: 'divider'
         }
     } as const;
-
-    // Helper functions for document rendering
-    const getDocIconColors = (type: string) => {
-        switch (type) {
-            case 'pdf': return { bg: 'rgba(239, 68, 68, 0.1)', color: 'rgb(220, 38, 38)' };
-            case 'excel': return { bg: 'rgba(34, 197, 94, 0.1)', color: 'rgb(22, 163, 74)' };
-            case 'word': return { bg: 'rgba(59, 130, 246, 0.1)', color: 'rgb(37, 99, 235)' };
-            default: return { bg: 'action.selected', color: 'text.secondary' };
-        }
-    };
 
     return (
         <Box sx={{ flex: 1, p: 3, overflowY: { xs: 'visible', md: 'auto' } }}>
@@ -408,50 +395,7 @@ export default function DepartmentOverview({ departmentId }: DepartmentOverviewP
                 </Box>
 
                 {/* Right Column (Documents List) */}
-                <Box className="col-span-1">
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Typography variant="h6" fontWeight={700} sx={{ letterSpacing: '-0.01em' }}>
-                            Documentos Recientes
-                        </Typography>
-                    </Box>
-                    <Box className="flex flex-col gap-3 rounded-md border p-3 bg-slate-50/30">
-                        {mockDepartment.documents.map(doc => {
-                            const iconColors = getDocIconColors(doc.type);
-                            return (
-                                <Box
-                                    key={doc.id}
-                                    className="flex items-center gap-3 p-3 rounded-md bg-white border shadow-sm transition-colors hover:bg-slate-50 cursor-pointer"
-                                    sx={{ borderColor: 'divider' }}
-                                >
-                                    <Box
-                                        sx={{
-                                            p: 1.25,
-                                            borderRadius: 1.5,
-                                            bgcolor: iconColors.bg,
-                                            color: iconColors.color,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}
-                                    >
-                                        <InsertDriveFileOutlined fontSize="small" />
-                                    </Box>
-                                    <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                                        <Typography variant="body2" fontWeight={600} noWrap sx={{ lineHeight: 1.2, mb: 0.5, color: 'text.primary' }}>
-                                            {doc.name}
-                                        </Typography>
-                                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                                            Actualizado: {doc.date}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                            );
-                        })}
-                        <Button fullWidth size="small" sx={{ mt: 1, textTransform: 'none', fontWeight: 600, color: 'text.secondary' }}>
-                            Ver todos los archivos
-                        </Button>
-                    </Box>
-                </Box>
+                <DepartmentFilesList departmentId={departmentId} />
 
             </Box>
 
