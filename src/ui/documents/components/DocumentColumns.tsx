@@ -1,6 +1,7 @@
 import { MRT_ColumnDef } from 'material-react-table';
-import { Chip, Typography, Box } from '@mui/material';
+import { Chip, Typography } from '@mui/material';
 import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
+import { Link } from 'react-router';
 
 export const DocumentColumns: MRT_ColumnDef<DocumentEntity>[] = [
     {
@@ -8,7 +9,20 @@ export const DocumentColumns: MRT_ColumnDef<DocumentEntity>[] = [
         header: 'Número',
         size: 150,
         Cell: ({ row }) => (
-            <Typography variant="body2" fontWeight={600}>
+            <Typography
+                variant="body2"
+                fontWeight={600}
+                component={Link}
+                to={`/sales/${row.original.id}`}
+                sx={{
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    '&:hover': {
+                        color: 'primary.main',
+                        textDecoration: 'underline'
+                    }
+                }}
+            >
                 {row.original.number_serie || '-'}
             </Typography>
         )

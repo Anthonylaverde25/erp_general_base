@@ -11,4 +11,11 @@ export class ApiDocumentRepository implements DocumentRepositoryInterface {
         } = await axiosInstance.get('documents', { params: filters });
         return data.map((doc: any) => DocumentEntity.fromJson(doc));
     }
+
+    async show(id: string): Promise<DocumentEntity> {
+        const {
+            data: { data }
+        } = await axiosInstance.get(`documents/${id}`);
+        return DocumentEntity.fromJson(data);
+    }
 }
