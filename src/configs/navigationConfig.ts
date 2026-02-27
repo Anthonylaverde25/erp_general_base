@@ -78,7 +78,7 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Invoices',
 						translate: 'INVOICES',
 						type: 'item',
-						url: '/sales/invoices',
+						url: '/sales',
 						icon: 'lucide:receipt'
 					},
 					{
@@ -119,7 +119,7 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Bills',
 						translate: 'BILLS',
 						type: 'item',
-						url: '/purchases/bills',
+						url: '/purchases',
 						icon: 'lucide:file-invoice'
 					},
 					{

@@ -170,4 +170,8 @@ export const TYPES = {
 	CreateDepartmentUseCase: Symbol.for('CreateDepartmentUseCase'),
 	UpdateDepartmentUseCase: Symbol.for('UpdateDepartmentUseCase'),
 	DeleteDepartmentUseCase: Symbol.for('DeleteDepartmentUseCase'),
+
+	// Documents
+	IDocumentRepository: Symbol.for('IDocumentRepository'),
+	IndexDocumentsUseCase: Symbol.for('IndexDocumentsUseCase'),
 };
