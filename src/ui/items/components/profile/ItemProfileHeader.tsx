@@ -37,9 +37,8 @@ export default function ItemProfileHeader({ item, tabValue, onTabChange }: ItemP
 		<Box sx={{ width: '100%', borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
 			<Box
 				sx={{
-					px: { xs: 2, md: 3 },
-					pt: { xs: 2, md: 2 },
-					pb: { xs: 2, md: 2 }
+					p: 0,
+					pb: 2
 				}}
 			>
 				<Box

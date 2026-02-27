@@ -24,10 +24,8 @@ export default function DepartmentsHeader({ className, currentDepartmentCode, on
         <Box
             className={clsx('flex flex-col', className)}
             sx={{
-                pt: '0.5rem',
-                px: '0.5rem',
-                borderBottom: 1,
-                borderColor: 'divider',
+                p: 0,
+                pb: 2,
                 bgcolor: 'background.paper'
             }}
         >

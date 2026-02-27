@@ -31,6 +31,7 @@ export default function PurchasesPage() {
 				<DocumentTable
 					documents={documents}
 					isLoading={isLoading}
+					operation="purchase"
 				/>
 			}
 		/>

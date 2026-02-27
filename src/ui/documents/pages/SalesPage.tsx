@@ -36,6 +36,7 @@ export default function SalesPage() {
 				<DocumentTable
 					documents={documents}
 					isLoading={isLoading}
+					operation="sale"
 				/>
 			}
 		/>

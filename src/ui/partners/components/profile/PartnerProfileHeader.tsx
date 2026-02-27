@@ -31,9 +31,8 @@ export default function PartnerProfileHeader({ partner, tabValue, onTabChange }:
 			{/* HEADER ZONE */}
 			<Box
 				sx={{
-					px: { xs: 2, md: 3 },
-					pt: { xs: 2, md: 2 },
-					pb: { xs: 2, md: 2 },
+					p: 0,
+					pb: 2,
 					background: `linear-gradient(180deg, ${alpha(accentColor, 0.08)}, transparent)`
 				}}
 			>

@@ -8,7 +8,7 @@ interface DocumentShowHeaderProps {
 
 export default function DocumentShowHeader({ partnerName, numberSerie, onClose }: DocumentShowHeaderProps) {
     return (
-        <header className="bg-white dark:bg-gray-900 border-b border-[#e5e7eb] dark:border-gray-800 h-12 flex items-center justify-between px-4 shrink-0">
+        <header className="bg-white dark:bg-gray-900 border-b border-[#e5e7eb] dark:border-gray-800 flex items-center justify-between p-0 pb-4 shrink-0">
             <div className="flex items-center gap-4">
                 <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 cursor-pointer">
                     <X className="w-5 h-5" />

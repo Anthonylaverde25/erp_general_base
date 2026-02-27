@@ -23,7 +23,7 @@ function CreateItemPageHeader({
 	const isEditMode = mode === 'edit';
 
 	return (
-		<div className="bg-background-default flex w-full flex-1 flex-col items-center justify-between space-y-2 border-b p-6 sm:flex-row sm:space-y-0 sm:px-8">
+		<div className="bg-background-default flex w-full flex-1 flex-col items-center justify-between space-y-2 border-b p-0 pb-4 sm:flex-row sm:space-y-0">
 			<div className="flex flex-col items-start">
 				<PageBreadcrumb className="mb-4" />
 				<div className="flex items-center gap-3">

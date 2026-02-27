@@ -55,7 +55,10 @@ export default function ItemTable(props: ItemTableProps) {
 			}}
 			muiTableBodyRowProps={({ row }) => ({
 				onClick: () => onRowClick?.(row.original),
-				sx: { cursor: onRowClick ? 'pointer' : 'default' }
+				sx: {
+					cursor: onRowClick ? 'pointer' : 'default',
+					backgroundColor: row.index % 2 === 0 ? 'transparent' : 'action.hover',
+				}
 			})}
 			renderRowActionMenuItems={({ closeMenu, row }) => [
 				<MenuItem
@@ -72,19 +75,19 @@ export default function ItemTable(props: ItemTableProps) {
 				</MenuItem>,
 				...(onDelete
 					? [
-							<MenuItem
-								key="delete"
-								onClick={() => {
-									onDelete(row.original.id);
-									closeMenu();
-								}}
-							>
-								<ListItemIcon>
-									<FuseSvgIcon>heroicons-outline:trash</FuseSvgIcon>
-								</ListItemIcon>
-								Delete
-							</MenuItem>
-						]
+						<MenuItem
+							key="delete"
+							onClick={() => {
+								onDelete(row.original.id);
+								closeMenu();
+							}}
+						>
+							<ListItemIcon>
+								<FuseSvgIcon>heroicons-outline:trash</FuseSvgIcon>
+							</ListItemIcon>
+							Delete
+						</MenuItem>
+					]
 					: [])
 			]}
 		/>

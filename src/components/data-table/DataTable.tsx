@@ -54,6 +54,13 @@ function DataTable<TData>(props: MaterialReactTableProps<TData>) {
 				enableFacetedValues: true,
 				enableRowActions: true,
 				enableRowSelection: true,
+				muiTopToolbarProps: {
+					sx: {
+						backgroundColor: (theme: Theme) =>
+							theme.palette.mode === 'dark' ? '#2d3436' : '#f8f9fa',
+						borderBottom: (theme: Theme) => `1px solid ${theme.vars.palette.divider}`,
+					}
+				},
 				muiBottomToolbarProps: {
 					className: 'flex items-center min-h-14 h-14'
 				},
@@ -110,7 +117,8 @@ function DataTable<TData>(props: MaterialReactTableProps<TData>) {
 					if (density === 'compact') {
 						return {
 							sx: {
-								backgroundColor: 'initial',
+								backgroundColor: row.index % 2 === 0 ? 'transparent' : 'action.hover',
+								borderBottom: (theme: Theme) => `1px solid ${theme.vars.palette.divider}`,
 								opacity: 1,
 								boxShadow: 'none',
 								height: row.getIsPinned() ? `${37}px` : undefined
@@ -120,7 +128,8 @@ function DataTable<TData>(props: MaterialReactTableProps<TData>) {
 
 					return {
 						sx: {
-							backgroundColor: 'initial',
+							backgroundColor: row.index % 2 === 0 ? 'transparent' : 'action.hover',
+							borderBottom: (theme: Theme) => `1px solid ${theme.vars.palette.divider}`,
 							opacity: 1,
 							boxShadow: 'none',
 							// Set a fixed height for pinned rows
@@ -146,7 +155,14 @@ function DataTable<TData>(props: MaterialReactTableProps<TData>) {
 							fontSize: 11
 						},
 						backgroundColor: (theme) =>
-							column.getIsPinned() ? theme.vars.palette.background.paper : 'inherit'
+							column.getIsPinned()
+								? theme.vars.palette.background.paper
+								: theme.palette.mode === 'dark'
+									? '#2d3436'
+									: '#f8f9fa',
+						borderBottom: (theme: Theme) => `1px solid ${theme.vars.palette.divider}`,
+						fontWeight: 700,
+						fontSize: 13
 					}
 				}),
 				mrtTheme: (theme) => ({

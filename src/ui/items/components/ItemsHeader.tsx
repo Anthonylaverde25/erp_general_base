@@ -36,7 +36,7 @@ function ItemsHeader(props: ItemsHeaderProps) {
 	return (
 		<Box
 			className="container"
-			sx={{ p: 3, borderBottom: `1px solid ${theme.palette.divider}` }}
+			sx={{ p: 0, pb: 2 }}
 		>
 			<PageBreadcrumb className="mb-4" />
 			<Stack

@@ -44,15 +44,23 @@ function DataTableTopToolbar<TData extends MRT_RowData>({ table }: MRT_TopToolba
 	const globalFilterProps = {
 		sx: !isTablet
 			? {
-					zIndex: 2
-				}
+				zIndex: 2
+			}
 			: undefined,
 		table
 	};
 	return (
-		<div className="flex w-full flex-col border-b-1 px-3 py-1">
+		<Box
+			className="flex w-full flex-col"
+			sx={{
+				backgroundColor: (theme) => {
+					const sxProps = parseFromValuesOrFunc(toolbarProps?.sx, theme) as any;
+					return sxProps?.backgroundColor || table.options.mrtTheme.baseBackgroundColor;
+				}
+			}}
+		>
 			<Box
-				className="flex w-full flex-col items-center"
+				className="flex w-full flex-col items-center px-3 py-1"
 				{...toolbarProps}
 				ref={(ref: HTMLDivElement) => {
 					topToolbarRef.current = ref;
@@ -72,18 +80,18 @@ function DataTableTopToolbar<TData extends MRT_RowData>({ table }: MRT_TopToolba
 					}),
 					isFullScreen
 						? {
-								position: 'sticky'
-							}
+							position: 'sticky'
+						}
 						: {
-								position: 'relative'
-							},
+							position: 'relative'
+						},
 					isFullScreen
 						? {
-								top: '0'
-							}
+							top: '0'
+						}
 						: {
-								top: null
-							}
+							top: null
+						}
 				]}
 			>
 				{['both', 'top'].includes(positionToolbarDropZone ?? '') && <MRT_ToolbarDropZone table={table} />}
@@ -136,7 +144,7 @@ function DataTableTopToolbar<TData extends MRT_RowData>({ table }: MRT_TopToolba
 					}
 				}}
 			/>
-		</div>
+		</Box>
 	);
 }
 
