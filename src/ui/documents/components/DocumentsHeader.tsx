@@ -8,6 +8,7 @@ export type DocumentsHeaderProps = {
 	onCreate?: () => void;
 	onCreateInvoice?: () => void;
 	onCreateDraft?: () => void;
+	title?: string;
 };
 
 const HEADER_COPY: Record<DocumentsHeaderProps['operation'], { title: string; subtitle: string }> = {
@@ -21,7 +22,7 @@ const HEADER_COPY: Record<DocumentsHeaderProps['operation'], { title: string; su
 	}
 };
 
-function DocumentsHeader({ operation, onCreate, onCreateInvoice, onCreateDraft }: DocumentsHeaderProps) {
+function DocumentsHeader({ operation, onCreate, onCreateInvoice, onCreateDraft, title }: DocumentsHeaderProps) {
 	const theme = useTheme();
 	const copy = HEADER_COPY[operation];
 	const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -35,8 +36,12 @@ function DocumentsHeader({ operation, onCreate, onCreateInvoice, onCreateDraft }
 		setMenuAnchorEl(null);
 	};
 
-	const handleCreateInvoice = () => {
-		onCreateInvoice?.();
+	const handleCreatePrimary = () => {
+		if (onCreate) {
+			onCreate();
+		} else if (onCreateInvoice) {
+			onCreateInvoice();
+		}
 		handleMenuClose();
 	};
 
@@ -62,7 +67,7 @@ function DocumentsHeader({ operation, onCreate, onCreateInvoice, onCreateDraft }
 						variant="h2"
 						className="text-3xl font-bold tracking-tight"
 					>
-						{copy.title}
+						{title || copy.title}
 					</Typography>
 					<Typography
 						variant="subtitle1"
@@ -80,11 +85,11 @@ function DocumentsHeader({ operation, onCreate, onCreateInvoice, onCreateDraft }
 							disableElevation
 						>
 							<Button
-								onClick={handleCreateInvoice}
+								onClick={handleCreatePrimary}
 								sx={{ textTransform: 'none', fontWeight: 600, gap: 1 }}
 							>
 								<Add sx={{ fontSize: 18 }} />
-								Crear factura
+								Nuevo
 							</Button>
 							<Button
 								size="small"
@@ -103,7 +108,7 @@ function DocumentsHeader({ operation, onCreate, onCreateInvoice, onCreateDraft }
 							open={isMenuOpen}
 							onClose={handleMenuClose}
 						>
-							<MenuItem onClick={handleCreateInvoice}>Crear factura</MenuItem>
+							<MenuItem onClick={handleCreatePrimary}>Nuevo</MenuItem>
 							<MenuItem onClick={handleCreateDraft}>Crear borrador</MenuItem>
 						</Menu>
 					</>

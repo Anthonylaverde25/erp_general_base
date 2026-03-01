@@ -3,7 +3,7 @@ import { TYPES } from '../types';
 import { IDocumentTypeRepository } from '@/domain/entities/document_types/repositories/document-type.interface.repository';
 import { DocumentTypeRepositoryCrud } from '@/infrastructure/repositories/document_types/DocumentTypeRepositoryCrud';
 import { IndexDocumentTypesUseCase } from '@/application/use_cases/document_types/IndexDocumentTypesUseCase';
-import { IndexDocumentTypesByCategoryUseCase } from '@/application/use_cases/document_types/IndexDocumentTypesByCategoryUseCase';
+import { IndexDocumentTypesByModuleUseCase } from '@/application/use_cases/document_types/IndexDocumentTypesByModuleUseCase';
 
 export function registerDocumentTypeModule(container: Container) {
 	// Repository
@@ -12,6 +12,6 @@ export function registerDocumentTypeModule(container: Container) {
 	// Use Cases
 	container.bind<IndexDocumentTypesUseCase>(TYPES.IndexDocumentTypesUseCase).to(IndexDocumentTypesUseCase);
 	container
-		.bind<IndexDocumentTypesByCategoryUseCase>(TYPES.IndexDocumentTypesByCategoryUseCase)
-		.to(IndexDocumentTypesByCategoryUseCase);
+		.bind<IndexDocumentTypesByModuleUseCase>(TYPES.IndexDocumentTypesByModuleUseCase)
+		.to(IndexDocumentTypesByModuleUseCase);
 }

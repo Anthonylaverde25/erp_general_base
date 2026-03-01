@@ -1,13 +1,14 @@
 import NavLinkAdapter from '@fuse/core/NavLinkAdapter';
 import clsx from 'clsx';
 import { useMemo, ReactNode, useState, useEffect } from 'react';
-import { Button, Collapse, IconButton, SxProps, Typography, TypographyProps } from '@mui/material';
+import { Button, Collapse, IconButton, SxProps, Typography, TypographyProps, Tooltip } from '@mui/material';
 import FuseNavBadge from '../../FuseNavBadge';
 import FuseSvgIcon from '../../../FuseSvgIcon';
 import { FuseNavItemType } from '../../types/FuseNavItemType';
 import isUrlInChildren from '../../isUrlInChildren';
 import usePathname from '@fuse/hooks/usePathname';
 import Link from '@fuse/core/Link';
+import { useNavigate } from 'react-router';
 
 export type FuseNavVerticalBaseProps = {
 	item: FuseNavItemType;
@@ -47,6 +48,7 @@ function FuseNavVerticalItemBase(props: FuseNavVerticalBaseProps) {
 	} = props;
 
 	const pathname = usePathname();
+	const navigate = useNavigate();
 
 	const isGroup = useMemo(() => item.type === 'group', [item.type]);
 	const isCollapsable = useMemo(() => item.type === 'collapse', [item.type]);
@@ -178,6 +180,32 @@ function FuseNavVerticalItemBase(props: FuseNavVerticalBaseProps) {
 					)}
 				</div>
 				{item.badge && <FuseNavBadge badge={item.badge} />}
+
+				{item.quickCreateUrl && (
+					<Tooltip title="Crear nuevo" placement="top">
+						<IconButton
+							size="small"
+							className="h-6 w-6 p-0"
+							sx={{
+								flexShrink: 0,
+								opacity: 0.35,
+								transition: 'opacity 0.15s, color 0.15s',
+								'&:hover': {
+									opacity: 1,
+									color: 'secondary.main',
+									backgroundColor: 'transparent'
+								}
+							}}
+							onClick={(ev) => {
+								ev.preventDefault();
+								ev.stopPropagation();
+								navigate(item.quickCreateUrl!);
+							}}
+						>
+							<FuseSvgIcon size={15}>lucide:plus-circle</FuseSvgIcon>
+						</IconButton>
+					</Tooltip>
+				)}
 
 				{isCollapsable && (
 					<IconButton

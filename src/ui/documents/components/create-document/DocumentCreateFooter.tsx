@@ -1,45 +1,65 @@
-import type { DocumentFooterTotals } from './types';
+import { useFormContext } from "react-hook-form";
+import { DocumentFormValues } from "../../schemas/documentSchema";
+import { useDocumentCreate } from "../../context/DocumentCreateContext";
 
 interface DocumentCreateFooterProps {
-	totals: DocumentFooterTotals;
+	discountEnabled: boolean;
+	onDiscountEnabledChange: (enabled: boolean) => void;
 }
 
-export default function DocumentCreateFooter({ totals }: DocumentCreateFooterProps) {
+export default function DocumentCreateFooter({
+	discountEnabled,
+	onDiscountEnabledChange,
+}: DocumentCreateFooterProps) {
+	const { register } = useFormContext<DocumentFormValues>();
+	const { totals } = useDocumentCreate();
+
 	return (
 		<footer className="doc-footer">
 			<div className="doc-footer-section doc-footer-params">
 				<h3>Parámetros</h3>
 				<label>
-					<input type="checkbox" />
+					<input type="checkbox" {...register("include_legal")} />
 					<span>Incluir cláusulas legales</span>
 				</label>
 				<label>
 					<input
 						type="checkbox"
-						defaultChecked
+						{...register("apply_retention")}
 					/>
 					<span>Aplicar retención IRPF (15%)</span>
 				</label>
 				<label>
-					<input type="checkbox" />
+					<input type="checkbox" {...register("auto_send")} />
 					<span>Envío automático Email</span>
+				</label>
+				<label>
+					<input
+						type="checkbox"
+						checked={discountEnabled}
+						onChange={(e) => onDiscountEnabledChange(e.target.checked)}
+					/>
+					<span>Habilitar descuento por línea</span>
 				</label>
 			</div>
 
 			<div className="doc-footer-section doc-footer-notes">
 				<div>
 					<h3>Observaciones</h3>
-					<textarea placeholder="Notas de facturación interna..." />
+					<textarea
+						placeholder="Notas de facturación interna..."
+						{...register("notes")}
+					/>
 				</div>
 				<div>
 					<h3>Etiquetado</h3>
 					<input
 						type="text"
 						placeholder="Presupuesto, Urgente..."
+						{...register("tag")}
 					/>
 					<div className="doc-tag-wrap">
-						<span className="doc-tag doc-tag-primary">Ventas_Q1</span>
-						<span className="doc-tag">Internacional</span>
+						{/* Las etiquetas se agregarán dinámicamente en el futuro */}
 					</div>
 				</div>
 			</div>

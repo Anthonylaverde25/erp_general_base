@@ -1,5 +1,12 @@
 # Project Agents
 
+
+## Implementation plans:
+
+- Implementation plans must be in Spanish for better understanding
+
+
+
 ## Architecture Conventions (Domain Writes)
 
 For create/update flows in domain models:

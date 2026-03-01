@@ -13,10 +13,12 @@ export class DocumentTypeRepositoryCrud implements IDocumentTypeRepository {
 		return DocumentTypeMapper.fromDetailDTOList(document_types);
 	}
 
-	async indexByCategory(category: string): Promise<DocumentTypeEntity[]> {
+	async indexByModule(module: string): Promise<DocumentTypeEntity[]> {
 		const {
 			data: { document_types }
-		} = await axiosInstance.get(`document-types/by-category/${category}`);
+		} = await axiosInstance.get(`document-types`, {
+			params: { module }
+		});
 		return DocumentTypeMapper.fromDetailDTOList(document_types);
 	}
 }

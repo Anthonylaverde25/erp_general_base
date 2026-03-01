@@ -8,9 +8,9 @@ export class IndexPartnersUseCase {
 	constructor(
 		@inject(TYPES.PartnerRepository)
 		private repository: IPartnerRepository
-	) {}
+	) { }
 
-	async execute(): Promise<PartnerEntity[]> {
-		return await this.repository.index();
+	async execute(type?: string): Promise<PartnerEntity[]> {
+		return await this.repository.index(type);
 	}
 }

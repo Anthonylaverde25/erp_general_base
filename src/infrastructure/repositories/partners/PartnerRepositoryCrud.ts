@@ -7,10 +7,12 @@ import { PartnerWriteMapper } from '@/infrastructure/mappers/partners/PartnerWri
 
 @injectable()
 export class PartnerRepositoryCrud implements IPartnerRepository {
-	async index(): Promise<PartnerEntity[]> {
+	async index(type?: string): Promise<PartnerEntity[]> {
 		const {
 			data: { partners }
-		} = await axiosInstance.get('partners');
+		} = await axiosInstance.get('partners', {
+			params: { type }
+		});
 		return PartnerMapper.fromDTOList(partners);
 	}
 

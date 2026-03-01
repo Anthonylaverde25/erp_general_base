@@ -8,10 +8,12 @@ import { CreateNumberSeriesDTO } from '@/domain/entities/number_series/DTOs/Crea
 
 @injectable()
 export class NumberSeriesRepositoryCrud implements INumberSeriesRepository {
-	async index(): Promise<NumberSeriesEntity[]> {
+	async index(documentTypeCode?: string): Promise<NumberSeriesEntity[]> {
 		const {
 			data: { number_series }
-		} = await axiosInstance.get(`number-series`);
+		} = await axiosInstance.get(`number-series`, {
+			params: { document_type_code: documentTypeCode }
+		});
 		return NumberSeriesMapper.fromDetailDTOList(number_series);
 	}
 

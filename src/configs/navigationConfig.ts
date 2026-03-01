@@ -43,135 +43,232 @@ const navigationConfig: FuseNavItemType[] = [
 		url: '/departments'
 	},
 	{
-		id: 'operations',
-		title: 'Operations',
-		translate: 'OPERATIONS',
-		subtitle: 'Sales, Purchases & Inventory',
+		id: 'operations-items',
+		title: 'Artículos',
+		translate: 'ITEMS_GROUP',
+		subtitle: 'Documentos de compra/venta de artículos',
+		type: 'group',
+		icon: 'lucide:package',
+		children: [
+			{
+				id: 'sales-items',
+				title: 'Ingresos',
+				translate: 'SALES',
+				type: 'collapse',
+				icon: 'lucide:trending-up',
+				children: [
+					{
+						id: 'sales.invoices',
+						title: 'Facturas de Venta',
+						translate: 'LIST_INVOICES',
+						type: 'item',
+						icon: 'lucide:receipt',
+						url: '/sales/INV',
+						quickCreateUrl: '/sales/create/INV'
+					},
+					{
+						id: 'sales.quotes',
+						title: 'Presupuestos',
+						translate: 'LIST_QUOTES',
+						type: 'item',
+						icon: 'lucide:clipboard-list',
+						url: '/sales/QUO',
+						quickCreateUrl: '/sales/create/QUO'
+					},
+					{
+						id: 'sales.delivery',
+						title: 'Albaranes de Venta',
+						translate: 'LIST_DELIVERY_NOTES',
+						type: 'item',
+						icon: 'lucide:truck',
+						url: '/sales/DLV',
+						quickCreateUrl: '/sales/create/DLV'
+					},
+					{
+						id: 'sales.remittance',
+						title: 'Remitos',
+						translate: 'LIST_REMITTANCES',
+						type: 'item',
+						icon: 'lucide:file-text',
+						url: '/sales/REM',
+						quickCreateUrl: '/sales/create/REM'
+					},
+					{
+						id: 'sales.ticket',
+						title: 'Tickets',
+						translate: 'LIST_TICKETS',
+						type: 'item',
+						icon: 'lucide:ticket',
+						url: '/sales/TKT',
+						quickCreateUrl: '/sales/create/TKT'
+					},
+					{
+						id: 'sales.credit_note',
+						title: 'Facturas Rectificativas',
+						translate: 'LIST_CREDIT_NOTES',
+						type: 'item',
+						icon: 'lucide:file-minus',
+						url: '/sales/CRN',
+						quickCreateUrl: '/sales/create/CRN'
+					},
+					{
+						id: 'sales.customers',
+						title: 'Clientes',
+						translate: 'CUSTOMERS',
+						type: 'item',
+						icon: 'lucide:users',
+						url: '/sales/customers'
+					}
+				]
+			},
+			{
+				id: 'purchases-items',
+				title: 'Gastos',
+				translate: 'PURCHASES',
+				type: 'collapse',
+				icon: 'lucide:trending-down',
+				children: [
+					{
+						id: 'purchases.invoices',
+						title: 'Facturas de Compra',
+						translate: 'LIST_PURCHASE_INVOICES',
+						type: 'item',
+						icon: 'lucide:receipt',
+						url: '/purchases/PINV',
+						quickCreateUrl: '/purchases/create/PINV'
+					},
+					{
+						id: 'purchases.delivery',
+						title: 'Albaranes de Compra',
+						translate: 'LIST_PURCHASE_DELIVERY_NOTES',
+						type: 'item',
+						icon: 'lucide:truck',
+						url: '/purchases/PDLV',
+						quickCreateUrl: '/purchases/create/PDLV'
+					},
+					{
+						id: 'purchases.order',
+						title: 'Pedidos de Compra',
+						translate: 'LIST_PURCHASE_ORDERS',
+						type: 'item',
+						icon: 'lucide:shopping-cart',
+						url: '/purchases/PORD',
+						quickCreateUrl: '/purchases/create/PORD'
+					},
+					{
+						id: 'purchases.suppliers',
+						title: 'Proveedores',
+						translate: 'SUPPLIERS',
+						type: 'item',
+						icon: 'lucide:truck',
+						url: '/purchases/suppliers'
+					}
+				]
+			}
+		]
+	},
+	{
+		id: 'operations-services',
+		title: 'Servicios',
+		translate: 'SERVICES_GROUP',
+		subtitle: 'Documentos de compra/venta de servicios',
 		type: 'group',
 		icon: 'lucide:briefcase',
 		children: [
 			{
-				id: 'sales',
-				title: 'Sales',
+				id: 'sales-services',
+				title: 'Ingresos',
 				translate: 'SALES',
 				type: 'collapse',
-				icon: 'lucide:shopping-cart',
+				icon: 'lucide:trending-up',
 				children: [
 					{
-						id: 'sales.quotes',
-						title: 'Quotes',
-						translate: 'QUOTES',
+						id: 'sales.inv.services',
+						title: 'Facturas de Venta',
+						translate: 'LIST_INVOICES',
 						type: 'item',
-						url: '/sales/quotes',
-						icon: 'lucide:file-text'
+						icon: 'lucide:receipt',
+						url: '/sales/INV?item_type=service',
+						quickCreateUrl: '/sales/create/INV?item_type=service'
 					},
 					{
-						id: 'sales.orders',
-						title: 'Orders',
-						translate: 'ORDERS',
+						id: 'sales.quo.services',
+						title: 'Presupuestos',
+						translate: 'LIST_QUOTES',
 						type: 'item',
-						url: '/sales/orders',
-						icon: 'lucide:shopping-bag'
-					},
-					{
-						id: 'sales.invoices',
-						title: 'Invoices',
-						translate: 'INVOICES',
-						type: 'item',
-						url: '/sales',
-						icon: 'lucide:receipt'
-					},
-					{
-						id: 'sales.customers',
-						title: 'Customers',
-						translate: 'CUSTOMERS',
-						type: 'item',
-						url: '/sales/customers',
-						icon: 'lucide:users'
+						icon: 'lucide:clipboard-list',
+						url: '/sales/QUO?item_type=service',
+						quickCreateUrl: '/sales/create/QUO?item_type=service'
 					}
 				]
 			},
 			{
-				id: 'purchases',
-				title: 'Purchases',
+				id: 'purchases-services',
+				title: 'Gastos',
 				translate: 'PURCHASES',
 				type: 'collapse',
-				icon: 'lucide:package',
+				icon: 'lucide:trending-down',
 				children: [
 					{
-						id: 'purchases.requests',
-						title: 'Purchase Requests',
-						translate: 'PURCHASE_REQUESTS',
+						id: 'purchases.inv.services',
+						title: 'Facturas de Compra',
+						translate: 'LIST_PURCHASE_INVOICES',
 						type: 'item',
-						url: '/purchases/requests',
-						icon: 'lucide:file-plus'
+						icon: 'lucide:receipt',
+						url: '/purchases/PINV?item_type=service',
+						quickCreateUrl: '/purchases/create/PINV?item_type=service'
 					},
 					{
-						id: 'purchases.orders',
-						title: 'Purchase Orders',
-						translate: 'PURCHASE_ORDERS',
+						id: 'purchases.pord.services',
+						title: 'Pedidos de Compra',
+						translate: 'LIST_PURCHASE_ORDERS',
 						type: 'item',
-						url: '/purchases/orders',
-						icon: 'lucide:clipboard-list'
-					},
-					{
-						id: 'purchases.bills',
-						title: 'Bills',
-						translate: 'BILLS',
-						type: 'item',
-						url: '/purchases',
-						icon: 'lucide:file-invoice'
-					},
-					{
-						id: 'purchases.suppliers',
-						title: 'Suppliers',
-						translate: 'SUPPLIERS',
-						type: 'item',
-						url: '/purchases/suppliers',
-						icon: 'lucide:truck'
+						icon: 'lucide:shopping-cart',
+						url: '/purchases/PORD?item_type=service',
+						quickCreateUrl: '/purchases/create/PORD?item_type=service'
 					}
 				]
+			}
+		]
+	},
+	{
+		id: 'inventory',
+		title: 'Inventory',
+		translate: 'INVENTORY',
+		type: 'collapse',
+		icon: 'lucide:box',
+		children: [
+			{
+				id: 'inventory.products',
+				title: 'Products',
+				translate: 'PRODUCTS',
+				type: 'item',
+				url: '/inventory/products',
+				icon: 'lucide:package-2'
 			},
 			{
-				id: 'inventory',
-				title: 'Inventory',
-				translate: 'INVENTORY',
-				type: 'collapse',
-				icon: 'lucide:box',
-				children: [
-					{
-						id: 'inventory.products',
-						title: 'Products',
-						translate: 'PRODUCTS',
-						type: 'item',
-						url: '/inventory/products',
-						icon: 'lucide:package-2'
-					},
-					{
-						id: 'inventory.categories',
-						title: 'Categories',
-						translate: 'CATEGORIES',
-						type: 'item',
-						url: '/inventory/categories',
-						icon: 'lucide:folder'
-					},
-					{
-						id: 'inventory.warehouses',
-						title: 'Warehouses',
-						translate: 'WAREHOUSES',
-						type: 'item',
-						url: '/inventory/warehouses',
-						icon: 'lucide:warehouse'
-					},
-					{
-						id: 'inventory.stock-movements',
-						title: 'Stock Movements',
-						translate: 'STOCK_MOVEMENTS',
-						type: 'item',
-						url: '/inventory/stock-movements',
-						icon: 'lucide:arrow-right-left'
-					}
-				]
+				id: 'inventory.categories',
+				title: 'Categories',
+				translate: 'CATEGORIES',
+				type: 'item',
+				url: '/inventory/categories',
+				icon: 'lucide:folder'
+			},
+			{
+				id: 'inventory.warehouses',
+				title: 'Warehouses',
+				translate: 'WAREHOUSES',
+				type: 'item',
+				url: '/inventory/warehouses',
+				icon: 'lucide:warehouse'
+			},
+			{
+				id: 'inventory.stock-movements',
+				title: 'Stock Movements',
+				translate: 'STOCK_MOVEMENTS',
+				type: 'item',
+				url: '/inventory/stock-movements',
+				icon: 'lucide:arrow-right-left'
 			}
 		]
 	},

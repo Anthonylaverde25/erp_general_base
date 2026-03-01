@@ -1,71 +1,80 @@
-import { useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
-import { Box } from '@mui/material';
+import { useState } from "react";
+import { Box, ToggleButtonGroup, ToggleButton, Typography } from "@mui/material";
+import "./DocumentCreatePage.css";
 import {
-	buildDocumentRows,
-	COPY_BY_OPERATION,
-	CURRENCY_OPTIONS,
 	DocumentCreateFooter,
 	DocumentCreateLinesTable,
+	DocumentCreateLinesTableMui,
 	DocumentCreateMetaGrid,
 	DocumentCreateTopbar,
-	FOOTER_TOTALS,
 	GRID_THEME_OPTIONS,
-	LINE_ITEMS,
-	PARTY_OPTIONS,
-	TAX_OPTIONS,
 	type DocumentGridTheme,
-	type DocumentOperation
-} from '../components/create-document';
-import './DocumentCreatePage.css';
+	type DocumentOperation,
+} from "../components/create-document";
+import { DocumentCreateProvider } from "../context/DocumentCreateContext";
 
 interface DocumentCreatePageProps {
 	operation: DocumentOperation;
 }
 
-export default function DocumentCreatePage({ operation }: DocumentCreatePageProps) {
-	const navigate = useNavigate();
-	const [searchParams] = useSearchParams();
-	const mode = searchParams.get('mode');
-	const copy = COPY_BY_OPERATION[operation];
-	const [gridTheme, setGridTheme] = useState<DocumentGridTheme>('material');
-
-	const rows = useMemo(() => buildDocumentRows(LINE_ITEMS), []);
-	const isDraftMode = operation === 'sale' && mode === 'draft';
-	const primaryActionLabel = isDraftMode ? 'Guardar Borrador' : copy.primaryAction;
-	const documentNumber = isDraftMode ? 'BOR-2026-0001' : copy.documentNumber;
-	const statusLabel = isDraftMode ? 'BORRADOR' : 'NUEVO';
+export default function DocumentCreatePage({
+	operation,
+}: DocumentCreatePageProps) {
+	const [gridTheme, setGridTheme] = useState<DocumentGridTheme>("material");
+	const [discountEnabled, setDiscountEnabled] = useState(false);
+	const [tableVersion, setTableVersion] = useState<"v1" | "v2">("v1");
 
 	return (
-		<Box className="doc-create-root">
-			<DocumentCreateTopbar
-				title={copy.title}
-				statusLabel={statusLabel}
-				primaryActionLabel={primaryActionLabel}
-				gridTheme={gridTheme}
-				gridThemeOptions={GRID_THEME_OPTIONS}
-				onGridThemeChange={setGridTheme}
-				onBack={() => navigate(-1)}
-			/>
-
-			<main className="doc-create-main">
-				<DocumentCreateMetaGrid
-					partyLabel={copy.partyLabel}
-					partyOptions={PARTY_OPTIONS}
-					documentNumber={documentNumber}
-					currencyOptions={CURRENCY_OPTIONS}
-					topTotal={copy.topTotal}
-				/>
-
-				<DocumentCreateLinesTable
-					rows={rows}
-					prefilledRowsCount={LINE_ITEMS.length}
-					taxOptions={TAX_OPTIONS}
+		<DocumentCreateProvider operation={operation}>
+			<Box className="doc-create-root">
+				<DocumentCreateTopbar
 					gridTheme={gridTheme}
+					gridThemeOptions={GRID_THEME_OPTIONS}
+					onGridThemeChange={setGridTheme}
 				/>
 
-				<DocumentCreateFooter totals={FOOTER_TOTALS} />
-			</main>
-		</Box>
+				<main className="doc-create-main">
+					<Box display="flex" justifyContent="space-between" alignItems="center" bgcolor="#f5f5f5" p={1} borderRadius={1} mb={2} mx={2} mt={2}>
+						<Typography variant="body2" fontWeight="bold" color="text.secondary">
+							Versión de Tabla (Testing)
+						</Typography>
+						<ToggleButtonGroup
+							size="small"
+							value={tableVersion}
+							exclusive
+							onChange={(_, newV) => {
+								if (newV) setTableVersion(newV);
+							}}
+							aria-label="Table version"
+						>
+							<ToggleButton value="v1" aria-label="Nuevo 1 (AG Grid)">
+								Nuevo 1 (AG Grid)
+							</ToggleButton>
+							<ToggleButton value="v2" aria-label="Nuevo 2 (MUI Nativo)">
+								Nuevo 2 (MUI Nativo)
+							</ToggleButton>
+						</ToggleButtonGroup>
+					</Box>
+
+					<DocumentCreateMetaGrid />
+
+					{tableVersion === "v1" ? (
+						<DocumentCreateLinesTable
+							gridTheme={gridTheme}
+							discountEnabled={discountEnabled}
+						/>
+					) : (
+						<DocumentCreateLinesTableMui
+							discountEnabled={discountEnabled}
+						/>
+					)}
+
+					<DocumentCreateFooter
+						discountEnabled={discountEnabled}
+						onDiscountEnabledChange={setDiscountEnabled}
+					/>
+				</main>
+			</Box>
+		</DocumentCreateProvider>
 	);
 }

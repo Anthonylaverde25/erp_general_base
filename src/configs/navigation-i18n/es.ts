@@ -10,9 +10,10 @@ const locale = {
 	ADMINISTRATION: 'Administración',
 
 	// Operaciones
-	SALES: 'Ventas',
-	PURCHASES: 'Compras',
+	SALES: 'Ingresos',
+	PURCHASES: 'Gastos',
 	INVENTORY: 'Inventario',
+	CREATE: 'Crear',
 
 	// Ventas
 	QUOTES: 'Cotizaciones',
@@ -59,7 +60,29 @@ const locale = {
 	USERS: 'Usuarios',
 	ROLES_PERMISSIONS: 'Roles y Permisos',
 	TAXES: 'Impuestos',
-	PAYMENT_METHODS: 'Métodos de Pago'
+	PAYMENT_METHODS: 'Métodos de Pago',
+
+	// Acciones de Creación
+	CREATE_INVOICE: 'Nueva Factura de Venta',
+	CREATE_DELIVERY_NOTE: 'Nuevo Albarán de Venta',
+	CREATE_REMITTANCE: 'Nuevo Remito',
+	CREATE_QUOTE: 'Nuevo Presupuesto',
+	CREATE_TICKET: 'Nuevo Ticket',
+	CREATE_CREDIT_NOTE: 'Nueva Factura Rectificativa',
+	CREATE_PURCHASE_INVOICE: 'Nueva Factura de Compra',
+	CREATE_PURCHASE_DELIVERY_NOTE: 'Nuevo Albarán de Compra',
+	CREATE_PURCHASE_ORDER: 'Nuevo Pedido de Compra',
+
+	// Listados por Tipo
+	LIST_INVOICES: 'Facturas de Venta',
+	LIST_QUOTES: 'Presupuestos',
+	LIST_DELIVERY_NOTES: 'Albaranes de Venta',
+	LIST_REMITTANCES: 'Remitos',
+	LIST_TICKETS: 'Tickets',
+	LIST_CREDIT_NOTES: 'Facturas Rectificativas',
+	LIST_PURCHASE_INVOICES: 'Facturas de Compra',
+	LIST_PURCHASE_DELIVERY_NOTES: 'Albaranes de Compra',
+	LIST_PURCHASE_ORDERS: 'Pedidos de Compra'
 };
 
 export default locale;

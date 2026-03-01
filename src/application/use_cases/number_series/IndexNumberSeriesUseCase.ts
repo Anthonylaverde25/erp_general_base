@@ -5,13 +5,13 @@ import type { INumberSeriesRepository } from '@/domain/entities/number_series/re
 import { NumberSeriesEntity } from '@/domain/entities/number_series/NumberSeriesEntity';
 
 @injectable()
-export class IndexNumberSeriesUseCase implements IUseCase<void, NumberSeriesEntity[]> {
+export class IndexNumberSeriesUseCase implements IUseCase<string | undefined, NumberSeriesEntity[]> {
 	constructor(
 		@inject(TYPES.INumberSeriesRepository)
 		private readonly repository: INumberSeriesRepository
-	) {}
+	) { }
 
-	async execute(): Promise<NumberSeriesEntity[]> {
-		return await this.repository.index();
+	async execute(documentTypeCode?: string): Promise<NumberSeriesEntity[]> {
+		return await this.repository.index(documentTypeCode);
 	}
 }

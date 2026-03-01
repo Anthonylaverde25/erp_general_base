@@ -1,15 +1,13 @@
 import { ArrowBack } from '@mui/icons-material';
 import { Button, FormControl, IconButton, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
 import type { DocumentGridTheme, DocumentGridThemeOption } from './types';
+import { useDocumentCreate } from '../../context/DocumentCreateContext';
+import { useNavigate } from 'react-router';
 
 interface DocumentCreateTopbarProps {
-	title: string;
-	statusLabel: string;
-	primaryActionLabel: string;
 	gridTheme: DocumentGridTheme;
 	gridThemeOptions: DocumentGridThemeOption[];
 	onGridThemeChange: (theme: DocumentGridTheme) => void;
-	onBack: () => void;
 }
 
 const SHORTCUTS = [
@@ -19,24 +17,40 @@ const SHORTCUTS = [
 ];
 
 export default function DocumentCreateTopbar({
-	title,
-	statusLabel,
-	primaryActionLabel,
 	gridTheme,
 	gridThemeOptions,
 	onGridThemeChange,
-	onBack
 }: DocumentCreateTopbarProps) {
+	const navigate = useNavigate();
+	const {
+		currentDocumentType,
+		copy,
+		isDraftMode,
+		itemType,
+		isCreating,
+		onSubmit
+	} = useDocumentCreate();
+
 	const handleThemeChange = (event: SelectChangeEvent) => {
 		onGridThemeChange(event.target.value as DocumentGridTheme);
 	};
+
+	const itemTypeLabel = itemType === 'service' ? 'Servicios' : 'Artículos';
+	const title = currentDocumentType
+		? `Nuevo: ${currentDocumentType.name} (${itemTypeLabel})`
+		: copy.title;
+
+	const statusLabel = isDraftMode ? "BORRADOR" : "NUEVO";
+	const primaryActionLabel = isDraftMode
+		? "Guardar Borrador"
+		: copy.primaryAction;
 
 	return (
 		<header className="doc-create-topbar">
 			<div className="doc-create-topbar-left">
 				<IconButton
 					size="small"
-					onClick={onBack}
+					onClick={() => navigate(-1)}
 					className="doc-back-button"
 					aria-label="Volver"
 				>
@@ -71,6 +85,7 @@ export default function DocumentCreateTopbar({
 					variant="outlined"
 					size="small"
 					className="doc-action-secondary"
+					onClick={() => console.log("Saving Draft...")}
 				>
 					Guardar Borrador
 				</Button>
@@ -99,8 +114,10 @@ export default function DocumentCreateTopbar({
 					size="small"
 					color="secondary"
 					className="doc-action-primary"
+					onClick={onSubmit}
+					disabled={isCreating}
 				>
-					{primaryActionLabel}
+					{isCreating ? 'Procesando...' : primaryActionLabel}
 				</Button>
 			</div>
 		</header>

@@ -7,7 +7,7 @@ export class DocumentTypeMapper {
 			name: data.name,
 			code: data.code,
 			description: data.description,
-			category: data.category
+			module: data.module
 		});
 	}
 

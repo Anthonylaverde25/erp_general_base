@@ -4,9 +4,11 @@ import { DocumentRepositoryInterface } from '@/domain/interfaces/documents/Docum
 import { ApiDocumentRepository } from '@/infrastructure/repositories/documents/ApiDocumentRepository';
 import { IndexDocumentsUseCase } from '@/application/use_cases/documents/IndexDocumentsUseCase';
 import { GetDocumentUseCase } from '@/application/use_cases/documents/GetDocumentUseCase';
+import { CreateDocumentUseCase } from '@/application/use_cases/documents/CreateDocumentUseCase';
 
 export const registerDocumentModule = (container: Container) => {
-    container.bind<DocumentRepositoryInterface>(TYPES.IDocumentRepository).to(ApiDocumentRepository);
+    container.bind<DocumentRepositoryInterface>(TYPES.IDocumentRepository).to(ApiDocumentRepository).inSingletonScope();
     container.bind<IndexDocumentsUseCase>(TYPES.IndexDocumentsUseCase).to(IndexDocumentsUseCase);
     container.bind<GetDocumentUseCase>(TYPES.GetDocumentUseCase).to(GetDocumentUseCase);
+    container.bind<CreateDocumentUseCase>(TYPES.CreateDocumentUseCase).to(CreateDocumentUseCase);
 };

@@ -3,7 +3,7 @@ import { useIndexDocuments } from '@/features/documents/hooks/useIndexDocuments'
 import DocumentTable from '../components/DocumentTable';
 import styled from 'styled-components';
 import DocumentsHeader from '../components/DocumentsHeader';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 const Root = styled(FusePageCarded)(() => ({
 	'& .container': {
@@ -13,22 +13,31 @@ const Root = styled(FusePageCarded)(() => ({
 
 export default function SalesPage() {
 	const navigate = useNavigate();
-	const { data: documents, isLoading } = useIndexDocuments({ operation: 'sale' });
+	const { code } = useParams();
+	const { data: documents, isLoading } = useIndexDocuments({
+		operation: 'sale',
+		document_type_code: code
+	});
 
-	const handleCreateInvoice = () => {
-		navigate('/sales/create?mode=invoice');
+	const handleCreate = () => {
+		const targetCode = code || 'INV';
+		navigate(`/sales/create/${targetCode}`);
 	};
 
 	const handleCreateDraft = () => {
-		navigate('/sales/create?mode=draft');
+		const targetCode = code || 'INV';
+		navigate(`/sales/create/${targetCode}?mode=draft`);
 	};
+
+	const title = code ? `Documentos: ${code}` : 'Documentos de Venta';
 
 	return (
 		<Root
 			header={
 				<DocumentsHeader
 					operation="sale"
-					onCreateInvoice={handleCreateInvoice}
+					title={title}
+					onCreate={handleCreate}
 					onCreateDraft={handleCreateDraft}
 				/>
 			}

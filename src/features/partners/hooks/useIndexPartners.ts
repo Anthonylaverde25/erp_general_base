@@ -5,12 +5,12 @@ import { IndexPartnersUseCase } from '@/application/use_cases/partners/IndexPart
 import { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import useActiveCompany from '@/features/companies/useActiveCompany';
 
-export function useIndexPartners() {
+export function useIndexPartners(type?: string) {
 	const useCase = container.get<IndexPartnersUseCase>(TYPES.IndexPartnersUseCase);
 	const activeCompany = useActiveCompany();
 
 	return useQuery<PartnerEntity[], Error>({
-		queryKey: ['partners', activeCompany?.id],
-		queryFn: async () => await useCase.execute()
+		queryKey: ['partners', type, activeCompany?.id],
+		queryFn: async () => await useCase.execute(type)
 	});
 }

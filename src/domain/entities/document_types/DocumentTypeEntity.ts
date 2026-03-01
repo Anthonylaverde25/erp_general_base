@@ -3,7 +3,7 @@ export interface DocumentType {
 	name: string;
 	code: string;
 	description: string;
-	category: string;
+	module: string;
 }
 
 export class DocumentTypeEntity implements DocumentType {
@@ -12,11 +12,11 @@ export class DocumentTypeEntity implements DocumentType {
 		public name: string,
 		public code: string,
 		public description: string,
-		public category: string
-	) {}
+		public module: string
+	) { }
 
 	static fromPrimitives(data: DocumentType): DocumentTypeEntity {
-		return new DocumentTypeEntity(data.id, data.name, data.code, data.description, data.category);
+		return new DocumentTypeEntity(data.id, data.name, data.code, data.description, data.module);
 	}
 
 	toPlainObject(): DocumentType {
@@ -25,7 +25,7 @@ export class DocumentTypeEntity implements DocumentType {
 			name: this.name,
 			code: this.code,
 			description: this.description,
-			category: this.category
+			module: this.module
 		};
 	}
 }

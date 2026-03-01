@@ -1,7 +1,7 @@
 import { PartnerEntity } from '../PartnerEntity';
 
 export interface IPartnerRepository {
-	index(): Promise<PartnerEntity[]>;
+	index(type?: string): Promise<PartnerEntity[]>;
 	indexSuppliers(): Promise<PartnerEntity[]>;
 	show(id: number): Promise<PartnerEntity>;
 	create(data: PartnerEntity): Promise<{ partner: PartnerEntity; message: string }>;

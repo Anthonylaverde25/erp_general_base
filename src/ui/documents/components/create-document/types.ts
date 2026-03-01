@@ -9,14 +9,21 @@ export interface DocumentCreateCopy {
 	topTotal: string;
 }
 
+export interface DocumentLineTaxItem {
+	id: number;
+	name: string;
+	rate: number;
+}
+
 export interface DocumentLineItem {
 	id: string;
+	item_id?: number;
 	code: string;
 	description: string;
 	quantity: string;
 	unitPrice: string;
 	discount: string;
-	taxType: string;
+	taxes: DocumentLineTaxItem[];
 	subtotal: string;
 }
 
@@ -30,4 +37,55 @@ export interface DocumentFooterTotals {
 export interface DocumentGridThemeOption {
 	value: DocumentGridTheme;
 	label: string;
+}
+
+export interface ItemSearchResult {
+	id: number;
+	sku: string;
+	name: string;
+	type: string;
+	sale_price: number;
+	purchase_price?: number;
+	description: string;
+	tax_rates: DocumentLineTaxItem[];
+}
+
+export const CURRENCY_OPTIONS = ['EUR (€) - Euro', 'USD ($) - Dólar', 'GBP (£) - Libra'];
+
+export const COPY_BY_OPERATION: Record<DocumentOperation, DocumentCreateCopy> = {
+	sale: {
+		title: 'Facturación Avanzada',
+		partyLabel: 'CLIENTE',
+		primaryAction: 'Emitir Factura',
+		documentNumber: 'FAC-2026-0001',
+		topTotal: '0,00 €'
+	},
+	purchase: {
+		title: 'Compras Avanzadas',
+		partyLabel: 'PROVEEDOR',
+		primaryAction: 'Registrar Compra',
+		documentNumber: 'COM-2026-0001',
+		topTotal: '0,00 €'
+	}
+};
+
+export const GRID_THEME_OPTIONS: DocumentGridThemeOption[] = [
+	{ value: 'material', label: 'Material' },
+	{ value: 'quartz', label: 'Quartz' },
+	{ value: 'alpine', label: 'Alpine' },
+	{ value: 'balham', label: 'Balham' }
+];
+
+export function makeEmptyLine(index: number): DocumentLineItem {
+	return {
+		id: String(index + 1).padStart(2, '0'),
+		item_id: undefined,
+		code: '',
+		description: '',
+		quantity: '1',
+		unitPrice: '0',
+		discount: '0',
+		taxes: [],
+		subtotal: '0.00',
+	};
 }

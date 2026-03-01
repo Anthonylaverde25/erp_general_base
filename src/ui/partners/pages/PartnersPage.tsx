@@ -14,9 +14,9 @@ import PartnersHeader from '../components/PartnersHeader';
 // import { lazy, useState, SyntheticEvent } from "react"; // Moved to top
 import { CreatePartnerModal } from '@/app/(control-panel)/partners/CreatePartnerModal';
 
-export default function PartnersPage() {
+export default function PartnersPage({ defaultTab = 'all' }: { defaultTab?: string }) {
 	const [openCreateModal, setOpenCreateModal] = useState(false);
-	const [currentTab, setCurrentTab] = useState('all');
+	const [currentTab, setCurrentTab] = useState(defaultTab);
 
 	const handleCreate = () => {
 		setOpenCreateModal(true);
