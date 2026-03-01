@@ -13,6 +13,8 @@ export interface DocumentLineTaxItem {
 	id: number;
 	name: string;
 	rate: number;
+	tax_type_id: number;
+	operation: 'add' | 'subtract';
 }
 
 export interface DocumentLineItem {

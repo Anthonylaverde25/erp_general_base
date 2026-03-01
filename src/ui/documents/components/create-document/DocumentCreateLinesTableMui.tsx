@@ -9,16 +9,16 @@ import {
     TableRow,
     IconButton,
     Button,
-    Chip,
     Box,
     InputBase,
     Paper,
 } from '@mui/material';
-import { DeleteOutline, Add, Close } from '@mui/icons-material';
+import { DeleteOutline, Add } from '@mui/icons-material';
 import type { DocumentLineItem, ItemSearchResult } from './types';
 import type { DocumentFormValues } from '../../schemas/documentSchema';
 import { useSearchItems } from '@/features/items/hooks/useSearchItems';
 import { useDocumentCreate } from '../../context/DocumentCreateContext';
+import { TaxMultiSelect } from './TaxMultiSelect';
 
 function makeEmptyLine(): DocumentLineItem {
     return {
@@ -209,7 +209,13 @@ export default function DocumentCreateLinesTableMui({
         const qty = Number(current.quantity) || 0;
         const price = Number(current.unitPrice) || 0;
         const disc = discountEnabled ? Number(current.discount) || 0 : 0;
-        current.subtotal = String(qty * price * (1 - disc / 100));
+        const net = qty * price * (1 - disc / 100);
+        let taxAmount = 0;
+        (current.taxes || []).forEach(t => {
+            const amount = net * (t.rate / 100);
+            taxAmount += t.operation === 'subtract' ? -amount : amount;
+        });
+        current.subtotal = String(net + taxAmount);
         update(index, current);
     }, [fields, discountEnabled, update]);
 
@@ -221,12 +227,6 @@ export default function DocumentCreateLinesTableMui({
         append(makeEmptyLine());
     };
 
-    const handleRemoveTax = (index: number, taxId: number) => {
-        const current = fields[index] as DocumentLineItem;
-        const newTaxes = (current.taxes || []).filter(t => t.id !== taxId);
-        update(index, { ...current, taxes: newTaxes });
-    };
-
     return (
         <Box display="flex" flexDirection="column" flex={1} minHeight={0} bgcolor="white" borderTop="1px solid #f0f0f0">
             <TableContainer sx={{ flex: 1, minHeight: 0 }}>
@@ -234,12 +234,12 @@ export default function DocumentCreateLinesTableMui({
                     <TableHead>
                         <TableRow sx={{ '& th': { bgcolor: 'rgba(226, 232, 240, 0.85)', fontWeight: 600, fontSize: '12px', color: '#475569', py: 1.5, borderBottom: '2px solid #cbd5e1' } }}>
                             <TableCell width={50} align="center">#</TableCell>
-                            <TableCell width="35%">ARTÍCULO / CONCEPTO</TableCell>
-                            <TableCell width="25%">DESCRIPCIÓN</TableCell>
+                            <TableCell width="25%">ARTÍCULO / CONCEPTO</TableCell>
+                            <TableCell width="20%">DESCRIPCIÓN</TableCell>
                             <TableCell width={90} align="right">CANT.</TableCell>
                             <TableCell width={110} align="right">PRECIO U.</TableCell>
                             {discountEnabled && <TableCell width={90} align="right">DTO %</TableCell>}
-                            <TableCell width={160}>IMPUESTOS</TableCell>
+                            <TableCell width={200}>IMPUESTOS</TableCell>
                             <TableCell width={120} align="right">SUBTOTAL</TableCell>
                             <TableCell width={50} align="center"></TableCell>
                         </TableRow>
@@ -305,22 +305,12 @@ export default function DocumentCreateLinesTableMui({
                                         </TableCell>
                                     )}
                                     <TableCell>
-                                        <Box display="flex" flexWrap="wrap" gap={0.5}>
-                                            {!item.taxes || item.taxes.length === 0 ? (
-                                                <span style={{ color: '#ccc', fontSize: '12px' }}>—</span>
-                                            ) : (
-                                                item.taxes.map(tax => (
-                                                    <Chip
-                                                        key={tax.id}
-                                                        label={tax.name}
-                                                        size="small"
-                                                        onDelete={() => handleRemoveTax(index, tax.id)}
-                                                        deleteIcon={<Close sx={{ fontSize: 13 }} />}
-                                                        sx={{ height: 20, fontSize: '10px' }}
-                                                    />
-                                                ))
-                                            )}
-                                        </Box>
+                                        <TaxMultiSelect
+                                            taxes={item.taxes || []}
+                                            onChange={(newTaxes) => {
+                                                update(index, { ...item, taxes: newTaxes });
+                                            }}
+                                        />
                                     </TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 600, fontSize: '13px' }}>
                                         {Number(item.subtotal || 0).toFixed(2)}

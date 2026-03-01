@@ -478,6 +478,13 @@
 	color: var(--doc-text);
 }
 
+.doc-ag-cell-taxes {
+	overflow-x: auto !important;
+	overflow-y: hidden !important;
+	scrollbar-width: thin;
+	scrollbar-color: #ccc transparent;
+}
+
 .doc-ag-actions {
 	display: flex;
 	justify-content: center;
@@ -618,7 +625,7 @@
 	box-shadow: 0 1px 2px var(--doc-card-shadow);
 }
 
-.doc-total-card > div {
+.doc-total-card>div {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -626,7 +633,7 @@
 	margin-bottom: 0.2rem;
 }
 
-.doc-total-card > div span {
+.doc-total-card>div span {
 	font-size: 0.56rem;
 	font-weight: 800;
 	text-transform: uppercase;
@@ -634,7 +641,7 @@
 	letter-spacing: 0.05em;
 }
 
-.doc-total-card > div strong {
+.doc-total-card>div strong {
 	font-weight: 700;
 	color: var(--doc-text);
 	font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
