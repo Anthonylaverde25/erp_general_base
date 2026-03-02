@@ -2,7 +2,7 @@ import FusePageSimple from '@fuse/core/FusePageSimple';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TextFieldProps } from '@mui/material';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 import useActiveCompany from '@/features/companies/useActiveCompany';
@@ -65,6 +65,10 @@ function ItemFormContainer({
 	const itemType = watch('type');
 	const selectedCategoryId = watch('category_id');
 	const selectedStoreId = watch('store_id');
+	const selectedFamilyId = watch('family_id');
+
+	// Track whether the family change is user-initiated (not initial load)
+	const prevFamilyIdRef = useRef<string | undefined>(initialValues.family_id);
 
 	const mainCategories = useMemo(() => categories.filter((category) => category.parent_id === null), [categories]);
 
@@ -78,8 +82,8 @@ function ItemFormContainer({
 			selectedCategory?.children?.length
 				? selectedCategory.children
 				: categories.filter(
-						(category) => selectedCategoryId && category.parent_id === Number(selectedCategoryId)
-					),
+					(category) => selectedCategoryId && category.parent_id === Number(selectedCategoryId)
+				),
 		[categories, selectedCategory, selectedCategoryId]
 	);
 
@@ -135,6 +139,30 @@ function ItemFormContainer({
 			shouldDirty: false
 		});
 	}, [activeCompany?.settings?.defaultStoreId, selectedStoreId, itemType, setValue]);
+
+	// Auto-populate taxes when family changes (additive merge)
+	useEffect(() => {
+		// Skip if family hasn't changed (initial mount or same selection)
+		if (selectedFamilyId === prevFamilyIdRef.current) {
+			return;
+		}
+
+		prevFamilyIdRef.current = selectedFamilyId;
+
+		if (!selectedFamilyId) {
+			// User selected "Sin familia" — don't clear manually-added taxes
+			return;
+		}
+
+		const family = families.find((f) => String(f.id) === selectedFamilyId);
+
+		if (family && family.tax_rate_ids.length > 0) {
+			const currentTaxIds = methods.getValues('tax_rate_ids') || [];
+			// Merge: union of current taxes + family taxes (no duplicates)
+			const merged = Array.from(new Set([...currentTaxIds, ...family.tax_rate_ids]));
+			setValue('tax_rate_ids', merged, { shouldValidate: true, shouldDirty: true });
+		}
+	}, [selectedFamilyId, families, setValue, methods]);
 
 	return (
 		<FormProvider {...methods}>
