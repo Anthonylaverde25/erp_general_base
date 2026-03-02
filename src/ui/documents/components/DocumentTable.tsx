@@ -32,7 +32,7 @@ export default function DocumentTable(props: DocumentTableProps) {
                 showGlobalFilter: true
             }}
             muiTableBodyRowProps={({ row }) => ({
-                onClick: () => navigate(`${basePath}/${row.original.id}`),
+                onClick: () => navigate(`${basePath}/view/${row.original.id}`),
                 sx: {
                     cursor: 'pointer',
                     backgroundColor: row.index % 2 === 0 ? 'transparent' : 'action.hover',
@@ -42,7 +42,7 @@ export default function DocumentTable(props: DocumentTableProps) {
                 <MenuItem
                     key="view"
                     onClick={() => {
-                        navigate(`${basePath}/${row.original.id}`);
+                        navigate(`${basePath}/view/${row.original.id}`);
                         closeMenu();
                     }}
                 >

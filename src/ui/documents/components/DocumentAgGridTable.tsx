@@ -42,14 +42,17 @@ ModuleRegistry.registerModules([
 interface DocumentAgGridTableProps {
     documents: DocumentEntity[] | undefined;
     isLoading?: boolean;
+    operation?: 'sale' | 'purchase';
 }
 
-export default function DocumentAgGridTable({ documents, isLoading }: DocumentAgGridTableProps) {
+export default function DocumentAgGridTable({ documents, isLoading, operation = 'sale' }: DocumentAgGridTableProps) {
     const navigate = useNavigate();
     const muiTheme = useTheme();
     const isDark = muiTheme.palette.mode === 'dark';
     const [quickFilterText, setQuickFilterText] = useState('');
     const [showFilters, setShowFilters] = useState(true);
+
+    const basePath = operation === 'sale' ? '/sales' : '/purchases';
 
     // Modern Balham customization based on current theme mode
     const modernTheme = useMemo(() => {
@@ -87,7 +90,7 @@ export default function DocumentAgGridTable({ documents, isLoading }: DocumentAg
                         <Typography
                             variant="body2"
                             className="font-bold text-blue-600 hover:underline cursor-pointer"
-                            onClick={() => navigate(`/sales/${doc.id}`)}
+                            onClick={() => navigate(`${basePath}/view/${doc.id}`)}
                         >
                             {doc.number_serie || '(Borrador)'}
                         </Typography>

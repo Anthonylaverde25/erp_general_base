@@ -14,16 +14,16 @@ const route: FuseRouteItemType = {
 			element: <PartnersPage defaultTab="client" />
 		},
 		{
+			path: 'view/:documentId',
+			element: <DocumentShowPage />
+		},
+		{
 			path: ':code?',
 			element: <SalesPage />
 		},
 		{
 			path: 'create/:code?',
 			element: <CreateSalesDocumentPage />
-		},
-		{
-			path: ':documentId',
-			element: <DocumentShowPage />
 		}
 	]
 };

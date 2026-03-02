@@ -14,6 +14,7 @@ export interface DocumentLine {
     document_id?: number;
     item_id?: number | null;
     name: string;
+    description: string | null;
     quantity: number;
     unit_price: number;
     discount_percentage: number;
@@ -49,6 +50,7 @@ export class DocumentEntity {
         public readonly total: number,
         public readonly partner_name: string | null,
         public readonly partner_email: string | null,
+        public readonly partner_address: string | null,
         public readonly document_type_name: string | null,
         public readonly issue_date_raw: string | null,
         public readonly due_date_raw: string | null,
@@ -67,6 +69,7 @@ export class DocumentEntity {
                 document_id: line.document_id,
                 item_id: line.item_id ?? null,
                 name: line.name || '',
+                description: line.description || null,
                 quantity: Number(line.quantity ?? 0),
                 unit_price: Number(line.unit_price ?? 0),
                 discount_percentage: Number(line.discount_percentage ?? 0),
@@ -115,6 +118,7 @@ export class DocumentEntity {
             Number(json.total ?? 0),
             json.partner?.name || json.partner_name || json.partner_snapshot?.name || null,
             defaultContact?.email || fallbackContact?.email || json.partner_snapshot?.email || null,
+            json.partner?.address || json.partner_address || json.partner_snapshot?.address || null,
             json.document_type?.name || json.document_type_name || null,
             json.issue_date || null,
             json.due_date || null,

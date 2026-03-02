@@ -35,22 +35,24 @@ export default function DocumentShowPage() {
         );
     }
 
+    const backPath = document.operation === 'sale' ? '/sales' : '/purchases';
+
     return (
         <div className="flex flex-col flex-1 h-full overflow-hidden bg-[#f3f4f6] dark:bg-gray-950 text-[#1f2937] dark:text-gray-100 h-screen">
             <DocumentShowHeader
                 partnerName={document.partner_name}
                 numberSerie={document.number_serie}
-                onClose={() => navigate('/sales')}
+                onClose={() => navigate(backPath)}
             />
 
             <div className="flex flex-1 overflow-hidden">
-                <main className="flex-1 overflow-y-auto p-8 flex flex-col items-center">
+                <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center">
                     <DocumentShowPaper
                         document={document}
                         activeCompany={activeCompany}
                     />
-                    <DocumentShowFloatingActions />
-                </main>
+                    <DocumentShowFloatingActions document={document} activeCompany={activeCompany} />
+                </div>
 
                 <DocumentShowSidebar document={document} />
             </div>

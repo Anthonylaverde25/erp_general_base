@@ -19,7 +19,7 @@ export const getDocumentColumns = (operation: 'sale' | 'purchase'): MRT_ColumnDe
                             variant="body2"
                             fontWeight={600}
                             component={Link}
-                            to={`${basePath}/${doc.id}`}
+                            to={`${basePath}/view/${doc.id}`}
                             sx={{
                                 textDecoration: 'none',
                                 color: 'inherit',
