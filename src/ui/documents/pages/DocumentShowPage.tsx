@@ -38,7 +38,7 @@ export default function DocumentShowPage() {
     const backPath = document.operation === 'sale' ? '/sales' : '/purchases';
 
     return (
-        <div className="flex flex-col flex-1 h-full overflow-hidden bg-[#f3f4f6] dark:bg-gray-950 text-[#1f2937] dark:text-gray-100 h-screen">
+        <div className="flex flex-col flex-1 h-screen overflow-hidden bg-[#f3f4f6] dark:bg-gray-950 text-[#1f2937] dark:text-gray-100">
             <DocumentShowHeader
                 partnerName={document.partner_name}
                 numberSerie={document.number_serie}
@@ -46,16 +46,19 @@ export default function DocumentShowPage() {
             />
 
             <div className="flex flex-1 overflow-hidden">
-                <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center">
+                <main className="flex-1 overflow-y-auto p-6 md:p-12 flex flex-col items-center relative gap-8">
                     <DocumentShowPaper
                         document={document}
                         activeCompany={activeCompany}
                     />
                     <DocumentShowFloatingActions document={document} activeCompany={activeCompany} />
-                </div>
+                </main>
 
                 <DocumentShowSidebar document={document} />
             </div>
         </div>
     );
 }
+
+
+
