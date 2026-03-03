@@ -65,6 +65,8 @@ const navigationConfig: FuseNavItemType[] = [
 						icon: 'lucide:receipt',
 						url: '/sales/INV',
 						quickCreateUrl: '/sales/create/INV'
+
+
 					},
 					{
 						id: 'sales.quotes',

@@ -28,7 +28,8 @@ export default function DocumentCreateTopbar({
 		isDraftMode,
 		itemType,
 		isCreating,
-		onSubmit
+		onSubmitDraft,
+		onSubmitIssue
 	} = useDocumentCreate();
 
 	const handleThemeChange = (event: SelectChangeEvent) => {
@@ -85,9 +86,10 @@ export default function DocumentCreateTopbar({
 					variant="outlined"
 					size="small"
 					className="doc-action-secondary"
-					onClick={() => console.log("Saving Draft...")}
+					onClick={onSubmitDraft}
+					disabled={isCreating}
 				>
-					Guardar Borrador
+					{isCreating ? 'Guardando...' : 'Guardar Borrador'}
 				</Button>
 				<FormControl
 					size="small"
@@ -114,7 +116,7 @@ export default function DocumentCreateTopbar({
 					size="small"
 					color="secondary"
 					className="doc-action-primary"
-					onClick={onSubmit}
+					onClick={onSubmitIssue}
 					disabled={isCreating}
 				>
 					{isCreating ? 'Procesando...' : primaryActionLabel}

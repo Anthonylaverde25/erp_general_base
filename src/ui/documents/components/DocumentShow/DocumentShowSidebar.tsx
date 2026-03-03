@@ -1,5 +1,6 @@
 import { Clock, CheckCircle2, Plus, PenLine, ChevronRight, Copy, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
+import { format } from 'date-fns';
 import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 
 interface DocumentShowSidebarProps {
@@ -57,11 +58,11 @@ export default function DocumentShowSidebar({ document }: DocumentShowSidebarPro
                         </div>
                         <div className="flex justify-between">
                             <span>Fecha</span>
-                            <span>{document.issue_date}</span>
+                            <span>{document.issue_date ? format(new Date(document.issue_date), 'dd/MM/yyyy') : 'N/A'}</span>
                         </div>
                         <div className="flex justify-between">
                             <span>Vencimiento</span>
-                            <span className="text-blue-500 dark:text-blue-400">{document.due_date}</span>
+                            <span className="text-blue-500 dark:text-blue-400">{document.due_date ? format(new Date(document.due_date), 'dd/MM/yyyy') : 'N/A'}</span>
                         </div>
                         <div className="flex justify-between">
                             <span>Total unidades</span>

@@ -2,6 +2,7 @@ import { MRT_ColumnDef } from 'material-react-table';
 import { Chip, Typography, Box, Avatar } from '@mui/material';
 import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 import { Link } from 'react-router';
+import { format } from 'date-fns';
 
 export const getDocumentColumns = (operation: 'sale' | 'purchase'): MRT_ColumnDef<DocumentEntity>[] => {
     const basePath = operation === 'sale' ? '/sales' : '/purchases';
@@ -103,7 +104,7 @@ export const getDocumentColumns = (operation: 'sale' | 'purchase'): MRT_ColumnDe
             size: 120,
             Cell: ({ row }) => (
                 <Typography variant="body2">
-                    {row.original.issue_date}
+                    {row.original.issue_date ? format(new Date(row.original.issue_date), 'dd/MM/yyyy') : 'N/A'}
                 </Typography>
             )
         },

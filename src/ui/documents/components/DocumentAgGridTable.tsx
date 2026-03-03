@@ -189,7 +189,7 @@ export default function DocumentAgGridTable({ documents, isLoading, operation = 
                 buttons: ['apply', 'clear'],
                 debounceMs: 500
             },
-            valueFormatter: (params) => params.value ? format(new Date(params.value), 'dd MMM, yyyy') : '',
+            valueFormatter: (params) => params.value ? format(new Date(params.value), 'dd/MM/yyyy') : '',
             cellStyle: { color: 'rgb(100, 116, 139)', fontSize: '0.85rem' }
         },
         {

@@ -22,7 +22,8 @@ import { NumberSeriesEntity } from "@/domain/entities/number_series/NumberSeries
 
 interface DocumentCreateContextValue {
     methods: UseFormReturn<DocumentFormValues>;
-    onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+    onSubmitDraft: (e?: React.BaseSyntheticEvent) => Promise<void>;
+    onSubmitIssue: (e?: React.BaseSyntheticEvent) => Promise<void>;
     isCreating: boolean;
     partnerOptions: { id: string | number; name: string }[];
     numberSeries: NumberSeriesEntity[];
@@ -144,22 +145,24 @@ export function DocumentCreateProvider({
         };
     }, [formLines, applyRetention]);
 
-    const onActualSubmit = (data: DocumentFormValues) => {
-        const payload = {
-            ...data,
-            lines: data.lines
-                .filter((i) => i.code || i.description)
-                .map((i) => ({
-                    name: i.code,
-                    description: i.description,
-                    quantity: Number(i.quantity),
-                    unit_price: Number(i.unitPrice),
-                    discount: Number(i.discount),
-                    taxes: i.taxes.map(t => t.id)
-                })),
-        };
+    const buildPayload = (data: DocumentFormValues, status: 'draft' | 'issued') => ({
+        ...data,
+        status,
+        lines: data.lines
+            .filter((i) => i.code || i.description)
+            .map((i) => ({
+                item_id: i.item_id || null,
+                name: i.code,
+                description: i.description,
+                quantity: Number(i.quantity),
+                unit_price: Number(i.unitPrice),
+                discount_percentage: Number(i.discount),
+                tax_rates: i.taxes.map(t => t.id)
+            })),
+    });
 
-        createDocument(payload as any, {
+    const submitWithStatus = (status: 'draft' | 'issued') => (data: DocumentFormValues) => {
+        createDocument(buildPayload(data, status) as any, {
             onSuccess: () => {
                 navigate(`/${operation === "sale" ? "sales" : "purchases"}`);
             },
@@ -175,7 +178,8 @@ export function DocumentCreateProvider({
 
     const value: DocumentCreateContextValue = {
         methods,
-        onSubmit: handleSubmit(onActualSubmit),
+        onSubmitDraft: handleSubmit(submitWithStatus('draft')),
+        onSubmitIssue: handleSubmit(submitWithStatus('issued')),
         isCreating,
         partnerOptions,
         numberSeries: numberSeries || [],

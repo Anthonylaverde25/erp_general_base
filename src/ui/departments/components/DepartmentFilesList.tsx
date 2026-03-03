@@ -283,7 +283,7 @@ export default function DepartmentFilesList({
                       sx={{ color: "text.secondary", fontWeight: 500 }}
                     >
                       {formatSize(file.size)} •{" "}
-                      {format(new Date(file.created_at), "dd MMM yyyy")}
+                      {format(new Date(file.created_at), "dd/MM/yyyy")}
                     </Typography>
                   </Box>
                 </Box>
