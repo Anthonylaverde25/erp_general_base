@@ -214,21 +214,43 @@ export default function DocumentAgGridTable({ documents, isLoading, operation = 
         },
         {
             headerName: '',
-            width: 80,
+            width: 110,
             pinned: 'right',
             sortable: false,
             filter: false,
-            cellRenderer: () => (
-                <Box className="flex items-center justify-center h-full">
-                    <Tooltip title="Acciones">
-                        <IconButton size="small">
-                            <FuseSvgIcon size={18} color={isDark ? 'disabled' : 'action'}>heroicons-outline:ellipsis-horizontal</FuseSvgIcon>
-                        </IconButton>
-                    </Tooltip>
-                </Box>
-            )
+            cellRenderer: (params: ICellRendererParams<DocumentEntity>) => {
+                const doc = params.data;
+                if (!doc) return null;
+                const statusKey = doc.status?.key || '';
+                const isEditable = statusKey === 'draft';
+                const docTypeCode = doc.document_type_code || '';
+
+                return (
+                    <Box className="flex items-center justify-center h-full gap-1">
+                        <Tooltip title="Ver documento">
+                            <IconButton
+                                size="small"
+                                onClick={() => navigate(`${basePath}/view/${doc.id}`)}
+                            >
+                                <FuseSvgIcon size={16} color={isDark ? 'disabled' : 'action'}>heroicons-outline:eye</FuseSvgIcon>
+                            </IconButton>
+                        </Tooltip>
+                        {isEditable && (
+                            <Tooltip title="Editar documento">
+                                <IconButton
+                                    size="small"
+                                    onClick={() => navigate(`${basePath}/edit/${docTypeCode}/${doc.id}`)}
+                                    sx={{ color: '#f59e0b' }}
+                                >
+                                    <FuseSvgIcon size={16}>heroicons-outline:pencil-square</FuseSvgIcon>
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                    </Box>
+                );
+            }
         }
-    ], [navigate, isDark]);
+    ], [navigate, isDark, basePath]);
 
     const defaultColDef = useMemo<ColDef>(() => ({
         sortable: true,

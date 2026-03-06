@@ -25,4 +25,11 @@ export class ApiDocumentRepository implements DocumentRepositoryInterface {
         } = await axiosInstance.post('documents', data);
         return DocumentEntity.fromJson(createdDoc);
     }
+
+    async update(id: string, data: any): Promise<DocumentEntity> {
+        const {
+            data: { data: updatedDoc }
+        } = await axiosInstance.put(`documents/${id}`, data);
+        return DocumentEntity.fromJson(updatedDoc);
+    }
 }

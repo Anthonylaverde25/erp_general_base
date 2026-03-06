@@ -57,6 +57,7 @@ export class DocumentEntity {
         public readonly subtotal: number,
         public readonly tax_total: number,
         public readonly total: number,
+        public readonly partner_id: number | null,
         public readonly partner_name: string | null,
         public readonly partner_email: string | null,
         public readonly partner_address: string | null,
@@ -64,6 +65,8 @@ export class DocumentEntity {
         public readonly document_type_code: string | null,
         public readonly issue_date_raw: string | null,
         public readonly due_date_raw: string | null,
+        public readonly number_series_id: number | null,
+        public readonly notes: string | null,
         public readonly lines: DocumentLine[],
         public readonly tax_summaries: DocumentTaxSummary[]
     ) { }
@@ -126,13 +129,16 @@ export class DocumentEntity {
             Number(json.subtotal ?? 0),
             Number(json.tax_total ?? 0),
             Number(json.total ?? 0),
+            json.partner_id ? Number(json.partner_id) : null,
             json.partner?.name || json.partner_name || json.partner_snapshot?.name || null,
             defaultContact?.email || fallbackContact?.email || json.partner_snapshot?.email || null,
             json.partner?.address || json.partner_address || json.partner_snapshot?.address || null,
             json.document_type?.name || json.document_type_name || null,
-            json.document_type_code || null,
+            json.document_type?.code || json.document_type_code || null,
             json.issue_date || null,
             json.due_date || null,
+            json.number_series_id ? Number(json.number_series_id) : null,
+            json.notes || null,
             lines,
             tax_summaries
         );

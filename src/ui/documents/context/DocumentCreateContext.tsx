@@ -1,24 +1,27 @@
-import React, { createContext, useContext, useMemo, useEffect } from "react";
-import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams, useSearchParams, useNavigate } from "react-router";
-import {
-    documentSchema,
-    type DocumentFormValues,
-} from "../schemas/documentSchema";
+import React, { createContext, useContext, useEffect, useMemo } from "react";
+import { FormProvider, UseFormReturn } from "react-hook-form";
+import { useParams, useSearchParams } from "react-router";
+
+import { type DocumentFormValues } from "../schemas/documentSchema";
 import {
     COPY_BY_OPERATION,
-    CURRENCY_OPTIONS,
-    makeEmptyLine,
-    type DocumentOperation,
     type DocumentCreateCopy,
     type DocumentFooterTotals,
+    type DocumentOperation,
 } from "../components/create-document/types";
+
+import { useDocumentForm } from "../hooks/useDocumentForm";
+import { useDocumentNumberSeries } from "../hooks/useDocumentNumberSeries";
+import { useDocumentTotals } from "../hooks/useDocumentTotals";
+import { useDocumentSubmit } from "../hooks/useDocumentSubmit";
+
 import useIndexDocumentTypesByModule from "@/features/document_types/hooks/useIndexDocumentTypesByModule";
 import { useIndexPartners } from "@/features/partners/hooks/useIndexPartners";
-import { useCreateDocument } from "@/features/documents/hooks/useCreateDocument";
+import { useGetDocument } from "@/features/documents/hooks/useGetDocument";
 import useIndexNumberSeries from "@/features/number_series/hooks/useIndexNumberSeries";
 import { NumberSeriesEntity } from "@/domain/entities/number_series/NumberSeriesEntity";
+
+// ─── Context Types ────────────────────────────────────────────────────────────
 
 interface DocumentCreateContextValue {
     methods: UseFormReturn<DocumentFormValues>;
@@ -33,56 +36,45 @@ interface DocumentCreateContextValue {
     isDraftMode: boolean;
     itemType: "item" | "service";
     operation: DocumentOperation;
+    isEditMode: boolean;
+    isLoadingDocument: boolean;
 }
 
 const DocumentCreateContext = createContext<DocumentCreateContextValue | undefined>(undefined);
 
+// ─── Provider ─────────────────────────────────────────────────────────────────
+
 export function DocumentCreateProvider({
     children,
     operation,
+    documentId,
 }: {
     children: React.ReactNode;
     operation: DocumentOperation;
+    documentId?: string;
 }) {
-    const navigate = useNavigate();
     const { code } = useParams();
     const [searchParams] = useSearchParams();
     const mode = searchParams.get("mode");
     const itemType = (searchParams.get("item_type") as "service" | "item") || "item";
+    const isEditMode = !!documentId;
 
+    // ─── Data fetching ──────────────────────────────────────────────────────
     const { documentTypes } = useIndexDocumentTypesByModule(operation.toUpperCase());
     const partnerType = operation === "sale" ? "customer" : "vendor";
     const { data: partners } = useIndexPartners(partnerType);
-    const { mutate: createDocument, isPending: isCreating } = useCreateDocument();
+    const { data: existingDocument, isLoading: isLoadingDocument } = useGetDocument(documentId || "");
 
     const currentDocumentTypeCode = code || documentTypes?.[0]?.code;
     const { numberSeries } = useIndexNumberSeries(currentDocumentTypeCode);
 
-    const methods = useForm<DocumentFormValues>({
-        resolver: zodResolver(documentSchema),
-        defaultValues: {
-            partner_id: "",
-            document_type_code: code || "",
-            number_series_id: "",
-            issue_date: new Date().toISOString().split("T")[0],
-            due_date: "",
-            number: "",
-            currency: CURRENCY_OPTIONS[0],
-            notes: "",
-            tag: "",
-            include_legal: false,
-            apply_retention: true,
-            auto_send: false,
-            item_type: itemType,
-            lines: [makeEmptyLine(0), makeEmptyLine(1)],
-        },
-    });
-
+    // ─── Form setup ─────────────────────────────────────────────────────────
+    const methods = useDocumentForm({ code, itemType, isEditMode, existingDocument });
     const { watch, setValue, handleSubmit } = methods;
-    const selectedNumberSeries = watch("number_series_id");
     const formLines = watch("lines");
     const applyRetention = watch("apply_retention");
 
+    // ─── Current document type ───────────────────────────────────────────────
     const currentDocumentType = useMemo(() => {
         if (!documentTypes) return null;
         if (code) return documentTypes.find((t) => t.code === code) ?? documentTypes[0];
@@ -95,96 +87,32 @@ export function DocumentCreateProvider({
         }
     }, [currentDocumentType, setValue]);
 
-    useEffect(() => {
-        if (numberSeries && numberSeries.length > 0) {
-            const activeSeriesId = selectedNumberSeries || numberSeries[0].id;
-            if (!selectedNumberSeries) setValue("number_series_id", activeSeriesId);
+    // ─── Auto-numbering (create mode only) ──────────────────────────────────
+    useDocumentNumberSeries({ numberSeries, isEditMode, watch, setValue });
 
-            const activeSeries = numberSeries.find(
-                (ns) => String(ns.id) === String(activeSeriesId),
-            );
-            if (activeSeries) {
-                const nextNum = String(activeSeries.current_number + 1).padStart(4, "0");
-                setValue("number", `${activeSeries.serie}-${activeSeries.year}-${nextNum}`);
-            }
-        }
-    }, [numberSeries, selectedNumberSeries, setValue]);
+    // ─── Totals ─────────────────────────────────────────────────────────────
+    const totals = useDocumentTotals(formLines, applyRetention);
 
-    // Dynamic Totals Calculation
-    const totals = useMemo(() => {
-        let taxBaseValue = 0;
-        let taxAmountValue = 0;
-
-        formLines.forEach((line) => {
-            const qty = Number(line.quantity) || 0;
-            const price = Number(line.unitPrice) || 0;
-            const disc = Number(line.discount) || 0;
-
-            const lineBase = qty * price * (1 - disc / 100);
-            taxBaseValue += lineBase;
-
-            // Calculate taxes for this line
-            line.taxes.forEach((tax) => {
-                taxAmountValue += lineBase * (tax.rate / 100);
-            });
-        });
-
-        const withholdingValue = applyRetention ? taxBaseValue * 0.15 : 0;
-        const netValue = taxBaseValue + taxAmountValue - withholdingValue;
-
-        const formatter = new Intl.NumberFormat("es-ES", {
-            style: "currency",
-            currency: "EUR",
-        });
-
-        return {
-            taxBase: formatter.format(taxBaseValue),
-            taxAmount: formatter.format(taxAmountValue),
-            withholding: formatter.format(-withholdingValue),
-            netPayable: formatter.format(netValue),
-        };
-    }, [formLines, applyRetention]);
-
-    const buildPayload = (data: DocumentFormValues, statusKey: 'draft' | 'issued') => ({
-        ...data,
-        status_key: statusKey,
-        lines: data.lines
-            .filter((i) => i.code || i.description)
-            .map((i) => ({
-                item_id: i.item_id || null,
-                name: i.code,
-                description: i.description,
-                quantity: Number(i.quantity),
-                unit_price: Number(i.unitPrice),
-                discount_percentage: Number(i.discount),
-                tax_rates: i.taxes.map(t => t.id)
-            })),
+    // ─── Submit ─────────────────────────────────────────────────────────────
+    const { submitWithStatus, isPending: isCreating } = useDocumentSubmit({
+        operation,
+        isEditMode,
+        documentId,
     });
 
-    const submitWithStatus = (statusKey: 'draft' | 'issued') => (data: DocumentFormValues) => {
-        createDocument(buildPayload(data, statusKey) as any, {
-            onSuccess: (responseData) => {
-                navigate(`/${operation === "sale" ? "sales" : "purchases"}/view/${responseData.id}`);
-            },
-        });
-    };
-
-    const partnerOptions = useMemo(() => {
-        return partners?.map((p) => ({
-            id: p.id!,
-            name: p.name,
-            cif: p.cif,
-            vat_number: p.vat_number
-        })) || [];
-    }, [partners]);
+    // ─── Partner options ─────────────────────────────────────────────────────
+    const partnerOptions = useMemo(
+        () => partners?.map((p) => ({ id: p.id!, name: p.name, cif: p.cif, vat_number: p.vat_number })) || [],
+        [partners],
+    );
 
     const copy = COPY_BY_OPERATION[operation];
     const isDraftMode = operation === "sale" && mode === "draft";
 
     const value: DocumentCreateContextValue = {
         methods,
-        onSubmitDraft: handleSubmit(submitWithStatus('draft')),
-        onSubmitIssue: handleSubmit(submitWithStatus('issued')),
+        onSubmitDraft: handleSubmit(submitWithStatus("draft")),
+        onSubmitIssue: handleSubmit(submitWithStatus("issued")),
         isCreating,
         partnerOptions,
         numberSeries: numberSeries || [],
@@ -194,6 +122,8 @@ export function DocumentCreateProvider({
         isDraftMode,
         itemType,
         operation,
+        isEditMode,
+        isLoadingDocument,
     };
 
     return (
@@ -204,6 +134,8 @@ export function DocumentCreateProvider({
         </DocumentCreateContext.Provider>
     );
 }
+
+// ─── Consumer hook ────────────────────────────────────────────────────────────
 
 export function useDocumentCreate() {
     const context = useContext(DocumentCreateContext);

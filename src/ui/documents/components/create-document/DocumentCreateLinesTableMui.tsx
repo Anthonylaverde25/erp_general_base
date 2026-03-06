@@ -57,6 +57,9 @@ function AutocompleteCell({
     const inputRef = useRef<HTMLInputElement>(null);
     const committedRef = useRef(false); // track if we committed via item click
 
+    // Sync internal state when initialCode changes (e.g. from reset() in edit mode)
+    useEffect(() => setInputValue(initialCode), [initialCode]);
+
     // Reset selected index when results change
     useEffect(() => setSelectedIndex(0), [results]);
 
@@ -189,19 +192,21 @@ export default function DocumentCreateLinesTableMui({
     discountEnabled: boolean;
 }) {
     const { control, getValues } = useFormContext<DocumentFormValues>();
+    const { isEditMode, isLoadingDocument } = useDocumentCreate();
 
     const { fields, append, remove, update } = useFieldArray({
         control,
         name: 'lines',
     });
 
-    // Initialize default 2 lines if empty on mount
+    // Initialize default 2 lines if empty on mount — skip in edit mode (data comes from reset())
     useEffect(() => {
+        if (isEditMode || isLoadingDocument) return;
         const currentLines = getValues('lines');
         if (!currentLines || currentLines.length === 0) {
             append([makeEmptyLine(), makeEmptyLine()]);
         }
-    }, [append, getValues]);
+    }, [append, getValues, isEditMode, isLoadingDocument]);
 
     /** Commit a partial update to a line (called on blur / item selection only) */
     const commitLinePatch = useCallback((index: number, patch: Partial<DocumentLineItem>) => {

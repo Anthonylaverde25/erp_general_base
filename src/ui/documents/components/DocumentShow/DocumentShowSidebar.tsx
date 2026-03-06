@@ -5,7 +5,6 @@ import { Clock, CheckCircle2, Plus, PenLine, ChevronRight, Copy, ExternalLink, L
 import { format } from "date-fns"
 import { DocumentEntity } from "@/domain/entities/documents/DocumentEntity"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Button } from '@mui/material'
 
 interface DocumentShowSidebarProps {
     document: DocumentEntity
@@ -16,6 +15,7 @@ const formatCurrency = (amount: number) => {
 }
 
 export default function DocumentShowSidebar({ document }: DocumentShowSidebarProps) {
+
     return (
         <aside className="w-[418px] flex-shrink-0 bg-white dark:bg-gray-900 border-l border-[#e5e7eb] dark:border-gray-800 flex flex-col h-full overflow-hidden">
             <Tabs defaultValue="general" className="w-full h-full flex flex-col pt-2">

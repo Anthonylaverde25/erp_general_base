@@ -2,18 +2,33 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import type { GridApi } from 'ag-grid-community';
 import type { DocumentLineItem } from '../../types';
-import type { DocumentFormValues } from '../../../schemas/documentSchema';
+import type { DocumentFormValues } from '../../../../schemas/documentSchema';
 import { collectRows, makeEmptyLine } from '../utils';
 
 export function useDocumentTableSync() {
-    const { setValue } = useFormContext<DocumentFormValues>();
+    const { setValue, getValues, watch } = useFormContext<DocumentFormValues>();
     const gridApiRef = useRef<GridApi<DocumentLineItem> | null>(null);
 
-    // Local rows state — AG Grid reads from this via rowData prop
-    const [rows, setRows] = useState<DocumentLineItem[]>(() => [
-        makeEmptyLine('01'),
-        makeEmptyLine('02'),
-    ]);
+    // Initialize rows from form values — in edit mode, these will already be populated
+    const [rows, setRows] = useState<DocumentLineItem[]>(() => {
+        const formLines = getValues('lines');
+        if (formLines && formLines.length > 0) {
+            return formLines as DocumentLineItem[];
+        }
+        return [makeEmptyLine('01'), makeEmptyLine('02')];
+    });
+
+    // Watch form lines — when reset() or values prop updates the form, sync to AG Grid
+    const formLines = watch('lines');
+    useEffect(() => {
+        if (!formLines || formLines.length === 0) return;
+        // Only sync if the data actually changed (avoid infinite loop)
+        const api = gridApiRef.current;
+        setRows(formLines as DocumentLineItem[]);
+        if (api) {
+            api.setGridOption('rowData', formLines as DocumentLineItem[]);
+        }
+    }, [formLines]);
 
     /** Sync rows → React Hook Form (one-way push) */
     const syncToForm = useCallback((currentRows: DocumentLineItem[]) => {
@@ -75,8 +90,15 @@ export function useDocumentTableSync() {
 
     const onGridReady = useCallback((params: { api: GridApi<DocumentLineItem> }) => {
         gridApiRef.current = params.api;
-        syncToForm(rows); // initial sync
-    }, [rows, syncToForm]);
+        // Use the current rows (might already have edit mode data)
+        const currentRows = getValues('lines') as DocumentLineItem[];
+        if (currentRows && currentRows.length > 0) {
+            setRows(currentRows);
+            syncToForm(currentRows);
+        } else {
+            syncToForm(rows);
+        }
+    }, [rows, syncToForm, getValues]);
 
     return {
         rows,

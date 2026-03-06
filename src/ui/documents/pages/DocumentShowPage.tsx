@@ -39,19 +39,20 @@ export default function DocumentShowPage() {
 
     return (
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-[#f3f4f6] dark:bg-gray-950 text-[#1f2937] dark:text-gray-100">
+            {/* ── Top chrome ── */}
             <DocumentShowHeader
-                partnerName={document.partner_name}
-                numberSerie={document.number_serie}
+                document={document}
                 onClose={() => navigate(backPath)}
             />
+            <DocumentShowFloatingActions document={document} activeCompany={activeCompany} />
 
+            {/* ── Content area ── */}
             <div className="flex flex-1 overflow-hidden">
-                <main className="flex-1 overflow-y-auto p-6 md:p-12 flex flex-col items-center relative gap-8">
+                <main className="flex-1 overflow-y-auto p-6 md:p-12 flex flex-col items-center relative">
                     <DocumentShowPaper
                         document={document}
                         activeCompany={activeCompany}
                     />
-                    <DocumentShowFloatingActions document={document} activeCompany={activeCompany} />
                 </main>
 
                 <DocumentShowSidebar document={document} />

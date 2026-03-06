@@ -176,4 +176,5 @@ export const TYPES = {
 	IndexDocumentsUseCase: Symbol.for('IndexDocumentsUseCase'),
 	GetDocumentUseCase: Symbol.for('GetDocumentUseCase'),
 	CreateDocumentUseCase: Symbol.for('CreateDocumentUseCase'),
+	UpdateDocumentUseCase: Symbol.for('UpdateDocumentUseCase'),
 };

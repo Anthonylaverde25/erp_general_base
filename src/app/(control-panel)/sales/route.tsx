@@ -3,6 +3,7 @@ import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
 
 const SalesPage = lazy(() => import('@/ui/documents/pages/SalesPage'));
 const CreateSalesDocumentPage = lazy(() => import('@/ui/documents/pages/CreateSalesDocumentPage'));
+const EditSalesDocumentPage = lazy(() => import('@/ui/documents/pages/EditSalesDocumentPage'));
 const DocumentShowPage = lazy(() => import('@/ui/documents/pages/DocumentShowPage'));
 const PartnersPage = lazy(() => import('@/ui/partners/pages/PartnersPage'));
 
@@ -16,6 +17,10 @@ const route: FuseRouteItemType = {
 		{
 			path: 'view/:documentId',
 			element: <DocumentShowPage />
+		},
+		{
+			path: 'edit/:code/:documentId',
+			element: <EditSalesDocumentPage />
 		},
 		{
 			path: ':code?',

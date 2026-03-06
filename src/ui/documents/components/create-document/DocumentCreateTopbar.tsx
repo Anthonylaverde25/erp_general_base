@@ -91,7 +91,7 @@ export default function DocumentCreateTopbar({
 				>
 					{isCreating ? 'Guardando...' : 'Guardar Borrador'}
 				</Button>
-				{/* <FormControl
+				<FormControl
 					size="small"
 					className="doc-theme-select"
 				>
@@ -110,7 +110,7 @@ export default function DocumentCreateTopbar({
 							</MenuItem>
 						))}
 					</Select>
-				</FormControl> */}
+				</FormControl>
 				<Button
 					variant="contained"
 					size="small"
