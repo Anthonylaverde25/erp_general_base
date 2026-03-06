@@ -20,7 +20,7 @@ interface DocumentCreatePageProps {
 export default function DocumentCreatePage({
 	operation,
 }: DocumentCreatePageProps) {
-	const [gridTheme, setGridTheme] = useState<DocumentGridTheme>("material");
+	const [gridTheme, setGridTheme] = useState<DocumentGridTheme>("alpine");
 	const [discountEnabled, setDiscountEnabled] = useState(false);
 	const [tableVersion, setTableVersion] = useState<"v1" | "v2">("v1");
 
@@ -34,7 +34,7 @@ export default function DocumentCreatePage({
 				/>
 
 				<main className="doc-create-main">
-					<Box display="flex" justifyContent="space-between" alignItems="center" bgcolor="#f5f5f5" p={1} borderRadius={1} mb={2} mx={2} mt={2}>
+					{/* <Box display="flex" justifyContent="space-between" alignItems="center" bgcolor="#f5f5f5" p={1} borderRadius={1} mb={2} mx={2} mt={2}>
 						<Typography variant="body2" fontWeight="bold" color="text.secondary">
 							Versión de Tabla (Testing)
 						</Typography>
@@ -54,7 +54,7 @@ export default function DocumentCreatePage({
 								Nuevo 2 (MUI Nativo)
 							</ToggleButton>
 						</ToggleButtonGroup>
-					</Box>
+					</Box> */}
 
 					<DocumentCreateMetaGrid />
 

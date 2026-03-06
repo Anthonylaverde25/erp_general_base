@@ -14,7 +14,7 @@ const Root = styled(FusePageCarded)(() => ({
 export default function PurchasesPage() {
 	const navigate = useNavigate();
 	const { code } = useParams();
-	const { data: documents, isLoading } = useIndexDocuments({
+	const { data: documents, isLoading, refetch } = useIndexDocuments({
 		operation: 'purchase',
 		document_type_code: code
 	});
@@ -40,6 +40,7 @@ export default function PurchasesPage() {
 					documents={documents}
 					isLoading={isLoading}
 					operation="purchase"
+					onStatusUpdated={() => refetch()}
 				/>
 			}
 		/>

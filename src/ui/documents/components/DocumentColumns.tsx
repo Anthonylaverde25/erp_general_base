@@ -4,7 +4,10 @@ import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 import { Link } from 'react-router';
 import { format } from 'date-fns';
 
-export const getDocumentColumns = (operation: 'sale' | 'purchase'): MRT_ColumnDef<DocumentEntity>[] => {
+export const getDocumentColumns = (
+    operation: 'sale' | 'purchase',
+    onStatusClick?: (document: DocumentEntity) => void
+): MRT_ColumnDef<DocumentEntity>[] => {
     const basePath = operation === 'sale' ? '/sales' : '/purchases';
 
     return [
@@ -82,20 +85,43 @@ export const getDocumentColumns = (operation: 'sale' | 'purchase'): MRT_ColumnDe
             }
         },
         {
-            accessorKey: 'status',
+            accessorKey: 'status.name',
             header: 'Estado',
             size: 120,
             Cell: ({ row }) => {
                 const status = row.original.status;
-                let color: 'default' | 'success' | 'warning' | 'error' = 'default';
+                if (!status) return null;
 
-                switch (status) {
-                    case 'issued': color = 'success'; break;
-                    case 'draft': color = 'warning'; break;
-                    case 'cancelled': color = 'error'; break;
+                // Mapear colores de status object a las variantes validas del MUI Chip
+                let muiColor: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+                const validColors = ['default', 'primary', 'secondary', 'error', 'info', 'success', 'warning'];
+
+                // Mapeos adicionales opcionales para adaptar si es 'success', 'warning', etc.
+                if (status.color && validColors.includes(status.color)) {
+                    muiColor = status.color as any;
+                } else if (status.key === 'issued') {
+                    muiColor = 'success';
+                } else if (status.key === 'draft') {
+                    muiColor = 'warning';
+                } else if (status.key === 'cancelled') {
+                    muiColor = 'error';
                 }
 
-                return <Chip label={status} size="small" color={color} sx={{ textTransform: 'capitalize', fontSize: '0.75rem', height: 20 }} />;
+                return (
+                    <Chip
+                        label={status.name}
+                        size="small"
+                        variant="filled"
+                        color={muiColor}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (onStatusClick) {
+                                onStatusClick(row.original);
+                            }
+                        }}
+                        sx={{ fontSize: '0.75rem', cursor: 'pointer' }}
+                    />
+                );
             }
         },
         {

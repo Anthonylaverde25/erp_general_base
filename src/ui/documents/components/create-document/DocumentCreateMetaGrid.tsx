@@ -1,4 +1,4 @@
-import { useFormContext, Controller } from "react-hook-form";
+import { useFormContext, Controller, useWatch } from "react-hook-form";
 import { DocumentFormValues } from "../../schemas/documentSchema";
 import { useDocumentCreate } from "../../context/DocumentCreateContext";
 import { CURRENCY_OPTIONS } from "./types";
@@ -11,6 +11,9 @@ export default function DocumentCreateMetaGrid() {
     numberSeries,
     copy,
   } = useDocumentCreate();
+
+  const selectedPartnerId = useWatch({ control, name: "partner_id" });
+  const selectedPartner = partnerOptions.find((p) => String(p.id) === String(selectedPartnerId));
 
   return (
     <section className="doc-meta-grid">
@@ -29,6 +32,13 @@ export default function DocumentCreateMetaGrid() {
             </option>
           ))}
         </select>
+        {selectedPartner && (selectedPartner.cif || selectedPartner.vat_number) && (
+          <div style={{ fontSize: '0.52rem', color: 'var(--doc-text-muted)', marginTop: '0.15rem', display: 'flex', gap: '0.4rem', fontWeight: 600 }}>
+            {selectedPartner.cif && <span>CIF: {selectedPartner.cif}</span>}
+            {selectedPartner.cif && selectedPartner.vat_number && <span>|</span>}
+            {selectedPartner.vat_number && <span>VAT: {selectedPartner.vat_number}</span>}
+          </div>
+        )}
       </div>
 
       <div className="doc-meta-cell">

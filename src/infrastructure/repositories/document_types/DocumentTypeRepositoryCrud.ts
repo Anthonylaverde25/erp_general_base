@@ -3,6 +3,7 @@ import axiosInstance from '@/lib/@axios';
 import { IDocumentTypeRepository } from '@/domain/entities/document_types/repositories/document-type.interface.repository';
 import { DocumentTypeEntity } from '@/domain/entities/document_types/DocumentTypeEntity';
 import { DocumentTypeMapper } from '@/domain/entities/document_types/Mappers/DocumentTypeMapper';
+import { DocumentStatus } from '@/domain/entities/documents/DocumentEntity';
 
 @injectable()
 export class DocumentTypeRepositoryCrud implements IDocumentTypeRepository {
@@ -20,5 +21,12 @@ export class DocumentTypeRepositoryCrud implements IDocumentTypeRepository {
 			params: { module }
 		});
 		return DocumentTypeMapper.fromDetailDTOList(document_types);
+	}
+
+	async getStatusesByCode(code: string): Promise<DocumentStatus[]> {
+		const {
+			data: { statuses }
+		} = await axiosInstance.get(`document-types/${code}/statuses`);
+		return statuses;
 	}
 }

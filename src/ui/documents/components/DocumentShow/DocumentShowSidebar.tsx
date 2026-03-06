@@ -65,7 +65,7 @@ export default function DocumentShowSidebar({ document }: DocumentShowSidebarPro
 
                                     <div className="flex items-center gap-2 mt-4 bg-gray-50 dark:bg-gray-800/50 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-700 dark:text-gray-300">
                                         <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                        Status: <span className="capitalize text-gray-900 dark:text-gray-100">{document.status || "Borrador"}</span>
+                                        Status: <span className="capitalize text-gray-900 dark:text-gray-100">{document.status?.name || "Borrador"}</span>
                                     </div>
                                 </div>
                             </section>

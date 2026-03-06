@@ -25,7 +25,7 @@ interface DocumentCreateContextValue {
     onSubmitDraft: (e?: React.BaseSyntheticEvent) => Promise<void>;
     onSubmitIssue: (e?: React.BaseSyntheticEvent) => Promise<void>;
     isCreating: boolean;
-    partnerOptions: { id: string | number; name: string }[];
+    partnerOptions: { id: string | number; name: string; cif?: string; vat_number?: string }[];
     numberSeries: NumberSeriesEntity[];
     currentDocumentType: any;
     copy: DocumentCreateCopy;
@@ -145,9 +145,9 @@ export function DocumentCreateProvider({
         };
     }, [formLines, applyRetention]);
 
-    const buildPayload = (data: DocumentFormValues, status: 'draft' | 'issued') => ({
+    const buildPayload = (data: DocumentFormValues, statusKey: 'draft' | 'issued') => ({
         ...data,
-        status,
+        status_key: statusKey,
         lines: data.lines
             .filter((i) => i.code || i.description)
             .map((i) => ({
@@ -161,16 +161,21 @@ export function DocumentCreateProvider({
             })),
     });
 
-    const submitWithStatus = (status: 'draft' | 'issued') => (data: DocumentFormValues) => {
-        createDocument(buildPayload(data, status) as any, {
-            onSuccess: () => {
-                navigate(`/${operation === "sale" ? "sales" : "purchases"}`);
+    const submitWithStatus = (statusKey: 'draft' | 'issued') => (data: DocumentFormValues) => {
+        createDocument(buildPayload(data, statusKey) as any, {
+            onSuccess: (responseData) => {
+                navigate(`/${operation === "sale" ? "sales" : "purchases"}/view/${responseData.id}`);
             },
         });
     };
 
     const partnerOptions = useMemo(() => {
-        return partners?.map((p) => ({ id: p.id!, name: p.name })) || [];
+        return partners?.map((p) => ({
+            id: p.id!,
+            name: p.name,
+            cif: p.cif,
+            vat_number: p.vat_number
+        })) || [];
     }, [partners]);
 
     const copy = COPY_BY_OPERATION[operation];

@@ -277,7 +277,7 @@ const DocumentPDF = ({ document, activeCompany }: DocumentPDFProps) => {
                         <Text style={styles.infoLabel}>Detalles</Text>
                         <View style={styles.summaryRow}>
                             <Text style={styles.summaryLabel}>Estado</Text>
-                            <Text style={styles.statusBadge}>{document.status || 'Borrador'}</Text>
+                            <Text style={styles.statusBadge}>{document.status?.name || 'Borrador'}</Text>
                         </View>
                         <View style={styles.summaryRow}>
                             <Text style={styles.summaryLabel}>Vencimiento</Text>

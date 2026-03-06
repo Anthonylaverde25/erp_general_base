@@ -1,3 +1,12 @@
+export interface DocumentStatus {
+    id: number;
+    name: string;
+    key: string;
+    color: string;
+    icon: string;
+    is_final: boolean;
+}
+
 export interface DocumentLineTax {
     id?: number;
     document_line_id?: number;
@@ -41,7 +50,7 @@ export class DocumentEntity {
         public readonly id: number,
         public readonly company_id: number,
         public readonly operation: 'sale' | 'purchase',
-        public readonly status: string,
+        public readonly status: DocumentStatus,
         public readonly issue_date: string | null,
         public readonly due_date: string | null,
         public readonly number_serie: string | null,
@@ -52,6 +61,7 @@ export class DocumentEntity {
         public readonly partner_email: string | null,
         public readonly partner_address: string | null,
         public readonly document_type_name: string | null,
+        public readonly document_type_code: string | null,
         public readonly issue_date_raw: string | null,
         public readonly due_date_raw: string | null,
         public readonly lines: DocumentLine[],
@@ -120,6 +130,7 @@ export class DocumentEntity {
             defaultContact?.email || fallbackContact?.email || json.partner_snapshot?.email || null,
             json.partner?.address || json.partner_address || json.partner_snapshot?.address || null,
             json.document_type?.name || json.document_type_name || null,
+            json.document_type_code || null,
             json.issue_date || null,
             json.due_date || null,
             lines,

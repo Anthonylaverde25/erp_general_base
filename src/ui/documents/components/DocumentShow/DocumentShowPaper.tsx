@@ -148,7 +148,7 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                             <div className="flex justify-between items-center text-[12px]">
                                 <span className="text-slate-400">Estado</span>
                                 <span className="font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest text-[9px] bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded">
-                                    {document.status || 'Borrador'}
+                                    {document.status?.name || 'Borrador'}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-[12px]">

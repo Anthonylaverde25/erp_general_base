@@ -14,7 +14,7 @@ const Root = styled(FusePageCarded)(() => ({
 export default function SalesPage() {
 	const navigate = useNavigate();
 	const { code } = useParams();
-	const { data: documents, isLoading } = useIndexDocuments({
+	const { data: documents, isLoading, refetch } = useIndexDocuments({
 		operation: 'sale',
 		document_type_code: code
 	});
@@ -46,6 +46,7 @@ export default function SalesPage() {
 					documents={documents}
 					isLoading={isLoading}
 					operation="sale"
+					onStatusUpdated={() => refetch()}
 				/>
 			}
 		/>

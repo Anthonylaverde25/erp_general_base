@@ -142,7 +142,7 @@ export default function DocumentAgGridTable({ documents, isLoading, operation = 
             }
         },
         {
-            field: 'status',
+            field: 'status.name',
             headerName: 'Estado',
             width: 120,
             filter: 'agTextColumnFilter',
@@ -152,27 +152,29 @@ export default function DocumentAgGridTable({ documents, isLoading, operation = 
                 placeholder: 'Filtrar estado...'
             },
             cellRenderer: (params: ICellRendererParams<DocumentEntity>) => {
-                const status = params.value;
+                const status = params.data?.status;
                 if (!status) return null;
-                const config: Record<string, { color: string, label: string }> = {
-                    issued: { color: '#22c55e', label: 'Emitido' },
-                    draft: { color: '#f59e0b', label: 'Borrador' },
-                    cancelled: { color: '#ef4444', label: 'Anulado' }
-                };
-                const { color, label } = config[status] || { color: '#64748b', label: status };
+
+                // Conversión de color MUI a HEX para estilos adhoc en base a la key principal si no hay color provisto o distinto.
+                let hexColor = '#64748b'; // default slate-500
+                if (status.color === 'primary') hexColor = '#1976d2';
+                else if (status.color === 'success' || status.key === 'issued') hexColor = '#22c55e';
+                else if (status.color === 'warning' || status.key === 'draft') hexColor = '#f59e0b';
+                else if (status.color === 'error' || status.key === 'cancelled') hexColor = '#ef4444';
+                else if (status.color === 'info') hexColor = '#0ea5e9';
 
                 return (
                     <Box className="flex items-center h-full">
                         <Chip
-                            label={label}
+                            label={status.name}
                             size="small"
                             sx={{
-                                bgcolor: `${color}15`,
-                                color: color,
+                                bgcolor: `${hexColor}15`,
+                                color: hexColor,
                                 fontWeight: 700,
                                 fontSize: '0.65rem',
                                 height: 20,
-                                border: `1px solid ${color}30`,
+                                border: `1px solid ${hexColor}30`,
                                 textTransform: 'uppercase'
                             }}
                         />
