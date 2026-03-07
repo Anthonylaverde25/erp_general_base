@@ -26,13 +26,14 @@ interface UseDocumentSubmitOptions {
     operation: DocumentOperation;
     isEditMode: boolean;
     documentId?: string;
+    fromDocumentId?: string | null;
 }
 
 /**
  * Returns submit handlers for draft and issue actions.
  * Automatically dispatches create or update depending on isEditMode.
  */
-export function useDocumentSubmit({ operation, isEditMode, documentId }: UseDocumentSubmitOptions) {
+export function useDocumentSubmit({ operation, isEditMode, documentId, fromDocumentId }: UseDocumentSubmitOptions) {
     const navigate = useNavigate();
     const { mutate: createDocument, isPending: isCreatingNew } = useCreateDocument();
     const { mutate: updateDocument, isPending: isUpdating } = useUpdateDocument();
@@ -40,6 +41,11 @@ export function useDocumentSubmit({ operation, isEditMode, documentId }: UseDocu
     const basePath = operation === "sale" ? "sales" : "purchases";
 
     const submitWithStatus = (statusKey: "draft" | "issued") => (data: DocumentFormValues) => {
+        if (statusKey !== "draft" && operation === "sale" && !data.number_series_id) {
+            alert("Debe seleccionar una Serie de Numeración para emitir o validar este documento.");
+            return;
+        }
+
         const payload = buildPayload(data, statusKey) as any;
 
         if (isEditMode && documentId) {
@@ -47,6 +53,9 @@ export function useDocumentSubmit({ operation, isEditMode, documentId }: UseDocu
                 onSuccess: (res) => navigate(`/${basePath}/view/${res.id}`),
             });
         } else {
+            if (fromDocumentId) {
+                payload.parent_document_id = fromDocumentId;
+            }
             createDocument(payload, {
                 onSuccess: (res) => navigate(`/${basePath}/view/${res.id}`),
             });

@@ -25,15 +25,18 @@ export function useDocumentNumberSeries({
     useEffect(() => {
         if (isEditMode || !numberSeries || numberSeries.length === 0) return;
 
-        const activeSeriesId = selectedNumberSeries || numberSeries[0].id;
-        if (!selectedNumberSeries) setValue("number_series_id", activeSeriesId);
+        // Si el usuario ha seleccionado una serie, previsualizamos el numero
+        if (selectedNumberSeries) {
+            const activeSeries = numberSeries.find(
+                (ns) => String(ns.id) === String(selectedNumberSeries),
+            );
 
-        const activeSeries = numberSeries.find(
-            (ns) => String(ns.id) === String(activeSeriesId),
-        );
-        if (activeSeries) {
-            const nextNum = String(activeSeries.current_number + 1).padStart(4, "0");
-            setValue("number", `${activeSeries.serie}-${activeSeries.year}-${nextNum}`);
+            if (activeSeries) {
+                const nextNum = String(activeSeries.current_number + 1).padStart(4, "0");
+                setValue("number", `${activeSeries.serie}-${activeSeries.year}-${nextNum}`);
+            }
+        } else {
+            setValue("number", "");
         }
     }, [numberSeries, selectedNumberSeries, setValue, isEditMode]);
 }

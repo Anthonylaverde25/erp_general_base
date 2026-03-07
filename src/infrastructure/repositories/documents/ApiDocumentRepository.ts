@@ -32,4 +32,11 @@ export class ApiDocumentRepository implements DocumentRepositoryInterface {
         } = await axiosInstance.put(`documents/${id}`, data);
         return DocumentEntity.fromJson(updatedDoc);
     }
+
+    async convert(id: string): Promise<DocumentEntity> {
+        const {
+            data: { data: invoice }
+        } = await axiosInstance.post(`documents/${id}/convert`);
+        return DocumentEntity.fromJson(invoice);
+    }
 }

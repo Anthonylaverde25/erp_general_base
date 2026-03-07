@@ -26,7 +26,7 @@ export const documentSchema = z.object({
     number_series_id: z.union([z.string(), z.number()]).optional(),
     issue_date: z.string().min(1, "La fecha de emisión es obligatoria"),
     due_date: z.string().optional(),
-    number: z.string().min(1, "El número de documento es obligatorio"),
+    number: z.string().optional(),
     currency: z.string().min(1, "La divisa es obligatoria"),
     notes: z.string().optional(),
     tag: z.string().optional(),

@@ -1,11 +1,14 @@
-import { Truck, FileText, RotateCcw, Package, CheckCircle, SendHorizonal, ClipboardCheck, ChevronRight } from 'lucide-react';
+import { Truck, FileText, RotateCcw, Package, CheckCircle, SendHorizonal, ClipboardCheck, ChevronRight, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import DocumentPDF from './DocumentPDF';
 import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 import { CompanyEntity } from '@/domain/entities/companies/Company';
 import { useUpdateDocument } from '@/features/documents/hooks/useUpdateDocument';
+import { useConvertDocument } from '@/features/documents/hooks/useConvertDocument';
 import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { ConversionSeriesModal } from './ConversionSeriesModal';
 
 interface FloatingActionsProps {
     document: DocumentEntity;
@@ -68,6 +71,8 @@ export default function DocumentShowFloatingActions({ document, activeCompany }:
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { mutate: updateDocument, isPending: isUpdating } = useUpdateDocument();
+    const { mutate: convertDocument, isPending: isConverting } = useConvertDocument();
+    const [conversionModalOpen, setConversionModalOpen] = useState(false);
 
     const statusKey = document.status?.key || '';
     const operation = document.operation;
@@ -79,11 +84,28 @@ export default function DocumentShowFloatingActions({ document, activeCompany }:
     const isRevertible = ['validated', 'approved'].includes(statusKey);
     const currentIdx = steps?.findIndex(s => s.key === statusKey) ?? -1;
 
+    // True when this delivery note was already converted
+    const isAlreadyInvoiced = statusKey === 'invoiced';
+    // Show conversion / return actions when the DLV/PDLV is in its terminal delivered state
+    const showPostDeliveredActions =
+        DELIVERY_CODES.includes(docTypeCode) &&
+        (statusKey === 'delivered' || statusKey === 'received' || isAlreadyInvoiced);
+
     const handleStatusChange = (newStatus: string) => {
         updateDocument(
             { id: String(document.id), data: { status_key: newStatus } },
             { onSuccess: () => queryClient.invalidateQueries({ queryKey: ['document', String(document.id)] }) }
         );
+    };
+
+    const handleConvertToInvoice = (payload: { number_series_id: number; status_key: string }) => {
+        convertDocument({ id: String(document.id), payload }, {
+            onSuccess: (invoice) => {
+                setConversionModalOpen(false);
+                // Navigate directly to the brand-new invoice
+                navigate(`/${module}/view/${invoice.id}`);
+            },
+        });
     };
 
     return (
@@ -143,27 +165,43 @@ export default function DocumentShowFloatingActions({ document, activeCompany }:
                     </div>
                 )}
 
-                {/* secondary: post-delivered actions for delivery notes */}
-                {DELIVERY_CODES.includes(docTypeCode) && statusKey === 'delivered' && (
+                {/* post-delivered actions: convert to invoice + return */}
+                {showPostDeliveredActions && (
                     <div className="flex items-center gap-1 px-2">
+                        {/* Convert to invoice 1 (Frontend form) */}
                         <button
-                            onClick={() => navigate(`/${module}/create/${operation === 'sale' ? 'INV' : 'PINV'}`)}
-                            className="px-2 py-1 text-[11px] font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 uppercase tracking-wide flex items-center gap-1 transition-colors"
+                            onClick={() => navigate(`/${module}/create/${operation === 'sale' ? 'INV' : 'PINV'}?from_document_id=${document.id}`)}
+                            disabled={isAlreadyInvoiced}
+                            title={isAlreadyInvoiced ? 'Este albarán ya fue facturado' : 'Ir a pre-factura'}
+                            className="px-2 py-1 text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 uppercase tracking-wide flex items-center gap-1 transition-colors disabled:opacity-40"
                         >
                             <FileText className="w-3 h-3" />
-                            Crear Factura
+                            Crear Factura 1 (UI)
                         </button>
+
+                        {/* Convert to invoice 2 (Backend instant) — disabled once already invoiced */}
                         <button
-                            onClick={() => navigate(`/${module}/create/${operation === 'sale' ? 'SDLV' : 'PRDLV'}`)}
-                            className="px-2 py-1 text-[11px] font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 uppercase tracking-wide flex items-center gap-1 transition-colors"
+                            onClick={() => setConversionModalOpen(true)}
+                            disabled={isAlreadyInvoiced}
+                            title={isAlreadyInvoiced ? 'Este albarán ya fue facturado' : 'Convertir instantáneamente'}
+                            className="px-2 py-1 text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 uppercase tracking-wide flex items-center gap-1 transition-colors disabled:opacity-40"
                         >
-                            <Package className="w-3 h-3" />
-                            Devolución
+                            <FileText className="w-3 h-3" />
+                            Crear Factura 2 (API)
                         </button>
+                        {/* Return — only available while not yet invoiced */}
+                        {!isAlreadyInvoiced && (
+                            <button
+                                onClick={() => navigate(`/${module}/create/${operation === 'sale' ? 'SDLV' : 'PRDLV'}`)}
+                                className="px-2 py-1 text-[11px] font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 uppercase tracking-wide flex items-center gap-1 transition-colors"
+                            >
+                                <Package className="w-3 h-3" />
+                                Devolución
+                            </button>
+                        )}
                     </div>
                 )}
 
-                {/* PRIMARY CTA */}
                 {nextAction && (
                     <div className="flex items-center pl-3">
                         <button
@@ -177,6 +215,14 @@ export default function DocumentShowFloatingActions({ document, activeCompany }:
                     </div>
                 )}
             </div>
+
+            <ConversionSeriesModal
+                open={conversionModalOpen}
+                onClose={() => setConversionModalOpen(false)}
+                document={document}
+                onConvert={handleConvertToInvoice}
+                isConverting={isConverting}
+            />
         </div>
     );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DocumentEntity, DocumentStatus } from '@/domain/entities/documents/DocumentEntity';
 import axiosInstance from '@/lib/@axios';
+import useIndexNumberSeries from '@/features/number_series/hooks/useIndexNumberSeries';
 
 export function useDocumentStatus(
     open: boolean,
@@ -12,6 +13,21 @@ export function useDocumentStatus(
     const [availableStatuses, setAvailableStatuses] = useState<DocumentStatus[]>([]);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [selectedSeriesId, setSelectedSeriesId] = useState<number | ''>('');
+
+    const isSales = document?.operation === 'sale';
+    const isDraft = document?.status?.key === 'draft';
+    const needsSeriesSelection = isSales && isDraft && selectedKey !== 'draft' && !document?.number_serie;
+
+    const { numberSeries, isLoading: isLoadingSeries } = useIndexNumberSeries(
+        needsSeriesSelection ? document?.document_type_code : undefined
+    );
+
+    useEffect(() => {
+        if (needsSeriesSelection && numberSeries && numberSeries.length > 0 && !selectedSeriesId) {
+            setSelectedSeriesId(numberSeries[0].id);
+        }
+    }, [numberSeries, needsSeriesSelection, selectedSeriesId]);
 
     useEffect(() => {
         if (document?.status) {
@@ -41,6 +57,7 @@ export function useDocumentStatus(
         try {
             await axiosInstance.put(`documents/${document.id}`, {
                 status_key: selectedKey,
+                ...(needsSeriesSelection && selectedSeriesId ? { number_series_id: selectedSeriesId } : {})
             });
             onStatusUpdated?.();
             onClose();
@@ -60,6 +77,11 @@ export function useDocumentStatus(
         loading,
         saving,
         handleSave,
-        hasChanged
+        hasChanged,
+        needsSeriesSelection,
+        numberSeries,
+        isLoadingSeries,
+        selectedSeriesId,
+        setSelectedSeriesId
     };
 }

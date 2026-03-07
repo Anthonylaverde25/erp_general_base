@@ -6,6 +6,7 @@ import { IndexDocumentsUseCase } from '@/application/use_cases/documents/IndexDo
 import { GetDocumentUseCase } from '@/application/use_cases/documents/GetDocumentUseCase';
 import { CreateDocumentUseCase } from '@/application/use_cases/documents/CreateDocumentUseCase';
 import { UpdateDocumentUseCase } from '@/application/use_cases/documents/UpdateDocumentUseCase';
+import { ConvertDocumentUseCase } from '@/application/use_cases/documents/ConvertDocumentUseCase';
 
 export const registerDocumentModule = (container: Container) => {
     container.bind<DocumentRepositoryInterface>(TYPES.IDocumentRepository).to(ApiDocumentRepository).inSingletonScope();
@@ -13,4 +14,5 @@ export const registerDocumentModule = (container: Container) => {
     container.bind<GetDocumentUseCase>(TYPES.GetDocumentUseCase).to(GetDocumentUseCase);
     container.bind<CreateDocumentUseCase>(TYPES.CreateDocumentUseCase).to(CreateDocumentUseCase);
     container.bind<UpdateDocumentUseCase>(TYPES.UpdateDocumentUseCase).to(UpdateDocumentUseCase);
+    container.bind<ConvertDocumentUseCase>(TYPES.ConvertDocumentUseCase).to(ConvertDocumentUseCase);
 };

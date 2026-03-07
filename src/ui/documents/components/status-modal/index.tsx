@@ -18,7 +18,12 @@ export default function DocumentStatusModal({ open, onClose, document, onStatusU
         loading,
         saving,
         handleSave,
-        hasChanged
+        hasChanged,
+        needsSeriesSelection,
+        numberSeries,
+        isLoadingSeries,
+        selectedSeriesId,
+        setSelectedSeriesId
     } = useDocumentStatus(open, document, onClose, onStatusUpdated);
 
     if (!document) return null;
@@ -52,6 +57,11 @@ export default function DocumentStatusModal({ open, onClose, document, onStatusU
                     selectedKey={selectedKey}
                     availableStatuses={availableStatuses}
                     onStatusChange={setSelectedKey}
+                    needsSeriesSelection={needsSeriesSelection}
+                    numberSeries={numberSeries}
+                    isLoadingSeries={isLoadingSeries}
+                    selectedSeriesId={selectedSeriesId}
+                    onSeriesChange={setSelectedSeriesId}
                 />
             </DialogContent>
             <DialogActions sx={{ p: 2, gap: 1 }}>
@@ -68,7 +78,7 @@ export default function DocumentStatusModal({ open, onClose, document, onStatusU
                     variant="contained"
                     color="secondary"
                     autoFocus
-                    disabled={!hasChanged || saving || loading}
+                    disabled={!hasChanged || saving || loading || (needsSeriesSelection && !selectedSeriesId)}
                     sx={{ textTransform: 'none', fontWeight: 600, px: 3 }}
                 >
                     {saving ? <CircularProgress size={20} color="inherit" /> : 'Actualizar'}

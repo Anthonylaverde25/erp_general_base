@@ -47,24 +47,41 @@ export function mapDocumentToFormValues(doc: DocumentEntity): Partial<DocumentFo
     };
 }
 
+/** Maps a DocumentEntity (API) → DocumentFormValues for PRE-FILLING a new document (e.g. Albaran -> Factura) */
+export function mapSourceDocumentToFormValues(doc: DocumentEntity, targetCode: string): Partial<DocumentFormValues> {
+    const base = mapDocumentToFormValues(doc);
+    return {
+        ...base,
+        document_type_code: targetCode,
+        number_series_id: "", // Let the user or auto-select choose the series
+        number: "",
+        issue_date: new Date().toISOString().split("T")[0], // Today
+        due_date: "", // User must re-calculate or input
+    };
+}
+
 interface UseDocumentFormOptions {
     code?: string;
     itemType: "item" | "service";
     isEditMode: boolean;
     existingDocument: DocumentEntity | undefined;
+    sourceDocument?: DocumentEntity | undefined;
 }
 
 /**
  * Sets up react-hook-form for document create/edit.
  * Uses the `values` prop to auto-sync the form when `existingDocument` loads.
  */
-export function useDocumentForm({ code, itemType, isEditMode, existingDocument }: UseDocumentFormOptions) {
+export function useDocumentForm({ code, itemType, isEditMode, existingDocument, sourceDocument }: UseDocumentFormOptions) {
     const existingFormValues = useMemo<Partial<DocumentFormValues> | undefined>(() => {
         if (isEditMode && existingDocument) {
             return mapDocumentToFormValues(existingDocument);
         }
+        if (!isEditMode && sourceDocument && code) {
+            return mapSourceDocumentToFormValues(sourceDocument, code);
+        }
         return undefined;
-    }, [isEditMode, existingDocument]);
+    }, [isEditMode, existingDocument, sourceDocument, code]);
 
     const methods = useForm<DocumentFormValues>({
         resolver: zodResolver(documentSchema),

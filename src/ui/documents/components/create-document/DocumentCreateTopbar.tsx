@@ -2,7 +2,7 @@ import { ArrowBack } from '@mui/icons-material';
 import { Button, FormControl, IconButton, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
 import type { DocumentGridTheme, DocumentGridThemeOption } from './types';
 import { useDocumentCreate } from '../../context/DocumentCreateContext';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 interface DocumentCreateTopbarProps {
 	gridTheme: DocumentGridTheme;
@@ -22,6 +22,8 @@ export default function DocumentCreateTopbar({
 	onGridThemeChange,
 }: DocumentCreateTopbarProps) {
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
+	const fromDocumentId = searchParams.get("from_document_id");
 	const {
 		currentDocumentType,
 		copy,
@@ -38,7 +40,9 @@ export default function DocumentCreateTopbar({
 
 	const itemTypeLabel = itemType === 'service' ? 'Servicios' : 'Artículos';
 	const title = currentDocumentType
-		? `Nuevo: ${currentDocumentType.name} (${itemTypeLabel})`
+		? fromDocumentId
+			? `Conversión: ${currentDocumentType.name} (${itemTypeLabel})`
+			: `Nuevo: ${currentDocumentType.name} (${itemTypeLabel})`
 		: copy.title;
 
 	const statusLabel = isDraftMode ? "BORRADOR" : "NUEVO";

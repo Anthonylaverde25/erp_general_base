@@ -57,19 +57,23 @@ export function DocumentCreateProvider({
     const [searchParams] = useSearchParams();
     const mode = searchParams.get("mode");
     const itemType = (searchParams.get("item_type") as "service" | "item") || "item";
+    const fromDocumentId = searchParams.get("from_document_id");
     const isEditMode = !!documentId;
 
     // ─── Data fetching ──────────────────────────────────────────────────────
     const { documentTypes } = useIndexDocumentTypesByModule(operation.toUpperCase());
     const partnerType = operation === "sale" ? "customer" : "vendor";
     const { data: partners } = useIndexPartners(partnerType);
-    const { data: existingDocument, isLoading: isLoadingDocument } = useGetDocument(documentId || "");
+    const { data: existingDocument, isLoading: isLoadingExisting } = useGetDocument(documentId || "");
+    const { data: sourceDocument, isLoading: isLoadingSource } = useGetDocument(fromDocumentId || "");
+
+    const isLoadingDocument = isLoadingExisting || isLoadingSource;
 
     const currentDocumentTypeCode = code || documentTypes?.[0]?.code;
     const { numberSeries } = useIndexNumberSeries(currentDocumentTypeCode);
 
     // ─── Form setup ─────────────────────────────────────────────────────────
-    const methods = useDocumentForm({ code, itemType, isEditMode, existingDocument });
+    const methods = useDocumentForm({ code, itemType, isEditMode, existingDocument, sourceDocument });
     const { watch, setValue, handleSubmit } = methods;
     const formLines = watch("lines");
     const applyRetention = watch("apply_retention");
@@ -98,6 +102,7 @@ export function DocumentCreateProvider({
         operation,
         isEditMode,
         documentId,
+        fromDocumentId,
     });
 
     // ─── Partner options ─────────────────────────────────────────────────────
