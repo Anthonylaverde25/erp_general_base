@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { X, RefreshCcw, Share2, MoreHorizontal, PenLine, Printer, Download } from "lucide-react";
 import { useNavigate } from "react-router";
 import { DocumentEntity } from "@/domain/entities/documents/DocumentEntity";
+import { DocumentBreadcrumb } from "../DocumentBreadcrumb";
 
 /** States where the Edit button should be visible in the header */
 const EDITABLE_STATES = ['draft'];
@@ -66,21 +67,16 @@ export default function DocumentShowHeader({
         >
           <X className="w-5 h-5" />
         </button>
-        <h1 className="text-sm font-semibold truncate max-w-[300px] text-[#1f2937] dark:text-gray-100">
-          {document.partner_name} - {document.number_serie || "Borrador"}
-        </h1>
+        <div className=' p-2 flex flex-col gap-1'>
+          <div className="">
+            <h1 className="text-sm font-bold truncate max-w-[300px] text-gray-900 dark:text-gray-100 leading-tight">
+              {document.partner_name} - {document.number_serie || "Borrador"}
+            </h1>
+          </div>
 
-        {/* Status Chip */}
-        <span
-          className="text-[0.65rem] font-bold uppercase px-2 py-0.5 rounded-full"
-          style={{
-            backgroundColor: `${statusColor}15`,
-            color: statusColor,
-            border: `1px solid ${statusColor}30`,
-          }}
-        >
-          {statusName}
-        </span>
+
+        </div>
+
       </div>
 
       <div className="flex items-center gap-2">

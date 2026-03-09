@@ -9,8 +9,11 @@ import DocumentShowHeader from '../components/DocumentShow/DocumentShowHeader';
 import DocumentShowPaper from '../components/DocumentShow/DocumentShowPaper';
 import DocumentShowSidebar from '../components/DocumentShow/DocumentShowSidebar';
 import DocumentShowFloatingActions from '../components/DocumentShow/DocumentShowFloatingActions';
+import { DocumentShowFloatingToolbar } from '../components/DocumentShow/DocumentShowFloatingToolbar';
+import { useState } from 'react';
 
 export default function DocumentShowPage() {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const { documentId } = useParams();
     const navigate = useNavigate();
     const { data: document, isLoading: isDocumentLoading } = useGetDocument(documentId as string);
@@ -24,7 +27,7 @@ export default function DocumentShowPage() {
 
     if (!document) {
         return (
-            <div className="flex items-center justify-center flex-1 h-full h-screen bg-[#f3f4f6] dark:bg-gray-950">
+            <div className="flex items-center justify-center flex-1 h-screen bg-[#f3f4f6] dark:bg-gray-950">
                 <div className="text-center text-[#1f2937] dark:text-gray-100">
                     <h2 className="text-2xl font-bold">Documento no encontrado</h2>
                     <Button onClick={() => navigate('/sales')} className="mt-4">
@@ -53,10 +56,22 @@ export default function DocumentShowPage() {
                         document={document}
                         activeCompany={activeCompany}
                     />
+
                 </main>
 
-                <DocumentShowSidebar document={document} />
+                {/* Sidebar controlled by state */}
+                {sidebarOpen && (
+                    <DocumentShowSidebar
+                        document={document}
+                        onClose={() => setSidebarOpen(false)}
+                    />
+                )}
             </div>
+
+            {/* Floating Toolbar - Only visible when sidebar is closed */}
+            {!sidebarOpen && (
+                <DocumentShowFloatingToolbar onMoreClick={() => setSidebarOpen(true)} />
+            )}
         </div>
     );
 }

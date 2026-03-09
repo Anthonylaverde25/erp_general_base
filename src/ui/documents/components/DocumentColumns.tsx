@@ -33,7 +33,7 @@ export const getDocumentColumns = (
                                 }
                             }}
                         >
-                            {doc.number_serie || '(Borrador)'}
+                            {doc.number_serie || (operation === 'purchase' && doc.external_reference ? doc.external_reference : (doc.status?.key === 'draft' ? '(Borrador)' : 'Sin número'))}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
                             {doc.document_type_name}

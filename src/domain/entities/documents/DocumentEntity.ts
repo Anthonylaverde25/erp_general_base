@@ -45,6 +45,12 @@ export interface DocumentTaxSummary {
     tax_amount: number;
 }
 
+export interface ParentDocumentInfo {
+    id: number;
+    number_serie: string;
+    document_type_name: string | null;
+}
+
 export class DocumentEntity {
     constructor(
         public readonly id: number,
@@ -54,6 +60,7 @@ export class DocumentEntity {
         public readonly issue_date: string | null,
         public readonly due_date: string | null,
         public readonly number_serie: string | null,
+        public readonly external_reference: string | null,
         public readonly subtotal: number,
         public readonly tax_total: number,
         public readonly total: number,
@@ -68,7 +75,8 @@ export class DocumentEntity {
         public readonly number_series_id: number | null,
         public readonly notes: string | null,
         public readonly lines: DocumentLine[],
-        public readonly tax_summaries: DocumentTaxSummary[]
+        public readonly tax_summaries: DocumentTaxSummary[],
+        public readonly parent_document: ParentDocumentInfo | null = null
     ) { }
 
     static fromJson(json: any): DocumentEntity {
@@ -126,6 +134,7 @@ export class DocumentEntity {
             json.issue_date,
             json.due_date,
             json.number_serie,
+            json.external_reference || null,
             Number(json.subtotal ?? 0),
             Number(json.tax_total ?? 0),
             Number(json.total ?? 0),
@@ -140,7 +149,12 @@ export class DocumentEntity {
             json.number_series_id ? Number(json.number_series_id) : null,
             json.notes || null,
             lines,
-            tax_summaries
+            tax_summaries,
+            json.parent_document ? {
+                id: Number(json.parent_document.id),
+                number_serie: json.parent_document.number_serie,
+                document_type_name: json.parent_document.document_type_name
+            } : null
         );
     }
 }
