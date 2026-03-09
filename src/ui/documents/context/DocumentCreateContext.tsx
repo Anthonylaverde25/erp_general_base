@@ -38,6 +38,7 @@ interface DocumentCreateContextValue {
     operation: DocumentOperation;
     isEditMode: boolean;
     isLoadingDocument: boolean;
+    isReadOnly: boolean;
 }
 
 const DocumentCreateContext = createContext<DocumentCreateContextValue | undefined>(undefined);
@@ -129,6 +130,7 @@ export function DocumentCreateProvider({
         operation,
         isEditMode,
         isLoadingDocument,
+        isReadOnly: isEditMode && existingDocument?.status?.key !== 'draft',
     };
 
     return (

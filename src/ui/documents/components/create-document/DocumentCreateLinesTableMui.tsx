@@ -43,10 +43,12 @@ function AutocompleteCell({
     index,
     initialCode,
     onCommit,
+    disabled = false,
 }: {
     index: number;
     initialCode: string;
     onCommit: (idx: number, patch: Partial<DocumentLineItem>) => void;
+    disabled?: boolean;
 }) {
     const { itemType, operation } = useDocumentCreate();
     const { results, setQuery, isLoading } = useSearchItems(itemType);
@@ -64,15 +66,16 @@ function AutocompleteCell({
     useEffect(() => setSelectedIndex(0), [results]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (disabled) return;
         const val = e.target.value;
         setInputValue(val);
         setQuery(val);
         setShowDropdown(val.length >= 1);
         committedRef.current = false;
-        // DON'T call onCommit here — wait for blur or item selection
     };
 
     const applyItem = (selected: ItemSearchResult) => {
+        if (disabled) return;
         setInputValue(selected.name);
         setShowDropdown(false);
         committedRef.current = true;
@@ -91,6 +94,7 @@ function AutocompleteCell({
     };
 
     const handleBlur = () => {
+        if (disabled) return;
         setTimeout(() => setShowDropdown(false), 200);
         // Only commit free text on blur if we didn't already commit via item selection
         if (!committedRef.current && inputValue !== initialCode) {
@@ -99,6 +103,7 @@ function AutocompleteCell({
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (disabled) return;
         if (e.key === 'Escape') {
             setShowDropdown(false);
             return;
@@ -127,12 +132,13 @@ function AutocompleteCell({
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
+                disabled={disabled}
                 placeholder="Buscar artículo o escribir concepto..."
                 fullWidth
-                sx={{ fontSize: '13px' }}
+                sx={{ fontSize: '13px', opacity: disabled ? 0.8 : 1 }}
             />
 
-            {showDropdown && (results.length > 0 || isLoading) && (
+            {showDropdown && !disabled && (results.length > 0 || isLoading) && (
                 <Paper
                     sx={{
                         position: 'absolute',
@@ -185,14 +191,14 @@ function AutocompleteCell({
 
 /* ──────────────────────────────────────────────────────────────
    Main MUI Table Component
-────────────────────────────────────────────────────────────── */
+ ────────────────────────────────────────────────────────────── */
 export default function DocumentCreateLinesTableMui({
     discountEnabled,
 }: {
     discountEnabled: boolean;
 }) {
     const { control, getValues } = useFormContext<DocumentFormValues>();
-    const { isEditMode, isLoadingDocument } = useDocumentCreate();
+    const { isEditMode, isLoadingDocument, isReadOnly } = useDocumentCreate();
 
     const { fields, append, remove, update } = useFieldArray({
         control,
@@ -201,12 +207,12 @@ export default function DocumentCreateLinesTableMui({
 
     // Initialize default 2 lines if empty on mount — skip in edit mode (data comes from reset())
     useEffect(() => {
-        if (isEditMode || isLoadingDocument) return;
+        if (isEditMode || isLoadingDocument || isReadOnly) return;
         const currentLines = getValues('lines');
         if (!currentLines || currentLines.length === 0) {
             append([makeEmptyLine(), makeEmptyLine()]);
         }
-    }, [append, getValues, isEditMode, isLoadingDocument]);
+    }, [append, getValues, isEditMode, isLoadingDocument, isReadOnly]);
 
     /** Commit a partial update to a line (called on blur / item selection only) */
     const commitLinePatch = useCallback((index: number, patch: Partial<DocumentLineItem>) => {
@@ -225,10 +231,12 @@ export default function DocumentCreateLinesTableMui({
     }, [fields, discountEnabled, update]);
 
     const updateLineField = (index: number, field: keyof DocumentLineItem, value: any) => {
+        if (isReadOnly) return;
         commitLinePatch(index, { [field]: value });
     };
 
     const handleAddLine = () => {
+        if (isReadOnly) return;
         append(makeEmptyLine());
     };
 
@@ -246,7 +254,7 @@ export default function DocumentCreateLinesTableMui({
                             {discountEnabled && <TableCell width={90} align="right">DTO %</TableCell>}
                             <TableCell width={200}>IMPUESTOS</TableCell>
                             <TableCell width={120} align="right">SUBTOTAL</TableCell>
-                            <TableCell width={50} align="center"></TableCell>
+                            {!isReadOnly && <TableCell width={50} align="center"></TableCell>}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -266,6 +274,7 @@ export default function DocumentCreateLinesTableMui({
                                             index={index}
                                             initialCode={item.code || ''}
                                             onCommit={commitLinePatch}
+                                            disabled={isReadOnly}
                                         />
                                     </TableCell>
                                     <TableCell>
@@ -274,6 +283,7 @@ export default function DocumentCreateLinesTableMui({
                                             onChange={(e) => updateLineField(index, 'description', e.target.value)}
                                             placeholder="Añadir descripción..."
                                             fullWidth
+                                            disabled={isReadOnly}
                                             sx={{ fontSize: '13px' }}
                                         />
                                     </TableCell>
@@ -284,6 +294,7 @@ export default function DocumentCreateLinesTableMui({
                                             type="number"
                                             inputProps={{ style: { textAlign: 'right' } }}
                                             fullWidth
+                                            disabled={isReadOnly}
                                             sx={{ fontSize: '13px' }}
                                         />
                                     </TableCell>
@@ -294,6 +305,7 @@ export default function DocumentCreateLinesTableMui({
                                             type="number"
                                             inputProps={{ style: { textAlign: 'right' } }}
                                             fullWidth
+                                            disabled={isReadOnly}
                                             sx={{ fontSize: '13px' }}
                                         />
                                     </TableCell>
@@ -305,6 +317,7 @@ export default function DocumentCreateLinesTableMui({
                                                 type="number"
                                                 inputProps={{ style: { textAlign: 'right' } }}
                                                 fullWidth
+                                                disabled={isReadOnly}
                                                 sx={{ fontSize: '13px' }}
                                             />
                                         </TableCell>
@@ -312,25 +325,30 @@ export default function DocumentCreateLinesTableMui({
                                     <TableCell>
                                         <TaxMultiSelect
                                             taxes={item.taxes || []}
+                                            disabled={isReadOnly}
                                             onChange={(newTaxes) => {
-                                                update(index, { ...item, taxes: newTaxes });
+                                                if (!isReadOnly) {
+                                                    update(index, { ...item, taxes: newTaxes });
+                                                }
                                             }}
                                         />
                                     </TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 600, fontSize: '13px' }}>
                                         {Number(item.subtotal || 0).toFixed(2)}
                                     </TableCell>
-                                    <TableCell align="center">
-                                        {(item.code || item.description) && (
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => remove(index)}
-                                                sx={{ color: '#e57373', p: 0.5 }}
-                                            >
-                                                <DeleteOutline fontSize="small" />
-                                            </IconButton>
-                                        )}
-                                    </TableCell>
+                                    {!isReadOnly && (
+                                        <TableCell align="center">
+                                            {(item.code || item.description) && (
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => remove(index)}
+                                                    sx={{ color: '#e57373', p: 0.5 }}
+                                                >
+                                                    <DeleteOutline fontSize="small" />
+                                                </IconButton>
+                                            )}
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             );
                         })}
@@ -343,6 +361,7 @@ export default function DocumentCreateLinesTableMui({
                     size="small"
                     startIcon={<Add />}
                     onClick={handleAddLine}
+                    disabled={isReadOnly}
                     variant="outlined"
                     color="primary"
                     sx={{
@@ -351,6 +370,7 @@ export default function DocumentCreateLinesTableMui({
                         borderRadius: '6px',
                         borderStyle: 'dashed',
                         borderWidth: '1.5px',
+                        opacity: isReadOnly ? 0.5 : 1,
                     }}
                 >
                     Añadir nueva línea

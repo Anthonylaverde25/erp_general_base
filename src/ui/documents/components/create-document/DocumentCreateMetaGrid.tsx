@@ -10,6 +10,7 @@ export default function DocumentCreateMetaGrid() {
     partnerOptions,
     numberSeries,
     copy,
+    isReadOnly,
   } = useDocumentCreate();
 
   const selectedPartnerId = useWatch({ control, name: "partner_id" });
@@ -21,6 +22,7 @@ export default function DocumentCreateMetaGrid() {
         <label>{copy.partyLabel}</label>
         <select
           className="doc-input doc-input-bold doc-input-primary"
+          disabled={isReadOnly}
           {...register("partner_id")}
         >
           <option value="" disabled>
@@ -45,6 +47,7 @@ export default function DocumentCreateMetaGrid() {
         <label>SERIE</label>
         <select
           className="doc-input doc-input-bold doc-input-primary"
+          disabled={isReadOnly}
           {...register("number_series_id")}
         >
           <option value="" disabled>
@@ -62,6 +65,7 @@ export default function DocumentCreateMetaGrid() {
         <label>Nº DOCUMENTO</label>
         <input
           className="doc-input doc-input-bold"
+          disabled={isReadOnly}
           {...register("number")}
         />
       </div>
@@ -76,6 +80,7 @@ export default function DocumentCreateMetaGrid() {
               value={field.value}
               onChange={field.onChange}
               placeholder="Fecha de emisión"
+              disabled={isReadOnly}
             />
           )}
         />
@@ -91,6 +96,7 @@ export default function DocumentCreateMetaGrid() {
               value={field.value || ''}
               onChange={field.onChange}
               placeholder="Fecha de vencimiento"
+              disabled={isReadOnly}
             />
           )}
         />
@@ -100,6 +106,7 @@ export default function DocumentCreateMetaGrid() {
         <label>DIVISA</label>
         <select
           className="doc-input"
+          disabled={isReadOnly}
           {...register("currency")}
         >
           {CURRENCY_OPTIONS.map((currency) => (

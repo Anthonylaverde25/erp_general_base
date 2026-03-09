@@ -139,6 +139,20 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                         {/* Top Bar Accent */}
                         <div className="h-1 w-full bg-[#0f172a] dark:bg-blue-500" />
 
+                        {/* Visual Status Stamp (Restored Center Position, Overlays Content) */}
+                        {isFirstPage && (document.document_type_code === 'QUO' || document.document_type_code === 'PQUO') &&
+                            (document.status?.key === 'approved' || document.status?.key === 'rejected') && (
+                                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-[0.12] dark:opacity-[0.22] rotate-[-35deg] border-[12px] rounded-2xl px-12 py-6 flex flex-col items-center select-none
+                                ${document.status?.key === 'approved' ? 'border-emerald-600' : 'border-red-600'}`}>
+                                    <h1 className={`text-9xl font-black tracking-tighter uppercase mb-2 ${document.status?.key === 'approved' ? 'text-emerald-700' : 'text-red-700'}`}>
+                                        {document.status?.key === 'approved' ? 'Aprobado' : 'Rechazado'}
+                                    </h1>
+                                    <div className={`text-2xl font-bold uppercase tracking-[0.5em] ${document.status?.key === 'approved' ? 'text-emerald-600' : 'text-red-600'}`}>
+                                        {activeCompany?.name}
+                                    </div>
+                                </div>
+                            )}
+
                         <div className="p-[1.5cm] flex flex-col flex-1">
                             {/* Header: Full on 1st page, Mini on others */}
                             {isFirstPage ? (
@@ -157,7 +171,9 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <Typography className="text-[#0f172a] dark:text-blue-400 font-black text-3xl mb-4 tracking-widest uppercase">Documento</Typography>
+                                            <Typography className="text-[#0f172a] dark:text-blue-400 font-black text-3xl mb-4 tracking-widest uppercase">
+                                                {document.document_type_name || 'Documento'}
+                                            </Typography>
                                             <div className="flex gap-10 justify-end">
                                                 <div className="flex flex-col items-end">
                                                     <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nº Documento</span>

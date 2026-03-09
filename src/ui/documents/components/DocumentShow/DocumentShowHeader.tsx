@@ -21,6 +21,7 @@ function getStatusColor(key: string): string {
     issued: '#22c55e',
     delivered: '#10b981',
     cancelled: '#ef4444',
+    rejected: '#ef4444',
     collected: '#8b5cf6',
     paid: '#8b5cf6',
     invoiced: '#6366f1',
@@ -70,7 +71,7 @@ export default function DocumentShowHeader({
         <div className=' p-2 flex flex-col gap-1'>
           <div className="">
             <h1 className="text-sm font-bold truncate max-w-[300px] text-gray-900 dark:text-gray-100 leading-tight">
-              {document.partner_name} - {document.number_serie || "Borrador"}
+              {document.document_type_name || 'Documento'}: {document.partner_name} - {document.number_serie || "Borrador"}
             </h1>
           </div>
 

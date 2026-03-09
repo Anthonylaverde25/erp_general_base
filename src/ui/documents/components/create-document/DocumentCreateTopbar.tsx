@@ -31,7 +31,8 @@ export default function DocumentCreateTopbar({
 		itemType,
 		isCreating,
 		onSubmitDraft,
-		onSubmitIssue
+		onSubmitIssue,
+		isReadOnly
 	} = useDocumentCreate();
 
 	const handleThemeChange = (event: SelectChangeEvent) => {
@@ -45,7 +46,7 @@ export default function DocumentCreateTopbar({
 			: `Nuevo: ${currentDocumentType.name} (${itemTypeLabel})`
 		: copy.title;
 
-	const statusLabel = isDraftMode ? "BORRADOR" : "NUEVO";
+	const statusLabel = isReadOnly ? "SOLO LECTURA" : (isDraftMode ? "BORRADOR" : "NUEVO");
 	const primaryActionLabel = isDraftMode
 		? "Guardar Borrador"
 		: copy.primaryAction;
@@ -69,32 +70,38 @@ export default function DocumentCreateTopbar({
 
 				<div className="doc-create-title-wrap">
 					<h1>{title}</h1>
-					<span className="doc-create-status">{statusLabel}</span>
+					<span className="doc-create-status" style={{ backgroundColor: isReadOnly ? '#94a3b8' : undefined }}>
+						{statusLabel}
+					</span>
 				</div>
 			</div>
 
 			<div className="doc-create-topbar-right">
-				<div className="doc-shortcuts">
-					{SHORTCUTS.map((shortcut) => (
-						<div
-							key={shortcut.key}
-							className="doc-shortcut"
-						>
-							<span className="doc-key">{shortcut.key}</span>
-							<span>{shortcut.label}</span>
-						</div>
-					))}
-				</div>
+				{!isReadOnly && (
+					<div className="doc-shortcuts">
+						{SHORTCUTS.map((shortcut) => (
+							<div
+								key={shortcut.key}
+								className="doc-shortcut"
+							>
+								<span className="doc-key">{shortcut.key}</span>
+								<span>{shortcut.label}</span>
+							</div>
+						))}
+					</div>
+				)}
 
-				<Button
-					variant="outlined"
-					size="small"
-					className="doc-action-secondary"
-					onClick={onSubmitDraft}
-					disabled={isCreating}
-				>
-					{isCreating ? 'Guardando...' : 'Guardar Borrador'}
-				</Button>
+				{!isReadOnly && (
+					<Button
+						variant="outlined"
+						size="small"
+						className="doc-action-secondary"
+						onClick={onSubmitDraft}
+						disabled={isCreating}
+					>
+						{isCreating ? 'Guardando...' : 'Guardar Borrador'}
+					</Button>
+				)}
 				<FormControl
 					size="small"
 					className="doc-theme-select"
@@ -115,16 +122,18 @@ export default function DocumentCreateTopbar({
 						))}
 					</Select>
 				</FormControl>
-				<Button
-					variant="contained"
-					size="small"
-					color="secondary"
-					className="doc-action-primary"
-					onClick={onSubmitIssue}
-					disabled={isCreating}
-				>
-					{isCreating ? 'Procesando...' : primaryActionLabel}
-				</Button>
+				{!isReadOnly && (
+					<Button
+						variant="contained"
+						size="small"
+						color="secondary"
+						className="doc-action-primary"
+						onClick={onSubmitIssue}
+						disabled={isCreating}
+					>
+						{isCreating ? 'Procesando...' : primaryActionLabel}
+					</Button>
+				)}
 			</div>
 		</header>
 	);

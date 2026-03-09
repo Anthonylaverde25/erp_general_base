@@ -12,25 +12,26 @@ export default function DocumentCreateFooter({
 	onDiscountEnabledChange,
 }: DocumentCreateFooterProps) {
 	const { register } = useFormContext<DocumentFormValues>();
-	const { totals } = useDocumentCreate();
+	const { totals, isReadOnly } = useDocumentCreate();
 
 	return (
 		<footer className="doc-footer">
 			<div className="doc-footer-section doc-footer-params">
 				<h3>Parámetros</h3>
 				<label>
-					<input type="checkbox" {...register("include_legal")} />
+					<input type="checkbox" {...register("include_legal")} disabled={isReadOnly} />
 					<span>Incluir cláusulas legales</span>
 				</label>
 				<label>
 					<input
 						type="checkbox"
 						{...register("apply_retention")}
+						disabled={isReadOnly}
 					/>
 					<span>Aplicar retención IRPF (15%)</span>
 				</label>
 				<label>
-					<input type="checkbox" {...register("auto_send")} />
+					<input type="checkbox" {...register("auto_send")} disabled={isReadOnly} />
 					<span>Envío automático Email</span>
 				</label>
 				<label>
@@ -38,6 +39,7 @@ export default function DocumentCreateFooter({
 						type="checkbox"
 						checked={discountEnabled}
 						onChange={(e) => onDiscountEnabledChange(e.target.checked)}
+						disabled={isReadOnly}
 					/>
 					<span>Habilitar descuento por línea</span>
 				</label>
@@ -49,6 +51,7 @@ export default function DocumentCreateFooter({
 					<textarea
 						placeholder="Notas de facturación interna..."
 						{...register("notes")}
+						disabled={isReadOnly}
 					/>
 				</div>
 				<div>
@@ -57,6 +60,7 @@ export default function DocumentCreateFooter({
 						type="text"
 						placeholder="Presupuesto, Urgente..."
 						{...register("tag")}
+						disabled={isReadOnly}
 					/>
 					<div className="doc-tag-wrap">
 						{/* Las etiquetas se agregarán dinámicamente en el futuro */}

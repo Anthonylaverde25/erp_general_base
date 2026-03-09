@@ -12,6 +12,8 @@ interface TaxMultiSelectProps {
     onChange: (taxes: DocumentLineTaxItem[]) => void;
     /** Whether to render the dropdown via portal (needed for AG Grid) */
     usePortal?: boolean;
+    /** Whether the component is disabled */
+    disabled?: boolean;
 }
 
 /**
@@ -19,7 +21,7 @@ interface TaxMultiSelectProps {
  * Shows chips for selected taxes and a "+" button to add more.
  * Enforces the rule: only one tax_rate per tax_type per line.
  */
-export function TaxMultiSelect({ taxes, onChange, usePortal = false }: TaxMultiSelectProps) {
+export function TaxMultiSelect({ taxes, onChange, usePortal = false, disabled = false }: TaxMultiSelectProps) {
     const { data: allTaxRates } = useIndexTaxRates();
     const [open, setOpen] = useState(false);
     const anchorRef = useRef<HTMLDivElement>(null);
@@ -72,6 +74,7 @@ export function TaxMultiSelect({ taxes, onChange, usePortal = false }: TaxMultiS
     }, [availableOptions]);
 
     const handleAddTax = (taxRate: (typeof availableOptions)[0]) => {
+        if (disabled) return;
         const newTax: DocumentLineTaxItem = {
             id: taxRate.id,
             name: taxRate.name,
@@ -84,10 +87,11 @@ export function TaxMultiSelect({ taxes, onChange, usePortal = false }: TaxMultiS
     };
 
     const handleRemoveTax = (taxId: number) => {
+        if (disabled) return;
         onChange(taxes.filter(t => t.id !== taxId));
     };
 
-    const dropdownContent = open && availableOptions.length > 0 && (
+    const dropdownContent = open && !disabled && availableOptions.length > 0 && (
         <div
             ref={dropdownRef}
             style={{
@@ -128,7 +132,7 @@ export function TaxMultiSelect({ taxes, onChange, usePortal = false }: TaxMultiS
                                 cursor: 'pointer',
                                 fontSize: '12px',
                                 display: 'flex',
-                                justifyContent: 'space-between',
+                                justify_content: 'space-between',
                                 alignItems: 'center',
                                 borderBottom: '1px solid #f5f5f5',
                             }}
@@ -170,7 +174,7 @@ export function TaxMultiSelect({ taxes, onChange, usePortal = false }: TaxMultiS
                     key={tax.id}
                     label={tax.name}
                     size="small"
-                    onDelete={() => handleRemoveTax(tax.id)}
+                    onDelete={disabled ? undefined : () => handleRemoveTax(tax.id)}
                     deleteIcon={<Close style={{ fontSize: 11 }} />}
                     sx={{
                         height: 20,
@@ -183,7 +187,8 @@ export function TaxMultiSelect({ taxes, onChange, usePortal = false }: TaxMultiS
             {availableOptions.length > 0 && (
                 <IconButton
                     size="small"
-                    onClick={() => setOpen(!open)}
+                    onClick={disabled ? undefined : () => setOpen(!open)}
+                    disabled={disabled}
                     sx={{
                         padding: '1px',
                         width: 18,

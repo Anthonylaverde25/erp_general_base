@@ -276,6 +276,36 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         gap: 10,
     },
+    stampContainer: {
+        position: 'absolute',
+        top: '40%',
+        left: '50%',
+        marginTop: -100,
+        marginLeft: -150,
+        width: 300,
+        height: 150,
+        borderWidth: 8,
+        borderRadius: 15,
+        borderStyle: 'solid',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: 0.15,
+        transform: 'rotate(-35)',
+    },
+    stampText: {
+        fontSize: 60,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        marginBottom: 5,
+    },
+    stampSubtext: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        letterSpacing: 4,
+    },
 });
 
 const formatCurrency = (amount: number) => {
@@ -334,8 +364,30 @@ const DocumentPDF = ({ document, activeCompany }: DocumentPDFProps) => {
                 const isLastPage = pageIndex === totalPages - 1;
 
                 return (
-                    <Page key={pageIndex.toString()} size="A4" style={styles.page}>
+                    <Page size="A4" style={styles.page}>
                         <View style={styles.topBar} />
+
+                        {/* Status Stamp Overlay */}
+                        {(document.document_type_code === 'QUO' || document.document_type_code === 'PQUO') &&
+                            (document.status?.key === 'approved' || document.status?.key === 'rejected') && (
+                                <View style={[
+                                    styles.stampContainer,
+                                    { borderColor: document.status?.key === 'approved' ? '#10b981' : '#ef4444' }
+                                ]}>
+                                    <Text style={[
+                                        styles.stampText,
+                                        { color: document.status?.key === 'approved' ? '#065f46' : '#991b1b' }
+                                    ]}>
+                                        {document.status?.key === 'approved' ? 'Aprobado' : 'Rechazado'}
+                                    </Text>
+                                    <Text style={[
+                                        styles.stampSubtext,
+                                        { color: document.status?.key === 'approved' ? '#10b981' : '#ef4444' }
+                                    ]}>
+                                        {activeCompany?.name || ''}
+                                    </Text>
+                                </View>
+                            )}
 
                         {isFirstPage ? (
                             <>
@@ -353,7 +405,7 @@ const DocumentPDF = ({ document, activeCompany }: DocumentPDFProps) => {
                                     </View>
 
                                     <View style={styles.headerRight}>
-                                        <Text style={styles.invoiceTitle}>Documento</Text>
+                                        <Text style={styles.invoiceTitle}>{document.document_type_name || 'Documento'}</Text>
                                         <View style={styles.metaGrid}>
                                             <View style={styles.metaItem}>
                                                 <Text style={styles.metaLabel}>Nº Documento</Text>
@@ -415,7 +467,7 @@ const DocumentPDF = ({ document, activeCompany }: DocumentPDFProps) => {
                             </View>
 
                             {pageLines?.map((line, index) => (
-                                <View key={index.toString()} style={[styles.tableRow, index % 2 === 1 ? styles.tableRowEven : {}]}>
+                                <View style={[styles.tableRow, index % 2 === 1 ? styles.tableRowEven : {}]}>
                                     <View style={styles.colDesc}>
                                         <Text style={styles.itemMain}>{line.name}</Text>
                                         {line.description && <Text style={styles.itemSub}>{line.description}</Text>}
@@ -450,7 +502,7 @@ const DocumentPDF = ({ document, activeCompany }: DocumentPDFProps) => {
                                         <Text style={styles.summaryValue}>{formatCurrency(document.subtotal)}</Text>
                                     </View>
                                     {document.tax_summaries?.map((tax, i) => (
-                                        <View key={i.toString()} style={styles.summaryRow}>
+                                        <View style={styles.summaryRow}>
                                             <Text style={styles.summaryLabel}>IVA ({tax.rate}%)</Text>
                                             <Text style={styles.summaryValue}>{formatCurrency(tax.tax_amount)}</Text>
                                         </View>

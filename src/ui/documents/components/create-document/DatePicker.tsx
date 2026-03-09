@@ -11,42 +11,45 @@ interface DatePickerProps {
     onChange: (date: string) => void;
     placeholder?: string;
     className?: string;
+    disabled?: boolean;
 }
 
-export default function DatePicker({ value, onChange, placeholder = 'Seleccionar fecha', className = '' }: DatePickerProps) {
+export default function DatePicker({ value, onChange, placeholder = 'Seleccionar fecha', className = '', disabled = false }: DatePickerProps) {
     const [open, setOpen] = useState(false);
 
     const selectedDate = value ? new Date(value + 'T00:00:00') : undefined;
 
     const handleSelect = (day: Date | undefined) => {
-        if (day) {
+        if (day && !disabled) {
             onChange(format(day, 'yyyy-MM-dd'));
             setOpen(false);
         }
     };
 
     return (
-        <Popover.Root open={open} onOpenChange={setOpen}>
+        <Popover.Root open={disabled ? false : open} onOpenChange={setOpen}>
             <Popover.Trigger asChild>
                 <button
                     type="button"
+                    disabled={disabled}
                     className={`doc-input doc-input-primary doc-datepicker-trigger ${className}`}
                     style={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        cursor: 'pointer',
+                        cursor: disabled ? 'default' : 'pointer',
                         textAlign: 'left',
                         width: '100%',
-                        background: 'var(--doc-input-bg, #fff)',
+                        background: disabled ? 'var(--doc-input-disabled-bg, #f5f5f5)' : 'var(--doc-input-bg, #fff)',
                         border: '1px solid var(--doc-border, #e0e0e0)',
                         borderRadius: '4px',
                         padding: '4px 8px',
                         fontSize: '12px',
                         minHeight: '28px',
+                        opacity: disabled ? 0.7 : 1,
                     }}
                 >
-                    <span style={{ opacity: selectedDate ? 1 : 0.5 }}>
+                    <span style={{ opacity: (selectedDate && !disabled) ? 1 : 0.5 }}>
                         {selectedDate ? format(selectedDate, 'dd/MM/yyyy', { locale: es }) : placeholder}
                     </span>
                     <CalendarMonth style={{ fontSize: 16, opacity: 0.5 }} />

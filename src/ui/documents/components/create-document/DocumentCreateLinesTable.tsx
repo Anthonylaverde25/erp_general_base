@@ -14,6 +14,7 @@ import {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import type { DocumentGridTheme, DocumentLineItem } from './types';
+import { useDocumentCreate } from '../../context/DocumentCreateContext';
 import { ItemAutocompleteCellEditor } from './ag-grid-components/cell-editors/ItemAutocompleteCellEditor';
 import { TaxChipsCellRenderer } from './ag-grid-components/cell-renderers/TaxChipsCellRenderer';
 import { DeleteCellRenderer } from './ag-grid-components/cell-renderers/DeleteCellRenderer';
@@ -46,6 +47,8 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 		onGridReady
 	} = useDocumentTableSync();
 
+	const { isReadOnly } = useDocumentCreate();
+
 	const defaultColDef = useMemo<ColDef<DocumentLineItem>>(() => ({
 		sortable: false,
 		filter: false,
@@ -61,14 +64,14 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 				headerName: '#',
 				width: 46, minWidth: 46, maxWidth: 46,
 				pinned: 'left',
-				rowDrag: true,
+				rowDrag: !isReadOnly,
 				cellClass: 'doc-ag-cell doc-ag-cell-center doc-ag-cell-id',
 			},
 			{
 				field: 'code',
 				headerName: 'ARTÍCULO / CONCEPTO',
 				flex: 1, minWidth: 180,
-				editable: true,
+				editable: !isReadOnly,
 				singleClickEdit: true,
 				cellClass: 'doc-ag-cell',
 				cellEditor: ItemAutocompleteCellEditor,
@@ -78,14 +81,14 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 				field: 'description',
 				headerName: 'DESCRIPCIÓN',
 				flex: 1, minWidth: 160,
-				editable: true,
+				editable: !isReadOnly,
 				singleClickEdit: true,
 			},
 			{
 				field: 'quantity',
 				headerName: 'CANT.',
 				width: 80, minWidth: 80,
-				editable: true,
+				editable: !isReadOnly,
 				singleClickEdit: true,
 				cellClass: 'doc-ag-cell doc-ag-cell-right',
 			},
@@ -93,7 +96,7 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 				field: 'unitPrice',
 				headerName: 'PRECIO U.',
 				width: 110, minWidth: 100,
-				editable: true,
+				editable: !isReadOnly,
 				singleClickEdit: true,
 				cellClass: 'doc-ag-cell doc-ag-cell-right',
 			},
@@ -104,7 +107,7 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 				field: 'discount',
 				headerName: 'DTO %',
 				width: 90, minWidth: 80,
-				editable: true,
+				editable: !isReadOnly,
 				singleClickEdit: true,
 				cellClass: 'doc-ag-cell doc-ag-cell-right',
 			});
@@ -146,6 +149,7 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 				pinned: 'right',
 				cellRenderer: DeleteCellRenderer,
 				cellClass: 'doc-ag-cell',
+				hide: isReadOnly,
 			},
 		);
 
@@ -182,6 +186,7 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 			<div style={{ padding: '8px', borderTop: '1px dashed #e0e0e0', marginTop: '4px' }}>
 				<Button
 					size="small"
+					disabled={isReadOnly}
 					startIcon={<Add />}
 					onClick={handleAddLine}
 					variant="outlined"
