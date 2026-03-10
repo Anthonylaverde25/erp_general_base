@@ -3,7 +3,7 @@ import { useIndexDocuments } from '@/features/documents/hooks/useIndexDocuments'
 import DocumentTable from '../components/DocumentTable';
 import styled from 'styled-components';
 import DocumentsHeader from '../components/DocumentsHeader';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useLocation } from 'react-router';
 
 const Root = styled(FusePageCarded)(() => ({
 	'& .container': {
@@ -14,19 +14,24 @@ const Root = styled(FusePageCarded)(() => ({
 export default function SalesPage() {
 	const navigate = useNavigate();
 	const { code } = useParams();
+	const location = useLocation();
+	const searchParams = new URLSearchParams(location.search);
+	const item_type = searchParams.get('item_type') || 'product';
+
 	const { data: documents, isLoading, refetch } = useIndexDocuments({
 		operation: 'sale',
-		document_type_code: code
+		document_type_code: code,
+		item_type
 	});
 
 	const handleCreate = () => {
 		const targetCode = code || 'INV';
-		navigate(`/sales/create/${targetCode}`);
+		navigate(`/sales/create/${targetCode}?item_type=${item_type}`);
 	};
 
 	const handleCreateDraft = () => {
 		const targetCode = code || 'INV';
-		navigate(`/sales/create/${targetCode}?mode=draft`);
+		navigate(`/sales/create/${targetCode}?mode=draft&item_type=${item_type}`);
 	};
 
 	const title = code ? `Documentos: ${code}` : 'Documentos de Venta';

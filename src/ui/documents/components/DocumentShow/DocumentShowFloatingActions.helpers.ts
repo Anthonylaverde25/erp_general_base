@@ -17,12 +17,15 @@ export type NextAction = {
 const INVOICE_CODES = ["INV", "PINV"];
 const DELIVERY_CODES = ["DLV", "PDLV"];
 const QUOTE_CODES = ["QUO", "PQUO"];
+const PURCHASE_ORDER_CODES = ["PORD"];
 
 const isInvoice = (code: string) => INVOICE_CODES.includes(code);
 const isDelivery = (code: string) => code === "DLV";
 const isPurchaseDelivery = (code: string) => code === "PDLV";
 const isDeliveryFamily = (code: string) => DELIVERY_CODES.includes(code);
 export const isQuote = (code: string) => QUOTE_CODES.includes(code);
+export const isPurchaseOrder = (code: string) =>
+  PURCHASE_ORDER_CODES.includes(code);
 
 export const canRevert = (statusKey: string) =>
   ["validated", "approved"].includes(statusKey);
@@ -81,6 +84,14 @@ export function buildLifecycleSteps(
       { key: "draft", label: "Borrador" },
       { key: "validated", label: "Validado" },
       { key: approvedKey, label: approvedLabel },
+    ];
+  }
+
+  if (isPurchaseOrder(docTypeCode)) {
+    return [
+      { key: "draft", label: "Borrador" },
+      { key: "validated", label: "Validado" },
+      { key: "ordered", label: "Pedido" },
     ];
   }
 
@@ -160,6 +171,23 @@ export function resolveNextAction(
       };
   }
 
+  if (isPurchaseOrder(docTypeCode)) {
+    if (statusKey === "draft")
+      return {
+        label: "Validar",
+        nextStatus: "validated",
+        Icon: ClipboardCheck,
+        variant: "indigo",
+      };
+    if (statusKey === "validated")
+      return {
+        label: "Realizar pedido",
+        nextStatus: "ordered",
+        Icon: Truck,
+        variant: "green",
+      };
+  }
+
   return null;
 }
 
@@ -169,14 +197,16 @@ export function canShowPostDeliveredActions(
   isAlreadyInvoiced: boolean,
 ) {
   const isDelivered = statusKey === "delivered" || statusKey === "received";
-  const quoteApproved = statusKey === "approved";
+  const isApprovedOrValidated = ["approved", "validated"].includes(statusKey);
 
   const deliveryFlow =
     isDeliveryFamily(docTypeCode) && (isDelivered || isAlreadyInvoiced);
   const quoteFlow =
-    isQuote(docTypeCode) && (quoteApproved || isAlreadyInvoiced);
+    isQuote(docTypeCode) && (isApprovedOrValidated || isAlreadyInvoiced);
+  const purchaseOrderFlow =
+    isPurchaseOrder(docTypeCode) && (statusKey === "ordered" || isAlreadyInvoiced);
 
-  return deliveryFlow || quoteFlow;
+  return deliveryFlow || quoteFlow || purchaseOrderFlow;
 }
 
 export function getConversionTargetType(
@@ -185,6 +215,9 @@ export function getConversionTargetType(
 ) {
   if (isQuote(docTypeCode)) {
     return operation === "sale" ? "DLV" : "PDLV";
+  }
+  if (isPurchaseOrder(docTypeCode)) {
+    return "PDLV";
   }
   return operation === "sale" ? "INV" : "PINV";
 }

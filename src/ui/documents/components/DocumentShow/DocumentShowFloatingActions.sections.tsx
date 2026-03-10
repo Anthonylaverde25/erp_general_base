@@ -4,6 +4,7 @@ import {
   FileText,
   Package,
   RotateCcw,
+  ShoppingCart,
   X,
 } from "lucide-react";
 import { useNavigate } from "react-router";
@@ -15,6 +16,7 @@ import {
   LifecycleStep,
   NextAction,
   getConversionTargetType,
+  isPurchaseOrder,
   isQuote,
 } from "./DocumentShowFloatingActions.helpers";
 
@@ -120,6 +122,7 @@ export function PostDeliveredActions({
   isAlreadyInvoiced,
   onOpenConversion,
   onOpenBudget,
+  onOpenPurchaseOrder,
 }: {
   document: DocumentEntity;
   module: string;
@@ -128,6 +131,7 @@ export function PostDeliveredActions({
   isAlreadyInvoiced: boolean;
   onOpenConversion: () => void;
   onOpenBudget: () => void;
+  onOpenPurchaseOrder: () => void;
 }) {
   const navigate = useNavigate();
 
@@ -137,7 +141,7 @@ export function PostDeliveredActions({
   };
 
   const handleInstantConversion = () => {
-    if (isQuote(docTypeCode)) {
+    if (isQuote(docTypeCode) || isPurchaseOrder(docTypeCode)) {
       onOpenBudget();
       return;
     }
@@ -146,21 +150,7 @@ export function PostDeliveredActions({
 
   return (
     <div className="flex items-center gap-1 px-2">
-      <button
-        onClick={handlePrefilledCreation}
-        disabled={isAlreadyInvoiced}
-        title={
-          isAlreadyInvoiced
-            ? "Este documento ya fue procesado"
-            : "Ir a pre-creación"
-        }
-        className="px-2 py-1 text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 uppercase tracking-wide flex items-center gap-1 transition-colors disabled:opacity-40"
-      >
-        <FileText className="w-3 h-3" />
-        {isQuote(docTypeCode)
-          ? "Crear Albarán 1 (UI)"
-          : "Crear Factura 1 (UI)"}
-      </button>
+      {/* ok */}
 
       <button
         onClick={handleInstantConversion}
@@ -173,10 +163,20 @@ export function PostDeliveredActions({
         className="px-2 py-1 text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 uppercase tracking-wide flex items-center gap-1 transition-colors disabled:opacity-40"
       >
         <FileText className="w-3 h-3" />
-        {isQuote(docTypeCode)
+        {isQuote(docTypeCode) || isPurchaseOrder(docTypeCode)
           ? "Crear Albarán 2 (API)"
           : "Crear Factura 2 (API)"}
       </button>
+
+      {(docTypeCode === "QUO" || docTypeCode === "PQUO") && (
+        <button
+          onClick={onOpenPurchaseOrder}
+          className="px-2 py-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 uppercase tracking-wide flex items-center gap-1 transition-colors"
+        >
+          <ShoppingCart className="w-3 h-3" />
+          Generar Orden de Compra
+        </button>
+      )}
 
       {!isAlreadyInvoiced && (
         <button

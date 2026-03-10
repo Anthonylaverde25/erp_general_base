@@ -63,19 +63,16 @@ const navigationConfig: FuseNavItemType[] = [
 						translate: 'LIST_INVOICES',
 						type: 'item',
 						icon: 'lucide:receipt',
-						url: '/sales/INV',
-						quickCreateUrl: '/sales/create/INV'
-
-
-					},
+						url: '/sales/INV?item_type=product',
+						quickCreateUrl: '/sales/create/INV?item_type=product'					},
 					{
 						id: 'sales.quotes',
 						title: 'Presupuestos',
 						translate: 'LIST_QUOTES',
 						type: 'item',
 						icon: 'lucide:clipboard-list',
-						url: '/sales/QUO',
-						quickCreateUrl: '/sales/create/QUO'
+						url: '/sales/QUO?item_type=product',
+						quickCreateUrl: '/sales/create/QUO?item_type=product'
 					},
 					{
 						id: 'sales.delivery',
@@ -83,17 +80,9 @@ const navigationConfig: FuseNavItemType[] = [
 						translate: 'LIST_DELIVERY_NOTES',
 						type: 'item',
 						icon: 'lucide:truck',
-						url: '/sales/DLV',
-						quickCreateUrl: '/sales/create/DLV'
-					},
-					{
-						id: 'sales.remittance',
-						title: 'Remitos',
-						translate: 'LIST_REMITTANCES',
-						type: 'item',
-						icon: 'lucide:file-text',
-						url: '/sales/REM',
-						quickCreateUrl: '/sales/create/REM'
+						url: '/sales/DLV?item_type=product',
+						quickCreateUrl: '/sales/create/DLV?item_type=product'
+
 					},
 					{
 						id: 'sales.ticket',
@@ -101,8 +90,8 @@ const navigationConfig: FuseNavItemType[] = [
 						translate: 'LIST_TICKETS',
 						type: 'item',
 						icon: 'lucide:ticket',
-						url: '/sales/TKT',
-						quickCreateUrl: '/sales/create/TKT'
+						url: '/sales/TKT?item_type=product',
+						quickCreateUrl: '/sales/create/TKT?item_type=product'
 					},
 					{
 						id: 'sales.credit_note',
@@ -110,8 +99,8 @@ const navigationConfig: FuseNavItemType[] = [
 						translate: 'LIST_CREDIT_NOTES',
 						type: 'item',
 						icon: 'lucide:file-minus',
-						url: '/sales/CRN',
-						quickCreateUrl: '/sales/create/CRN'
+						url: '/sales/CRN?item_type=product',
+						quickCreateUrl: '/sales/create/CRN?item_type=product'
 					},
 					{
 						id: 'sales.customers',
@@ -136,8 +125,8 @@ const navigationConfig: FuseNavItemType[] = [
 						translate: 'LIST_PURCHASE_INVOICES',
 						type: 'item',
 						icon: 'lucide:receipt',
-						url: '/purchases/PINV',
-						quickCreateUrl: '/purchases/create/PINV'
+						url: '/purchases/PINV?item_type=product',
+						quickCreateUrl: '/purchases/create/PINV?item_type=product'
 					},
 					{
 						id: 'purchases.delivery',
@@ -145,8 +134,8 @@ const navigationConfig: FuseNavItemType[] = [
 						translate: 'LIST_PURCHASE_DELIVERY_NOTES',
 						type: 'item',
 						icon: 'lucide:truck',
-						url: '/purchases/PDLV',
-						quickCreateUrl: '/purchases/create/PDLV'
+						url: '/purchases/PDLV?item_type=product',
+						quickCreateUrl: '/purchases/create/PDLV?item_type=product'
 					},
 					{
 						id: 'purchases.order',
@@ -154,8 +143,8 @@ const navigationConfig: FuseNavItemType[] = [
 						translate: 'LIST_PURCHASE_ORDERS',
 						type: 'item',
 						icon: 'lucide:shopping-cart',
-						url: '/purchases/PORD',
-						quickCreateUrl: '/purchases/create/PORD'
+						url: '/purchases/PORD?item_type=product',
+						quickCreateUrl: '/purchases/create/PORD?item_type=product'
 					},
 					{
 						id: 'purchases.suppliers',
@@ -201,6 +190,15 @@ const navigationConfig: FuseNavItemType[] = [
 						icon: 'lucide:clipboard-list',
 						url: '/sales/QUO?item_type=service',
 						quickCreateUrl: '/sales/create/QUO?item_type=service'
+					},
+					{
+						id: 'sales.dlv.services',
+						title: 'Albaranes de Venta',
+						translate: 'LIST_DELIVERIES',
+						type: 'item',
+						icon: 'lucide:truck',
+						url: '/sales/DLV?item_type=service',
+						quickCreateUrl: '/sales/create/DLV?item_type=service'
 					}
 				]
 			},
@@ -221,13 +219,13 @@ const navigationConfig: FuseNavItemType[] = [
 						quickCreateUrl: '/purchases/create/PINV?item_type=service'
 					},
 					{
-						id: 'purchases.pord.services',
-						title: 'Pedidos de Compra',
-						translate: 'LIST_PURCHASE_ORDERS',
+						id: 'purchases.pdlv.services',
+						title: 'Albaranes de Compra',
+						translate: 'LIST_RECEIPTS',
 						type: 'item',
-						icon: 'lucide:shopping-cart',
-						url: '/purchases/PORD?item_type=service',
-						quickCreateUrl: '/purchases/create/PORD?item_type=service'
+						icon: 'lucide:truck',
+						url: '/purchases/PDLV?item_type=service',
+						quickCreateUrl: '/purchases/create/PDLV?item_type=service'
 					}
 				]
 			}

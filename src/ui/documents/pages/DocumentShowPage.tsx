@@ -11,17 +11,32 @@ import DocumentShowSidebar from "../components/DocumentShow/DocumentShowSidebar"
 import DocumentShowFloatingActions from "../components/DocumentShow/DocumentShowFloatingActions";
 import { DocumentShowFloatingToolbar } from "../components/DocumentShow/DocumentShowFloatingToolbar";
 import { RecordPaymentModal } from "../components/DocumentShow/RecordPaymentModal";
+import { DocumentDetailsModal } from "../components/DocumentShow/DocumentDetailsModal";
+import { useConvertToPurchase } from "@/features/documents/hooks/useConvertToPurchase";
 import { useState } from "react";
 
 export default function DocumentShowPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const { documentId } = useParams();
   const navigate = useNavigate();
   const { data: document, isLoading: isDocumentLoading } = useGetDocument(
     documentId as string,
   );
   const activeCompany = useActiveCompany();
+  const convertToPurchase = useConvertToPurchase();
+
+  const handleConvertToPurchase = async () => {
+    if (!documentId) return;
+    try {
+      const newDoc = await convertToPurchase.mutateAsync({ id: documentId });
+      // Redirigir a la edición de la nueva Orden de Compra (PORD)
+      navigate(`/purchases/${newDoc.id}/edit`);
+    } catch (error) {
+      console.error("Error al convertir a orden de compra:", error);
+    }
+  };
 
   const isLoading = isDocumentLoading || !activeCompany;
 
@@ -77,8 +92,10 @@ export default function DocumentShowPage() {
       {/* Floating Toolbar - Only visible when sidebar is closed */}
       {!sidebarOpen && (
         <DocumentShowFloatingToolbar
+          document={document}
           onMoreClick={() => setSidebarOpen(true)}
           onPaymentClick={() => setPaymentModalOpen(true)}
+          onDetailsClick={() => setDetailsModalOpen(true)}
         />
       )}
 
@@ -86,6 +103,14 @@ export default function DocumentShowPage() {
         <RecordPaymentModal
           open={paymentModalOpen}
           onClose={() => setPaymentModalOpen(false)}
+          document={document}
+        />
+      )}
+
+      {document && (
+        <DocumentDetailsModal
+          open={detailsModalOpen}
+          onClose={() => setDetailsModalOpen(false)}
           document={document}
         />
       )}

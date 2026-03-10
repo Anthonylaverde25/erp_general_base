@@ -104,6 +104,7 @@ export function DocumentCreateProvider({
         isEditMode,
         documentId,
         fromDocumentId,
+        itemType,
     });
 
     // ─── Partner options ─────────────────────────────────────────────────────

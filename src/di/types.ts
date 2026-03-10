@@ -178,5 +178,6 @@ export const TYPES = {
 	CreateDocumentUseCase: Symbol.for('CreateDocumentUseCase'),
 	UpdateDocumentUseCase: Symbol.for('UpdateDocumentUseCase'),
 	ConvertDocumentUseCase: Symbol.for('ConvertDocumentUseCase'),
+	ConvertToPurchaseUseCase: Symbol.for('ConvertToPurchaseUseCase'),
 	RecordPaymentUseCase: Symbol.for('RecordPaymentUseCase'),
 };

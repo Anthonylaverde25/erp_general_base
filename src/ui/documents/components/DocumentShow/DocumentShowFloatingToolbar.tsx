@@ -1,14 +1,24 @@
-import * as React from "react"
-import { Printer, Download, Share2, MoreHorizontal, PenLine, Send, Copy, CreditCard } from "lucide-react"
+import { Printer, Download, Share2, MoreHorizontal, PenLine, Send, Copy, CreditCard, FileText, ShoppingCart } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { DocumentEntity } from "@/domain/entities/documents/DocumentEntity"
 
 interface DocumentShowFloatingToolbarProps {
     className?: string
+    document?: DocumentEntity
     onMoreClick?: () => void
     onPaymentClick?: () => void
+    onDetailsClick?: () => void
 }
 
-export function DocumentShowFloatingToolbar({ className, onMoreClick, onPaymentClick }: DocumentShowFloatingToolbarProps) {
+export function DocumentShowFloatingToolbar({ 
+    className, 
+    document,
+    onMoreClick, 
+    onPaymentClick, 
+    onDetailsClick,
+}: DocumentShowFloatingToolbarProps) {
+    const isQuote = document?.document_type_code === 'QUO';
+
     return (
         <div className={cn(
             "fixed right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center p-1",
@@ -16,6 +26,7 @@ export function DocumentShowFloatingToolbar({ className, onMoreClick, onPaymentC
             className
         )}>
             {/* Primary Actions */}
+            <ToolbarButton icon={FileText} label="Detalles de documento" onClick={onDetailsClick} />
             <ToolbarButton icon={Printer} label="Imprimir" />
             <ToolbarButton icon={Download} label="Descargar PDF" />
             <ToolbarButton icon={Send} label="Enviar" primary />
@@ -30,6 +41,7 @@ export function DocumentShowFloatingToolbar({ className, onMoreClick, onPaymentC
 
             {/* Share & More */}
             <ToolbarButton icon={Share2} label="Compartir" />
+
             <ToolbarButton icon={CreditCard} label="Consignar pago" onClick={onPaymentClick} />
             <ToolbarButton icon={MoreHorizontal} label="Más" onClick={onMoreClick} />
         </div>

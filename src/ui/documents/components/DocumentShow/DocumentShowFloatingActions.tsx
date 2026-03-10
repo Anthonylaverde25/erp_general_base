@@ -19,6 +19,7 @@ import {
 import type { CompanyEntity } from "@/domain/entities/companies/Company";
 import type { DocumentEntity } from "@/domain/entities/documents/DocumentEntity";
 import { useConvertDocument } from "@/features/documents/hooks/useConvertDocument";
+import { useConvertToPurchase } from "@/features/documents/hooks/useConvertToPurchase";
 import { useUpdateDocument } from "@/features/documents/hooks/useUpdateDocument";
 
 interface FloatingActionsProps {
@@ -35,10 +36,22 @@ export default function DocumentShowFloatingActions({
   const { mutate: updateDocument, isPending: isUpdating } = useUpdateDocument();
   const { mutate: convertDocument, isPending: isConverting } =
     useConvertDocument();
+  const convertToPurchase = useConvertToPurchase();
   const [conversionModalOpen, setConversionModalOpen] = useState(false);
   const [budgetModalOpen, setBudgetModalOpen] = useState(false);
 
   const statusKey = document.status?.key || "";
+
+  const handleConvertToPurchase = async () => {
+    try {
+      const newDoc = await convertToPurchase.mutateAsync({
+        id: String(document.id),
+      });
+      navigate(`/purchases/edit/${newDoc.document_type_code}/${newDoc.id}`);
+    } catch (error) {
+      console.error("Error al convertir a orden de compra:", error);
+    }
+  };
   const operation = document.operation;
   const module = operation === "sale" ? "sales" : "purchases";
   const docTypeCode = document.document_type_code || "";
@@ -123,6 +136,7 @@ export default function DocumentShowFloatingActions({
             isAlreadyInvoiced={isAlreadyInvoiced}
             onOpenConversion={() => setConversionModalOpen(true)}
             onOpenBudget={() => setBudgetModalOpen(true)}
+            onOpenPurchaseOrder={handleConvertToPurchase}
           />
         )}
 
