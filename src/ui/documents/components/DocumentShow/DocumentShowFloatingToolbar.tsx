@@ -1,17 +1,17 @@
 import * as React from "react"
-import { Printer, Download, Share2, MoreHorizontal, PenLine, Send, Copy } from "lucide-react"
+import { Printer, Download, Share2, MoreHorizontal, PenLine, Send, Copy, CreditCard } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface DocumentShowFloatingToolbarProps {
     className?: string
     onMoreClick?: () => void
+    onPaymentClick?: () => void
 }
 
-export function DocumentShowFloatingToolbar({ className, onMoreClick }: DocumentShowFloatingToolbarProps) {
+export function DocumentShowFloatingToolbar({ className, onMoreClick, onPaymentClick }: DocumentShowFloatingToolbarProps) {
     return (
         <div className={cn(
             "fixed right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center p-1",
-            // Fondo sólido, bordes sutiles (md), sin sombras ni transparencias complejas
             "bg-white dark:bg-gray-950 border border-gray-300 dark:border-gray-800 rounded-md",
             className
         )}>
@@ -30,6 +30,7 @@ export function DocumentShowFloatingToolbar({ className, onMoreClick }: Document
 
             {/* Share & More */}
             <ToolbarButton icon={Share2} label="Compartir" />
+            <ToolbarButton icon={CreditCard} label="Consignar pago" onClick={onPaymentClick} />
             <ToolbarButton icon={MoreHorizontal} label="Más" onClick={onMoreClick} />
         </div>
     )

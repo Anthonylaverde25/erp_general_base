@@ -64,6 +64,7 @@ export class DocumentEntity {
         public readonly subtotal: number,
         public readonly tax_total: number,
         public readonly total: number,
+        public readonly total_paid: number = 0,
         public readonly partner_id: number | null,
         public readonly partner_name: string | null,
         public readonly partner_email: string | null,
@@ -78,6 +79,10 @@ export class DocumentEntity {
         public readonly tax_summaries: DocumentTaxSummary[],
         public readonly parent_document: ParentDocumentInfo | null = null
     ) { }
+
+    get balance(): number {
+        return Number((this.total - this.total_paid).toFixed(2));
+    }
 
     static fromJson(json: any): DocumentEntity {
         const contactList = Array.isArray(json.partner?.contact) ? json.partner.contact : [];
@@ -138,6 +143,7 @@ export class DocumentEntity {
             Number(json.subtotal ?? 0),
             Number(json.tax_total ?? 0),
             Number(json.total ?? 0),
+            Number(json.total_paid ?? 0),
             json.partner_id ? Number(json.partner_id) : null,
             json.partner?.name || json.partner_name || json.partner_snapshot?.name || null,
             defaultContact?.email || fallbackContact?.email || json.partner_snapshot?.email || null,

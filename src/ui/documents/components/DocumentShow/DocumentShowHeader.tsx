@@ -1,11 +1,19 @@
 import { useState, useRef, useEffect } from "react";
-import { X, RefreshCcw, Share2, MoreHorizontal, PenLine, Printer, Download } from "lucide-react";
+import {
+  X,
+  RefreshCcw,
+  Share2,
+  MoreHorizontal,
+  PenLine,
+  Printer,
+  Download,
+} from "lucide-react";
 import { useNavigate } from "react-router";
 import { DocumentEntity } from "@/domain/entities/documents/DocumentEntity";
 import { DocumentBreadcrumb } from "../DocumentBreadcrumb";
 
 /** States where the Edit button should be visible in the header */
-const EDITABLE_STATES = ['draft'];
+const EDITABLE_STATES = ["draft"];
 
 interface DocumentShowHeaderProps {
   document: DocumentEntity;
@@ -15,20 +23,20 @@ interface DocumentShowHeaderProps {
 /** Map status key to a hex color for the chip */
 function getStatusColor(key: string): string {
   const map: Record<string, string> = {
-    draft: '#f59e0b',
-    validated: '#3b82f6',
-    approved: '#6366f1',
-    issued: '#22c55e',
-    delivered: '#10b981',
-    cancelled: '#ef4444',
-    rejected: '#ef4444',
-    collected: '#8b5cf6',
-    paid: '#8b5cf6',
-    invoiced: '#6366f1',
-    partially_collected: '#a78bfa',
-    partially_paid: '#a78bfa',
+    draft: "#f59e0b",
+    validated: "#3b82f6",
+    approved: "#6366f1",
+    issued: "#22c55e",
+    delivered: "#10b981",
+    cancelled: "#ef4444",
+    rejected: "#ef4444",
+    collected: "#8b5cf6",
+    paid: "#8b5cf6",
+    invoiced: "#6366f1",
+    partially_collected: "#a78bfa",
+    partially_paid: "#a78bfa",
   };
-  return map[key] || '#64748b';
+  return map[key] || "#64748b";
 }
 
 export default function DocumentShowHeader({
@@ -39,12 +47,12 @@ export default function DocumentShowHeader({
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const statusKey = document.status?.key || '';
+  const statusKey = document.status?.key || "";
   const statusName = document.status?.name || statusKey;
   const statusColor = getStatusColor(statusKey);
   const isEditable = EDITABLE_STATES.includes(statusKey);
-  const module = document.operation === 'sale' ? 'sales' : 'purchases';
-  const docTypeCode = document.document_type_code || '';
+  const module = document.operation === "sale" ? "sales" : "purchases";
+  const docTypeCode = document.document_type_code || "";
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -53,11 +61,12 @@ export default function DocumentShowHeader({
         setMenuOpen(false);
       }
     }
-    if (menuOpen) window.addEventListener('mousedown', handleClickOutside);
-    return () => window.removeEventListener('mousedown', handleClickOutside);
+    if (menuOpen) window.addEventListener("mousedown", handleClickOutside);
+    return () => window.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
 
-  const btnClass = "px-3 py-1.5 text-xs font-medium border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 flex items-center gap-2 cursor-pointer transition-colors";
+  const btnClass =
+    "px-3 py-1.5 text-xs font-medium border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 flex items-center gap-2 cursor-pointer transition-colors";
 
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-[#e5e7eb] dark:border-gray-800 flex items-center justify-between p-2 shrink-0">
@@ -68,16 +77,14 @@ export default function DocumentShowHeader({
         >
           <X className="w-5 h-5" />
         </button>
-        <div className=' p-2 flex flex-col gap-1'>
+        <div className=" p-2 flex flex-col gap-1">
           <div className="">
             <h1 className="text-sm font-bold truncate max-w-[300px] text-gray-900 dark:text-gray-100 leading-tight">
-              {document.document_type_name || 'Documento'}: {document.partner_name} - {document.number_serie || "Borrador"}
+              {document.document_type_name || "Documento"}:{" "}
+              {document.partner_name} - {document.number_serie || "Borrador"}
             </h1>
           </div>
-
-
         </div>
-
       </div>
 
       <div className="flex items-center gap-2">
@@ -100,7 +107,7 @@ export default function DocumentShowHeader({
         {/* 3-dot dropdown */}
         <div className="relative" ref={menuRef}>
           <button
-            onClick={() => setMenuOpen(v => !v)}
+            onClick={() => setMenuOpen((v) => !v)}
             className="p-1.5 border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
           >
             <MoreHorizontal className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -120,15 +127,11 @@ export default function DocumentShowHeader({
                   Editar borrador
                 </button>
               )}
-              <button
-                className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              >
+              <button className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                 <Share2 className="w-3.5 h-3.5 text-gray-400" />
                 Compartir
               </button>
-              <button
-                className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              >
+              <button className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                 <Download className="w-3.5 h-3.5 text-gray-400" />
                 Exportar
               </button>

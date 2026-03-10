@@ -116,14 +116,16 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
     return (
         <div className="flex flex-col gap-6 items-center w-full">
             {/* Floating Breadcrumb above the "Paper" */}
-            <div className="flex items-center justify-between border-b border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 w-full max-w-[21cm] px-2 py-2 sm:rounded-t-xl backdrop-blur-sm">
-                <Typography variant='body2' className=" dark:text-gray-400 font-medium">
-                    Documento relacionado:
-                </Typography>
-                <DocumentBreadcrumb
-                    document={document}
-                />
-            </div>
+            {document.parent_document && (
+                <div className="flex items-center justify-between border-b border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 w-full max-w-[21cm] px-2 py-2 sm:rounded-t-xl backdrop-blur-sm">
+                    <Typography variant='body2' className=" dark:text-gray-400 font-medium">
+                        Documento relacionado:
+                    </Typography>
+                    <DocumentBreadcrumb
+                        document={document}
+                    />
+                </div>
+            )}
 
             {pages.map((pageLines, pageIndex) => {
                 const isFirstPage = pageIndex === 0;

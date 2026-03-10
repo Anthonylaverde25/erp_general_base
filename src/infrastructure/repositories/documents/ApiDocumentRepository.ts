@@ -39,4 +39,9 @@ export class ApiDocumentRepository implements DocumentRepositoryInterface {
         } = await axiosInstance.post(`documents/${id}/convert`, payload);
         return DocumentEntity.fromJson(invoice);
     }
+
+    async recordPayment(id: string, payload: { amount: number; payment_date: string; payment_method_id?: number; reference?: string; notes?: string }): Promise<any> {
+        const { data } = await axiosInstance.post(`documents/${id}/payments`, payload);
+        return data;
+    }
 }
