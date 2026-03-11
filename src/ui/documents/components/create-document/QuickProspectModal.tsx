@@ -29,16 +29,23 @@ interface QuickProspectModalProps {
     open: boolean;
     onClose: () => void;
     onSuccess: (newPartner: PartnerEntity) => void;
+    initialName?: string;
 }
 
-export function QuickProspectModal({ open, onClose, onSuccess }: QuickProspectModalProps) {
+export function QuickProspectModal({ open, onClose, onSuccess, initialName = '' }: QuickProspectModalProps) {
     const { handleCreatePartner, isLoading } = useCreatePartner();
     const activeCompany = useActiveCompany();
 
     const { control, handleSubmit, reset, formState: { errors } } = useForm<QuickProspectForm>({
         resolver: zodResolver(quickProspectSchema),
-        defaultValues: { name: '', email: '' }
+        defaultValues: { name: initialName, email: '' }
     });
+
+    React.useEffect(() => {
+        if (open) {
+            reset({ name: initialName, email: '' });
+        }
+    }, [open, initialName, reset]);
 
     const onSubmit = async (values: QuickProspectForm) => {
         if (!activeCompany) return;

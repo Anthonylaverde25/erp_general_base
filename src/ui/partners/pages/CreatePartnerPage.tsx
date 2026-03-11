@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm, Controller, useFieldArray, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import {
 	TextField,
@@ -37,6 +37,7 @@ import useIndexCurrencies from '@/features/currencies/hooks/useIndexCurrencies';
 
 function CreatePartnerPage() {
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 	const theme = useTheme();
 	const { handleCreatePartner, isLoading: isCreating } = useCreatePartner();
 	const { paymentMethods } = useIndexPaymentMethods();
@@ -55,7 +56,7 @@ function CreatePartnerPage() {
 	} = useForm<PartnerFormType>({
 		mode: 'onChange',
 		resolver: zodResolver(partnerSchema),
-		defaultValues: defaultCreatePartnerValues
+		defaultValues: { ...defaultCreatePartnerValues, name: searchParams.get('name') || '' }
 	});
 
 	const {

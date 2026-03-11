@@ -23,7 +23,7 @@ export function useSearchPartners(type?: string) {
         };
     }, []);
 
-    const { data, isLoading } = useQuery<PartnerEntity[]>({
+    const { data, isLoading, isFetching } = useQuery<PartnerEntity[]>({
         queryKey: ['partners_search', debouncedTerm, type],
         queryFn: async () => {
             const { data } = await axiosInstance.get('partners', {
@@ -37,10 +37,13 @@ export function useSearchPartners(type?: string) {
         enabled: debouncedTerm.length >= 1,
     });
 
+    // True if react-query is loading/fetching, OR if the user is typing and we're waiting for the debounce to finish.
+    const isSearchLoading = isLoading || isFetching || searchTerm !== debouncedTerm;
+
     return {
         searchTerm,
         setQuery,
         results: data || [],
-        isLoading,
+        isLoading: isSearchLoading,
     };
 }

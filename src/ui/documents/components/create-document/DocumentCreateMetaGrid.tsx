@@ -4,6 +4,7 @@ import { useDocumentCreate } from "../../context/DocumentCreateContext";
 import { CURRENCY_OPTIONS } from "./types";
 import DatePicker from "./DatePicker";
 import { PartnerAutocomplete } from "./PartnerAutocomplete";
+import { useParams } from "react-router";
 
 export default function DocumentCreateMetaGrid() {
   const { register, control } = useFormContext<DocumentFormValues>();
@@ -12,15 +13,17 @@ export default function DocumentCreateMetaGrid() {
     numberSeries,
     copy,
     isReadOnly,
+    currentDocumentType,
   } = useDocumentCreate();
 
   const selectedPartnerId = useWatch({ control, name: "partner_id" });
   const selectedPartner = partnerOptions.find((p) => String(p.id) === String(selectedPartnerId));
+  const { code } = useParams();
+  const isQuoteDocument = ['QUO', 'PQUO'].includes(code?.toUpperCase() || '');
 
   return (
     <section className="doc-meta-grid">
-      <div className="doc-meta-cell">
-        <label>{copy.partyLabel}</label>
+      <div className="doc-meta-cell" style={{ padding: 0 }}>
         <Controller
           name="partner_id"
           control={control}
@@ -31,6 +34,8 @@ export default function DocumentCreateMetaGrid() {
               type={copy.partyLabel === 'Cliente' ? 'customer' : (copy.partyLabel === 'Proveedor' ? 'supplier' : undefined)}
               disabled={isReadOnly}
               initialPartner={selectedPartner}
+              isQuoteDocument={isQuoteDocument}
+              label={copy.partyLabel}
             />
           )}
         />

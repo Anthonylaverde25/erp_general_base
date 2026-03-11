@@ -4,6 +4,7 @@ import { useSearchPartners } from '@/features/partners/hooks/useSearchPartners';
 import { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import { Close as CloseIcon, Add as AddIcon } from '@mui/icons-material';
 import { QuickProspectModal } from './QuickProspectModal';
+import { useNavigate } from 'react-router';
 
 interface PartnerAutocompleteProps {
     value: string | number | undefined; // partner_id
@@ -11,6 +12,8 @@ interface PartnerAutocompleteProps {
     type?: string; // 'customer' | 'supplier'
     disabled?: boolean;
     initialPartner?: any; // Accepting any shape for now to avoid PartnerEntity mismatch
+    isQuoteDocument?: boolean;
+    label?: string;
 }
 
 export function PartnerAutocomplete({
@@ -19,8 +22,11 @@ export function PartnerAutocomplete({
     type,
     disabled = false,
     initialPartner,
+    isQuoteDocument = true,
+    label,
 }: PartnerAutocompleteProps) {
     const { results, setQuery, isLoading } = useSearchPartners(type);
+    const navigate = useNavigate();
 
     const [inputValue, setInputValue] = useState(initialPartner ? initialPartner.name : '');
     const [selectedPartner, setSelectedPartner] = useState<PartnerEntity | undefined>(initialPartner);
@@ -97,13 +103,35 @@ export function PartnerAutocomplete({
                 applyPartner(results[selectedIndex]);
             }
         } else if (e.key === 'Enter') {
-            setShowDropdown(false);
+            if (showDropdown && inputValue.length > 0 && !isLoading && results.length === 0) {
+                // Trigger create action when pressing enter on 'no results'
+                setShowDropdown(false);
+                if (isQuoteDocument) {
+                    setIsProspectModalOpen(true);
+                } else {
+                    navigate(`/partners/create?name=${encodeURIComponent(inputValue)}`);
+                }
+            } else {
+                setShowDropdown(false);
+            }
         }
     };
 
     return (
-        <Box position="relative">
-            <Box display="flex" alignItems="center" position="relative">
+        <Box position="relative" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {label && (
+                <label style={{
+                    fontSize: '0.62rem',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    color: 'var(--doc-text-muted)',
+                    marginBottom: '0.2rem',
+                    padding: '6px 12px 0 12px'
+                }}>
+                    {label}
+                </label>
+            )}
+            <Box display="flex" alignItems="center" position="relative" sx={{ padding: '0 12px 6px 12px', flex: 1 }}>
                 <InputBase
                     inputRef={inputRef}
                     value={inputValue}
@@ -134,34 +162,9 @@ export function PartnerAutocomplete({
                         <CloseIcon sx={{ fontSize: '16px' }} />
                     </IconButton>
                 )}
-                {!disabled && !inputValue && (
-                    <IconButton
-                        size="small"
-                        onClick={() => setIsProspectModalOpen(true)}
-                        title="Añadir Prospecto Rápido"
-                        sx={{
-                            position: 'absolute',
-                            right: 6,
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            padding: '4px',
-                            backgroundColor: 'var(--doc-primary-soft)',
-                            color: 'var(--doc-primary-strong)',
-                            borderRadius: '4px',
-                            transition: 'all 0.2s ease',
-                            '&:hover': {
-                                backgroundColor: 'var(--doc-primary-strong)',
-                                color: 'white',
-                                transform: 'translateY(-50%) scale(1.05)',
-                            },
-                        }}
-                    >
-                        <AddIcon sx={{ fontSize: '14px' }} />
-                    </IconButton>
-                )}
             </Box>
 
-            {showDropdown && !disabled && (results.length > 0 || isLoading) && (
+            {showDropdown && !disabled && (results.length > 0 || isLoading || inputValue.length > 0) && (
                 <Paper
                     sx={{
                         position: 'absolute',
@@ -169,12 +172,12 @@ export function PartnerAutocomplete({
                         left: 0,
                         zIndex: 9999,
                         width: '100%',
-                        minWidth: 350,
-                        maxHeight: 250,
+                        maxHeight: 220,
                         overflowY: 'auto',
-                        mt: 0.5,
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                        border: '1px solid #e0e0e0',
+                        mt: 0,
+                        boxShadow: '0 6px 20px rgba(0,0,0,0.13)',
+                        border: '1px solid #d0d0d0',
+                        borderRadius: '0 0 6px 6px',
                     }}
                 >
                     {isLoading && <Box p={1} fontSize="12px" color="gray">Buscando...</Box>}
@@ -187,31 +190,53 @@ export function PartnerAutocomplete({
                             }}
                             onMouseEnter={() => setSelectedIndex(i)}
                             sx={{
-                                p: 1.5,
+                                padding: '7px 12px',
                                 cursor: 'pointer',
                                 borderBottom: '1px solid #f0f0f0',
                                 display: 'flex',
-                                flexDirection: 'column',
-                                bgcolor: i === selectedIndex ? '#e3f2fd' : 'transparent',
-                                '&:hover': { bgcolor: '#e3f2fd' },
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                gap: 1,
+                                bgcolor: i === selectedIndex ? '#eef4ff' : 'transparent',
+                                '&:hover': { bgcolor: '#eef4ff' },
                                 '&:last-child': { borderBottom: 'none' },
                             }}
                         >
-                            <Box sx={{ fontSize: '13px', fontWeight: 'bold' }}>
-                                {res.name}
+                            <Box sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '12px' }}>
+                                <strong>{res.name}</strong>
+                                {(res.vat_number || res.cif) && (
+                                    <span style={{ marginLeft: 6, color: '#999', fontSize: '11px' }}>
+                                        ({res.cif || res.vat_number})
+                                    </span>
+                                )}
                             </Box>
-                            {(res.vat_number || res.cif) && (
-                                <Box sx={{ fontSize: '11px', color: '#666', mt: 0.5 }}>
-                                    {res.cif && <span>CIF: {res.cif}</span>}
-                                    {res.cif && res.vat_number && <span style={{ margin: '0 6px' }}>|</span>}
-                                    {res.vat_number && <span>VAT: {res.vat_number}</span>}
-                                </Box>
-                            )}
                         </Box>
                     ))}
                     {!isLoading && results.length === 0 && inputValue.length > 0 && (
-                        <Box p={2} fontSize="12px" color="gray" textAlign="center">
-                            No se encontraron resultados
+                        <Box
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                setShowDropdown(false);
+                                if (isQuoteDocument) {
+                                    setIsProspectModalOpen(true);
+                                } else {
+                                    navigate(`/partners/create?name=${encodeURIComponent(inputValue)}`);
+                                }
+                            }}
+                            sx={{
+                                padding: '10px 12px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                color: 'var(--doc-primary-strong)',
+                                '&:hover': { bgcolor: '#eef4ff' },
+                            }}
+                        >
+                            <AddIcon sx={{ fontSize: '16px' }} />
+                            <strong style={{ fontSize: '12px' }}>
+                                Crear {isQuoteDocument ? 'Prospecto' : 'Socio'} "{inputValue}"
+                            </strong>
                         </Box>
                     )}
                 </Paper>
@@ -219,7 +244,7 @@ export function PartnerAutocomplete({
 
             {/* Show details underneath like original layout if valid */}
             {selectedPartner && (selectedPartner.cif || selectedPartner.vat_number) && (
-                <div style={{ fontSize: '0.52rem', color: 'var(--doc-text-muted)', marginTop: '0.15rem', display: 'flex', gap: '0.4rem', fontWeight: 600 }}>
+                <div style={{ fontSize: '0.52rem', color: 'var(--doc-text-muted)', margin: '0 12px 6px 12px', display: 'flex', gap: '0.4rem', fontWeight: 600 }}>
                     {selectedPartner.cif && <span>CIF: {selectedPartner.cif}</span>}
                     {selectedPartner.cif && selectedPartner.vat_number && <span>|</span>}
                     {selectedPartner.vat_number && <span>VAT: {selectedPartner.vat_number}</span>}
