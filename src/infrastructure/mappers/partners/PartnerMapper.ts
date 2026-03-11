@@ -9,13 +9,16 @@ export class PartnerMapper {
 		let role = dto.role || 'prospect';
 
 		if (dto.roles && Array.isArray(dto.roles)) {
-			const roles = dto.roles.map((r: any) => r.role);
+			const roles = dto.roles.map((r: any) => String(r.role).toLowerCase());
+			
+			const isClient = roles.includes('client') || roles.includes('customer');
+			const isSupplier = roles.includes('supplier') || roles.includes('provider') || roles.includes('vendor');
 
-			if (roles.includes('client') && roles.includes('supplier')) {
+			if (isClient && isSupplier) {
 				role = 'client_supplier';
-			} else if (roles.includes('client')) {
+			} else if (isClient) {
 				role = 'client';
-			} else if (roles.includes('supplier')) {
+			} else if (isSupplier) {
 				role = 'supplier';
 			} else if (roles.includes('prospect')) {
 				role = 'prospect';

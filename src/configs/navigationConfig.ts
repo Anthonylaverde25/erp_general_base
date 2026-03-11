@@ -109,6 +109,14 @@ const navigationConfig: FuseNavItemType[] = [
 						type: 'item',
 						icon: 'lucide:users',
 						url: '/sales/customers'
+					},
+					{
+						id: 'sales.prospects',
+						title: 'Prospectos',
+						translate: 'PROSPECTS',
+						type: 'item',
+						icon: 'lucide:user-plus',
+						url: '/partners?type=prospect'
 					}
 				]
 			},

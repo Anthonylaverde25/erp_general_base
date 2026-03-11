@@ -1,4 +1,5 @@
-import { Box, Tabs, Tab, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import { Box, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIndexPartners } from '@/features/partners/hooks/useIndexPartners';
 import { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import PartnerTable from './PartnerTable';
@@ -8,7 +9,7 @@ import PartnerDetailDrawer from './PartnerDetailDrawer';
 
 interface PartnersTabViewProps {
 	currentTab: string;
-	onTabChange: (event: React.SyntheticEvent, newValue: string) => void;
+	onTabChange: (newValue: string) => void;
 }
 
 export default function PartnersTabView({ currentTab, onTabChange }: PartnersTabViewProps) {
@@ -93,34 +94,41 @@ export default function PartnersTabView({ currentTab, onTabChange }: PartnersTab
 			>
 				<Tabs
 					value={currentTab}
-					onChange={onTabChange}
-					variant="scrollable"
-					scrollButtons="auto"
-					indicatorColor="secondary"
-					textColor="secondary"
-					aria-label="filter partners by role"
-					className="min-h-[48px]"
+					onValueChange={onTabChange}
+					className="w-auto"
 				>
-					<Tab
-						label="Todos"
-						value="all"
-					/>
-					<Tab
-						label="Clientes"
-						value="client"
-					/>
-					<Tab
-						label="Proveedores"
-						value="supplier"
-					/>
-					<Tab
-						label="Ambos"
-						value="client_supplier"
-					/>
-					<Tab
-						label="Prospectos"
-						value="prospect"
-					/>
+					<TabsList className="bg-gray-100 dark:bg-gray-800 h-9 p-1 gap-1">
+						<TabsTrigger 
+							value="all"
+							className="text-xs px-4"
+						>
+							Todos
+						</TabsTrigger>
+						<TabsTrigger 
+							value="client"
+							className="text-xs px-4"
+						>
+							Clientes
+						</TabsTrigger>
+						<TabsTrigger 
+							value="supplier"
+							className="text-xs px-4"
+						>
+							Proveedores
+						</TabsTrigger>
+						<TabsTrigger 
+							value="client_supplier"
+							className="text-xs px-4"
+						>
+							Ambos
+						</TabsTrigger>
+						<TabsTrigger 
+							value="prospect"
+							className="text-xs px-4"
+						>
+							Prospectos
+						</TabsTrigger>
+					</TabsList>
 				</Tabs>
 
 				<FormControl

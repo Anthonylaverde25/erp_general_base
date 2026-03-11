@@ -279,7 +279,7 @@
 
 .doc-meta-grid {
 	display: grid;
-	grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) repeat(4, minmax(0, 1fr));
+	grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 0.85fr) minmax(0, 1.05fr) minmax(0, 1.05fr) minmax(0, 1.05fr);
 	border-bottom: 1px solid var(--doc-border);
 	background: var(--doc-topbar-bg);
 }

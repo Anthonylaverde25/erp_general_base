@@ -11,7 +11,7 @@ import DocumentShowSidebar from "../components/DocumentShow/DocumentShowSidebar"
 import DocumentShowFloatingActions from "../components/DocumentShow/DocumentShowFloatingActions";
 import { DocumentShowFloatingToolbar } from "../components/DocumentShow/DocumentShowFloatingToolbar";
 import { RecordPaymentModal } from "../components/DocumentShow/RecordPaymentModal";
-import { DocumentDetailsModal } from "../components/DocumentShow/DocumentDetailsModal";
+import DocumentDetailsModal from "../components/DocumentShow/DocumentDetailsModal";
 import { useConvertToPurchase } from "@/features/documents/hooks/useConvertToPurchase";
 import { useState } from "react";
 

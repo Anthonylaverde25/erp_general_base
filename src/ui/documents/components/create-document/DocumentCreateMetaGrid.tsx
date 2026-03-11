@@ -3,6 +3,7 @@ import { DocumentFormValues } from "../../schemas/documentSchema";
 import { useDocumentCreate } from "../../context/DocumentCreateContext";
 import { CURRENCY_OPTIONS } from "./types";
 import DatePicker from "./DatePicker";
+import { PartnerAutocomplete } from "./PartnerAutocomplete";
 
 export default function DocumentCreateMetaGrid() {
   const { register, control } = useFormContext<DocumentFormValues>();
@@ -20,27 +21,19 @@ export default function DocumentCreateMetaGrid() {
     <section className="doc-meta-grid">
       <div className="doc-meta-cell">
         <label>{copy.partyLabel}</label>
-        <select
-          className="doc-input doc-input-bold doc-input-primary"
-          disabled={isReadOnly}
-          {...register("partner_id")}
-        >
-          <option value="" disabled>
-            Seleccionar {copy.partyLabel}
-          </option>
-          {partnerOptions.map((partner) => (
-            <option key={partner.id} value={partner.id}>
-              {partner.name}
-            </option>
-          ))}
-        </select>
-        {selectedPartner && (selectedPartner.cif || selectedPartner.vat_number) && (
-          <div style={{ fontSize: '0.52rem', color: 'var(--doc-text-muted)', marginTop: '0.15rem', display: 'flex', gap: '0.4rem', fontWeight: 600 }}>
-            {selectedPartner.cif && <span>CIF: {selectedPartner.cif}</span>}
-            {selectedPartner.cif && selectedPartner.vat_number && <span>|</span>}
-            {selectedPartner.vat_number && <span>VAT: {selectedPartner.vat_number}</span>}
-          </div>
-        )}
+        <Controller
+          name="partner_id"
+          control={control}
+          render={({ field }) => (
+            <PartnerAutocomplete
+              value={field.value}
+              onChange={field.onChange}
+              type={copy.partyLabel === 'Cliente' ? 'customer' : (copy.partyLabel === 'Proveedor' ? 'supplier' : undefined)}
+              disabled={isReadOnly}
+              initialPartner={selectedPartner}
+            />
+          )}
+        />
       </div>
 
       <div className="doc-meta-cell">
