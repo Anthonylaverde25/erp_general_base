@@ -26,7 +26,7 @@ export function mapDocumentToFormValues(doc: DocumentEntity): Partial<DocumentFo
         include_legal: false,
         apply_retention: true,
         auto_send: false,
-        item_type: "item",
+        item_type: "product",
         lines: doc.lines.length > 0
             ? doc.lines.map((line: any) => ({
                 id: String(line.id),
@@ -62,7 +62,7 @@ export function mapSourceDocumentToFormValues(doc: DocumentEntity, targetCode: s
 
 interface UseDocumentFormOptions {
     code?: string;
-    itemType: "item" | "service";
+    itemType: "product" | "service";
     isEditMode: boolean;
     existingDocument: DocumentEntity | undefined;
     sourceDocument?: DocumentEntity | undefined;

@@ -33,7 +33,7 @@ export const documentSchema = z.object({
     include_legal: z.boolean().optional().default(false),
     apply_retention: z.boolean().optional().default(true),
     auto_send: z.boolean().optional().default(false),
-    item_type: z.enum(["item", "service"]),
+    item_type: z.enum(["product", "service"]),
     lines: z.array(documentLineSchema).min(1, "Debe haber al menos una línea"),
 });
 

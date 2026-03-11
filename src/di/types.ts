@@ -173,6 +173,7 @@ export const TYPES = {
 
 	// Documents
 	IDocumentRepository: Symbol.for('IDocumentRepository'),
+	IDocumentActionRepository: Symbol.for('IDocumentActionRepository'),
 	IndexDocumentsUseCase: Symbol.for('IndexDocumentsUseCase'),
 	GetDocumentUseCase: Symbol.for('GetDocumentUseCase'),
 	CreateDocumentUseCase: Symbol.for('CreateDocumentUseCase'),

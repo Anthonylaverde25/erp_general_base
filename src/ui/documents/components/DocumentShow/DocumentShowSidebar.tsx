@@ -6,6 +6,7 @@ import { format } from "date-fns"
 import { DocumentEntity } from "@/domain/entities/documents/DocumentEntity"
 import { DocumentBreadcrumb } from "../DocumentBreadcrumb"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { useIndexPayments } from "@/features/payments/hooks/useIndexPayments"
 import { Link as RouterLink } from "react-router"
 
 interface DocumentShowSidebarProps {
@@ -17,7 +18,19 @@ const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(amount)
 }
 
+const formatEuropeanDate = (dateString: string | null | undefined) => {
+    if (!dateString) return "---"
+    try {
+        const date = new Date(dateString)
+        if (isNaN(date.getTime())) return dateString
+        return format(date, "dd/MM/yyyy")
+    } catch (e) {
+        return dateString
+    }
+}
+
 export default function DocumentShowSidebar({ document, onClose }: DocumentShowSidebarProps) {
+    const { payments, isLoading } = useIndexPayments({ documentId: document.id.toString() });
 
     return (
         <aside className="w-[418px] flex-shrink-0 bg-white dark:bg-gray-900 border-l border-[#e5e7eb] dark:border-gray-800 flex flex-col h-full overflow-hidden">
@@ -83,13 +96,13 @@ export default function DocumentShowSidebar({ document, onClose }: DocumentShowS
                                     <div className="flex justify-between items-center py-0.5">
                                         <span className="text-gray-500 dark:text-gray-400 text-xs font-semibold">Fecha de Factura</span>
                                         <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                            {document.issue_date ? format(new Date(document.issue_date), "dd MMM yyyy") : "---"}
+                                            {formatEuropeanDate(document.issue_date)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center py-0.5">
                                         <span className="text-gray-500 dark:text-gray-400 text-xs font-semibold">Vencimiento</span>
                                         <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                                            {document.due_date ? format(new Date(document.due_date), "dd MMM yyyy") : "---"}
+                                            {formatEuropeanDate(document.due_date)}
                                         </span>
                                     </div>
                                 </div>
@@ -198,10 +211,87 @@ export default function DocumentShowSidebar({ document, onClose }: DocumentShowS
                     </TabsContent>
 
                     <TabsContent value="history" className="m-0 p-4 focus-visible:ring-0">
-                        <div className="text-center text-gray-500 dark:text-gray-400 py-10 flex flex-col items-center">
-                            <Clock className="w-8 h-8 mb-4 opacity-20" />
-                            <p className="text-sm font-medium">No hay historial disponible</p>
-                        </div>
+                        {isLoading ? (
+                            <div className="text-center text-gray-500 dark:text-gray-400 py-10 flex flex-col items-center">
+                                <span className="text-sm font-medium animate-pulse">Cargando pagos...</span>
+                            </div>
+                        ) : (
+                            <div className="space-y-6">
+                                {/* Trayectoria del Documento */}
+                                {(document.parent_document || document.child_documents.length > 0) && (
+                                    <div className="space-y-3">
+                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2">Trayectoria Documental</h4>
+                                        <div className="space-y-2">
+                                            {document.parent_document && (
+                                                <div className="flex items-center gap-3 p-2 rounded-lg border border-dashed border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
+                                                    <div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-[10px] text-gray-500 font-bold uppercase">{document.parent_document.document_type_name}</p>
+                                                        <p className="text-xs font-black text-gray-900 dark:text-gray-100 truncate">{document.parent_document.number_serie}</p>
+                                                    </div>
+                                                    <div className="text-[9px] font-bold text-gray-400">ORIGEN</div>
+                                                </div>
+                                            )}
+
+                                            <div className="flex items-center gap-3 p-2 rounded-lg border-2 border-blue-100 dark:border-blue-900/30 bg-blue-50/50 dark:bg-blue-900/10">
+                                                <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_0_2px_rgba(59,130,246,0.2)]"></div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase">{document.document_type_name}</p>
+                                                    <p className="text-xs font-black text-blue-900 dark:text-blue-100 truncate">{document.number_serie || '(Borrador)'}</p>
+                                                </div>
+                                                <div className="text-[9px] font-black text-blue-600 dark:text-blue-400">ACTUAL</div>
+                                            </div>
+
+                                            {document.child_documents.map((child) => (
+                                                <div key={child.id} className="flex items-center gap-3 p-2 rounded-lg border border-dashed border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
+                                                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-[10px] text-gray-500 font-bold uppercase">{child.document_type_name}</p>
+                                                        <p className="text-xs font-black text-gray-900 dark:text-gray-100 truncate">{child.number_serie}</p>
+                                                    </div>
+                                                    <div className="text-[9px] font-bold text-green-600 dark:text-green-500 uppercase">Destino</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Historial de Pagos */}
+                                <div className="space-y-4">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2">Historial de Pagos</h4>
+                                    {payments.length === 0 ? (
+                                        <div className="text-center text-gray-500 dark:text-gray-400 py-6 border border-dashed border-gray-200 dark:border-gray-800 rounded-lg">
+                                            <p className="text-[11px] font-medium italic">No hay pagos registrados aún</p>
+                                        </div>
+                                    ) : (
+                                        payments.map((payment) => (
+                                            <div key={payment.id} className="relative pl-6 pb-4 border-l border-gray-200 dark:border-gray-800 last:border-0 last:pb-0">
+                                                <div className="absolute left-[-5px] top-1 w-2.5 h-2.5 rounded-full bg-blue-500 border-2 border-white dark:border-gray-900 shadow-[0_0_0_2px_rgba(59,130,246,0.2)]"></div>
+                                                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-md p-3 border border-gray-100 dark:border-gray-800 hover:border-blue-200 transition-colors">
+                                                    <div className="flex justify-between items-start mb-1">
+                                                        <span className="text-[11px] font-bold text-gray-900 dark:text-gray-100">
+                                                            {payment.payment_method_name || 'Abono general'}
+                                                        </span>
+                                                        <span className="text-[10px] whitespace-nowrap text-gray-500 dark:text-gray-400 font-semibold bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded shadow-sm border border-gray-100 dark:border-gray-700">
+                                                            {formatEuropeanDate(payment.payment_date)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-lg font-black text-green-600 dark:text-green-500 mt-1 mb-1">
+                                                        {formatCurrency(payment.amount)}
+                                                    </div>
+                                                    {(payment.reference || payment.notes) && (
+                                                        <div className="text-[10px] text-gray-500 mt-2 border-t border-gray-200 dark:border-gray-700 pt-2 flex flex-col gap-0.5">
+                                                            {payment.reference && <span><strong className="text-gray-700 dark:text-gray-300">Ref:</strong> {payment.reference}</span>}
+                                                            {payment.notes && <span className="italic">"{payment.notes}"</span>}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </TabsContent>
                 </div>
             </Tabs>

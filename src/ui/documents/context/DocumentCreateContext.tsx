@@ -34,7 +34,7 @@ interface DocumentCreateContextValue {
     copy: DocumentCreateCopy;
     totals: DocumentFooterTotals;
     isDraftMode: boolean;
-    itemType: "item" | "service";
+    itemType: "product" | "service";
     operation: DocumentOperation;
     isEditMode: boolean;
     isLoadingDocument: boolean;
@@ -57,7 +57,7 @@ export function DocumentCreateProvider({
     const { code } = useParams();
     const [searchParams] = useSearchParams();
     const mode = searchParams.get("mode");
-    const itemType = (searchParams.get("item_type") as "service" | "item") || "item";
+    const itemType = (searchParams.get("item_type") as "service" | "product") || "product";
     const fromDocumentId = searchParams.get("from_document_id");
     const isEditMode = !!documentId;
 
@@ -118,8 +118,8 @@ export function DocumentCreateProvider({
 
     const value: DocumentCreateContextValue = {
         methods,
-        onSubmitDraft: handleSubmit(submitWithStatus("draft")),
-        onSubmitIssue: handleSubmit(submitWithStatus("issued")),
+        onSubmitDraft: handleSubmit(submitWithStatus("draft"), (errors) => console.error("Validation Errors on Draft:", errors)),
+        onSubmitIssue: handleSubmit(submitWithStatus("issued"), (errors) => console.error("Validation Errors on Issue:", errors)),
         isCreating,
         partnerOptions,
         numberSeries: numberSeries || [],

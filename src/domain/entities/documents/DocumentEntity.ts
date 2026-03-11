@@ -49,6 +49,11 @@ export interface ParentDocumentInfo {
     id: number;
     number_serie: string;
     document_type_name: string | null;
+    issue_date?: string | null;
+    status?: {
+        name: string;
+        color: string;
+    } | null;
 }
 
 export class DocumentEntity {
@@ -77,7 +82,8 @@ export class DocumentEntity {
         public readonly notes: string | null,
         public readonly lines: DocumentLine[],
         public readonly tax_summaries: DocumentTaxSummary[],
-        public readonly parent_document: ParentDocumentInfo | null = null
+        public readonly parent_document: ParentDocumentInfo | null = null,
+        public readonly child_documents: ParentDocumentInfo[] = []
     ) { }
 
     get balance(): number {
@@ -159,8 +165,17 @@ export class DocumentEntity {
             json.parent_document ? {
                 id: Number(json.parent_document.id),
                 number_serie: json.parent_document.number_serie,
-                document_type_name: json.parent_document.document_type_name
-            } : null
+                document_type_name: json.parent_document.document_type_name,
+                issue_date: json.parent_document.issue_date || null,
+                status: json.parent_document.status || null
+            } : null,
+            Array.isArray(json.child_documents) ? json.child_documents.map((child: any) => ({
+                id: Number(child.id),
+                number_serie: child.number_serie,
+                document_type_name: child.document_type_name,
+                issue_date: child.issue_date || null,
+                status: child.status || null
+            })) : []
         );
     }
 }
