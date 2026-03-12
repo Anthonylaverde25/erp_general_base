@@ -10,6 +10,7 @@ export interface TimelineItemProps {
   icon: React.ReactNode;
   selected?: boolean;
   docNumber?: string;
+  key?: React.Key;
 }
 
 export function TimelineItem({

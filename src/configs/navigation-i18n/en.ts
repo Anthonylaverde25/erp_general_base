@@ -20,6 +20,7 @@ const locale = {
 	ORDERS: 'Orders',
 	INVOICES: 'Invoices',
 	CUSTOMERS: 'Customers',
+	GROUPED_INVOICES: 'Grouped Invoices',
 	PROSPECTS: 'Prospects',
 
 	// Purchases

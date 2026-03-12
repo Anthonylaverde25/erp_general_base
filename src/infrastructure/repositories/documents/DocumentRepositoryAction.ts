@@ -23,4 +23,11 @@ export class DocumentRepositoryAction implements IDocumentActionRepository {
         const { data } = await axiosInstance.post(`documents/${id}/payments`, payload);
         return data;
     }
+
+    async batchConvert(payload: { source_ids: (string | number)[]; number_series_id?: number | null; status_key?: string }): Promise<DocumentEntity> {
+        const {
+            data: { data: invoice }
+        } = await axiosInstance.post(`documents/batch-convert`, payload);
+        return DocumentEntity.fromJson(invoice);
+    }
 }

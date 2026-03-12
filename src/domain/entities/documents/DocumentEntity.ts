@@ -79,11 +79,12 @@ export class DocumentEntity {
         public readonly issue_date_raw: string | null,
         public readonly due_date_raw: string | null,
         public readonly number_series_id: number | null,
+        public readonly item_type: 'product' | 'service' | null,
         public readonly notes: string | null,
         public readonly lines: DocumentLine[],
         public readonly tax_summaries: DocumentTaxSummary[],
-        public readonly parent_document: ParentDocumentInfo | null = null,
-        public readonly child_documents: ParentDocumentInfo[] = []
+        public readonly predecessors: ParentDocumentInfo[] = [],
+        public readonly successors: ParentDocumentInfo[] = []
     ) { }
 
     get balance(): number {
@@ -137,6 +138,26 @@ export class DocumentEntity {
             }))
             : [];
 
+        const predecessors: ParentDocumentInfo[] = Array.isArray(json.predecessors) 
+            ? json.predecessors.map((p: any) => ({
+                id: Number(p.id),
+                number_serie: p.number_serie,
+                document_type_name: p.document_type_name,
+                issue_date: p.issue_date || null,
+                status: p.status || null
+            })) 
+            : [];
+
+        const successors: ParentDocumentInfo[] = Array.isArray(json.successors)
+            ? json.successors.map((s: any) => ({
+                id: Number(s.id),
+                number_serie: s.number_serie,
+                document_type_name: s.document_type_name,
+                issue_date: s.issue_date || null,
+                status: s.status || null
+            }))
+            : [];
+
         return new DocumentEntity(
             Number(json.id),
             Number(json.company_id),
@@ -159,23 +180,12 @@ export class DocumentEntity {
             json.issue_date || null,
             json.due_date || null,
             json.number_series_id ? Number(json.number_series_id) : null,
+            json.item_type || null,
             json.notes || null,
             lines,
             tax_summaries,
-            json.parent_document ? {
-                id: Number(json.parent_document.id),
-                number_serie: json.parent_document.number_serie,
-                document_type_name: json.parent_document.document_type_name,
-                issue_date: json.parent_document.issue_date || null,
-                status: json.parent_document.status || null
-            } : null,
-            Array.isArray(json.child_documents) ? json.child_documents.map((child: any) => ({
-                id: Number(child.id),
-                number_serie: child.number_serie,
-                document_type_name: child.document_type_name,
-                issue_date: child.issue_date || null,
-                status: child.status || null
-            })) : []
+            predecessors,
+            successors
         );
     }
 }

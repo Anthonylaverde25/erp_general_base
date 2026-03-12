@@ -6,10 +6,15 @@ const CreateSalesDocumentPage = lazy(() => import('@/ui/documents/pages/CreateSa
 const EditSalesDocumentPage = lazy(() => import('@/ui/documents/pages/EditSalesDocumentPage'));
 const DocumentShowPage = lazy(() => import('@/ui/documents/pages/DocumentShowPage'));
 const PartnersPage = lazy(() => import('@/ui/partners/pages/PartnersPage'));
+const GroupedInvoicesPage = lazy(() => import('@/ui/documents/pages/GroupedInvoicesPage'));
 
 const route: FuseRouteItemType = {
 	path: 'sales',
 	children: [
+		{
+			path: 'grouped-invoices',
+			element: <GroupedInvoicesPage />
+		},
 		{
 			path: 'customers',
 			element: <PartnersPage defaultTab="client" />

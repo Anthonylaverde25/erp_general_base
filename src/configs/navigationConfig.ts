@@ -111,6 +111,14 @@ const navigationConfig: FuseNavItemType[] = [
 						url: '/sales/customers'
 					},
 					{
+						id: 'sales.grouped_invoices',
+						title: 'Facturación Agrupada',
+						translate: 'GROUPED_INVOICES',
+						type: 'item',
+						icon: 'lucide:layers',
+						url: '/sales/grouped-invoices'
+					},
+					{
 						id: 'sales.prospects',
 						title: 'Prospectos',
 						translate: 'PROSPECTS',

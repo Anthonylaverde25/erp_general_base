@@ -66,16 +66,17 @@ export function DocumentTrajectory({ document }: DocumentTrajectoryProps) {
       </Box>
 
       <Stack spacing={1.6}>
-        {document.parent_document && (
+        {document.predecessors.map((parent) => (
           <TimelineItem
-            title={document.parent_document.document_type_name || "Documento Padre"}
+            key={parent.id}
+            title={parent.document_type_name || "Documento Padre"}
             subtitle="Documento origen"
-            date={formatEuropeanDate(document.parent_document.issue_date)}
+            date={formatEuropeanDate(parent.issue_date)}
             status="completed"
             icon={<FileText size={13} />}
-            docNumber={document.parent_document.number_serie}
+            docNumber={parent.number_serie}
           />
-        )}
+        ))}
 
         <TimelineItem
           title={document.document_type_name || "Documento Actual"}
@@ -87,20 +88,20 @@ export function DocumentTrajectory({ document }: DocumentTrajectoryProps) {
           selected
         />
 
-        {document.child_documents.map((child, index) => (
+        {document.successors.map((child, index) => (
           <TimelineItem
             key={child.id}
             title={child.document_type_name || "Documento Hijo"}
             subtitle="Documento generado"
             date={formatEuropeanDate(child.issue_date)}
             status="pending"
-            isLast={index === document.child_documents.length - 1}
+            isLast={index === document.successors.length - 1}
             icon={<Clock size={13} />}
             docNumber={child.number_serie}
           />
         ))}
 
-        {(!document.child_documents || document.child_documents.length === 0) && (
+        {(!document.successors || document.successors.length === 0) && (
           <TimelineItem
             title="Fin de Ciclo"
             subtitle="Documento final"
