@@ -18,7 +18,9 @@ import {
   getConversionTargetType,
   isPurchaseOrder,
   isQuote,
+  resolveFastTrackAction,
 } from "./DocumentShowFloatingActions.helpers";
+import DocumentActionSplitButton from "./components/DocumentActionSplitButton";
 
 const CTA_VARIANTS = {
   indigo: "bg-indigo-600 hover:bg-indigo-700 text-white",
@@ -200,12 +202,14 @@ export function PrimaryActions({
   docTypeCode,
   isUpdating,
   nextAction,
+  fastTrackAction,
   onStatusChange,
 }: {
   statusKey: string;
   docTypeCode: string;
   isUpdating: boolean;
   nextAction: NextAction | null;
+  fastTrackAction: NextAction | null;
   onStatusChange: (next: string) => void;
 }) {
   if (!nextAction) return null;
@@ -223,14 +227,12 @@ export function PrimaryActions({
         </button>
       )}
 
-      <button
-        onClick={() => onStatusChange(nextAction.nextStatus)}
+      <DocumentActionSplitButton
+        primaryAction={nextAction}
+        fastTrackAction={fastTrackAction}
+        onAction={onStatusChange}
         disabled={isUpdating}
-        className={`px-4 h-7 text-[11px] font-bold uppercase tracking-wide flex items-center gap-1.5 transition-colors disabled:opacity-60 ${CTA_VARIANTS[nextAction.variant]}`}
-      >
-        <nextAction.Icon className="w-3.5 h-3.5" />
-        {isUpdating ? "Procesando..." : nextAction.label}
-      </button>
+      />
     </div>
   );
 }

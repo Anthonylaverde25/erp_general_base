@@ -28,6 +28,8 @@ import {
 import { format } from 'date-fns';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useNavigate } from 'react-router';
+import DocumentEmptyState from './common/DocumentEmptyState';
+import DocumentTableSkeleton from './common/DocumentTableSkeleton';
 
 ModuleRegistry.registerModules([
     ClientSideRowModelModule,
@@ -258,6 +260,19 @@ export default function DocumentAgGridTable({ documents, isLoading, operation = 
         floatingFilter: showFilters,
         resizable: true,
     }), [showFilters]);
+
+    if (isLoading) {
+        return <DocumentTableSkeleton />;
+    }
+
+    if (!documents || documents.length === 0) {
+        return (
+            <DocumentEmptyState 
+                operation={operation} 
+                onCreate={() => navigate(`${basePath}/create/INV`)} 
+            />
+        );
+    }
 
     return (
         <Box className="flex flex-col h-full w-full">

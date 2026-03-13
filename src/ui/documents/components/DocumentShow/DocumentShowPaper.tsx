@@ -11,6 +11,7 @@ import { DocumentEntity, DocumentLine } from '@/domain/entities/documents/Docume
 import { CompanyEntity } from '@/domain/entities/companies/Company';
 import { Box, Typography, useTheme } from '@mui/material';
 import { DocumentBreadcrumb } from '../DocumentBreadcrumb';
+import { formatDate } from './components/pdf/PDFUtils';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -47,65 +48,108 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
         });
     }, [isDark]);
 
-    const columnDefs = useMemo<ColDef<DocumentLine>[]>(() => [
-        {
-            headerName: 'Descripción',
-            field: 'name',
-            flex: 4,
-            cellRenderer: (params: any) => (
-                <Box className="flex flex-col py-1.5">
-                    <Typography style={{ fontSize: '13px', fontWeight: 600 }}>{params.value}</Typography>
-                    {params.data.description && (
-                        <Typography variant="caption" color="text.secondary" className="leading-tight italic">
-                            {params.data.description}
-                        </Typography>
-                    )}
-                </Box>
-            ),
-            autoHeight: true,
-        },
-        {
-            headerName: 'Cant.',
-            field: 'quantity',
-            flex: 1,
-            type: 'numericColumn',
-            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
-        },
-        {
-            headerName: 'Precio',
-            field: 'unit_price',
-            flex: 1.5,
-            valueFormatter: (p) => formatCurrency(p.value),
-            type: 'numericColumn',
-            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
-        },
-        {
-            headerName: 'Imp.',
-            valueGetter: (p) => `${p.data.taxes?.[0]?.percentage || 0}%`,
-            flex: 1,
-            type: 'numericColumn',
-            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
-        },
-        {
-            headerName: 'Total',
-            field: 'line_total',
-            flex: 1.5,
-            valueFormatter: (p) => formatCurrency(p.value),
-            cellStyle: (params) => ({
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                fontWeight: 700,
-                color: isDark ? '#60a5fa' : '#0f172a'
-            }),
-            type: 'numericColumn',
-        },
-    ], [isDark]);
+    const columnDefs = useMemo<ColDef<any>[]>(() => {
+        const hasPredecessors = document.predecessors && document.predecessors.length > 1;
+        
+        const defs: ColDef<any>[] = [];
+        
+        if (hasPredecessors) {
+            defs.push({
+                headerName: 'Origen',
+                field: 'source_document_number',
+                flex: 1.5,
+                cellRenderer: (params: any) => {
+                    const rowIndex = params.node.rowIndex;
+                    const rowData = params.data;
+                    const prevRowData = params.api.getDisplayedRowAtIndex(rowIndex - 1)?.data;
+                    
+                    // Only show if it's the first row or the source document changed
+                    const isFirstOfGroup = !prevRowData || prevRowData.source_document_number !== rowData.source_document_number;
+                    
+                    if (!isFirstOfGroup) return null;
 
-    const LINES_PER_PAGE = 15;
+                    return (
+                        <Box className="flex items-center h-full">
+                            <Typography className="text-blue-600 dark:text-blue-400 font-black italic tracking-tight" style={{ fontSize: '11px' }}>
+                                #{rowData.source_document_number || 'S/N'}
+                            </Typography>
+                        </Box>
+                    );
+                },
+                cellStyle: { borderRight: isDark ? '1px solid #1e293b' : '1px solid #f1f5f9' },
+            });
+        }
+
+        defs.push(
+            {
+                headerName: 'Descripción',
+                field: 'name',
+                flex: 4,
+                cellRenderer: (params: any) => (
+                    <Box className="flex flex-col py-1.5">
+                        <Typography style={{ fontSize: '13px', fontWeight: 600 }}>{params.value}</Typography>
+                        {params.data.description && (
+                            <Typography variant="caption" color="text.secondary" className="leading-tight italic">
+                                {params.data.description}
+                            </Typography>
+                        )}
+                    </Box>
+                ),
+                autoHeight: true,
+            },
+            {
+                headerName: 'Cant.',
+                field: 'quantity',
+                flex: 1,
+                type: 'numericColumn',
+                cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
+            },
+            {
+                headerName: 'Precio',
+                field: 'unit_price',
+                flex: 1.5,
+                valueFormatter: (p) => formatCurrency(p.value),
+                type: 'numericColumn',
+                cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
+            },
+            {
+                headerName: 'Imp.',
+                valueGetter: (p) => `${p.data.taxes?.[0]?.percentage || 0}%`,
+                flex: 1,
+                type: 'numericColumn',
+                cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
+            },
+            {
+                headerName: 'Total',
+                field: 'line_total',
+                flex: 1.5,
+                valueFormatter: (p) => formatCurrency(p.value),
+                cellStyle: (params) => ({
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    fontWeight: 700,
+                    color: isDark ? '#60a5fa' : '#0f172a'
+                }),
+                type: 'numericColumn',
+            }
+        );
+
+        return defs;
+    }, [isDark, document.predecessors]);
+
+    const LINES_PER_PAGE = 25; // More lines as we removed header rows
     const pages = useMemo(() => {
         if (!document.lines || document.lines.length === 0) return [[]];
-        return chunkArray(document.lines, LINES_PER_PAGE);
+
+        // Sort lines by predecessor order ("en serie")
+        const sortedLines = [...document.lines].sort((a, b) => {
+            const indexA = document.predecessors?.findIndex(p => p.id === a.source_document_id) ?? -1;
+            const indexB = document.predecessors?.findIndex(p => p.id === b.source_document_id) ?? -1;
+            return indexA - indexB;
+        });
+        
+        return chunkArray(sortedLines, LINES_PER_PAGE);
     }, [document.lines]);
 
     const totalPages = pages.length;
@@ -115,17 +159,6 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
 
     return (
         <div className="flex flex-col gap-6 items-center w-full">
-            {/* Floating Breadcrumb above the "Paper" */}
-            {document.parent_document && (
-                <div className="flex items-center justify-between border-b border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 w-full max-w-[21cm] px-2 py-2 sm:rounded-t-xl backdrop-blur-sm">
-                    <Typography variant='body2' className=" dark:text-gray-400 font-medium">
-                        Documento relacionado:
-                    </Typography>
-                    <DocumentBreadcrumb
-                        document={document}
-                    />
-                </div>
-            )}
 
             {pages.map((pageLines, pageIndex) => {
                 const isFirstPage = pageIndex === 0;
@@ -183,7 +216,7 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                                                 </div>
                                                 <div className="flex flex-col items-end">
                                                     <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Fecha</span>
-                                                    <span className="text-[12px] font-bold text-[#0f172a] dark:text-white">{document.issue_date}</span>
+                                                    <span className="text-[12px] font-bold text-[#0f172a] dark:text-white">{formatDate(document.issue_date)}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -200,7 +233,7 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                                             </div>
                                         </div>
                                         <div>
-                                            <p className="font-bold text-slate-400 dark:text-slate-400 uppercase text-[9px] mb-4 tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Detalles</p>
+                                            <p className="font-bold text-slate-400 dark:text-slate-400 uppercase text-[9px] mb-4 tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Detalles del Documento</p>
                                             <div className="space-y-3">
                                                 <div className="flex justify-between items-center text-[12px]">
                                                     <span className="text-slate-400">Estado</span>
@@ -210,8 +243,9 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                                                 </div>
                                                 <div className="flex justify-between items-center text-[12px]">
                                                     <span className="text-slate-400">Vencimiento</span>
-                                                    <span className="font-medium text-slate-700 dark:text-slate-200">{document.due_date || document.issue_date}</span>
+                                                    <span className="font-medium text-slate-700 dark:text-slate-200">{formatDate(document.due_date || document.issue_date)}</span>
                                                 </div>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -229,7 +263,7 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                                     <div className="text-right flex gap-4 text-[10px] text-slate-500">
                                         <span>Nº {document.number_serie || '(Borrador)'}</span>
                                         <span>•</span>
-                                        <span>{document.issue_date}</span>
+                                        <span>{formatDate(document.issue_date)}</span>
                                     </div>
                                 </div>
                             )}
@@ -264,8 +298,8 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                                             <span className="text-slate-400">Subtotal</span>
                                             <span className="text-slate-900 dark:text-slate-200 font-medium">{formatCurrency(document.subtotal)}</span>
                                         </div>
-                                        {document.tax_summaries?.map((tax, i) => (
-                                            <div key={i} className="flex justify-between text-[11px] px-2 py-1">
+                                        {document.tax_summaries?.map((tax) => (
+                                            <div key={tax.rate} className="flex justify-between text-[11px] px-2 py-1">
                                                 <span className="text-slate-400">IVA ({tax.rate}%)</span>
                                                 <span className="text-slate-900 dark:text-slate-200 font-medium">{formatCurrency(tax.tax_amount)}</span>
                                             </div>

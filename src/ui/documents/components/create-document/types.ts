@@ -71,6 +71,34 @@ export const COPY_BY_OPERATION: Record<DocumentOperation, DocumentCreateCopy> = 
 	}
 };
 
+/**
+ * Gets customized copy based on document type code.
+ */
+export function getDocumentTypeCopy(
+	operation: DocumentOperation,
+	typeCode: string | undefined,
+	baseCopy: DocumentCreateCopy
+): DocumentCreateCopy {
+	if (!typeCode) return baseCopy;
+
+	const labels: Record<string, string> = {
+		'INV': 'Emitir Factura',
+		'PINV': 'Registrar Factura',
+		'DLV': 'Emitir Albarán',
+		'PDLV': 'Registrar Albarán',
+		'QUO': 'Emitir Presupuesto',
+		'PQUO': 'Registrar Presupuesto',
+		'PORD': 'Registrar Pedido',
+	};
+
+	const action = labels[typeCode];
+	if (action) {
+		return { ...baseCopy, primaryAction: action };
+	}
+
+	return baseCopy;
+}
+
 export const GRID_THEME_OPTIONS: DocumentGridThemeOption[] = [
 	{ value: 'material', label: 'Material' },
 	{ value: 'quartz', label: 'Quartz' },

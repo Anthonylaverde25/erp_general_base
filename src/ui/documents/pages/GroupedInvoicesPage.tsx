@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useIndexDocuments } from '@/features/documents/hooks/useIndexDocuments';
-import DocumentTable from '../components/DocumentTable';
+import GroupedInvoicesTable from './components/grouped-invoices-table';
 import GroupedBillingStats from './components/GroupedBillingStats';
 import DocumentsHeader from '../components/DocumentsHeader';
 
@@ -22,8 +22,11 @@ const Root = styled(FusePageCarded)(() => ({
 export default function GroupedInvoicesPage() {
 	const { t } = useTranslation('navigation');
 
-	// Filtramos solo albaranes facturables (sin hijos, entregados)
+	// Filtramos solo albaranes facturables (sin hijos, entregados) desde el backend
 	const { data: documents, isLoading, refetch } = useIndexDocuments({
+		operation: 'sale',
+		document_type_code: 'DLV',
+		status: 'delivered',
 		only_billable: true
 	});
 
@@ -42,10 +45,9 @@ export default function GroupedInvoicesPage() {
 			}
 			content={
 				<Box>
-					<DocumentTable
+					<GroupedInvoicesTable
 						documents={documents}
 						isLoading={isLoading}
-						operation="sale"
 						onStatusUpdated={refetch}
 					/>
 				</Box>

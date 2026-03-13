@@ -1,0 +1,320 @@
+import { StyleSheet, Font } from '@react-pdf/renderer';
+
+// Register a professional font
+Font.register({
+    family: 'Helvetica',
+    fonts: [
+        { src: 'https://cdn.jsdelivr.net/npm/@canvas-fonts/helvetica@1.0.4/Helvetica.ttf' },
+        { src: 'https://cdn.jsdelivr.net/npm/@canvas-fonts/helvetica@1.0.4/Helvetica-Bold.ttf', fontWeight: 'bold' },
+    ],
+});
+
+export const PRIMARY_COLOR = '#0f172a';
+export const SECONDARY_COLOR = '#64748b';
+export const BORDER_COLOR = '#f1f5f9';
+export const TABLE_HEADER_BG = '#f8fafc';
+
+export const styles = StyleSheet.create({
+    page: {
+        padding: 40,
+        backgroundColor: '#ffffff',
+        fontFamily: 'Helvetica',
+        color: '#1e293b',
+    },
+    topBar: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 4,
+        backgroundColor: PRIMARY_COLOR,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 40,
+        borderBottomWidth: 1,
+        borderBottomColor: BORDER_COLOR,
+        paddingBottom: 30,
+    },
+    companyInfo: {
+        flexDirection: 'column',
+    },
+    logo: {
+        height: 35,
+        marginBottom: 10,
+    },
+    logoPlaceholder: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: PRIMARY_COLOR,
+        textTransform: 'uppercase',
+    },
+    companyText: {
+        fontSize: 8,
+        color: SECONDARY_COLOR,
+        marginTop: 4,
+        lineHeight: 1.4,
+    },
+    headerRight: {
+        textAlign: 'right',
+    },
+    invoiceTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: PRIMARY_COLOR,
+        textTransform: 'uppercase',
+        letterSpacing: 2,
+        marginBottom: 15,
+    },
+    metaGrid: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        gap: 25,
+    },
+    metaItem: {
+        flexDirection: 'column',
+        alignItems: 'flex-end',
+    },
+    metaLabel: {
+        fontSize: 7,
+        fontWeight: 'bold',
+        color: SECONDARY_COLOR,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        marginBottom: 2,
+    },
+    metaValue: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: PRIMARY_COLOR,
+    },
+    infoSection: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 40,
+    },
+    infoBox: {
+        width: '45%',
+    },
+    infoLabel: {
+        fontSize: 8,
+        fontWeight: 'bold',
+        color: SECONDARY_COLOR,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        borderBottomWidth: 1,
+        borderBottomColor: BORDER_COLOR,
+        paddingBottom: 5,
+        marginBottom: 10,
+    },
+    infoName: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#0f172a',
+        marginBottom: 5,
+    },
+    infoText: {
+        fontSize: 9,
+        color: SECONDARY_COLOR,
+        marginBottom: 2,
+        lineHeight: 1.3,
+    },
+    statusBadge: {
+        fontSize: 8,
+        fontWeight: 'bold',
+        color: '#475569',
+        backgroundColor: '#f8fafc',
+        padding: '2 6',
+        borderRadius: 2,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    tableHeader: {
+        flexDirection: 'row',
+        backgroundColor: TABLE_HEADER_BG,
+        padding: '8 10',
+        borderBottomWidth: 1,
+        borderBottomColor: BORDER_COLOR,
+    },
+    tableHeaderText: {
+        fontSize: 8,
+        fontWeight: 'bold',
+        color: PRIMARY_COLOR,
+        textTransform: 'uppercase',
+    },
+    tableRow: {
+        flexDirection: 'row',
+        padding: '10 10',
+        borderBottomWidth: 1,
+        borderBottomColor: BORDER_COLOR,
+        alignItems: 'center',
+    },
+    tableRowEven: {
+        backgroundColor: '#fafbfc',
+    },
+    colOrigin: { width: '15%' },
+    colDesc: { width: '40%' },
+    colQty: { width: '10%', textAlign: 'center' },
+    colPrice: { width: '15%', textAlign: 'right' },
+    colTax: { width: '8%', textAlign: 'right' },
+    colTotal: { width: '12%', textAlign: 'right' },
+
+    itemMain: { fontSize: 9, fontWeight: 'bold', color: PRIMARY_COLOR },
+    itemSub: { fontSize: 7, color: SECONDARY_COLOR, fontStyle: 'italic', marginTop: 2 },
+    itemValue: { fontSize: 9, color: SECONDARY_COLOR },
+    itemBold: { fontSize: 9, fontWeight: 'bold', color: PRIMARY_COLOR },
+
+    summarySection: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20,
+        alignItems: 'flex-end',
+    },
+    summaryWrapper: {
+        width: 180,
+    },
+    summaryRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: '4 8',
+    },
+    summaryLabel: {
+        fontSize: 9,
+        color: SECONDARY_COLOR,
+    },
+    summaryValue: {
+        fontSize: 9,
+        fontWeight: 'bold',
+        color: '#1e293b',
+    },
+    totalRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+        padding: '8 8',
+        borderTopWidth: 2,
+        borderTopColor: PRIMARY_COLOR,
+    },
+    totalLabel: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: PRIMARY_COLOR,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    totalValue: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: PRIMARY_COLOR,
+    },
+    sourceHeaderRow: {
+        backgroundColor: '#f1f5f9',
+        padding: '4 10',
+        borderBottomWidth: 1,
+        borderBottomColor: BORDER_COLOR,
+    },
+    sourceHeaderText: {
+        fontSize: 7,
+        fontWeight: 'bold',
+        color: PRIMARY_COLOR,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    table: {
+        width: '100%',
+    },
+    qrCodeContainer: {
+        width: 80,
+        height: 80,
+        borderWidth: 1,
+        borderColor: BORDER_COLOR,
+        padding: 5,
+        backgroundColor: '#ffffff',
+    },
+    qrCodeImage: {
+        width: '100%',
+        height: '100%',
+    },
+    qrCodeLabel: {
+        fontSize: 6,
+        color: SECONDARY_COLOR,
+        textAlign: 'center',
+        marginTop: 4,
+        textTransform: 'uppercase',
+    },
+    footerContainer: {
+        position: 'absolute',
+        bottom: 30,
+        left: 40,
+        right: 40,
+        paddingTop: 10,
+        borderTopWidth: 1,
+        borderTopColor: BORDER_COLOR,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    footerText: {
+        fontSize: 8,
+        color: SECONDARY_COLOR,
+        fontStyle: 'italic',
+    },
+    pageNumberInfo: {
+        fontSize: 8,
+        color: PRIMARY_COLOR,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+    },
+    miniHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: BORDER_COLOR,
+        paddingBottom: 15,
+        marginBottom: 20,
+    },
+    miniHeaderLogo: {
+        height: 20,
+        opacity: 0.5,
+    },
+    miniHeaderText: {
+        fontSize: 8,
+        color: SECONDARY_COLOR,
+        textTransform: 'uppercase',
+    },
+    miniHeaderMetaRow: {
+        flexDirection: 'row',
+        gap: 10,
+    },
+    stampContainer: {
+        position: 'absolute',
+        top: '40%',
+        left: '50%',
+        marginTop: -100,
+        marginLeft: -150,
+        width: 300,
+        height: 150,
+        borderWidth: 8,
+        borderRadius: 15,
+        borderStyle: 'solid',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: 0.15,
+        transform: 'rotate(-35)',
+    },
+    stampText: {
+        fontSize: 60,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        marginBottom: 5,
+    },
+    stampSubtext: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        letterSpacing: 4,
+    },
+});

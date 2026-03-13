@@ -1,16 +1,10 @@
-import type { LucideIcon } from "lucide-react";
-import {
-  CheckCircle,
-  ClipboardCheck,
-  SendHorizonal,
-  Truck,
-} from "lucide-react";
+// No unnecessary lucide imports since we use strings now for mapping to MUI
 
 export type LifecycleStep = { key: string; label: string };
 export type NextAction = {
   label: string;
   nextStatus: string;
-  Icon: LucideIcon;
+  Icon: string;
   variant: "indigo" | "green";
 };
 
@@ -108,14 +102,14 @@ export function resolveNextAction(
       return {
         label: "Aprobar",
         nextStatus: "approved",
-        Icon: CheckCircle,
+        Icon: "CheckCircle",
         variant: "indigo",
       };
     if (statusKey === "approved")
       return {
         label: "Emitir factura",
         nextStatus: "issued",
-        Icon: SendHorizonal,
+        Icon: "SendHorizonal",
         variant: "green",
       };
   }
@@ -125,14 +119,14 @@ export function resolveNextAction(
       return {
         label: "Validar",
         nextStatus: "validated",
-        Icon: ClipboardCheck,
+        Icon: "ClipboardCheck",
         variant: "indigo",
       };
     if (statusKey === "validated")
       return {
         label: "Registrar entrega",
         nextStatus: "delivered",
-        Icon: Truck,
+        Icon: "Truck",
         variant: "green",
       };
   }
@@ -142,14 +136,14 @@ export function resolveNextAction(
       return {
         label: "Validar",
         nextStatus: "validated",
-        Icon: ClipboardCheck,
+        Icon: "ClipboardCheck",
         variant: "indigo",
       };
     if (statusKey === "validated")
       return {
         label: "Registrar recepción",
         nextStatus: "received",
-        Icon: Truck,
+        Icon: "Truck",
         variant: "green",
       };
   }
@@ -159,14 +153,14 @@ export function resolveNextAction(
       return {
         label: "Validar",
         nextStatus: "validated",
-        Icon: ClipboardCheck,
+        Icon: "ClipboardCheck",
         variant: "indigo",
       };
     if (statusKey === "validated")
       return {
         label: "Aprobar",
         nextStatus: "approved",
-        Icon: CheckCircle,
+        Icon: "CheckCircle",
         variant: "green",
       };
   }
@@ -176,16 +170,71 @@ export function resolveNextAction(
       return {
         label: "Validar",
         nextStatus: "validated",
-        Icon: ClipboardCheck,
+        Icon: "ClipboardCheck",
         variant: "indigo",
       };
     if (statusKey === "validated")
       return {
         label: "Realizar pedido",
         nextStatus: "ordered",
-        Icon: Truck,
+        Icon: "Truck",
         variant: "green",
       };
+  }
+
+  return null;
+}
+
+export function resolveFastTrackAction(
+  docTypeCode: string,
+  statusKey: string,
+  operation: string,
+): NextAction | null {
+  if (statusKey !== "draft") return null;
+
+  if (isInvoice(docTypeCode)) {
+    return {
+      label: "Emitir",
+      nextStatus: "issued",
+      Icon: "Zap",
+      variant: "green",
+    };
+  }
+
+  if (isDelivery(docTypeCode)) {
+    return {
+      label: "Entregar",
+      nextStatus: "delivered",
+      Icon: "Zap",
+      variant: "green",
+    };
+  }
+
+  if (isPurchaseDelivery(docTypeCode)) {
+    return {
+      label: "Recibir",
+      nextStatus: "received",
+      Icon: "Zap",
+      variant: "green",
+    };
+  }
+
+  if (isQuote(docTypeCode)) {
+    return {
+      label: "Aprobar",
+      nextStatus: "approved",
+      Icon: "CheckCircle",
+      variant: "green",
+    };
+  }
+
+  if (isPurchaseOrder(docTypeCode)) {
+    return {
+      label: "Pedir",
+      nextStatus: "ordered",
+      Icon: "Truck",
+      variant: "green",
+    };
   }
 
   return null;

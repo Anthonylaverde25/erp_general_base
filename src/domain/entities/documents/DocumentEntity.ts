@@ -32,6 +32,8 @@ export interface DocumentLine {
     tax_amount: number;
     line_total: number;
     taxes: DocumentLineTax[];
+    source_document_id?: number | null;
+    source_document_number?: string | null;
 }
 
 export interface DocumentTaxSummary {
@@ -74,6 +76,8 @@ export class DocumentEntity {
         public readonly partner_name: string | null,
         public readonly partner_email: string | null,
         public readonly partner_address: string | null,
+        public readonly partner_vat_number: string | null,
+        public readonly partner_cif: string | null,
         public readonly document_type_name: string | null,
         public readonly document_type_code: string | null,
         public readonly issue_date_raw: string | null,
@@ -95,6 +99,16 @@ export class DocumentEntity {
         const contactList = Array.isArray(json.partner?.contact) ? json.partner.contact : [];
         const defaultContact = contactList.find((contact: any) => contact?.default);
         const fallbackContact = contactList[0];
+
+        const predecessors: ParentDocumentInfo[] = Array.isArray(json.predecessors) 
+            ? json.predecessors.map((p: any) => ({
+                id: Number(p.id),
+                number_serie: p.number_serie,
+                document_type_name: p.document_type_name,
+                issue_date: p.issue_date || null,
+                status: p.status || null
+            })) 
+            : [];
 
         const lines: DocumentLine[] = Array.isArray(json.lines)
             ? json.lines.map((line: any) => ({
@@ -121,7 +135,9 @@ export class DocumentEntity {
                         base_amount: Number(tax.base_amount ?? 0),
                         tax_amount: Number(tax.tax_amount ?? 0)
                     }))
-                    : []
+                    : [],
+                source_document_id: line.source_document_id ? Number(line.source_document_id) : null,
+                source_document_number: line.source_document_number || (line.source_document_id ? predecessors.find(p => p.id === Number(line.source_document_id))?.number_serie : null),
             }))
             : [];
 
@@ -136,16 +152,6 @@ export class DocumentEntity {
                 base_amount: Number(summary.base_amount ?? 0),
                 tax_amount: Number(summary.tax_amount ?? 0)
             }))
-            : [];
-
-        const predecessors: ParentDocumentInfo[] = Array.isArray(json.predecessors) 
-            ? json.predecessors.map((p: any) => ({
-                id: Number(p.id),
-                number_serie: p.number_serie,
-                document_type_name: p.document_type_name,
-                issue_date: p.issue_date || null,
-                status: p.status || null
-            })) 
             : [];
 
         const successors: ParentDocumentInfo[] = Array.isArray(json.successors)
@@ -175,6 +181,8 @@ export class DocumentEntity {
             json.partner?.name || json.partner_name || json.partner_snapshot?.name || null,
             defaultContact?.email || fallbackContact?.email || json.partner_snapshot?.email || null,
             json.partner?.address || json.partner_address || json.partner_snapshot?.address || null,
+            json.partner?.vat_number || json.partner_vat_number || json.partner_snapshot?.vat_number || null,
+            json.partner?.cif || json.partner_cif || json.partner_snapshot?.cif || null,
             json.document_type?.name || json.document_type_name || null,
             json.document_type?.code || json.document_type_code || null,
             json.issue_date || null,

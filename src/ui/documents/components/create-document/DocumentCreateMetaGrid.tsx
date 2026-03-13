@@ -14,6 +14,7 @@ export default function DocumentCreateMetaGrid() {
     copy,
     isReadOnly,
     currentDocumentType,
+    operation,
   } = useDocumentCreate();
 
   const selectedPartnerId = useWatch({ control, name: "partner_id" });
@@ -42,16 +43,16 @@ export default function DocumentCreateMetaGrid() {
       </div>
 
       <div className="doc-meta-cell">
-        <label>SERIE</label>
+        <label>{operation === 'sale' ? 'SERIE' : 'CENTRO COSTES'}</label>
         <select
           className="doc-input doc-input-bold doc-input-primary"
-          disabled={isReadOnly}
+          disabled={isReadOnly || operation === 'purchase'}
           {...register("number_series_id")}
         >
           <option value="" disabled>
-            Seleccionar serie
+            {operation === 'sale' ? 'Seleccionar serie' : 'N/A'}
           </option>
-          {numberSeries.map((ns) => (
+          {operation === 'sale' && numberSeries.map((ns) => (
             <option key={ns.id} value={ns.id}>
               {ns.serie} ({ns.year})
             </option>
@@ -60,10 +61,11 @@ export default function DocumentCreateMetaGrid() {
       </div>
 
       <div className="doc-meta-cell">
-        <label>Nº DOCUMENTO</label>
+        <label>{operation === 'sale' ? 'Nº DOCUMENTO' : 'REF. PROVEEDOR'}</label>
         <input
-          className="doc-input doc-input-bold"
+          className={`doc-input doc-input-bold ${operation === 'purchase' ? 'doc-input-highlight' : ''}`}
           disabled={isReadOnly}
+          placeholder={operation === 'purchase' ? "Ej: FAC-2024/001" : ""}
           {...register("number")}
         />
       </div>

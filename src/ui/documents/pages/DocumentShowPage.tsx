@@ -64,6 +64,7 @@ export default function DocumentShowPage() {
       {/* ── Top chrome ── */}
       <DocumentShowHeader
         document={document}
+        activeCompany={activeCompany}
         onClose={() => navigate(backPath)}
       />
       <DocumentShowFloatingActions

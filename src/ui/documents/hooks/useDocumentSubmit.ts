@@ -4,10 +4,26 @@ import type { DocumentOperation } from "../components/create-document/types";
 import { useCreateDocument } from "@/features/documents/hooks/useCreateDocument";
 import { useUpdateDocument } from "@/features/documents/hooks/useUpdateDocument";
 
-function buildPayload(data: DocumentFormValues, statusKey: "draft" | "issued", itemType: string) {
+function buildPayload(data: DocumentFormValues, statusKey: string, itemType: string, typeCode?: string, operation?: DocumentOperation) {
+    let finalStatus = statusKey;
+    const effectiveTypeCode = data.document_type_code || typeCode;
+    const isPurchase = operation === 'purchase';
+    
+    // If issuing (not draft) and it's a delivery note, use standard keys
+    if (statusKey === 'issued' && effectiveTypeCode) {
+        if (effectiveTypeCode === 'DLV' || effectiveTypeCode.endsWith('DLV')) {
+            // Purchase Delivery Note (PDLV) -> received
+            // Sales Delivery Note (DLV, SDLV, PRDLV) -> delivered
+            finalStatus = effectiveTypeCode === 'PDLV' ? 'received' : 'delivered';
+        }
+    }
+
     return {
         ...data,
-        status_key: statusKey,
+        status_key: finalStatus,
+        // Architectural improvement: Map manual number to external_reference for purchases
+        external_reference: isPurchase ? data.number : undefined,
+        number: isPurchase ? undefined : data.number,
         item_type: itemType === 'service' ? 'service' : 'product',
         lines: data.lines
             .filter((i) => i.code || i.description)
@@ -29,13 +45,21 @@ interface UseDocumentSubmitOptions {
     documentId?: string;
     fromDocumentId?: string | null;
     itemType: string;
+    documentTypeCode?: string;
 }
 
 /**
  * Returns submit handlers for draft and issue actions.
  * Automatically dispatches create or update depending on isEditMode.
  */
-export function useDocumentSubmit({ operation, isEditMode, documentId, fromDocumentId, itemType }: UseDocumentSubmitOptions) {
+export function useDocumentSubmit({ 
+    operation, 
+    isEditMode, 
+    documentId, 
+    fromDocumentId, 
+    itemType,
+    documentTypeCode 
+}: UseDocumentSubmitOptions) {
     const navigate = useNavigate();
     const { mutate: createDocument, isPending: isCreatingNew } = useCreateDocument();
     const { mutate: updateDocument, isPending: isUpdating } = useUpdateDocument();
@@ -48,7 +72,7 @@ export function useDocumentSubmit({ operation, isEditMode, documentId, fromDocum
             return;
         }
 
-        const payload = buildPayload(data, statusKey, itemType) as any;
+        const payload = buildPayload(data, statusKey, itemType, documentTypeCode, operation) as any;
 
         if (isEditMode && documentId) {
             updateDocument({ id: documentId, data: payload }, {

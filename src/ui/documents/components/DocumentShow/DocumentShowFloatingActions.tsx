@@ -14,6 +14,7 @@ import {
   buildLifecycleSteps,
   canRevert,
   canShowPostDeliveredActions,
+  resolveFastTrackAction,
   resolveNextAction,
 } from "./DocumentShowFloatingActions.helpers";
 import type { CompanyEntity } from "@/domain/entities/companies/Company";
@@ -62,6 +63,10 @@ export default function DocumentShowFloatingActions({
   );
   const nextAction = useMemo(
     () => resolveNextAction(docTypeCode, statusKey, operation),
+    [docTypeCode, statusKey, operation],
+  );
+  const fastTrackAction = useMemo(
+    () => resolveFastTrackAction(docTypeCode, statusKey, operation),
     [docTypeCode, statusKey, operation],
   );
 
@@ -145,6 +150,7 @@ export default function DocumentShowFloatingActions({
           docTypeCode={docTypeCode}
           isUpdating={isUpdating}
           nextAction={nextAction}
+          fastTrackAction={fastTrackAction}
           onStatusChange={handleStatusChange}
         />
       </div>

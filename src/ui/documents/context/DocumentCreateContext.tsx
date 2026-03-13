@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from "react-router";
 import { type DocumentFormValues } from "../schemas/documentSchema";
 import {
     COPY_BY_OPERATION,
+    getDocumentTypeCopy,
     type DocumentCreateCopy,
     type DocumentFooterTotals,
     type DocumentOperation,
@@ -105,6 +106,7 @@ export function DocumentCreateProvider({
         documentId,
         fromDocumentId,
         itemType,
+        documentTypeCode: currentDocumentType?.code
     });
 
     // ─── Partner options ─────────────────────────────────────────────────────
@@ -113,7 +115,12 @@ export function DocumentCreateProvider({
         [partners],
     );
 
-    const copy = COPY_BY_OPERATION[operation];
+    const copy = useMemo(() => {
+        const baseCopy = COPY_BY_OPERATION[operation];
+        const typeCode = code || currentDocumentType?.code;
+        return getDocumentTypeCopy(operation, typeCode, baseCopy);
+    }, [operation, currentDocumentType, code]);
+
     const isDraftMode = operation === "sale" && mode === "draft";
 
     const value: DocumentCreateContextValue = {
@@ -136,9 +143,7 @@ export function DocumentCreateProvider({
 
     return (
         <DocumentCreateContext.Provider value={value}>
-            <FormProvider {...methods}>
-                {children}
-            </FormProvider>
+            <FormProvider {...methods} children={children} />
         </DocumentCreateContext.Provider>
     );
 }
