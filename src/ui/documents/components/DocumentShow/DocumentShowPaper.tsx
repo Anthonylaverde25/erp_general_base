@@ -9,7 +9,7 @@ import {
 } from 'ag-grid-community';
 import { DocumentEntity, DocumentLine } from '@/domain/entities/documents/DocumentEntity';
 import { CompanyEntity } from '@/domain/entities/companies/Company';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography, useTheme, LinearProgress, Tooltip } from '@mui/material';
 import { DocumentBreadcrumb } from '../DocumentBreadcrumb';
 import { formatDate } from './components/pdf/PDFUtils';
 
@@ -100,8 +100,50 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
             {
                 headerName: 'Cant.',
                 field: 'quantity',
-                flex: 1,
+                flex: 1.2,
                 type: 'numericColumn',
+                cellRenderer: (params: any) => {
+                    const line = params.data as DocumentLine;
+                    const isProcessable = ['QUO', 'PQUO', 'ORD', 'PORD'].includes(document.document_type_code || '');
+                    
+                    if (!isProcessable) return (
+                        <Typography style={{ fontSize: '13px', fontWeight: 600 }}>{line.quantity}</Typography>
+                    );
+
+                    const progress = (line.processed_quantity / line.quantity) * 100;
+                    const isDone = progress >= 99.9;
+
+                    return (
+                        <Tooltip title={`Procesado: ${line.processed_quantity} de ${line.quantity}`}>
+                            <Box className="flex flex-col w-full px-2 py-1">
+                                <Box className="flex justify-between items-baseline mb-0.5">
+                                    <Typography style={{ fontSize: '12px', fontWeight: 700 }}>
+                                        {line.quantity}
+                                    </Typography>
+                                    {line.processed_quantity > 0 && (
+                                        <Typography variant="caption" sx={{ color: isDone ? 'success.main' : 'warning.main', fontWeight: 800, fontSize: '9px' }}>
+                                            {line.processed_quantity} OK
+                                        </Typography>
+                                    )}
+                                </Box>
+                                {line.processed_quantity > 0 && (
+                                    <LinearProgress 
+                                        variant="determinate" 
+                                        value={progress} 
+                                        sx={{ 
+                                            height: 3, 
+                                            borderRadius: 1,
+                                            bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                            '& .MuiLinearProgress-bar': {
+                                                bgcolor: isDone ? '#22c55e' : '#f59e0b'
+                                            }
+                                        }} 
+                                    />
+                                )}
+                            </Box>
+                        </Tooltip>
+                    );
+                },
                 cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
             },
             {

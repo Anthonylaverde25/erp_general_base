@@ -81,7 +81,12 @@ export function buildLifecycleSteps(
       { key: approvedKey, label: approvedLabel },
     ];
 
+    if (statusKey === 'partially_converted') {
+      steps.push({ key: "partially_converted", label: "Parcial" });
+    }
+
     if (statusKey === 'converted') {
+      steps.push({ key: "partially_converted", label: "Parcial" });
       steps.push({ key: "converted", label: "Convertido" });
     }
 
@@ -95,7 +100,12 @@ export function buildLifecycleSteps(
       { key: "ordered", label: "Pedido" },
     ];
 
+    if (statusKey === 'partially_converted') {
+      steps.push({ key: "partially_converted", label: "Parcial" });
+    }
+
     if (statusKey === 'converted') {
+      steps.push({ key: "partially_converted", label: "Parcial" });
       steps.push({ key: "converted", label: "Convertido" });
     }
 

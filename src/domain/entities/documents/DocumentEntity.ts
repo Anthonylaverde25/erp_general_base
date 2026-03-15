@@ -25,6 +25,7 @@ export interface DocumentLine {
     name: string;
     description: string | null;
     quantity: number;
+    processed_quantity: number;
     unit_price: number;
     discount_percentage: number;
     discount_amount: number;
@@ -32,6 +33,7 @@ export interface DocumentLine {
     tax_amount: number;
     line_total: number;
     taxes: DocumentLineTax[];
+    source_line_id?: number | null;
     source_document_id?: number | null;
     source_document_number?: string | null;
 }
@@ -123,6 +125,7 @@ export class DocumentEntity {
                 name: line.name || '',
                 description: line.description || null,
                 quantity: Number(line.quantity ?? 0),
+                processed_quantity: Number(line.processed_quantity ?? 0),
                 unit_price: Number(line.unit_price ?? 0),
                 discount_percentage: Number(line.discount_percentage ?? 0),
                 discount_amount: Number(line.discount_amount ?? 0),
@@ -141,6 +144,7 @@ export class DocumentEntity {
                         tax_amount: Number(tax.tax_amount ?? 0)
                     }))
                     : [],
+                source_line_id: line.source_line_id ? Number(line.source_line_id) : null,
                 source_document_id: line.source_document_id ? Number(line.source_document_id) : null,
                 source_document_number: line.source_document_number || (line.source_document_id ? predecessors.find(p => p.id === Number(line.source_document_id))?.number_serie : null),
             }))

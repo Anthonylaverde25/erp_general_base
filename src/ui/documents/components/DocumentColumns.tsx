@@ -103,6 +103,8 @@ export const getDocumentColumns = (
                     muiColor = 'success';
                 } else if (status.key === 'converted') {
                     muiColor = 'default';
+                } else if (status.key === 'partially_converted') {
+                    muiColor = 'warning';
                 } else if (status.key === 'draft') {
                     muiColor = 'warning';
                 } else if (status.key === 'cancelled') {
