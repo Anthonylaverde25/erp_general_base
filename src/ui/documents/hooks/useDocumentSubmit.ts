@@ -9,12 +9,15 @@ function buildPayload(data: DocumentFormValues, statusKey: string, itemType: str
     const effectiveTypeCode = data.document_type_code || typeCode;
     const isPurchase = operation === 'purchase';
     
-    // If issuing (not draft) and it's a delivery note, use standard keys
+    // If issuing (not draft) and it's a delivery note or quote, use standard keys
     if (statusKey === 'issued' && effectiveTypeCode) {
         if (effectiveTypeCode === 'DLV' || effectiveTypeCode.endsWith('DLV')) {
             // Purchase Delivery Note (PDLV) -> received
             // Sales Delivery Note (DLV, SDLV, PRDLV) -> delivered
             finalStatus = effectiveTypeCode === 'PDLV' ? 'received' : 'delivered';
+        } else if (effectiveTypeCode === 'QUO' || effectiveTypeCode === 'PQUO') {
+            // Quotes (QUO, PQUO) -> approved
+            finalStatus = 'approved';
         }
     }
 

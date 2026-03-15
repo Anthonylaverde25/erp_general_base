@@ -88,8 +88,8 @@ export function getDocumentTypeCopy(
 		'PINV': 'Registrar Factura',
 		'DLV': 'Emitir Albarán',
 		'PDLV': 'Registrar Albarán',
-		'QUO': 'Emitir Presupuesto',
-		'PQUO': 'Registrar Presupuesto',
+		'QUO': 'Aprobar Presupuesto',
+		'PQUO': 'Aprobar Presupuesto',
 		'PORD': 'Registrar Pedido',
 	};
 

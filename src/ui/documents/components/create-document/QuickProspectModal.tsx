@@ -21,6 +21,7 @@ import { CreatePartnerDTO } from '@/domain/entities/partners/DTOs/PartnerDTOs';
 const quickProspectSchema = z.object({
     name: z.string().min(1, 'El nombre completo o razón social es requerido'),
     email: z.string().email('Email inválido').optional().or(z.literal('')),
+    phone: z.string().optional().or(z.literal('')),
 });
 
 type QuickProspectForm = z.infer<typeof quickProspectSchema>;
@@ -38,12 +39,12 @@ export function QuickProspectModal({ open, onClose, onSuccess, initialName = '' 
 
     const { control, handleSubmit, reset, formState: { errors } } = useForm<QuickProspectForm>({
         resolver: zodResolver(quickProspectSchema),
-        defaultValues: { name: initialName, email: '' }
+        defaultValues: { name: initialName, email: '', phone: '' }
     });
 
     React.useEffect(() => {
         if (open) {
-            reset({ name: initialName, email: '' });
+            reset({ name: initialName, email: '', phone: '' });
         }
     }, [open, initialName, reset]);
 
@@ -58,7 +59,11 @@ export function QuickProspectModal({ open, onClose, onSuccess, initialName = '' 
             type: 'company', // default to company, could be person but required
             credit_available: false,
             grouped_billing: false,
-            contact: values.email ? [{ email: values.email }] : [],
+            contact: (values.email || values.phone) ? [{ 
+                email: values.email || '', 
+                phone: values.phone || '',
+                default: true
+            }] : [],
         } as unknown as CreatePartnerDTO;
 
         try {
@@ -115,6 +120,20 @@ export function QuickProspectModal({ open, onClose, onSuccess, initialName = '' 
                                     label="Correo Electrónico (Opcional)"
                                     error={!!errors.email}
                                     helperText={errors.email?.message}
+                                    fullWidth
+                                    variant="outlined"
+                                />
+                            )}
+                        />
+                        <Controller
+                            name="phone"
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    label="Teléfono (Opcional)"
+                                    error={!!errors.phone}
+                                    helperText={errors.phone?.message}
                                     fullWidth
                                     variant="outlined"
                                 />
