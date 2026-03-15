@@ -19,14 +19,14 @@ export function useDocumentTableSync() {
     });
 
     // Watch form lines — when reset() or values prop updates the form, sync to AG Grid
-    const formLines = watch('lines');
+    const formLines = watch('lines') as DocumentLineItem[] | undefined;
     useEffect(() => {
         if (!formLines || formLines.length === 0) return;
         // Only sync if the data actually changed (avoid infinite loop)
         const api = gridApiRef.current;
-        setRows(formLines as DocumentLineItem[]);
+        setRows(formLines);
         if (api) {
-            api.setGridOption('rowData', formLines as DocumentLineItem[]);
+            api.setGridOption('rowData', formLines);
         }
     }, [formLines]);
 
@@ -75,10 +75,23 @@ export function useDocumentTableSync() {
     const handleCellValueChanged = useCallback(() => {
         const api = gridApiRef.current;
         if (!api) return;
-        const current = collectRows(api);
-        setRows(current);
-        syncToForm(current);
-    }, [syncToForm]);
+        
+        // Collect current grid's rows
+        const currentGridRows: DocumentLineItem[] = [];
+        api.forEachNode(node => {
+            if (node.data) currentGridRows.push(node.data);
+        });
+
+        // Merge with existing master lines to preserve other sections
+        const masterLines = (getValues('lines') || []) as DocumentLineItem[];
+        const next = masterLines.map(masterRow => {
+            const updated = currentGridRows.find(r => r.id === masterRow.id);
+            return updated ? updated : masterRow;
+        });
+
+        setRows(next);
+        syncToForm(next);
+    }, [syncToForm, getValues]);
 
     const handleRowDragEnd = useCallback(() => {
         const api = gridApiRef.current;
@@ -101,7 +114,7 @@ export function useDocumentTableSync() {
     }, [rows, syncToForm, getValues]);
 
     return {
-        rows,
+        rows: (rows || []) as DocumentLineItem[],
         gridApiRef,
         handleAddLine,
         handleCellValueChanged,

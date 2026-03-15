@@ -16,6 +16,8 @@ export const documentLineSchema = z.object({
     discount: z.string().default("0"),
     taxes: z.array(documentLineTaxSchema).default([]),
     subtotal: z.string().optional().default("0.00"),
+    source_document_id: z.string().optional(),
+    source_document_number: z.string().optional(),
 });
 
 export const documentSchema = z.object({

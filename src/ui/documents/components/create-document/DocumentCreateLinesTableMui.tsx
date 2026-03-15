@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, Fragment } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import {
     Table,
@@ -258,62 +258,87 @@ export default function DocumentCreateLinesTableMui({
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {fields.map((field, index) => {
-                            const item = field as DocumentLineItem;
-                            return (
-                                <TableRow
-                                    key={field.id}
-                                    hover
-                                    sx={{ '& td': { py: 1, borderBottom: '1px solid #f0f0f0' } }}
-                                >
-                                    <TableCell align="center" sx={{ color: '#888', fontSize: '12px' }}>
-                                        {index + 1}
-                                    </TableCell>
-                                    <TableCell>
-                                        <AutocompleteCell
-                                            index={index}
-                                            initialCode={item.code || ''}
-                                            onCommit={commitLinePatch}
-                                            disabled={isReadOnly}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputBase
-                                            value={item.description}
-                                            onChange={(e) => updateLineField(index, 'description', e.target.value)}
-                                            placeholder="Añadir descripción..."
-                                            fullWidth
-                                            disabled={isReadOnly}
-                                            sx={{ fontSize: '13px' }}
-                                        />
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <InputBase
-                                            value={item.quantity}
-                                            onChange={(e) => updateLineField(index, 'quantity', e.target.value)}
-                                            type="number"
-                                            inputProps={{ style: { textAlign: 'right' } }}
-                                            fullWidth
-                                            disabled={isReadOnly}
-                                            sx={{ fontSize: '13px' }}
-                                        />
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <InputBase
-                                            value={item.unitPrice}
-                                            onChange={(e) => updateLineField(index, 'unitPrice', e.target.value)}
-                                            type="number"
-                                            inputProps={{ style: { textAlign: 'right' } }}
-                                            fullWidth
-                                            disabled={isReadOnly}
-                                            sx={{ fontSize: '13px' }}
-                                        />
-                                    </TableCell>
-                                    {discountEnabled && (
+                        {(() => {
+                            let lastSourceId: string | undefined = undefined;
+                            return fields.flatMap((field, index) => {
+                                const item = field as DocumentLineItem;
+                                const isNewSection = item.source_document_id !== lastSourceId;
+                                lastSourceId = item.source_document_id;
+
+                                const sectionHeader = isNewSection && item.source_document_number ? (
+                                    <TableRow
+                                        key={`header-${item.source_document_id}-${index}`}
+                                        sx={{ 
+                                            bgcolor: '#f8fafc',
+                                            '& td': { py: 0.5, borderBottom: '1px solid #e2e8f0' } 
+                                        }}
+                                    >
+                                        <TableCell colSpan={discountEnabled ? 9 : 8} align="center">
+                                            <Box 
+                                                sx={{ 
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1.5,
+                                                    py: 1,
+                                                    px: 2,
+                                                }}
+                                            >
+                                                <Box component="span" sx={{ fontSize: '10px', fontWeight: 800, color: 'primary.main', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                    ALBARÁN:
+                                                </Box>
+                                                <Box 
+                                                    component="span" 
+                                                    sx={{ 
+                                                        fontSize: '12px', 
+                                                        fontWeight: 700, 
+                                                        color: 'text.primary', 
+                                                        bgcolor: 'white', 
+                                                        px: 1.5, 
+                                                        py: 0.5, 
+                                                        borderRadius: '4px', 
+                                                        border: '1px solid', 
+                                                        borderColor: 'divider',
+                                                        boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                                                    }}
+                                                >
+                                                    {item.source_document_number}
+                                                </Box>
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : null;
+
+                                const contentRow = (
+                                    <TableRow
+                                        key={field.id}
+                                        hover
+                                        sx={{ '& td': { py: 1, borderBottom: '1px solid #f0f0f0' } }}
+                                    >
+                                        <TableCell align="center" sx={{ color: '#888', fontSize: '12px' }}>
+                                            {index + 1}
+                                        </TableCell>
+                                        <TableCell>
+                                            <AutocompleteCell
+                                                index={index}
+                                                initialCode={item.code || ''}
+                                                onCommit={commitLinePatch}
+                                                disabled={isReadOnly}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <InputBase
+                                                value={item.description}
+                                                onChange={(e) => updateLineField(index, 'description', e.target.value)}
+                                                placeholder="Añadir descripción..."
+                                                fullWidth
+                                                disabled={isReadOnly}
+                                                sx={{ fontSize: '13px' }}
+                                            />
+                                        </TableCell>
                                         <TableCell align="right">
                                             <InputBase
-                                                value={item.discount}
-                                                onChange={(e) => updateLineField(index, 'discount', e.target.value)}
+                                                value={item.quantity}
+                                                onChange={(e) => updateLineField(index, 'quantity', e.target.value)}
                                                 type="number"
                                                 inputProps={{ style: { textAlign: 'right' } }}
                                                 fullWidth
@@ -321,55 +346,80 @@ export default function DocumentCreateLinesTableMui({
                                                 sx={{ fontSize: '13px' }}
                                             />
                                         </TableCell>
-                                    )}
-                                    <TableCell>
-                                        <TaxMultiSelect
-                                            taxes={item.taxes || []}
-                                            disabled={isReadOnly}
-                                            onChange={(newTaxes) => {
-                                                if (!isReadOnly) {
-                                                    update(index, { ...item, taxes: newTaxes });
-                                                }
-                                            }}
-                                        />
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 600, fontSize: '13px' }}>
-                                        {Number(item.subtotal || 0).toFixed(2)}
-                                    </TableCell>
-                                    {!isReadOnly && (
-                                        <TableCell align="center">
-                                            {(item.code || item.description) && (
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => remove(index)}
-                                                    sx={{ color: '#e57373', p: 0.5 }}
-                                                >
-                                                    <DeleteOutline fontSize="small" />
-                                                </IconButton>
-                                            )}
+                                        <TableCell align="right">
+                                            <InputBase
+                                                value={item.unitPrice}
+                                                onChange={(e) => updateLineField(index, 'unitPrice', e.target.value)}
+                                                type="number"
+                                                inputProps={{ style: { textAlign: 'right' } }}
+                                                fullWidth
+                                                disabled={isReadOnly}
+                                                sx={{ fontSize: '13px' }}
+                                            />
                                         </TableCell>
-                                    )}
-                                </TableRow>
-                            );
-                        })}
+                                        {discountEnabled && (
+                                            <TableCell align="right">
+                                                <InputBase
+                                                    value={item.discount}
+                                                    onChange={(e) => updateLineField(index, 'discount', e.target.value)}
+                                                    type="number"
+                                                    inputProps={{ style: { textAlign: 'right' } }}
+                                                    fullWidth
+                                                    disabled={isReadOnly}
+                                                    sx={{ fontSize: '13px' }}
+                                                />
+                                            </TableCell>
+                                        )}
+                                        <TableCell>
+                                            <TaxMultiSelect
+                                                taxes={item.taxes || []}
+                                                disabled={isReadOnly}
+                                                onChange={(newTaxes) => {
+                                                    if (!isReadOnly) {
+                                                        update(index, { ...item, taxes: newTaxes });
+                                                    }
+                                                }}
+                                            />
+                                        </TableCell>
+                                        <TableCell align="right" sx={{ fontWeight: 600, fontSize: '13px' }}>
+                                            {Number(item.subtotal || 0).toFixed(2)}
+                                        </TableCell>
+                                        {!isReadOnly && (
+                                            <TableCell align="center">
+                                                {(item.code || item.description) && (
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => remove(index)}
+                                                        sx={{ color: '#e57373', p: 0.5 }}
+                                                    >
+                                                        <DeleteOutline fontSize="small" />
+                                                    </IconButton>
+                                                )}
+                                            </TableCell>
+                                        )}
+                                    </TableRow>
+                                );
+
+                                return [sectionHeader, contentRow].filter(Boolean);
+                            });
+                        })()}
                     </TableBody>
                 </Table>
             </TableContainer>
 
-            <Box p={1.5} borderTop="1px dashed #e0e0e0" bgcolor="#fafafa">
+            <Box p={1.5}>
                 <Button
                     size="small"
                     startIcon={<Add />}
                     onClick={handleAddLine}
                     disabled={isReadOnly}
-                    variant="outlined"
-                    color="primary"
                     sx={{
                         fontSize: '13px',
                         textTransform: 'none',
                         borderRadius: '6px',
-                        borderStyle: 'dashed',
-                        borderWidth: '1.5px',
+                        border: '1px solid',
+                        borderColor: 'primary.main',
+                        px: 2,
                         opacity: isReadOnly ? 0.5 : 1,
                     }}
                 >

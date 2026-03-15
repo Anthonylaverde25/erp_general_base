@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import useIndexNumberSeries from '@/features/number_series/hooks/useIndexNumberSeries';
 import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 import { container } from '@/di/container';
@@ -15,6 +16,7 @@ export function useBatchBilling(
 ) {
     const [selectedSeriesId, setSelectedSeriesId] = useState<number | ''>('');
     const [saving, setSaving] = useState(false);
+    const queryClient = useQueryClient();
     const navigate = useNavigate();
     const documentActionRepo = container.get<IDocumentActionRepository>(TYPES.IDocumentActionRepository);
 
@@ -47,6 +49,8 @@ export function useBatchBilling(
             });
 
             toast.success('Factura agrupada generada con éxito');
+            queryClient.invalidateQueries({ queryKey: ['documents'] });
+            queryClient.invalidateQueries({ queryKey: ['number_series'] });
             onSuccess?.();
             onClose();
             

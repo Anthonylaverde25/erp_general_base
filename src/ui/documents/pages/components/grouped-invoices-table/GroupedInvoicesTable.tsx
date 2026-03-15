@@ -79,6 +79,24 @@ export default function GroupedInvoicesTable(props: GroupedInvoicesTableProps) {
         setBatchBillingOpen(true);
     };
 
+    const handleBatchBill2 = () => {
+        const selectedIds = Object.keys(rowSelection);
+        const selectedDocs = documents?.filter(d => selectedIds.includes(d.id.toString())) || [];
+
+        if (selectedDocs.length === 0) return;
+
+        const firstDoc = selectedDocs[0];
+        const differentPartner = selectedDocs.some(d => d.partner_id !== firstDoc.partner_id);
+        
+        if (differentPartner) {
+            alert("Error de Consolidación: Todos los documentos seleccionados deben pertenecer al mismo Partner.");
+            return;
+        }
+
+        const idsParam = selectedIds.join(',');
+        navigate(`/sales/create/INV?from_document_ids=${idsParam}`);
+    };
+
     const selectedIds = Object.keys(rowSelection);
     const selectedRowsData = documents?.filter(doc => rowSelection[doc.id.toString()]) || [];
     const selectedTotal = selectedRowsData.reduce((acc, doc) => acc + (doc.total || 0), 0);
@@ -97,6 +115,7 @@ export default function GroupedInvoicesTable(props: GroupedInvoicesTableProps) {
                     totalAmount={selectedTotal}
                     onCancel={() => setRowSelection({})}
                     onConfirm={handleBatchBill}
+                    onConfirm2={handleBatchBill2}
                 />
             )}
 

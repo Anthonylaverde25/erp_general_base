@@ -181,4 +181,5 @@ export const TYPES = {
 	ConvertDocumentUseCase: Symbol.for('ConvertDocumentUseCase'),
 	ConvertToPurchaseUseCase: Symbol.for('ConvertToPurchaseUseCase'),
 	RecordPaymentUseCase: Symbol.for('RecordPaymentUseCase'),
+	DuplicateDocumentUseCase: Symbol.for('DuplicateDocumentUseCase'),
 };

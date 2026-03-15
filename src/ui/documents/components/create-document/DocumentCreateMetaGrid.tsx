@@ -10,6 +10,7 @@ export default function DocumentCreateMetaGrid() {
   const { register, control } = useFormContext<DocumentFormValues>();
   const {
     partnerOptions,
+    sourcePartner,
     numberSeries,
     copy,
     isReadOnly,
@@ -18,7 +19,7 @@ export default function DocumentCreateMetaGrid() {
   } = useDocumentCreate();
 
   const selectedPartnerId = useWatch({ control, name: "partner_id" });
-  const selectedPartner = partnerOptions.find((p) => String(p.id) === String(selectedPartnerId));
+  const selectedPartner = partnerOptions.find((p) => String(p.id) === String(selectedPartnerId)) || (String(sourcePartner?.id) === String(selectedPartnerId) ? sourcePartner : undefined);
   const { code } = useParams();
   const isQuoteDocument = ['QUO', 'PQUO'].includes(code?.toUpperCase() || '');
 

@@ -19,6 +19,7 @@ import { useDocumentSubmit } from "../hooks/useDocumentSubmit";
 import useIndexDocumentTypesByModule from "@/features/document_types/hooks/useIndexDocumentTypesByModule";
 import { useIndexPartners } from "@/features/partners/hooks/useIndexPartners";
 import { useGetDocument } from "@/features/documents/hooks/useGetDocument";
+import { useGetDocuments } from "@/features/documents/hooks/useGetDocuments";
 import useIndexNumberSeries from "@/features/number_series/hooks/useIndexNumberSeries";
 import { NumberSeriesEntity } from "@/domain/entities/number_series/NumberSeriesEntity";
 
@@ -40,6 +41,7 @@ interface DocumentCreateContextValue {
     isEditMode: boolean;
     isLoadingDocument: boolean;
     isReadOnly: boolean;
+    sourcePartner?: { id: string | number; name: string; cif?: string; vat_number?: string };
 }
 
 const DocumentCreateContext = createContext<DocumentCreateContextValue | undefined>(undefined);
@@ -60,6 +62,11 @@ export function DocumentCreateProvider({
     const mode = searchParams.get("mode");
     const itemType = (searchParams.get("item_type") as "service" | "product") || "product";
     const fromDocumentId = searchParams.get("from_document_id");
+    const duplicateFromId = searchParams.get("duplicate_from");
+    const fromDocumentIds = useMemo(() => {
+        const ids = searchParams.get("from_document_ids");
+        return ids ? ids.split(",") : [];
+    }, [searchParams]);
     const isEditMode = !!documentId;
 
     // ─── Data fetching ──────────────────────────────────────────────────────
@@ -68,14 +75,23 @@ export function DocumentCreateProvider({
     const { data: partners } = useIndexPartners(partnerType);
     const { data: existingDocument, isLoading: isLoadingExisting } = useGetDocument(documentId || "");
     const { data: sourceDocument, isLoading: isLoadingSource } = useGetDocument(fromDocumentId || "");
+    const { data: duplicateSource, isLoading: isLoadingDuplicate } = useGetDocument(duplicateFromId || "");
+    const { data: sourceDocuments, isLoading: isLoadingSources } = useGetDocuments(fromDocumentIds);
 
-    const isLoadingDocument = isLoadingExisting || isLoadingSource;
+    const isLoadingDocument = isLoadingExisting || isLoadingSource || isLoadingDuplicate || isLoadingSources;
 
     const currentDocumentTypeCode = code || documentTypes?.[0]?.code;
     const { numberSeries } = useIndexNumberSeries(currentDocumentTypeCode);
 
     // ─── Form setup ─────────────────────────────────────────────────────────
-    const methods = useDocumentForm({ code, itemType, isEditMode, existingDocument, sourceDocument });
+    const methods = useDocumentForm({ 
+        code, 
+        itemType, 
+        isEditMode, 
+        existingDocument, 
+        sourceDocument: sourceDocument || duplicateSource, 
+        sourceDocuments 
+    });
     const { watch, setValue, handleSubmit } = methods;
     const formLines = watch("lines");
     const applyRetention = watch("apply_retention");
@@ -105,6 +121,7 @@ export function DocumentCreateProvider({
         isEditMode,
         documentId,
         fromDocumentId,
+        fromDocumentIds,
         itemType,
         documentTypeCode: currentDocumentType?.code
     });
@@ -114,6 +131,28 @@ export function DocumentCreateProvider({
         () => partners?.map((p) => ({ id: p.id!, name: p.name, cif: p.cif, vat_number: p.vat_number })) || [],
         [partners],
     );
+
+    const sourcePartner = useMemo(() => {
+        const source = sourceDocument || duplicateSource;
+        if (source) {
+            return {
+                id: source.partner_id!,
+                name: source.partner_name || "",
+                cif: source.partner_cif || "",
+                vat_number: source.partner_vat_number || ""
+            };
+        }
+        if (sourceDocuments && sourceDocuments.length > 0) {
+            const first = sourceDocuments[0];
+            return {
+                id: first.partner_id!,
+                name: first.partner_name || "",
+                cif: first.partner_cif || "",
+                vat_number: first.partner_vat_number || ""
+            };
+        }
+        return undefined;
+    }, [sourceDocument, duplicateSource, sourceDocuments]);
 
     const copy = useMemo(() => {
         const baseCopy = COPY_BY_OPERATION[operation];
@@ -129,6 +168,7 @@ export function DocumentCreateProvider({
         onSubmitIssue: handleSubmit(submitWithStatus("issued"), (errors) => console.error("Validation Errors on Issue:", errors)),
         isCreating,
         partnerOptions,
+        sourcePartner,
         numberSeries: numberSeries || [],
         currentDocumentType,
         copy,
@@ -143,7 +183,9 @@ export function DocumentCreateProvider({
 
     return (
         <DocumentCreateContext.Provider value={value}>
-            <FormProvider {...methods} children={children} />
+            <FormProvider {...methods}>
+                {children}
+            </FormProvider>
         </DocumentCreateContext.Provider>
     );
 }

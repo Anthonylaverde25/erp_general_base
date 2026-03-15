@@ -1,5 +1,6 @@
 import { Box, Stack, Typography, Button, Divider, alpha } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
+import { FileStack, X } from 'lucide-react';
 import { SAP_THEME } from './theme';
 
 interface SelectionToolbarProps {
@@ -7,9 +8,10 @@ interface SelectionToolbarProps {
     totalAmount: number;
     onCancel: () => void;
     onConfirm: () => void;
+    onConfirm2: () => void;
 }
 
-export default function SelectionToolbar({ selectedCount, totalAmount, onCancel, onConfirm }: SelectionToolbarProps) {
+export default function SelectionToolbar({ selectedCount, totalAmount, onCancel, onConfirm, onConfirm2 }: SelectionToolbarProps) {
     const formatCurrency = (amount: number) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(amount);
 
     return (
@@ -58,7 +60,7 @@ export default function SelectionToolbar({ selectedCount, totalAmount, onCancel,
                             fontSize: '0.85rem',
                             '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } 
                         }}
-                        startIcon={<FuseSvgIcon size={18}>heroicons-outline:x-mark</FuseSvgIcon>}
+                        startIcon={<X size={18} />}
                     >
                         Cancelar selección
                     </Button>
@@ -89,6 +91,34 @@ export default function SelectionToolbar({ selectedCount, totalAmount, onCancel,
                         startIcon={<FuseSvgIcon size={18}>heroicons-outline:document-duplicate</FuseSvgIcon>}
                     >
                         Generar Factura Agrupada
+                    </Button>
+                    <Button
+                        variant="contained"
+                        disableElevation
+                        onClick={onConfirm2}
+                        sx={{
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            px: 3,
+                            py: 0.8,
+                            borderRadius: '8px',
+                            bgcolor: '#3b82f6', // blue-500
+                            fontSize: '0.85rem',
+                            letterSpacing: -0.1,
+                            boxShadow: `0 4px 12px -2px ${alpha('#3b82f6', 0.2)}`,
+                            transition: 'all 0.2s ease-in-out',
+                            '&:hover': {
+                                bgcolor: '#2563eb', // blue-600
+                                transform: 'translateY(-1px)',
+                                boxShadow: `0 6px 15px -3px ${alpha('#3b82f6', 0.3)}`,
+                            },
+                            '&:active': {
+                                transform: 'translateY(0px)',
+                            }
+                        }}
+                        startIcon={<FileStack size={18} />}
+                    >
+                        Generar Facturación Agrupada 2
                     </Button>
                 </Stack>
             </Box>

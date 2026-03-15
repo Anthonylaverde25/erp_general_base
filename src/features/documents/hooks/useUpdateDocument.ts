@@ -13,6 +13,7 @@ export function useUpdateDocument() {
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ['documents'] });
             queryClient.invalidateQueries({ queryKey: ['document', variables.id] });
+            queryClient.invalidateQueries({ queryKey: ['number_series'] });
         }
     });
 }

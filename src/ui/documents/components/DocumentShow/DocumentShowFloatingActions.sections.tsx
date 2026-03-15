@@ -1,6 +1,7 @@
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import {
   ChevronRight,
+  Copy,
   FileText,
   Package,
   RotateCcw,

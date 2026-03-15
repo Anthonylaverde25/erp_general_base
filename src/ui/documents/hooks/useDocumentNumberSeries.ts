@@ -32,7 +32,7 @@ export function useDocumentNumberSeries({
             );
 
             if (activeSeries) {
-                const nextNum = String(activeSeries.current_number + 1).padStart(4, "0");
+                const nextNum = String(activeSeries.current_number + 1).padStart(6, "0");
                 setValue("number", `${activeSeries.serie}-${activeSeries.year}-${nextNum}`);
             }
         } else {

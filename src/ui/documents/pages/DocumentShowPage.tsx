@@ -38,6 +38,13 @@ export default function DocumentShowPage() {
     }
   };
 
+  const handleDuplicate = () => {
+    if (!document) return;
+    const docTypeCode = document.document_type_code || "";
+    const module = document.operation === "sale" ? "sales" : "purchases";
+    navigate(`/${module}/create/${docTypeCode}?duplicate_from=${document.id}`);
+  };
+
   const isLoading = isDocumentLoading || !activeCompany;
 
   if (isLoading) {
@@ -97,6 +104,7 @@ export default function DocumentShowPage() {
           onMoreClick={() => setSidebarOpen(true)}
           onPaymentClick={() => setPaymentModalOpen(true)}
           onDetailsClick={() => setDetailsModalOpen(true)}
+          onDuplicateClick={handleDuplicate}
         />
       )}
 

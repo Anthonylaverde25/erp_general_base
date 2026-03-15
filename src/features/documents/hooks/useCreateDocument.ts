@@ -11,6 +11,7 @@ export function useCreateDocument() {
     return useMutation<DocumentEntity, Error, any>({
         mutationFn: async (data: any) => await useCase.execute(data),
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['number_series'] });
             queryClient.invalidateQueries({ queryKey: ['documents'] });
         }
     });

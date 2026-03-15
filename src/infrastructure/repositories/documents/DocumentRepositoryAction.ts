@@ -30,4 +30,11 @@ export class DocumentRepositoryAction implements IDocumentActionRepository {
         } = await axiosInstance.post(`documents/batch-convert`, payload);
         return DocumentEntity.fromJson(invoice);
     }
+
+    async duplicate(id: string | number): Promise<DocumentEntity> {
+        const {
+            data: { data: duplicated }
+        } = await axiosInstance.post(`documents/${id}/duplicate`);
+        return DocumentEntity.fromJson(duplicated);
+    }
 }

@@ -35,6 +35,7 @@ function buildPayload(data: DocumentFormValues, statusKey: string, itemType: str
                 unit_price: Number(i.unitPrice),
                 discount_percentage: Number(i.discount),
                 tax_rates: i.taxes.map((t) => t.id),
+                source_document_id: i.source_document_id ? Number(i.source_document_id) : null,
             })),
     };
 }
@@ -44,6 +45,7 @@ interface UseDocumentSubmitOptions {
     isEditMode: boolean;
     documentId?: string;
     fromDocumentId?: string | null;
+    fromDocumentIds?: string[];
     itemType: string;
     documentTypeCode?: string;
 }
@@ -57,6 +59,7 @@ export function useDocumentSubmit({
     isEditMode, 
     documentId, 
     fromDocumentId, 
+    fromDocumentIds,
     itemType,
     documentTypeCode 
 }: UseDocumentSubmitOptions) {
@@ -79,9 +82,13 @@ export function useDocumentSubmit({
                 onSuccess: (res) => navigate(`/${basePath}/view/${res.id}`),
             });
         } else {
-            if (fromDocumentId) {
-                payload.parent_document_id = fromDocumentId;
+            // Priority: Multiple IDs (Aggregation) then single ID (Conversion)
+            if (fromDocumentIds && fromDocumentIds.length > 0) {
+                payload.parent_ids = fromDocumentIds.map(id => Number(id));
+            } else if (fromDocumentId) {
+                payload.parent_ids = [Number(fromDocumentId)];
             }
+            
             createDocument(payload, {
                 onSuccess: (res) => navigate(`/${basePath}/view/${res.id}`),
             });

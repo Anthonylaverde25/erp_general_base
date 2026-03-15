@@ -8,6 +8,7 @@ interface DocumentShowFloatingToolbarProps {
     onMoreClick?: () => void
     onPaymentClick?: () => void
     onDetailsClick?: () => void
+    onDuplicateClick?: () => void
 }
 
 export function DocumentShowFloatingToolbar({ 
@@ -16,6 +17,7 @@ export function DocumentShowFloatingToolbar({
     onMoreClick, 
     onPaymentClick, 
     onDetailsClick,
+    onDuplicateClick,
 }: DocumentShowFloatingToolbarProps) {
     const isQuote = document?.document_type_code === 'QUO';
 
@@ -34,7 +36,7 @@ export function DocumentShowFloatingToolbar({
             <Divider />
 
             {/* Secondary Actions */}
-            <ToolbarButton icon={Copy} label="Duplicar" />
+            <ToolbarButton icon={Copy} label="Duplicar" onClick={onDuplicateClick} />
             <ToolbarButton icon={PenLine} label="Editar" />
 
             <Divider />

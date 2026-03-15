@@ -60,28 +60,80 @@ export function mapSourceDocumentToFormValues(doc: DocumentEntity, targetCode: s
     };
 }
 
+/** Maps Multiple DocumentEntities → DocumentFormValues for AGGREGATING into a new document */
+export function mapSourceDocumentsToFormValues(docs: DocumentEntity[], targetCode: string): Partial<DocumentFormValues> {
+    if (docs.length === 0) return {};
+    
+    // Use the first doc as a base for partner info
+    const firstDoc = docs[0];
+    const base = mapDocumentToFormValues(firstDoc);
+    
+    // Aggregate all lines from all docs
+    const allLines: any[] = [];
+    
+    docs.forEach((doc) => {
+        const formValues = mapDocumentToFormValues(doc);
+        if (formValues.lines) {
+            // Tag each line with its source document info
+            const taggedLines = formValues.lines.map(line => ({
+                ...line,
+                source_document_id: String(doc.id),
+                source_document_number: doc.number_serie || String(doc.id),
+            }));
+            allLines.push(...taggedLines);
+        }
+    });
+
+    // Re-assign temporary unique IDs for the form (keep them unique across all groups)
+    const finalLines = allLines.map((line, index) => ({
+        ...line,
+        id: `agg-${index}`
+    }));
+
+    // Aggregate notes
+    const allNotes = docs
+        .map(doc => doc.number_serie ? `Ref: ${doc.number_serie}` : '')
+        .filter(Boolean)
+        .join('\n');
+
+    return {
+        ...base,
+        document_type_code: targetCode,
+        number_series_id: "",
+        number: "",
+        issue_date: new Date().toISOString().split("T")[0],
+        due_date: "",
+        lines: finalLines,
+        notes: allNotes
+    };
+}
+
 interface UseDocumentFormOptions {
     code?: string;
     itemType: "product" | "service";
     isEditMode: boolean;
     existingDocument: DocumentEntity | undefined;
     sourceDocument?: DocumentEntity | undefined;
+    sourceDocuments?: DocumentEntity[];
 }
 
 /**
  * Sets up react-hook-form for document create/edit.
  * Uses the `values` prop to auto-sync the form when `existingDocument` loads.
  */
-export function useDocumentForm({ code, itemType, isEditMode, existingDocument, sourceDocument }: UseDocumentFormOptions) {
+export function useDocumentForm({ code, itemType, isEditMode, existingDocument, sourceDocument, sourceDocuments }: UseDocumentFormOptions) {
     const existingFormValues = useMemo<Partial<DocumentFormValues> | undefined>(() => {
         if (isEditMode && existingDocument) {
             return mapDocumentToFormValues(existingDocument);
+        }
+        if (!isEditMode && sourceDocuments && sourceDocuments.length > 0 && code) {
+            return mapSourceDocumentsToFormValues(sourceDocuments, code);
         }
         if (!isEditMode && sourceDocument && code) {
             return mapSourceDocumentToFormValues(sourceDocument, code);
         }
         return undefined;
-    }, [isEditMode, existingDocument, sourceDocument, code]);
+    }, [isEditMode, existingDocument, sourceDocument, sourceDocuments, code]);
 
     const methods = useForm<DocumentFormValues>({
         resolver: zodResolver(documentSchema),

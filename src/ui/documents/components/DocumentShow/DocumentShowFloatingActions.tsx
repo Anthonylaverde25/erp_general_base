@@ -22,6 +22,7 @@ import type { DocumentEntity } from "@/domain/entities/documents/DocumentEntity"
 import { useConvertDocument } from "@/features/documents/hooks/useConvertDocument";
 import { useConvertToPurchase } from "@/features/documents/hooks/useConvertToPurchase";
 import { useUpdateDocument } from "@/features/documents/hooks/useUpdateDocument";
+// import { useDuplicateDocument } from "@/features/documents/hooks/useDuplicateDocument"; 
 
 interface FloatingActionsProps {
   document: DocumentEntity;
@@ -37,6 +38,7 @@ export default function DocumentShowFloatingActions({
   const { mutate: updateDocument, isPending: isUpdating } = useUpdateDocument();
   const { mutate: convertDocument, isPending: isConverting } =
     useConvertDocument();
+  // const { mutate: duplicateDocument, isPending: isDuplicating } = useDuplicateDocument();
   const convertToPurchase = useConvertToPurchase();
   const [conversionModalOpen, setConversionModalOpen] = useState(false);
   const [budgetModalOpen, setBudgetModalOpen] = useState(false);
@@ -118,6 +120,10 @@ export default function DocumentShowFloatingActions({
       },
     );
   };
+
+  // const handleDuplicate = () => {
+  //   navigate(`/${module}/create/${docTypeCode}?duplicate_from=${document.id}`);
+  // };
 
   return (
     <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 h-10 shrink-0">

@@ -27,6 +27,8 @@ export interface DocumentLineItem {
 	discount: string;
 	taxes: DocumentLineTaxItem[];
 	subtotal: string;
+	source_document_id?: string;
+	source_document_number?: string;
 }
 
 export interface DocumentFooterTotals {

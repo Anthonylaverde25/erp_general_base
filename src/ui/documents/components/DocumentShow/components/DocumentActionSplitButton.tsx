@@ -5,6 +5,8 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import SendIcon from '@mui/icons-material/Send';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import Divider from '@mui/material/Divider';
 import ClickAwayListener, { ClickAwayListenerProps } from '@mui/material/ClickAwayListener';
 import Grow from '@mui/material/Grow';
 import Paper from '@mui/material/Paper';
@@ -14,7 +16,7 @@ import MenuList from '@mui/material/MenuList';
 import { NextAction } from '../DocumentShowFloatingActions.helpers';
 
 interface DocumentActionSplitButtonProps {
-  primaryAction: NextAction;
+  primaryAction: NextAction | null;
   fastTrackAction: NextAction | null;
   onAction: (status: string) => void;
   disabled?: boolean;
@@ -72,20 +74,29 @@ export default function DocumentActionSplitButton({
     setOpen(false);
   };
 
-  const variant = CTA_VARIANTS[primaryAction.variant];
-  const PrimaryIcon = getMuiIcon(primaryAction.Icon);
+  const variant = primaryAction ? CTA_VARIANTS[primaryAction.variant] : CTA_VARIANTS.indigo;
+  const PrimaryIcon = primaryAction ? getMuiIcon(primaryAction.Icon) : ArrowDropDownIcon;
 
   return (
     <React.Fragment>
       <div className="flex items-center h-full" ref={anchorRef}>
         <div className="flex items-center h-7 overflow-hidden rounded shadow-sm border border-transparent">
           <button
-            onClick={() => onAction(primaryAction.nextStatus)}
+            onClick={primaryAction ? () => onAction(primaryAction.nextStatus) : handleToggle}
             disabled={disabled}
             className={`px-4 h-full text-[11px] font-bold uppercase tracking-wide flex items-center gap-1.5 transition-colors disabled:opacity-60 border-r border-white/10 ${variant.bg}`}
           >
-            <PrimaryIcon sx={{ fontSize: 16 }} />
-            {primaryAction.label}
+            {primaryAction ? (
+              <>
+                <PrimaryIcon sx={{ fontSize: 16 }} />
+                {primaryAction.label}
+              </>
+            ) : (
+              <>
+                <PrimaryIcon sx={{ fontSize: 18 }} />
+                Acciones
+              </>
+            )}
           </button>
           {fastTrackAction && (
             <button

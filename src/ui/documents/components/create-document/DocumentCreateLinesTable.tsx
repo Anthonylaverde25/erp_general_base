@@ -39,15 +39,86 @@ const GRID_THEME_BY_OPTION: Record<DocumentGridTheme, Theme> = {
    Main Component
 ────────────────────────────────────────────────────────────── */
 export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }: DocumentCreateLinesTableProps) {
+	const { rows, handleAddLine } = useDocumentTableSync();
+	const { isReadOnly } = useDocumentCreate();
+
+	// Group rows by source_document_id
+	const sections = useMemo(() => {
+		const groups: Record<string, { id: string, number: string, items: DocumentLineItem[] }> = {};
+		const noSource: DocumentLineItem[] = [];
+
+		rows.forEach(row => {
+			if (row.source_document_id) {
+				if (!groups[row.source_document_id]) {
+					groups[row.source_document_id] = {
+						id: row.source_document_id,
+						number: row.source_document_number || 'S/N',
+						items: []
+					};
+				}
+				groups[row.source_document_id].items.push(row);
+			} else {
+				noSource.push(row);
+			}
+		});
+
+		const result = Object.values(groups);
+		if (noSource.length > 0 || result.length === 0) {
+			result.push({ id: 'default', number: '', items: noSource });
+		}
+		return result;
+	}, [rows]);
+
+	return (
+		<section className="doc-table-wrap">
+			{sections.map((section) => (
+				<DocumentTableSection
+					key={section.id}
+					section={section}
+					gridTheme={gridTheme}
+					discountEnabled={discountEnabled}
+					isReadOnly={isReadOnly}
+				/>
+			))}
+
+			<div className="flex items-center p-2 border px-4">
+				<Button
+					size="small"
+					disabled={isReadOnly}
+					startIcon={<Add />}
+					onClick={handleAddLine}
+					variant='contained'
+					sx={{
+						fontSize: '12px',
+						textTransform: 'none',
+						borderRadius: '6px',
+						border: '1px solid',
+						borderColor: 'primary.main',
+						px: 2,
+					}}
+				>
+					Añadir nueva línea
+				</Button>
+			</div>
+		</section>
+	);
+}
+
+/* ─── Sub-component for each section ─── */
+interface SectionProps {
+	key?: string;
+	section: { id: string, number: string, items: DocumentLineItem[] };
+	gridTheme: DocumentGridTheme;
+	discountEnabled: boolean;
+	isReadOnly: boolean;
+}
+
+const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly }: SectionProps) => {
 	const {
-		rows,
-		handleAddLine,
 		handleCellValueChanged,
 		handleRowDragEnd,
 		onGridReady
 	} = useDocumentTableSync();
-
-	const { isReadOnly } = useDocumentCreate();
 
 	const defaultColDef = useMemo<ColDef<DocumentLineItem>>(() => ({
 		sortable: false,
@@ -154,20 +225,27 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 		);
 
 		return cols;
-	}, [discountEnabled]);
+	}, [discountEnabled, isReadOnly]);
 
 	return (
-		<section className="doc-table-wrap">
-			<div className="doc-lines-grid">
+		<div className="doc-section-container  h-[100%]" style={{ marginBottom: '1.5rem' }}>
+			{section.number && (
+				<div className="doc-section-header">
+					<span className="doc-section-label">ALBARÁN:</span>
+					<span className="doc-section-value">{section.number}</span>
+				</div>
+			)}
+			<div className="doc-lines-grid" style={{ height: 'auto', minHeight: '100px' }}>
 				<AgGridReact<DocumentLineItem>
 					theme={GRID_THEME_BY_OPTION[gridTheme]}
 					loadThemeGoogleFonts={false}
 					modules={GRID_MODULES}
 					columnDefs={columnDefs}
 					defaultColDef={defaultColDef}
-					rowData={rows}
+					rowData={section.items}
 					headerHeight={30}
 					rowHeight={32}
+					domLayout="autoHeight"
 					suppressMovableColumns
 					animateRows
 					rowDragManaged
@@ -175,33 +253,13 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 					onGridReady={onGridReady}
 					onCellValueChanged={handleCellValueChanged}
 					onRowDragEnd={handleRowDragEnd}
-					getRowClass={(params) =>
-						params.data?.code || params.data?.description
+					getRowClass={(params) => {
+						return params.data?.code || params.data?.description
 							? 'doc-row-active'
-							: 'doc-row-empty'
-					}
+							: 'doc-row-empty';
+					}}
 				/>
 			</div>
-
-			<div style={{ padding: '8px', borderTop: '1px dashed #e0e0e0', marginTop: '4px' }}>
-				<Button
-					size="small"
-					disabled={isReadOnly}
-					startIcon={<Add />}
-					onClick={handleAddLine}
-					variant="outlined"
-					color="primary"
-					sx={{
-						fontSize: '12px',
-						textTransform: 'none',
-						borderRadius: '6px',
-						borderStyle: 'dashed',
-						borderWidth: '1.5px',
-					}}
-				>
-					Añadir nueva línea
-				</Button>
-			</div>
-		</section>
+		</div>
 	);
 }
