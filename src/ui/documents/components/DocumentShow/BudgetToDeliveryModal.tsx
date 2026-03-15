@@ -12,7 +12,18 @@ interface BudgetToDeliveryModalProps {
     onConvert: (payload: { 
         number_series_id: number; 
         status_key: string;
-        partner_data?: { vat_number: string; cif: string }
+        partner_data?: { 
+            vat_number: string; 
+            cif: string;
+            type: string;
+            address: {
+                street: string;
+                city: string;
+                state: string;
+                postal_code: string;
+                country: string;
+            }
+        }
     }) => void;
     isConverting: boolean;
 }
@@ -23,6 +34,11 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
     const [selectedSeriesId, setSelectedSeriesId] = useState<number | ''>('');
     const [vatNumber, setVatNumber] = useState(document.partner_vat_number || '');
     const [cif, setCif] = useState(document.partner_cif || '');
+    const [partnerType, setPartnerType] = useState('company');
+    const [street, setStreet] = useState(document.partner_address || '');
+    const [city, setCity] = useState('');
+    const [state, setState] = useState('');
+    const [postalCode, setPostalCode] = useState('');
     
     const selectedStatusKey = 'draft'; // Conversion from budget always goes to draft delivery
 
@@ -52,11 +68,19 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
             status_key: selectedStatusKey 
         };
 
-        // Only send partner data if we are in a sales flow and fields are filled
-        if (document.operation === 'sale' && (vatNumber || cif)) {
+        // Only send partner data if we are in a sales flow
+        if (document.operation === 'sale') {
             payload.partner_data = {
                 vat_number: vatNumber,
-                cif: cif
+                cif: cif,
+                type: partnerType,
+                address: {
+                    street: street,
+                    city: city,
+                    state: state,
+                    postal_code: postalCode,
+                    country: 'España'
+                }
             };
         }
 
@@ -73,8 +97,8 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
             isConfirmDisabled={!selectedSeriesId || isConverting}
             PaperProps={{
                 sx: {
-                    width: '590px',
-                    maxWidth: '590px'
+                    width: '640px',
+                    maxWidth: '640px'
                 }
             }}
         >
@@ -90,6 +114,7 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
                                 Parámetros del Albarán
                             </Typography>
                             <TextField
+                                id="filled-basic"
                                 select
                                 fullWidth
                                 label="Serie de numeración (Albaranes)"
@@ -114,32 +139,93 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
                         </Box>
 
                         {document.operation === 'sale' && (
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                 <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, mb: 0, display: 'block' }}>
-                                    Datos Fiscales (Promoción a Cliente)
+                                    Formalización del Cliente
                                 </Typography>
+                                
                                 <Box sx={{ display: 'flex', gap: 2 }}>
                                     <TextField
+                                        id="filled-basic"
+                                        select
+                                        fullWidth
+                                        label="Tipo de Partner"
+                                        variant="filled"
+                                        size="small"
+                                        value={partnerType}
+                                        onChange={(e) => setPartnerType(e.target.value)}
+                                        sx={{ flex: 1 }}
+                                    >
+                                        <MenuItem value="company">Empresa</MenuItem>
+                                        <MenuItem value="person">Persona Física</MenuItem>
+                                    </TextField>
+                                    <TextField
+                                        id="filled-basic"
                                         fullWidth
                                         label="CIF / NIF"
-                                        variant="outlined"
+                                        variant="filled"
                                         size="small"
                                         value={cif}
                                         onChange={(e) => setCif(e.target.value)}
                                         placeholder="B12345678"
+                                        sx={{ flex: 1 }}
                                     />
                                     <TextField
+                                        id="filled-basic"
                                         fullWidth
-                                        label="VAT Number"
-                                        variant="outlined"
+                                        label="VAT"
+                                        variant="filled"
                                         size="small"
                                         value={vatNumber}
                                         onChange={(e) => setVatNumber(e.target.value)}
                                         placeholder="ESB12345678"
+                                        sx={{ flex: 1 }}
                                     />
                                 </Box>
-                                <Typography variant="caption" color="text.secondary">
-                                    Al completar estos datos, el prospecto se convertirá automáticamente en cliente.
+
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    <TextField
+                                        id="filled-basic"
+                                        fullWidth
+                                        label="Dirección (Calle, Número...)"
+                                        variant="filled"
+                                        size="small"
+                                        value={street}
+                                        onChange={(e) => setStreet(e.target.value)}
+                                    />
+                                    <Box sx={{ display: 'flex', gap: 2 }}>
+                                        <TextField
+                                            id="filled-basic"
+                                            fullWidth
+                                            label="Ciudad"
+                                            variant="filled"
+                                            size="small"
+                                            value={city}
+                                            onChange={(e) => setCity(e.target.value)}
+                                        />
+                                        <TextField
+                                            id="filled-basic"
+                                            fullWidth
+                                            label="Provincia"
+                                            variant="filled"
+                                            size="small"
+                                            value={state}
+                                            onChange={(e) => setState(e.target.value)}
+                                        />
+                                        <TextField
+                                            id="filled-basic"
+                                            fullWidth
+                                            label="Código Postal"
+                                            variant="filled"
+                                            size="small"
+                                            value={postalCode}
+                                            onChange={(e) => setPostalCode(e.target.value)}
+                                        />
+                                    </Box>
+                                </Box>
+                                
+                                <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                    Esta información actualizará al prospecto y lo convertirá en un cliente activo con dirección de facturación primaria.
                                 </Typography>
                             </Box>
                         )}
