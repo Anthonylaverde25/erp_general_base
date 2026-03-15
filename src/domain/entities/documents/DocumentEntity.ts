@@ -78,6 +78,7 @@ export class DocumentEntity {
         public readonly partner_address: string | null,
         public readonly partner_vat_number: string | null,
         public readonly partner_cif: string | null,
+        public readonly partner_roles: string[] = [],
         public readonly document_type_name: string | null,
         public readonly document_type_code: string | null,
         public readonly issue_date_raw: string | null,
@@ -93,6 +94,10 @@ export class DocumentEntity {
 
     get balance(): number {
         return Number((this.total - this.total_paid).toFixed(2));
+    }
+
+    get is_prospect(): boolean {
+        return this.partner_roles.includes('prospect');
     }
 
     static fromJson(json: any): DocumentEntity {
@@ -164,6 +169,10 @@ export class DocumentEntity {
             }))
             : [];
 
+        const partner_roles = Array.isArray(json.partner?.roles)
+            ? json.partner.roles.map((r: any) => r.role)
+            : (Array.isArray(json.partner_roles) ? json.partner_roles : []);
+
         return new DocumentEntity(
             Number(json.id),
             Number(json.company_id),
@@ -183,6 +192,7 @@ export class DocumentEntity {
             json.partner?.address || json.partner_address || json.partner_snapshot?.address || null,
             json.partner?.vat_number || json.partner_vat_number || json.partner_snapshot?.vat_number || null,
             json.partner?.cif || json.partner_cif || json.partner_snapshot?.cif || null,
+            partner_roles,
             json.document_type?.name || json.document_type_name || null,
             json.document_type?.code || json.document_type_code || null,
             json.issue_date || null,

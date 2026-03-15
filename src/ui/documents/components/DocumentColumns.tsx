@@ -101,6 +101,8 @@ export const getDocumentColumns = (
                     muiColor = status.color as any;
                 } else if (status.key === 'issued') {
                     muiColor = 'success';
+                } else if (status.key === 'converted') {
+                    muiColor = 'default';
                 } else if (status.key === 'draft') {
                     muiColor = 'warning';
                 } else if (status.key === 'cancelled') {

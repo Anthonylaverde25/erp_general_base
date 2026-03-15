@@ -74,19 +74,32 @@ export function buildLifecycleSteps(
   if (isQuote(docTypeCode)) {
     const approvedKey = statusKey === "rejected" ? "rejected" : "approved";
     const approvedLabel = statusKey === "rejected" ? "Rechazado" : "Aprobado";
-    return [
+    
+    const steps: LifecycleStep[] = [
       { key: "draft", label: "Borrador" },
       { key: "validated", label: "Validado" },
       { key: approvedKey, label: approvedLabel },
     ];
+
+    if (statusKey === 'converted') {
+      steps.push({ key: "converted", label: "Convertido" });
+    }
+
+    return steps;
   }
 
   if (isPurchaseOrder(docTypeCode)) {
-    return [
+    const steps: LifecycleStep[] = [
       { key: "draft", label: "Borrador" },
       { key: "validated", label: "Validado" },
       { key: "ordered", label: "Pedido" },
     ];
+
+    if (statusKey === 'converted') {
+      steps.push({ key: "converted", label: "Convertido" });
+    }
+
+    return steps;
   }
 
   return null;
@@ -97,6 +110,8 @@ export function resolveNextAction(
   statusKey: string,
   operation: string,
 ): NextAction | null {
+  if (statusKey === 'converted') return null;
+
   if (isInvoice(docTypeCode)) {
     if (statusKey === "draft")
       return {

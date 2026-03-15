@@ -43,7 +43,11 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
     const selectedStatusKey = 'draft'; // Conversion from budget always goes to draft delivery
 
     // Which delivery type do we need series for? QUO -> DLV, PQUO -> PDLV
-    const targetType = document.document_type_code === 'QUO' ? 'DLV' : 'PDLV';
+    const targetType = document.document_type_code === 'QUO' ? 'DLV' : 'PQUO' ? 'PDLV' : 'DLV';
+
+    // Robust detection: check roles array or check if fiscal data is missing for a sale
+    const isProspect = document.partner_roles?.includes('prospect') || 
+                      (document.operation === 'sale' && !document.partner_cif && !document.partner_vat_number);
 
     const { data: numberSeries, isLoading: isLoadingSeries } = useQuery({
         queryKey: ['number-series-for-conversion', document.company_id, targetType],
@@ -138,10 +142,10 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
                             </TextField>
                         </Box>
 
-                        {document.operation === 'sale' && (
+                        {isProspect && (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                 <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, mb: 0, display: 'block' }}>
-                                    Formalización del Cliente
+                                    Formalización del {document.operation === 'sale' ? 'Cliente' : 'Proveedor'}
                                 </Typography>
                                 
                                 <Box sx={{ display: 'flex', gap: 2 }}>
@@ -225,7 +229,7 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
                                 </Box>
                                 
                                 <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                                    Esta información actualizará al prospecto y lo convertirá en un cliente activo con dirección de facturación primaria.
+                                    Esta información actualizará al prospecto y lo convertirá en un {document.operation === 'sale' ? 'cliente' : 'proveedor'} activo con dirección de facturación primaria.
                                 </Typography>
                             </Box>
                         )}

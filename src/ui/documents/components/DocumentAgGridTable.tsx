@@ -161,7 +161,8 @@ export default function DocumentAgGridTable({ documents, isLoading, operation = 
                 let hexColor = '#64748b'; // default slate-500
                 if (status.color === 'primary') hexColor = '#1976d2';
                 else if (status.color === 'success' || status.key === 'issued') hexColor = '#22c55e';
-                else if (status.color === 'warning' || status.key === 'draft') hexColor = '#f59e0b';
+                else if (status.key === 'converted') hexColor = '#94a3b8'; // Neutral grey
+                else if (status.color === 'error' || status.key === 'rejected') hexColor = '#ef4444';
                 else if (status.color === 'error' || status.key === 'cancelled') hexColor = '#ef4444';
                 else if (status.color === 'info') hexColor = '#0ea5e9';
 

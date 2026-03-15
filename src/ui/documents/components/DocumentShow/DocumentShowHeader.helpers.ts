@@ -8,6 +8,7 @@ export function getStatusColor(key: string): string {
     validated: "#3b82f6",
     approved: "#6366f1",
     issued: "#22c55e",
+    converted: "#94a3b8",
     delivered: "#10b981",
     cancelled: "#ef4444",
     rejected: "#ef4444",
