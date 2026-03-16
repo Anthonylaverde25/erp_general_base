@@ -54,21 +54,33 @@ export function buildLifecycleSteps(
   }
 
   if (isDelivery(docTypeCode)) {
-    return [
+    const steps: LifecycleStep[] = [
       { key: "draft", label: "Borrador" },
       { key: "validated", label: "Validado" },
       { key: "delivered", label: "Entregado" },
-      { key: "invoiced", label: "Facturado" },
     ];
+
+    if (statusKey === "partially_collected") {
+      steps.push({ key: "partially_collected", label: "Parcialmente Cobrado" });
+    }
+
+    steps.push({ key: "invoiced", label: "Facturado" });
+    return steps;
   }
 
   if (isPurchaseDelivery(docTypeCode)) {
-    return [
+    const steps: LifecycleStep[] = [
       { key: "draft", label: "Borrador" },
       { key: "validated", label: "Validado" },
       { key: "received", label: "Recibido" },
-      { key: "invoiced", label: "Facturado" },
     ];
+
+    if (statusKey === "partially_paid") {
+      steps.push({ key: "partially_paid", label: "Parcialmente Pagado" });
+    }
+
+    steps.push({ key: "invoiced", label: "Facturado" });
+    return steps;
   }
 
   if (isQuote(docTypeCode)) {
@@ -270,15 +282,15 @@ export function canShowPostDeliveredActions(
   statusKey: string,
   isAlreadyInvoiced: boolean,
 ) {
-  const isDelivered = statusKey === "delivered" || statusKey === "received";
-  const isApprovedOrValidated = ["approved", "validated"].includes(statusKey);
+  const isDelivered = ["delivered", "received", "validated", "partially_collected", "partially_paid"].includes(statusKey);
+  const isApprovedOrValidated = ["approved", "validated", "partially_converted"].includes(statusKey);
 
   const deliveryFlow =
     isDeliveryFamily(docTypeCode) && (isDelivered || isAlreadyInvoiced);
   const quoteFlow =
     isQuote(docTypeCode) && (isApprovedOrValidated || isAlreadyInvoiced);
   const purchaseOrderFlow =
-    isPurchaseOrder(docTypeCode) && (statusKey === "ordered" || isAlreadyInvoiced);
+    isPurchaseOrder(docTypeCode) && (statusKey === "ordered" || statusKey === "partially_converted" || isAlreadyInvoiced);
 
   return deliveryFlow || quoteFlow || purchaseOrderFlow;
 }

@@ -1,8 +1,9 @@
-import { Box, MenuItem, CircularProgress, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Divider, IconButton, InputAdornment } from '@mui/material';
+import { Box, MenuItem, CircularProgress, TextField, Typography, Paper, Divider, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo, useEffect } from 'react';
+import { FileText, CheckCircle } from 'lucide-react';
 import { AppFormModal } from '@/components/modals/AppFormModal';
-import { DocumentEntity, DocumentLine } from '@/domain/entities/documents/DocumentEntity';
+import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 import { NumberSeriesRepositoryCrud } from '@/infrastructure/repositories/number_series/NumberSeriesRepositoryCrud';
 import { AddTask, Replay } from '@mui/icons-material';
 
@@ -28,11 +29,12 @@ interface BudgetToDeliveryModalProps {
         }
     }) => void;
     isConverting: boolean;
+    mode: 'full' | 'partial';
 }
 
 const numberSeriesRepository = new NumberSeriesRepositoryCrud();
 
-export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isConverting }: BudgetToDeliveryModalProps) {
+export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isConverting, mode }: BudgetToDeliveryModalProps) {
     const [selectedSeriesId, setSelectedSeriesId] = useState<number | ''>('');
     const [vatNumber, setVatNumber] = useState(document.partner_vat_number || '');
     const [cif, setCif] = useState(document.partner_cif || '');
@@ -42,7 +44,6 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
     const [state, setState] = useState('');
     const [postalCode, setPostalCode] = useState('');
     
-    // Fulfillment state: map of source_line_id -> quantity to process
     const [lineQuantities, setLineQuantities] = useState<Record<number, number>>({});
 
     useEffect(() => {
@@ -58,18 +59,6 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
         }
     }, [open, document]);
 
-    const selectedStatusKey = 'draft';
-    const targetType = document.document_type_code === 'QUO' ? 'DLV' : document.document_type_code === 'PQUO' ? 'PDLV' : 'DLV';
-
-    const isProspect = document.partner_roles?.includes('prospect') || 
-                      (document.operation === 'sale' && !document.partner_cif && !document.partner_vat_number);
-
-    const { data: numberSeries, isLoading: isLoadingSeries } = useQuery({
-        queryKey: ['number-series-for-conversion', document.company_id, targetType],
-        queryFn: () => numberSeriesRepository.index(targetType),
-        enabled: open,
-    });
-
     const handleQuantityChange = (lineId: number, val: string, max: number) => {
         const num = parseFloat(val);
         setLineQuantities(prev => ({
@@ -82,6 +71,16 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
         setLineQuantities(prev => ({ ...prev, [lineId]: max }));
     };
 
+    const targetType = document.document_type_code === 'QUO' ? 'DLV' : document.document_type_code === 'PQUO' ? 'PDLV' : 'DLV';
+    const isProspect = document.partner_roles?.includes('prospect') || 
+                      (document.operation === 'sale' && !document.partner_cif && !document.partner_vat_number);
+
+    const { data: numberSeries, isLoading: isLoadingSeries } = useQuery({
+        queryKey: ['number-series-for-conversion', document.company_id, targetType],
+        queryFn: () => numberSeriesRepository.index(targetType),
+        enabled: open,
+    });
+
     const previewNumber = useMemo(() => {
         if (!selectedSeriesId || !numberSeries) return null;
         const series = numberSeries.find(ns => ns.id === selectedSeriesId);
@@ -91,22 +90,31 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
     }, [selectedSeriesId, numberSeries]);
 
     const isTotalProcessZero = useMemo(() => {
+        if (mode === 'full') return false;
         return Object.values(lineQuantities).reduce((acc, curr) => acc + curr, 0) <= 0;
-    }, [lineQuantities]);
+    }, [lineQuantities, mode]);
 
     const handleSave = () => {
         if (!selectedSeriesId) return;
         
-        const linesPayload = Object.entries(lineQuantities)
-            .filter(([_, qty]) => qty > 0)
-            .map(([id, qty]) => ({
-                source_line_id: Number(id),
-                quantity: qty
-            }));
+        let linesPayload;
+        
+        if (mode === 'full') {
+            linesPayload = document.lines
+                .map(line => ({ 
+                    source_line_id: line.id!, 
+                    quantity: line.quantity - (line.processed_quantity || 0) 
+                }))
+                .filter(l => l.quantity > 0);
+        } else {
+            linesPayload = Object.entries(lineQuantities)
+                .filter(([_, qty]) => qty > 0)
+                .map(([id, qty]) => ({ source_line_id: Number(id), quantity: qty }));
+        }
 
         const payload: any = { 
             number_series_id: selectedSeriesId, 
-            status_key: selectedStatusKey,
+            status_key: 'draft',
             lines: linesPayload
         };
 
@@ -115,16 +123,9 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
                 vat_number: vatNumber,
                 cif: cif,
                 type: partnerType,
-                address: {
-                    street: street,
-                    city: city,
-                    state: state,
-                    postal_code: postalCode,
-                    country: 'España'
-                }
+                address: { street, city, state, postal_code: postalCode, country: 'España' }
             };
         }
-
         onConvert(payload);
     };
 
@@ -132,219 +133,246 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
         <AppFormModal
             isOpen={open}
             onClose={onClose}
-            title={`Convertir ${document.document_type_name} a Albarán`}
+            title={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Box sx={{ 
+                        width: 32, 
+                        height: 32, 
+                        borderRadius: '6px', 
+                        bgcolor: 'indigo.50', 
+                        color: 'indigo.600', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center' 
+                    }}>
+                        <FileText size={18} />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.1rem' }}>
+                        {mode === 'full' ? 'Conversión Directa' : 'Procesar Líneas de Presupuesto'}
+                    </Typography>
+                </Box>
+            }
             onConfirm={handleSave}
             confirmText={isConverting ? "Procesando..." : "Generar Albarán"}
             isConfirmDisabled={!selectedSeriesId || isConverting || isTotalProcessZero}
-            PaperProps={{
-                sx: {
-                    width: '800px',
-                    maxWidth: '90vw'
-                }
+            PaperProps={{ 
+                sx: { 
+                    width: mode === 'full' ? '400px' : '750px', 
+                    maxWidth: '95vw',
+                    borderRadius: '12px',
+                    boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+                } 
             }}
         >
-            <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 {isLoadingSeries ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                        <CircularProgress size={24} thickness={4} color="secondary" />
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                        <CircularProgress size={28} thickness={4} color="secondary" />
                     </Box>
                 ) : (
                     <>
-                        {/* SECCIÓN 1: SERIE Y PREVIEW */}
-                        <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
-                            <Box sx={{ flex: 1 }}>
-                                <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, mb: 1, display: 'block' }}>
-                                    Configuración del Destino
-                                </Typography>
-                                <TextField
-                                    id="filled-basic"
-                                    select
-                                    fullWidth
-                                    label="Serie de numeración (Albaranes)"
-                                    variant="filled"
-                                    value={selectedSeriesId}
-                                    onChange={(e) => setSelectedSeriesId(Number(e.target.value) || '')}
-                                    size="small"
-                                    helperText="Seleccione la serie legal para el nuevo documento"
-                                >
-                                    <MenuItem value="" disabled><em>Seleccione serie...</em></MenuItem>
-                                    {numberSeries?.map((ns) => (
-                                        <MenuItem key={ns.id} value={ns.id}>
-                                            Serie {ns.serie} (Contador: {ns.current_number})
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            </Box>
-                            {previewNumber && (
-                                <Paper variant="outlined" sx={{ flex: 1, p: 1.5, bgcolor: 'primary.main', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Box>
-                                        <Typography variant="caption" sx={{ opacity: 0.8, fontWeight: 600, textTransform: 'uppercase', fontSize: '9px' }}>Próximo número</Typography>
-                                        <Typography variant="h6" sx={{ fontWeight: 900, lineHeight: 1 }}>{previewNumber}</Typography>
-                                    </Box>
-                                    <AddTask />
-                                </Paper>
-                            )}
-                        </Box>
-
-                        <Divider />
-
-                        {/* SECCIÓN 2: GESTIÓN DE LÍNEAS (FULFILLMENT) */}
-                        <Box>
-                            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, mb: 1, display: 'block' }}>
-                                Líneas a Procesar (Cantidades Parciales)
-                            </Typography>
-                            <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 300 }}>
-                                <Table stickyHeader size="small">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell sx={{ fontWeight: 700, bgcolor: 'grey.50' }}>Producto / Descripción</TableCell>
-                                            <TableCell align="center" sx={{ fontWeight: 700, bgcolor: 'grey.50' }}>Pendiente</TableCell>
-                                            <TableCell align="right" sx={{ fontWeight: 700, bgcolor: 'grey.50', width: '180px' }}>A Procesar Ahora</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {document.lines.map((line) => {
-                                            const pending = line.quantity - (line.processed_quantity || 0);
-                                            const isFullyProcessed = pending <= 0;
-                                            
-                                            return (
-                                                <TableRow key={line.id} sx={{ opacity: isFullyProcessed ? 0.5 : 1, bgcolor: isFullyProcessed ? 'action.hover' : 'inherit' }}>
-                                                    <TableCell>
-                                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{line.name}</Typography>
-                                                        <Typography variant="caption" color="text.secondary">{line.description || 'Sin descripción'}</Typography>
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        <Typography variant="body2" sx={{ fontWeight: 700, color: isFullyProcessed ? 'success.main' : 'text.primary' }}>
-                                                            {pending.toFixed(2)}
-                                                        </Typography>
-                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '10px' }}>
-                                                            de {line.quantity}
-                                                        </Typography>
-                                                    </TableCell>
-                                                    <TableCell align="right">
-                                                        {!isFullyProcessed ? (
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-end' }}>
-                                                                <TextField
-                                                                    type="number"
-                                                                    size="small"
-                                                                    variant="standard"
-                                                                    value={lineQuantities[line.id!] || 0}
-                                                                    onChange={(e) => handleQuantityChange(line.id!, e.target.value, pending)}
-                                                                    inputProps={{ 
-                                                                        min: 0, 
-                                                                        max: pending, 
-                                                                        step: "0.01",
-                                                                        style: { textAlign: 'right', fontWeight: 800, color: '#1976d2' } 
-                                                                    }}
-                                                                    sx={{ width: '80px' }}
-                                                                />
-                                                                <IconButton size="small" onClick={() => resetQuantity(line.id!, pending)} title="Cargar máximo pendiente">
-                                                                    <Replay fontSize="small" />
-                                                                </IconButton>
-                                                            </Box>
-                                                        ) : (
-                                                            <Typography variant="caption" sx={{ fontWeight: 700, color: 'success.main' }}>COMPLETADO</Typography>
-                                                        )}
-                                                    </TableCell>
-                                                </TableRow>
-                                            );
-                                        })}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Box>
-
-                        {/* SECCIÓN 3: FORMALIZACIÓN (SÓLO PROSPECTOS) */}
-                        {isProspect && (
-                            <>
-                                <Divider />
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, mb: 0, display: 'block' }}>
-                                        Formalización del {document.operation === 'sale' ? 'Cliente' : 'Proveedor'}
+                        {/* 1. Header Section: Configuración de Serie */}
+                        <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'grey.100' }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
+                                <Box sx={{ width: '100%' }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', mb: 1, display: 'block', letterSpacing: '0.5px' }}>
+                                        Serie de Facturación
                                     </Typography>
-                                    
-                                    <Box sx={{ display: 'flex', gap: 2 }}>
-                                        <TextField
-                                            id="filled-basic"
-                                            select
-                                            fullWidth
-                                            label="Tipo de Partner"
-                                            variant="filled"
-                                            size="small"
-                                            value={partnerType}
-                                            onChange={(e) => setPartnerType(e.target.value)}
-                                            sx={{ flex: 1 }}
-                                        >
-                                            <MenuItem value="company">Empresa</MenuItem>
-                                            <MenuItem value="person">Persona Física</MenuItem>
-                                        </TextField>
-                                        <TextField
-                                            id="filled-basic"
-                                            fullWidth
-                                            label="CIF / NIF"
-                                            variant="filled"
-                                            size="small"
-                                            value={cif}
-                                            onChange={(e) => setCif(e.target.value)}
-                                            placeholder="B12345678"
-                                            sx={{ flex: 1 }}
-                                        />
-                                        <TextField
-                                            id="filled-basic"
-                                            fullWidth
-                                            label="VAT"
-                                            variant="filled"
-                                            size="small"
-                                            value={vatNumber}
-                                            onChange={(e) => setVatNumber(e.target.value)}
-                                            placeholder="ESB12345678"
-                                            sx={{ flex: 1 }}
-                                        />
+                                    <TextField
+                                        id="filled-basic"
+                                        select
+                                        fullWidth
+                                        variant="filled"
+                                        label="Seleccione serie legal"
+                                        value={selectedSeriesId}
+                                        onChange={(e) => setSelectedSeriesId(Number(e.target.value) || '')}
+                                        size="small"
+                                        sx={{ 
+                                            '& .MuiInputBase-input': { fontSize: '13px', fontWeight: 600 }
+                                        }}
+                                    >
+                                        <MenuItem value="" disabled><em className="text-gray-400">Seleccione la serie de numeración...</em></MenuItem>
+                                        {numberSeries?.map((ns) => (
+                                            <MenuItem key={ns.id} value={ns.id} sx={{ fontSize: '13px' }}>
+                                                Serie {ns.serie} (Contador actual: {ns.current_number})
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                </Box>
+                                
+                                {previewNumber && (
+                                    <Box sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'flex-start',
+                                        width: '100%',
+                                        px: 1.5,
+                                        py: 1,
+                                        borderLeft: '3px solid',
+                                        borderColor: 'indigo.400',
+                                        bgcolor: 'indigo.50/50',
+                                        borderRadius: '0 4px 4px 0'
+                                    }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'indigo.600', textTransform: 'uppercase', fontSize: '10px', mb: 0.5 }}>
+                                            Nº Próximo Albarán
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <AddTask sx={{ fontSize: '16px', color: 'indigo.600' }} />
+                                            <Typography variant="body1" sx={{ fontWeight: 800, color: 'indigo.900', letterSpacing: '1px', fontSize: '16px' }}>
+                                                {previewNumber}
+                                            </Typography>
+                                        </Box>
                                     </Box>
+                                )}
+                            </Box>
+                        </Box>
 
+                        {/* 2. Main Content Section */}
+                        <Box sx={{ p: 3 }}>
+                            {mode === 'partial' && (
+                                <Box sx={{ mb: isProspect ? 4 : 0 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            Detalle de Líneas de Presupuesto
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            Cantidades a procesar en este albarán.
+                                        </Typography>
+                                    </Box>
+                                    
+                                    <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid', borderColor: 'grey.200' }}>
+                                        <Table size="small">
+                                            <TableHead>
+                                                <TableRow sx={{ bgcolor: 'grey.50' }}>
+                                                    <TableCell sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200' }}>Producto / Descripción</TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200', width: '110px' }}>Estado</TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200', width: '80px' }}>Pend.</TableCell>
+                                                    <TableCell align="right" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200', width: '160px' }}>A Procesar</TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {document.lines.map((line) => {
+                                                    const pending = line.quantity - (line.processed_quantity || 0);
+                                                    const isDone = pending <= 0;
+                                                    
+                                                    return (
+                                                        <TableRow 
+                                                            key={line.id} 
+                                                            sx={{ 
+                                                                '&:hover': { bgcolor: 'grey.50' },
+                                                                transition: 'background-color 0.2s',
+                                                                '& td': { py: 1.5, px: 2, borderBottom: '1px solid', borderColor: 'grey.100' }
+                                                            }}
+                                                        >
+                                                            <TableCell>
+                                                                <Box>
+                                                                    <Typography variant="body2" sx={{ fontWeight: 700, color: isDone ? 'text.disabled' : 'text.primary', fontSize: '13px' }}>
+                                                                        {line.name}
+                                                                    </Typography>
+                                                                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '11px', fontStyle: 'italic', display: 'block', mt: 0.5 }}>
+                                                                        {line.description || 'Sin descripción adicional'}
+                                                                    </Typography>
+                                                                </Box>
+                                                            </TableCell>
+                                                            <TableCell align="center">
+                                                                <Box sx={{ 
+                                                                    display: 'inline-flex', 
+                                                                    px: 1, 
+                                                                    py: 0.25, 
+                                                                    borderRadius: '4px', 
+                                                                    fontSize: '10px', 
+                                                                    fontWeight: 800,
+                                                                    bgcolor: isDone ? 'success.50' : 'info.50',
+                                                                    color: isDone ? 'success.700' : 'info.700',
+                                                                    border: '1px solid',
+                                                                    borderColor: isDone ? 'success.100' : 'info.100'
+                                                                }}>
+                                                                    {isDone ? 'PROCESADO' : 'PENDIENTE'}
+                                                                </Box>
+                                                            </TableCell>
+                                                            <TableCell align="center">
+                                                                <Typography variant="body2" sx={{ fontWeight: 700, color: isDone ? 'text.disabled' : 'text.primary', fontSize: '13px' }}>
+                                                                    {pending.toFixed(2)}
+                                                                </Typography>
+                                                            </TableCell>
+                                                            <TableCell align="right">
+                                                                {!isDone ? (
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-end' }}>
+                                                                        <TextField
+                                                                            id="filled-basic"
+                                                                            type="number"
+                                                                            size="small"
+                                                                            variant="filled"
+                                                                            value={lineQuantities[line.id!] || 0}
+                                                                            onChange={(e) => handleQuantityChange(line.id!, e.target.value, pending)}
+                                                                            inputProps={{ 
+                                                                                min: 0, 
+                                                                                max: pending, 
+                                                                                step: "0.01",
+                                                                                style: { textAlign: 'right', fontWeight: 700, fontSize: '13px', paddingTop: '8px' } 
+                                                                            }}
+                                                                            sx={{ width: '100px', '& .MuiFilledInput-root': { height: '40px' } }}
+                                                                        />
+                                                                        <IconButton 
+                                                                            size="small" 
+                                                                            onClick={() => resetQuantity(line.id!, pending)} 
+                                                                            sx={{ 
+                                                                                borderRadius: '4px', 
+                                                                                bgcolor: 'grey.100',
+                                                                                color: 'grey.600',
+                                                                                '&:hover': { bgcolor: 'indigo.600', color: 'white' }
+                                                                            }}
+                                                                            title="Cargar máximo"
+                                                                        >
+                                                                            <Replay sx={{ fontSize: '16px' }} />
+                                                                        </IconButton>
+                                                                    </Box>
+                                                                ) : (
+                                                                    <CheckCircle sx={{ color: 'success.main', fontSize: '20px' }} />
+                                                                )}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+                                                })}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </Box>
+                            )}
+
+                            {/* 3. Formalization Section (Prospects) */}
+                            {isProspect && (
+                                <Box sx={{ 
+                                    p: 2.5, 
+                                    borderRadius: '8px', 
+                                    border: '1px solid', 
+                                    borderColor: 'orange.100', 
+                                    bgcolor: '#fffbf5' 
+                                }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'orange.900', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            Formalización de {document.operation === 'sale' ? 'Cliente' : 'Proveedor'}
+                                        </Typography>
+                                        <Box sx={{ px: 1, py: 0.25, bgcolor: 'orange.100', color: 'orange.900', borderRadius: '4px', fontSize: '9px', fontWeight: 900 }}>REQUERIDO</Box>
+                                    </Box>
+                                    
+                                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, mb: 2 }}>
+                                        <TextField id="filled-basic" select fullWidth label="Tipo" variant="filled" size="small" value={partnerType} onChange={(e) => setPartnerType(e.target.value)} />
+                                        <TextField id="filled-basic" fullWidth label="CIF / NIF" variant="filled" size="small" value={cif} onChange={(e) => setCif(e.target.value)} />
+                                        <TextField id="filled-basic" fullWidth label="VAT ID" variant="filled" size="small" value={vatNumber} onChange={(e) => setVatNumber(e.target.value)} />
+                                    </Box>
+                                    
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                        <TextField
-                                            id="filled-basic"
-                                            fullWidth
-                                            label="Dirección (Calle, Número...)"
-                                            variant="filled"
-                                            size="small"
-                                            value={street}
-                                            onChange={(e) => setStreet(e.target.value)}
-                                        />
-                                        <Box sx={{ display: 'flex', gap: 2 }}>
-                                            <TextField
-                                                id="filled-basic"
-                                                fullWidth
-                                                label="Ciudad"
-                                                variant="filled"
-                                                size="small"
-                                                value={city}
-                                                onChange={(e) => setCity(e.target.value)}
-                                            />
-                                            <TextField
-                                                id="filled-basic"
-                                                fullWidth
-                                                label="Provincia"
-                                                variant="filled"
-                                                size="small"
-                                                value={state}
-                                                onChange={(e) => setState(e.target.value)}
-                                            />
-                                            <TextField
-                                                id="filled-basic"
-                                                fullWidth
-                                                label="Código Postal"
-                                                variant="filled"
-                                                size="small"
-                                                value={postalCode}
-                                                onChange={(e) => setPostalCode(e.target.value)}
-                                            />
+                                        <TextField id="filled-basic" fullWidth label="Dirección Fiscal" variant="filled" size="small" value={street} onChange={(e) => setStreet(e.target.value)} />
+                                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 120px', gap: 2 }}>
+                                            <TextField id="filled-basic" fullWidth label="Ciudad" variant="filled" size="small" value={city} onChange={(e) => setCity(e.target.value)} />
+                                            <TextField id="filled-basic" fullWidth label="Provincia" variant="filled" size="small" value={state} onChange={(e) => setState(e.target.value)} />
+                                            <TextField id="filled-basic" fullWidth label="C.P." variant="filled" size="small" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
                                         </Box>
                                     </Box>
                                 </Box>
-                            </>
-                        )}
+                            )}
+                        </Box>
                     </>
                 )}
             </Box>

@@ -24,12 +24,14 @@ interface DocumentActionSplitButtonProps {
 
 const CTA_VARIANTS = {
   indigo: {
-    bg: 'bg-indigo-600 hover:bg-indigo-700 text-white',
-    border: 'border-indigo-700'
+    bg: 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50',
+    border: 'border-indigo-200 dark:border-indigo-800',
+    divider: 'border-indigo-200 dark:border-indigo-800'
   },
   green: {
-    bg: 'bg-emerald-600 hover:bg-emerald-700 text-white',
-    border: 'border-emerald-700'
+    bg: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50',
+    border: 'border-emerald-200 dark:border-emerald-800',
+    divider: 'border-emerald-200 dark:border-emerald-800'
   },
 } as const;
 
@@ -80,11 +82,11 @@ export default function DocumentActionSplitButton({
   return (
     <React.Fragment>
       <div className="flex items-center h-full" ref={anchorRef}>
-        <div className="flex items-center h-7 overflow-hidden rounded shadow-sm border border-transparent">
+        <div className={`flex items-center h-7 overflow-hidden rounded border ${variant.border}`}>
           <button
             onClick={primaryAction ? () => onAction(primaryAction.nextStatus) : handleToggle}
             disabled={disabled}
-            className={`px-4 h-full text-[11px] font-bold uppercase tracking-wide flex items-center gap-1.5 transition-colors disabled:opacity-60 border-r border-white/10 ${variant.bg}`}
+            className={`px-4 h-full text-[11px] font-bold uppercase tracking-wide flex items-center gap-1.5 transition-colors disabled:opacity-60 border-r ${variant.divider} ${variant.bg}`}
           >
             {primaryAction ? (
               <>
@@ -132,7 +134,7 @@ export default function DocumentActionSplitButton({
                 placement === 'bottom-end' ? 'right top' : 'right bottom',
             }}
           >
-            <Paper className="mt-1 shadow-xl bg-white dark:bg-gray-900 border-none overflow-hidden rounded-md">
+            <Paper className="mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 overflow-hidden rounded-md">
               <ClickAwayListener
                 onClickAway={handleClose}
                 children={

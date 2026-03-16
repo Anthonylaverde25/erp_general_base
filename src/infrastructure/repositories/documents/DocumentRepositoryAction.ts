@@ -5,7 +5,11 @@ import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 
 @injectable()
 export class DocumentRepositoryAction implements IDocumentActionRepository {
-    async convert(id: string | number, payload?: { number_series_id?: number | ''; status_key?: string }): Promise<DocumentEntity> {
+    async convert(id: string | number, payload?: { 
+        number_series_id?: number | ''; 
+        status_key?: string;
+        lines?: { source_line_id: number; quantity: number }[];
+    }): Promise<DocumentEntity> {
         const {
             data: { data: invoice }
         } = await axiosInstance.post(`documents/${id}/convert`, payload);

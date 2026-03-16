@@ -10,7 +10,11 @@ export class ConvertDocumentUseCase {
         private repository: IDocumentActionRepository
     ) { }
 
-    async execute(id: string, payload?: { number_series_id?: number | ''; status_key?: string }): Promise<DocumentEntity> {
+    async execute(id: string, payload?: { 
+        number_series_id?: number | ''; 
+        status_key?: string;
+        lines?: { source_line_id: number; quantity: number }[];
+    }): Promise<DocumentEntity> {
         return await this.repository.convert(id, payload);
     }
 }

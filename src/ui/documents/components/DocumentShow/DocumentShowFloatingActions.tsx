@@ -42,6 +42,8 @@ export default function DocumentShowFloatingActions({
   const convertToPurchase = useConvertToPurchase();
   const [conversionModalOpen, setConversionModalOpen] = useState(false);
   const [budgetModalOpen, setBudgetModalOpen] = useState(false);
+  const [conversionMode, setConversionMode] = useState<"full" | "partial">("full");
+  const [invoiceConversionMode, setInvoiceConversionMode] = useState<"full" | "partial">("full");
 
   const statusKey = document.status?.key || "";
 
@@ -94,6 +96,7 @@ export default function DocumentShowFloatingActions({
   const handleConvertToInvoice = (payload: {
     number_series_id: number;
     status_key: string;
+    lines?: { source_line_id: number; quantity: number }[];
   }) => {
     convertDocument(
       { id: String(document.id), payload },
@@ -109,6 +112,7 @@ export default function DocumentShowFloatingActions({
   const handleConvertToDelivery = (payload: {
     number_series_id: number;
     status_key: string;
+    lines?: { source_line_id: number; quantity: number }[];
   }) => {
     convertDocument(
       { id: String(document.id), payload },
@@ -145,8 +149,14 @@ export default function DocumentShowFloatingActions({
             docTypeCode={docTypeCode}
             operation={operation}
             isAlreadyInvoiced={isAlreadyInvoiced}
-            onOpenConversion={() => setConversionModalOpen(true)}
-            onOpenBudget={() => setBudgetModalOpen(true)}
+            onOpenConversion={(mode: "full" | "partial") => {
+              setInvoiceConversionMode(mode);
+              setConversionModalOpen(true);
+            }}
+            onOpenBudget={(mode: "full" | "partial") => {
+              setConversionMode(mode);
+              setBudgetModalOpen(true);
+            }}
             onOpenPurchaseOrder={handleConvertToPurchase}
           />
         )}
@@ -167,6 +177,7 @@ export default function DocumentShowFloatingActions({
         document={document}
         onConvert={handleConvertToInvoice}
         isConverting={isConverting}
+        mode={invoiceConversionMode}
       />
 
       <BudgetToDeliveryModal
@@ -175,6 +186,7 @@ export default function DocumentShowFloatingActions({
         document={document}
         onConvert={handleConvertToDelivery}
         isConverting={isConverting}
+        mode={conversionMode}
       />
     </div>
   );

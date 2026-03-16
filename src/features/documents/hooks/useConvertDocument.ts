@@ -13,7 +13,7 @@ export function useConvertDocument() {
     const useCase = container.get<ConvertDocumentUseCase>(TYPES.ConvertDocumentUseCase);
     const queryClient = useQueryClient();
 
-    return useMutation<DocumentEntity, Error, { id: string; payload?: { number_series_id?: number | ''; status_key?: string } }>({
+    return useMutation<DocumentEntity, Error, { id: string; payload?: { number_series_id?: number | ''; status_key?: string; lines?: { source_line_id: number; quantity: number }[] } }>({
         mutationFn: ({ id, payload }) => useCase.execute(id, payload),
         onSuccess: (_invoice, variables) => {
             // Refresh the source delivery note (now in 'invoiced' state)

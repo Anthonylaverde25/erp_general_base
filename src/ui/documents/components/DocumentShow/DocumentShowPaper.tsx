@@ -104,7 +104,7 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                 type: 'numericColumn',
                 cellRenderer: (params: any) => {
                     const line = params.data as DocumentLine;
-                    const isProcessable = ['QUO', 'PQUO', 'ORD', 'PORD'].includes(document.document_type_code || '');
+                    const isProcessable = ['QUO', 'PQUO', 'ORD', 'PORD', 'DLV', 'PDLV'].includes(document.document_type_code || '');
                     
                     if (!isProcessable) return (
                         <Typography style={{ fontSize: '13px', fontWeight: 600 }}>{line.quantity}</Typography>
