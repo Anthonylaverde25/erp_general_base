@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Box, Stack, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Stack, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, InputAdornment } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useNavigate } from 'react-router';
 import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
@@ -10,6 +10,7 @@ import { GroupedInvoicesTableProps } from './types';
 import PartnerRow from './PartnerRow';
 import SelectionToolbar from './SelectionToolbar';
 import EmptyState from './EmptyState';
+import { Search } from 'lucide-react';
 
 export default function GroupedInvoicesTable(props: GroupedInvoicesTableProps) {
     const { documents, isLoading, onStatusUpdated } = props;
@@ -19,16 +20,30 @@ export default function GroupedInvoicesTable(props: GroupedInvoicesTableProps) {
     const [selectedDocument, setSelectedDocument] = useState<DocumentEntity | null>(null);
     const [batchBillingOpen, setBatchBillingOpen] = useState(false);
     const [docsToBill, setDocsToBill] = useState<DocumentEntity[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredDocuments = useMemo(() => {
+        if (!documents) return [];
+        if (!searchTerm) return documents;
+
+        const lowTerm = searchTerm.toLowerCase();
+        return documents.filter(doc => {
+            const partnerName = doc.partner_name?.toLowerCase() || '';
+            const cif = doc.partner?.cif?.toLowerCase() || '';
+            const email = doc.partner?.email?.toLowerCase() || '';
+            
+            return partnerName.includes(lowTerm) || cif.includes(lowTerm) || email.includes(lowTerm);
+        });
+    }, [documents, searchTerm]);
 
     const groupedDocuments = useMemo(() => {
-        if (!documents) return {};
-        return documents.reduce((acc, doc) => {
+        return filteredDocuments.reduce((acc, doc) => {
             const partnerName = doc.partner_name || 'Desconocido';
             if (!acc[partnerName]) acc[partnerName] = [];
             acc[partnerName].push(doc);
             return acc;
         }, {} as Record<string, DocumentEntity[]>);
-    }, [documents]);
+    }, [filteredDocuments]);
 
     const handleStatusClick = (document: DocumentEntity) => {
         setSelectedDocument(document);
@@ -109,6 +124,35 @@ export default function GroupedInvoicesTable(props: GroupedInvoicesTableProps) {
 
     return (
         <Box className="flex flex-col">
+            <Box sx={{ p: 2, bgcolor: 'background.paper', borderBottom: `1px solid ${SAP_THEME.border}`, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <TextField
+                    placeholder="Buscar por nombre, CIF o email de partner..."
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Search size={18} className="text-gray-400" />
+                            </InputAdornment>
+                        ),
+                        sx: { 
+                            borderRadius: '8px',
+                            bgcolor: 'grey.50',
+                            '& fieldset': { borderColor: 'grey.200' },
+                            fontSize: '13px'
+                        }
+                    }}
+                />
+                {searchTerm && (
+                    <Typography variant="caption" sx={{ color: 'text.secondary', whiteSpace: 'nowrap', fontWeight: 600 }}>
+                        {Object.keys(groupedDocuments).length} partners encontrados
+                    </Typography>
+                )}
+            </Box>
+
             {selectedIds.length > 0 && (
                 <SelectionToolbar
                     selectedCount={selectedIds.length}

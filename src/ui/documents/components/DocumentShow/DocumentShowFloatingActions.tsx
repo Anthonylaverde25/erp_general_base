@@ -22,7 +22,6 @@ import type { DocumentEntity } from "@/domain/entities/documents/DocumentEntity"
 import { useConvertDocument } from "@/features/documents/hooks/useConvertDocument";
 import { useConvertToPurchase } from "@/features/documents/hooks/useConvertToPurchase";
 import { useUpdateDocument } from "@/features/documents/hooks/useUpdateDocument";
-// import { useDuplicateDocument } from "@/features/documents/hooks/useDuplicateDocument"; 
 
 interface FloatingActionsProps {
   document: DocumentEntity;
@@ -38,25 +37,18 @@ export default function DocumentShowFloatingActions({
   const { mutate: updateDocument, isPending: isUpdating } = useUpdateDocument();
   const { mutate: convertDocument, isPending: isConverting } =
     useConvertDocument();
-  // const { mutate: duplicateDocument, isPending: isDuplicating } = useDuplicateDocument();
   const convertToPurchase = useConvertToPurchase();
+  
   const [conversionModalOpen, setConversionModalOpen] = useState(false);
   const [budgetModalOpen, setBudgetModalOpen] = useState(false);
   const [conversionMode, setConversionMode] = useState<"full" | "partial">("full");
   const [invoiceConversionMode, setInvoiceConversionMode] = useState<"full" | "partial">("full");
+  
+  // States for direct emission/numbering selection
+  const [emissionModalOpen, setEmissionModalOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
 
   const statusKey = document.status?.key || "";
-
-  const handleConvertToPurchase = async () => {
-    try {
-      const newDoc = await convertToPurchase.mutateAsync({
-        id: String(document.id),
-      });
-      navigate(`/purchases/edit/${newDoc.document_type_code}/${newDoc.id}`);
-    } catch (error) {
-      console.error("Error al convertir a orden de compra:", error);
-    }
-  };
   const operation = document.operation;
   const module = operation === "sale" ? "sales" : "purchases";
   const docTypeCode = document.document_type_code || "";
@@ -82,6 +74,29 @@ export default function DocumentShowFloatingActions({
   );
 
   const handleStatusChange = (newStatus: string) => {
+    // Determine if the new status requires legal numbering for THIS specific document type
+    const isInvoiceType = ["INV", "PINV"].includes(docTypeCode);
+    const isDeliveryType = ["DLV", "PDLV"].includes(docTypeCode);
+    const isQuoteType = ["QUO", "PQUO"].includes(docTypeCode);
+
+    let requiresSeries = false;
+
+    if (isInvoiceType) {
+      requiresSeries = newStatus === "issued";
+    } else if (isDeliveryType) {
+      requiresSeries = ["delivered", "received"].includes(newStatus);
+    } else if (isQuoteType) {
+      requiresSeries = newStatus === "approved";
+    }
+    
+    // Only intercept if numbering is required AND the document doesn't already have one
+    if (requiresSeries && !document.number) {
+      setPendingStatus(newStatus);
+      setInvoiceConversionMode("full");
+      setEmissionModalOpen(true);
+      return;
+    }
+
     updateDocument(
       { id: String(document.id), data: { status_key: newStatus } },
       {
@@ -89,6 +104,30 @@ export default function DocumentShowFloatingActions({
           queryClient.invalidateQueries({
             queryKey: ["document", String(document.id)],
           }),
+      },
+    );
+  };
+
+  const handleEmissionConfirm = (payload: {
+    number_series_id: number;
+    status_key: string;
+  }) => {
+    updateDocument(
+      { 
+        id: String(document.id), 
+        data: { 
+          status_key: pendingStatus || payload.status_key,
+          number_series_id: payload.number_series_id 
+        } 
+      },
+      {
+        onSuccess: () => {
+          setEmissionModalOpen(false);
+          setPendingStatus(null);
+          queryClient.invalidateQueries({
+            queryKey: ["document", String(document.id)],
+          });
+        },
       },
     );
   };
@@ -125,9 +164,16 @@ export default function DocumentShowFloatingActions({
     );
   };
 
-  // const handleDuplicate = () => {
-  //   navigate(`/${module}/create/${docTypeCode}?duplicate_from=${document.id}`);
-  // };
+  const handleConvertToPurchase = async () => {
+    try {
+      const newDoc = await convertToPurchase.mutateAsync({
+        id: String(document.id),
+      });
+      navigate(`/purchases/edit/${newDoc.document_type_code}/${newDoc.id}`);
+    } catch (error) {
+      console.error("Error al convertir a orden de compra:", error);
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 h-10 shrink-0">
@@ -178,6 +224,20 @@ export default function DocumentShowFloatingActions({
         onConvert={handleConvertToInvoice}
         isConverting={isConverting}
         mode={invoiceConversionMode}
+      />
+
+      <ConversionSeriesModal
+        open={emissionModalOpen}
+        onClose={() => {
+          setEmissionModalOpen(false);
+          setPendingStatus(null);
+        }}
+        document={document}
+        onConvert={handleEmissionConfirm}
+        isConverting={isUpdating}
+        mode="full"
+        targetType={document.document_type_code}
+        title={pendingStatus === "issued" ? "Emitir Factura Legal" : "Registrar Numeración Legal"}
       />
 
       <BudgetToDeliveryModal

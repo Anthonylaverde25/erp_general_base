@@ -157,7 +157,7 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
             isConfirmDisabled={!selectedSeriesId || isConverting || isTotalProcessZero}
             PaperProps={{ 
                 sx: { 
-                    width: mode === 'full' ? '400px' : '750px', 
+                    width: '750px', 
                     maxWidth: '95vw',
                     borderRadius: '12px',
                     boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
@@ -229,8 +229,40 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
 
                         {/* 2. Main Content Section */}
                         <Box sx={{ p: 3 }}>
+                            {/* 2.1 Formalization Section (Prospects) - NOW AT TOP */}
+                            {isProspect && (
+                                <Box sx={{ mb: mode === 'partial' ? 4 : 0 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2.5 }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            Formalización de {document.operation === 'sale' ? 'Cliente' : 'Proveedor'}
+                                        </Typography>
+                                        <Box sx={{ px: 1, py: 0.25, bgcolor: 'indigo.50', color: 'indigo.700', borderRadius: '4px', fontSize: '9px', fontWeight: 900 }}>REQUERIDO</Box>
+                                    </Box>
+                                    
+                                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, mb: 2 }}>
+                                        <TextField id="filled-basic" select fullWidth label="Tipo" variant="filled" size="small" value={partnerType} onChange={(e) => setPartnerType(e.target.value)}>
+                                            <MenuItem value="person">Persona Física</MenuItem>
+                                            <MenuItem value="company">Empresa / Entidad</MenuItem>
+                                        </TextField>
+                                        <TextField id="filled-basic" fullWidth label="CIF / NIF" variant="filled" size="small" value={cif} onChange={(e) => setCif(e.target.value)} />
+                                        <TextField id="filled-basic" fullWidth label="VAT ID" variant="filled" size="small" value={vatNumber} onChange={(e) => setVatNumber(e.target.value)} />
+                                    </Box>
+                                    
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                        <TextField id="filled-basic" fullWidth label="Dirección Fiscal" variant="filled" size="small" value={street} onChange={(e) => setStreet(e.target.value)} />
+                                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 120px', gap: 2 }}>
+                                            <TextField id="filled-basic" fullWidth label="Ciudad" variant="filled" size="small" value={city} onChange={(e) => setCity(e.target.value)} />
+                                            <TextField id="filled-basic" fullWidth label="Provincia" variant="filled" size="small" value={state} onChange={(e) => setState(e.target.value)} />
+                                            <TextField id="filled-basic" fullWidth label="C.P." variant="filled" size="small" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
+                                        </Box>
+                                    </Box>
+                                    {mode === 'partial' && <Divider sx={{ mt: 4 }} />}
+                                </Box>
+                            )}
+
+                            {/* 2.2 Table Section (Partial Mode) */}
                             {mode === 'partial' && (
-                                <Box sx={{ mb: isProspect ? 4 : 0 }}>
+                                <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                         <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                             Detalle de Líneas de Presupuesto
@@ -328,7 +360,7 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
                                                                         </IconButton>
                                                                     </Box>
                                                                 ) : (
-                                                                    <CheckCircle sx={{ color: 'success.main', fontSize: '20px' }} />
+                                                                    <CheckCircle className="text-emerald-500" size={20} />
                                                                 )}
                                                             </TableCell>
                                                         </TableRow>
@@ -337,39 +369,6 @@ export function BudgetToDeliveryModal({ open, onClose, document, onConvert, isCo
                                             </TableBody>
                                         </Table>
                                     </TableContainer>
-                                </Box>
-                            )}
-
-                            {/* 3. Formalization Section (Prospects) */}
-                            {isProspect && (
-                                <Box sx={{ 
-                                    p: 2.5, 
-                                    borderRadius: '8px', 
-                                    border: '1px solid', 
-                                    borderColor: 'orange.100', 
-                                    bgcolor: '#fffbf5' 
-                                }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'orange.900', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                            Formalización de {document.operation === 'sale' ? 'Cliente' : 'Proveedor'}
-                                        </Typography>
-                                        <Box sx={{ px: 1, py: 0.25, bgcolor: 'orange.100', color: 'orange.900', borderRadius: '4px', fontSize: '9px', fontWeight: 900 }}>REQUERIDO</Box>
-                                    </Box>
-                                    
-                                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, mb: 2 }}>
-                                        <TextField id="filled-basic" select fullWidth label="Tipo" variant="filled" size="small" value={partnerType} onChange={(e) => setPartnerType(e.target.value)} />
-                                        <TextField id="filled-basic" fullWidth label="CIF / NIF" variant="filled" size="small" value={cif} onChange={(e) => setCif(e.target.value)} />
-                                        <TextField id="filled-basic" fullWidth label="VAT ID" variant="filled" size="small" value={vatNumber} onChange={(e) => setVatNumber(e.target.value)} />
-                                    </Box>
-                                    
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                        <TextField id="filled-basic" fullWidth label="Dirección Fiscal" variant="filled" size="small" value={street} onChange={(e) => setStreet(e.target.value)} />
-                                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 120px', gap: 2 }}>
-                                            <TextField id="filled-basic" fullWidth label="Ciudad" variant="filled" size="small" value={city} onChange={(e) => setCity(e.target.value)} />
-                                            <TextField id="filled-basic" fullWidth label="Provincia" variant="filled" size="small" value={state} onChange={(e) => setState(e.target.value)} />
-                                            <TextField id="filled-basic" fullWidth label="C.P." variant="filled" size="small" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
-                                        </Box>
-                                    </Box>
                                 </Box>
                             )}
                         </Box>

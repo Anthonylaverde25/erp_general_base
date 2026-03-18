@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { AppFormModal } from '@/components/modals/AppFormModal';
 import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 import { NumberSeriesRepositoryCrud } from '@/infrastructure/repositories/number_series/NumberSeriesRepositoryCrud';
-import { FileText, ArrowRight, LayoutList, CheckCircle } from 'lucide-react';
+import { FileText, CheckCircle } from 'lucide-react';
 
 interface ConversionSeriesModalProps {
     open: boolean;
@@ -17,11 +17,22 @@ interface ConversionSeriesModalProps {
     }) => void;
     isConverting: boolean;
     mode: 'full' | 'partial';
+    title?: string;
+    targetType?: string; // Explicitly define which series to look for
 }
 
 const numberSeriesRepository = new NumberSeriesRepositoryCrud();
 
-export function ConversionSeriesModal({ open, onClose, document, onConvert, isConverting, mode }: ConversionSeriesModalProps) {
+export function ConversionSeriesModal({ 
+    open, 
+    onClose, 
+    document, 
+    onConvert, 
+    isConverting, 
+    mode, 
+    title,
+    targetType: propTargetType
+}: ConversionSeriesModalProps) {
     const [selectedSeriesId, setSelectedSeriesId] = useState<number | ''>('');
     const [lineQuantities, setLineQuantities] = useState<Record<number, number>>({});
     const selectedStatusKey = 'issued'; 
@@ -36,6 +47,7 @@ export function ConversionSeriesModal({ open, onClose, document, onConvert, isCo
                 }
             });
             setLineQuantities(initialQtys);
+            setSelectedSeriesId(''); // Reset selection when opening
         }
     }, [open, document]);
 
@@ -47,16 +59,21 @@ export function ConversionSeriesModal({ open, onClose, document, onConvert, isCo
         }));
     };
 
-    const resetQuantity = (lineId: number, max: number) => {
-        setLineQuantities(prev => ({ ...prev, [lineId]: max }));
-    };
-
-    const targetType = document.document_type_code === 'DLV' ? 'INV' : 'PINV';
+    // Determine which series to fetch
+    const finalTargetType = useMemo(() => {
+        if (propTargetType) return propTargetType;
+        
+        // Fallback logic if no targetType is provided
+        const code = document.document_type_code;
+        if (code === 'DLV') return 'INV';
+        if (code === 'PDLV') return 'PINV';
+        return code || ''; // Emission mode: same as current doc
+    }, [propTargetType, document.document_type_code]);
 
     const { data: numberSeries, isLoading: isLoadingSeries } = useQuery({
-        queryKey: ['number-series-for-conversion', document.company_id, targetType],
-        queryFn: () => numberSeriesRepository.index(targetType),
-        enabled: open,
+        queryKey: ['number-series-for-conversion', document.company_id, finalTargetType],
+        queryFn: () => numberSeriesRepository.index(finalTargetType),
+        enabled: open && !!finalTargetType,
     });
 
     const previewNumber = useMemo(() => {
@@ -64,7 +81,7 @@ export function ConversionSeriesModal({ open, onClose, document, onConvert, isCo
         const series = numberSeries.find(ns => ns.id === selectedSeriesId);
         if (!series) return null;
         const nextNumber = series.current_number + 1;
-        return `${series.serie}-${String(nextNumber).padStart(6, '0')}`;
+        return `${series.serie}-${series.year}-${String(nextNumber).padStart(6, '0')}`;
     }, [selectedSeriesId, numberSeries]);
 
     const isTotalProcessZero = useMemo(() => {
@@ -115,12 +132,12 @@ export function ConversionSeriesModal({ open, onClose, document, onConvert, isCo
                         <FileText size={18} />
                     </Box>
                     <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.1rem' }}>
-                        {mode === 'full' ? 'Facturación Directa' : 'Certificación por Líneas'}
+                        {title || (mode === 'full' ? 'Facturación Directa' : 'Certificación por Líneas')}
                     </Typography>
                 </Box>
             }
             onConfirm={handleSave}
-            confirmText={isConverting ? "Procesando..." : "Emitir Factura"}
+            confirmText={isConverting ? "Procesando..." : "Confirmar Emisión"}
             isConfirmDisabled={!selectedSeriesId || isConverting || isTotalProcessZero}
             PaperProps={{ 
                 sx: { 
@@ -142,7 +159,7 @@ export function ConversionSeriesModal({ open, onClose, document, onConvert, isCo
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
                                 <Box sx={{ width: '100%' }}>
                                     <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', mb: 1, display: 'block', letterSpacing: '0.5px' }}>
-                                        Serie de Facturación
+                                        Serie de Numeración Legal ({finalTargetType})
                                     </Typography>
                                     <TextField
                                         id="filled-basic"
@@ -160,7 +177,7 @@ export function ConversionSeriesModal({ open, onClose, document, onConvert, isCo
                                         <MenuItem value="" disabled><em className="text-gray-400">Seleccione la serie de numeración...</em></MenuItem>
                                         {numberSeries?.map((ns) => (
                                             <MenuItem key={ns.id} value={ns.id} sx={{ fontSize: '13px' }}>
-                                                Serie {ns.serie} (Contador actual: {ns.current_number})
+                                                Serie {ns.serie} (Próximo: {ns.current_number + 1})
                                             </MenuItem>
                                         ))}
                                     </TextField>
@@ -180,7 +197,7 @@ export function ConversionSeriesModal({ open, onClose, document, onConvert, isCo
                                         borderRadius: '0 4px 4px 0'
                                     }}>
                                         <Typography variant="caption" sx={{ fontWeight: 700, color: 'indigo.600', textTransform: 'uppercase', fontSize: '10px', mb: 0.5 }}>
-                                            Nº Próxima Factura
+                                            Nº Documento Oficial
                                         </Typography>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <Typography variant="body1" sx={{ fontWeight: 800, color: 'indigo.900', letterSpacing: '1px', fontSize: '16px' }}>
@@ -197,10 +214,10 @@ export function ConversionSeriesModal({ open, onClose, document, onConvert, isCo
                                 <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                         <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                            Líneas del Albarán a Facturar
+                                            Líneas a Procesar
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                            Cantidades para esta factura (Certificación).
+                                            Cantidades para este documento.
                                         </Typography>
                                     </Box>
                                     
@@ -211,7 +228,7 @@ export function ConversionSeriesModal({ open, onClose, document, onConvert, isCo
                                                     <TableCell sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200' }}>Producto</TableCell>
                                                     <TableCell align="center" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200', width: '100px' }}>Estado</TableCell>
                                                     <TableCell align="center" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200', width: '80px' }}>Pend.</TableCell>
-                                                    <TableCell align="right" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200', width: '160px' }}>Facturar</TableCell>
+                                                    <TableCell align="right" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200', width: '160px' }}>Cantidad</TableCell>
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
@@ -246,7 +263,7 @@ export function ConversionSeriesModal({ open, onClose, document, onConvert, isCo
                                                                     border: '1px solid',
                                                                     borderColor: isDone ? 'success.100' : 'info.100'
                                                                 }}>
-                                                                    {isDone ? 'FACTURADO' : 'PENDIENTE'}
+                                                                    {isDone ? 'PROCESADO' : 'PENDIENTE'}
                                                                 </Box>
                                                             </TableCell>
                                                             <TableCell align="center">

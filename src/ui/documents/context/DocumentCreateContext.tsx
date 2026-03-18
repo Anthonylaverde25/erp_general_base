@@ -162,10 +162,30 @@ export function DocumentCreateProvider({
 
     const isDraftMode = operation === "sale" && mode === "draft";
 
+    const onSubmitDraft = async (e?: React.BaseSyntheticEvent) => {
+        const values = methods.getValues();
+        // For draft, we don't strictly require series selection via Zod but we allow it
+        // We bypass standard handleSubmit validation if needed, or use a partial one
+        return submitWithStatus("draft")(values);
+    };
+
+    const onSubmitIssue = handleSubmit(
+        async (values) => {
+            const nextStatus = copy.nextStatus || "issued";
+            // Mandatory check for series ONLY on non-draft flows that require numbering
+            if (!values.number_series_id && !['QUO', 'PQUO', 'DLV', 'PDLV'].includes(currentDocumentType?.code)) {
+                alert("Para procesar el documento es obligatorio seleccionar una serie de numeración.");
+                return;
+            }
+            return submitWithStatus(nextStatus)(values);
+        },
+        (errors) => console.error("Validation Errors on Issue:", errors)
+    );
+
     const value: DocumentCreateContextValue = {
         methods,
-        onSubmitDraft: handleSubmit(submitWithStatus("draft"), (errors) => console.error("Validation Errors on Draft:", errors)),
-        onSubmitIssue: handleSubmit(submitWithStatus("issued"), (errors) => console.error("Validation Errors on Issue:", errors)),
+        onSubmitDraft,
+        onSubmitIssue,
         isCreating,
         partnerOptions,
         sourcePartner,
