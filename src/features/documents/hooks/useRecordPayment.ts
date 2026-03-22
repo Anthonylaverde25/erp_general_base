@@ -18,11 +18,13 @@ export function useRecordPayment() {
             // Display success message from API
             toast.success(response?.message || 'Pago registrado correctamente');
 
-            // Refresh the document to show updated status and any payment info (if displayed)
-            queryClient.invalidateQueries({ queryKey: ['document', String(variables.id)] });
-            // Refresh the specific payments list for this document
+            // Broad invalidation: any document details currently in cache could be affected by cascade
+            queryClient.invalidateQueries({ queryKey: ['document'] });
+            
+            // Refresh specific payments list for the current document
             queryClient.invalidateQueries({ queryKey: ['document-payments', String(variables.id)] });
-            // Refresh the documents list
+            
+            // Refresh the general documents list
             queryClient.invalidateQueries({ queryKey: ['documents'] });
         },
         onError: (error) => {

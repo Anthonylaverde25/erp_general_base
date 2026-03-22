@@ -9,7 +9,7 @@ interface UseIndexPaymentsProps {
 
 export function useIndexPayments({ documentId, enabled = true }: UseIndexPaymentsProps) {
     const { data: payments = [], isLoading, isError, refetch } = useQuery<PaymentEntity[]>({
-        queryKey: ['document-payments', documentId],
+        queryKey: ['document-payments', String(documentId)],
         queryFn: async () => {
             const { data: { data } } = await axiosInstance.get(`documents/${documentId}/payments`);
             return data.map((payment: any) => PaymentEntityMapper.fromJson(payment));
