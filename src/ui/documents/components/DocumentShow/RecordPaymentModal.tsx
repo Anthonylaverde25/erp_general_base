@@ -21,6 +21,23 @@ export function RecordPaymentModal({ open, onClose, document }: RecordPaymentMod
     const [reference, setReference] = useState<string>('');
     const [notes, setNotes] = useState<string>('');
 
+    // Detectar si hay facturas sucesoras con deuda (heurística basada en estados finales)
+    const pendingChildInvoices = useMemo(() => {
+        if (!['DLV', 'PDLV'].includes(document.document_type_code || '')) return [];
+        
+        return document.successors.filter(s => {
+            const docTypeName = s.document_type_name?.toLowerCase() || '';
+            const statusName = s.status?.name?.toLowerCase() || '';
+            
+            const isInvoice = docTypeName.includes('factura') || docTypeName.includes('invoice');
+            const isFinalStatus = ['cobrada', 'pagada', 'collected', 'paid'].includes(statusName);
+            
+            return isInvoice && !isFinalStatus;
+        });
+    }, [document]);
+
+    const hasWaterfall = pendingChildInvoices.length > 0;
+
     const handleSave = () => {
         if (!amount || amount <= 0) return;
 
@@ -59,6 +76,26 @@ export function RecordPaymentModal({ open, onClose, document }: RecordPaymentMod
                     <Typography variant="body2" color="text.secondary">
                         Registre un nuevo pago para el documento <strong>{document.number_serie}</strong>.
                     </Typography>
+
+                    {hasWaterfall && (
+                        <Box sx={{ 
+                            p: 2, 
+                            bgcolor: '#eff6ff', 
+                            borderRadius: 1, 
+                            border: '1px solid #bfdbfe',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 0.5
+                        }}>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: '#1e40af', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                ℹ️ CASCADA DE SANEAMIENTO ACTIVA
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#1e40af' }}>
+                                Este albarán tiene <strong>{pendingChildInvoices.length} factura(s) pendiente(s)</strong>. 
+                                El pago se aplicará primero a saldar las deudas de dichas facturas.
+                            </Typography>
+                        </Box>
+                    )}
 
                     <TextField
                         fullWidth

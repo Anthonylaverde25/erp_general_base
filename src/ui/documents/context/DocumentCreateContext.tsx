@@ -41,6 +41,7 @@ interface DocumentCreateContextValue {
     isEditMode: boolean;
     isLoadingDocument: boolean;
     isReadOnly: boolean;
+    isRestricted: boolean;
     sourcePartner?: { id: string | number; name: string; cif?: string; vat_number?: string };
 }
 
@@ -198,7 +199,8 @@ export function DocumentCreateProvider({
         operation,
         isEditMode,
         isLoadingDocument,
-        isReadOnly: isEditMode && existingDocument?.status?.key !== 'draft',
+        isReadOnly: isEditMode && !["draft", "validated"].includes(existingDocument?.status?.key || ""),
+        isRestricted: isEditMode && existingDocument?.status?.key === "validated",
     };
 
     return (

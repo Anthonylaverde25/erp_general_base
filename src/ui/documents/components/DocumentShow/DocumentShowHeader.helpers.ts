@@ -1,11 +1,12 @@
 /** States where the Edit button should be visible in the header */
-export const EDITABLE_STATES = ["draft"];
+export const EDITABLE_STATES = ["draft", "validated"];
 
 /** Map status key to a hex color for the chip */
 export function getStatusColor(key: string): string {
   const map: Record<string, string> = {
     draft: "#f59e0b",
     validated: "#3b82f6",
+    pending_invoice: "#f59e0b",
     approved: "#6366f1",
     issued: "#22c55e",
     converted: "#94a3b8",

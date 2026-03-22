@@ -19,9 +19,9 @@ export function useRecordPayment() {
             toast.success(response?.message || 'Pago registrado correctamente');
 
             // Refresh the document to show updated status and any payment info (if displayed)
-            queryClient.invalidateQueries({ queryKey: ['document', variables.id] });
+            queryClient.invalidateQueries({ queryKey: ['document', String(variables.id)] });
             // Refresh the specific payments list for this document
-            queryClient.invalidateQueries({ queryKey: ['document-payments', variables.id] });
+            queryClient.invalidateQueries({ queryKey: ['document-payments', String(variables.id)] });
             // Refresh the documents list
             queryClient.invalidateQueries({ queryKey: ['documents'] });
         },

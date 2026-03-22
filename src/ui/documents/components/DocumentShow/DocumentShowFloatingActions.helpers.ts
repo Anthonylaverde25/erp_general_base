@@ -22,7 +22,7 @@ export const isPurchaseOrder = (code: string) =>
   PURCHASE_ORDER_CODES.includes(code);
 
 export const canRevert = (statusKey: string) =>
-  ["validated", "approved"].includes(statusKey);
+  ["validated", "approved", "issued", "shipped"].includes(statusKey);
 
 export function buildLifecycleSteps(
   docTypeCode: string,
@@ -34,7 +34,7 @@ export function buildLifecycleSteps(
     const finalKey = isSale ? "collected" : "paid";
     const steps: LifecycleStep[] = [
       { key: "draft", label: "Borrador" },
-      { key: "approved", label: "Aprobada" },
+      { key: "validated", label: "Validado" },
       { key: "issued", label: "Emitida" },
     ];
 
@@ -60,6 +60,10 @@ export function buildLifecycleSteps(
       { key: "delivered", label: "Entregado" },
     ];
 
+    if (statusKey === "pending_invoice") {
+      steps.push({ key: "pending_invoice", label: "Pendiente Facturar" });
+    }
+
     if (statusKey === "partially_collected") {
       steps.push({ key: "partially_collected", label: "Parcialmente Cobrado" });
     }
@@ -74,6 +78,10 @@ export function buildLifecycleSteps(
       { key: "validated", label: "Validado" },
       { key: "received", label: "Recibido" },
     ];
+
+    if (statusKey === "pending_invoice") {
+      steps.push({ key: "pending_invoice", label: "Pendiente Facturar" });
+    }
 
     if (statusKey === "partially_paid") {
       steps.push({ key: "partially_paid", label: "Parcialmente Pagado" });
@@ -137,12 +145,12 @@ export function resolveNextAction(
   if (isInvoice(docTypeCode)) {
     if (statusKey === "draft")
       return {
-        label: "Aprobar",
-        nextStatus: "approved",
-        Icon: "CheckCircle",
+        label: "Validar",
+        nextStatus: "validated",
+        Icon: "ClipboardCheck",
         variant: "indigo",
       };
-    if (statusKey === "approved")
+    if (statusKey === "validated")
       return {
         label: "Emitir factura",
         nextStatus: "issued",
@@ -166,6 +174,13 @@ export function resolveNextAction(
         Icon: "Truck",
         variant: "green",
       };
+    if (statusKey === "delivered")
+      return {
+        label: "Marcar para Facturar",
+        nextStatus: "pending_invoice",
+        Icon: "FileClock",
+        variant: "indigo",
+      };
   }
 
   if (isPurchaseDelivery(docTypeCode)) {
@@ -182,6 +197,13 @@ export function resolveNextAction(
         nextStatus: "received",
         Icon: "Truck",
         variant: "green",
+      };
+    if (statusKey === "received")
+      return {
+        label: "Marcar para Facturar",
+        nextStatus: "pending_invoice",
+        Icon: "FileClock",
+        variant: "indigo",
       };
   }
 
@@ -282,7 +304,7 @@ export function canShowPostDeliveredActions(
   statusKey: string,
   isAlreadyInvoiced: boolean,
 ) {
-  const isDelivered = ["delivered", "received", "validated", "partially_collected", "partially_paid"].includes(statusKey);
+  const isDelivered = ["delivered", "received", "validated", "pending_invoice", "partially_collected", "partially_paid"].includes(statusKey);
   const isApprovedOrValidated = ["approved", "validated", "partially_converted"].includes(statusKey);
 
   const deliveryFlow =

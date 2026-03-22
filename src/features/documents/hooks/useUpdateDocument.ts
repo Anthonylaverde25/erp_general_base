@@ -12,7 +12,7 @@ export function useUpdateDocument() {
         mutationFn: async ({ id, data }) => await useCase.execute(id, data),
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ['documents'] });
-            queryClient.invalidateQueries({ queryKey: ['document', variables.id] });
+            queryClient.invalidateQueries({ queryKey: ['document', String(variables.id)] });
             queryClient.invalidateQueries({ queryKey: ['number_series'] });
         }
     });

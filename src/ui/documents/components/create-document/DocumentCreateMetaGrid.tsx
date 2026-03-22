@@ -14,6 +14,7 @@ export default function DocumentCreateMetaGrid() {
     numberSeries,
     copy,
     isReadOnly,
+    isRestricted,
     currentDocumentType,
     operation,
   } = useDocumentCreate();
@@ -34,7 +35,7 @@ export default function DocumentCreateMetaGrid() {
               value={field.value}
               onChange={field.onChange}
               type={copy.partyLabel === 'Cliente' ? 'customer' : (copy.partyLabel === 'Proveedor' ? 'supplier' : undefined)}
-              disabled={isReadOnly}
+              disabled={isReadOnly || isRestricted}
               initialPartner={selectedPartner}
               isQuoteDocument={isQuoteDocument}
               label={copy.partyLabel}
@@ -47,7 +48,7 @@ export default function DocumentCreateMetaGrid() {
         <label>{operation === 'sale' ? 'SERIE' : 'CENTRO COSTES'}</label>
         <select
           className="doc-input doc-input-bold doc-input-primary"
-          disabled={isReadOnly || operation === 'purchase'}
+          disabled={isReadOnly || isRestricted || operation === 'purchase'}
           {...register("number_series_id")}
         >
           <option value="" disabled>
@@ -65,7 +66,7 @@ export default function DocumentCreateMetaGrid() {
         <label>{operation === 'sale' ? 'Nº DOCUMENTO' : 'REF. PROVEEDOR'}</label>
         <input
           className={`doc-input doc-input-bold ${operation === 'purchase' ? 'doc-input-highlight' : ''}`}
-          disabled={isReadOnly}
+          disabled={isReadOnly || isRestricted}
           placeholder={operation === 'purchase' ? "Ej: FAC-2024/001" : ""}
           {...register("number")}
         />
