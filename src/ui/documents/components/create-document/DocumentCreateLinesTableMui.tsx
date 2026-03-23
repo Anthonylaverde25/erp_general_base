@@ -27,6 +27,7 @@ function makeEmptyLine(): DocumentLineItem {
         code: '',
         description: '',
         quantity: '1',
+        unit_name: undefined,
         unitPrice: '0',
         discount: '0',
         taxes: [],
@@ -88,6 +89,7 @@ function AutocompleteCell({
             description: selected.description || selected.name,
             unitPrice: updatedPrice,
             quantity: '1',
+            unit_name: selected.unit?.name,
             taxes: selected.tax_rates ?? [],
             subtotal: String(1 * Number(updatedPrice)),
         });
@@ -98,7 +100,7 @@ function AutocompleteCell({
         setTimeout(() => setShowDropdown(false), 200);
         // Only commit free text on blur if we didn't already commit via item selection
         if (!committedRef.current && inputValue !== initialCode) {
-            onCommit(index, { code: inputValue, item_id: undefined });
+            onCommit(index, { code: inputValue, item_id: undefined, unit_name: undefined });
         }
     };
 
@@ -251,8 +253,9 @@ export default function DocumentCreateLinesTableMui({
                         <TableRow sx={{ '& th': { bgcolor: 'rgba(226, 232, 240, 0.85)', fontWeight: 600, fontSize: '12px', color: '#475569', py: 1.5, borderBottom: '2px solid #cbd5e1' } }}>
                             <TableCell width={50} align="center">#</TableCell>
                             <TableCell width="25%">ARTÍCULO / CONCEPTO</TableCell>
-                            <TableCell width="20%">DESCRIPCIÓN</TableCell>
-                            <TableCell width={90} align="right">CANT.</TableCell>
+                            <TableCell width="18%">DESCRIPCIÓN</TableCell>
+                            <TableCell width={110} align="right">CANT.</TableCell>
+                            <TableCell width={60} align="left">UD.</TableCell>
                             <TableCell width={110} align="right">PRECIO U.</TableCell>
                             {discountEnabled && <TableCell width={90} align="right">DTO %</TableCell>}
                             <TableCell width={200}>IMPUESTOS</TableCell>
@@ -276,7 +279,7 @@ export default function DocumentCreateLinesTableMui({
                                             '& td': { py: 0.5, borderBottom: '1px solid #e2e8f0' } 
                                         }}
                                     >
-                                        <TableCell colSpan={discountEnabled ? 9 : 8} align="center">
+                                        <TableCell colSpan={discountEnabled ? 10 : 9} align="center">
                                             <Box 
                                                 sx={{ 
                                                     display: 'flex',
@@ -348,6 +351,11 @@ export default function DocumentCreateLinesTableMui({
                                                 disabled={isActionDisabled}
                                                 sx={{ fontSize: '13px' }}
                                             />
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            <Box component="span" sx={{ fontSize: '11px', color: 'text.secondary', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                                                {item.unit_name || '-'}
+                                            </Box>
                                         </TableCell>
                                         <TableCell align="right">
                                             <InputBase

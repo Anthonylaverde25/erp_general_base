@@ -141,7 +141,7 @@ const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly 
 			{
 				field: 'code',
 				headerName: 'ARTÍCULO / CONCEPTO',
-				flex: 1, minWidth: 180,
+				flex: 1, minWidth: 144,
 				editable: !isReadOnly,
 				singleClickEdit: true,
 				cellClass: 'doc-ag-cell',
@@ -151,7 +151,7 @@ const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly 
 			{
 				field: 'description',
 				headerName: 'DESCRIPCIÓN',
-				flex: 1, minWidth: 160,
+				flex: 1, minWidth: 144,
 				editable: !isReadOnly,
 				singleClickEdit: true,
 			},
@@ -162,6 +162,14 @@ const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly 
 				editable: !isReadOnly,
 				singleClickEdit: true,
 				cellClass: 'doc-ag-cell doc-ag-cell-right',
+			},
+			{
+				field: 'unit_name' as any,
+				headerName: 'UD.',
+				width: 60, minWidth: 60,
+				editable: false,
+				cellClass: 'doc-ag-cell doc-ag-cell-center text-[10px] text-gray-500',
+				valueFormatter: (params) => params.value || '-',
 			},
 			{
 				field: 'unitPrice',

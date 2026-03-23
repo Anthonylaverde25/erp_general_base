@@ -23,6 +23,7 @@ export interface DocumentLineItem {
 	code: string;
 	description: string;
 	quantity: string;
+	unit_name?: string;
 	unitPrice: string;
 	discount: string;
 	taxes: DocumentLineTaxItem[];
@@ -51,6 +52,11 @@ export interface ItemSearchResult {
 	sale_price: number;
 	purchase_price?: number;
 	description: string;
+	unit?: {
+		id: number;
+		code: string;
+		name: string;
+	} | null;
 	tax_rates: DocumentLineTaxItem[];
 }
 
@@ -115,6 +121,7 @@ export function makeEmptyLine(index: number): DocumentLineItem {
 		code: '',
 		description: '',
 		quantity: '1',
+		unit_code: undefined,
 		unitPrice: '0',
 		discount: '0',
 		taxes: [],

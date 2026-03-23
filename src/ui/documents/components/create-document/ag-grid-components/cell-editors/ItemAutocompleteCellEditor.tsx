@@ -70,6 +70,7 @@ export const ItemAutocompleteCellEditor = forwardRef(
                 description: item.description || item.name,
                 unitPrice: updatedPrice,
                 quantity: qty,
+                unit_name: item.unit?.name,
                 taxes: item.tax_rates ?? [],
                 subtotal: String(Number(qty) * Number(updatedPrice)),
             };

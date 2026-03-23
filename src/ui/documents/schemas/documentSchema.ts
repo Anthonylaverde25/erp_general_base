@@ -12,6 +12,7 @@ export const documentLineSchema = z.object({
     code: z.string().optional().default(""),
     description: z.string().optional().default(""),
     quantity: z.string().default("1"),
+    unit_name: z.string().optional(),
     unitPrice: z.string().default("0"),
     discount: z.string().default("0"),
     taxes: z.array(documentLineTaxSchema).default([]),
