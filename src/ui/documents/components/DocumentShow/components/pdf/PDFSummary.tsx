@@ -12,29 +12,38 @@ export const PDFSummary = ({ document, qrDataUrl, formatCurrency }: PDFSummaryPr
     return (
         <View style={styles.summarySection}>
             {/* QR Code on the left side of the summary */}
-            <View>
-                {qrDataUrl && (
-                    <View style={styles.qrCodeContainer}>
-                        <Image src={qrDataUrl} style={styles.qrCodeImage} />
-                    </View>
-                )}
+            <View style={{ alignItems: 'center' }}>
+                <View style={styles.qrCodeContainer}>
+                    {qrDataUrl && <Image src={qrDataUrl} style={styles.qrCodeImage} />}
+                </View>
                 <Text style={styles.qrCodeLabel}>Verificación QR</Text>
             </View>
 
             {/* Totals on the right side */}
             <View style={styles.summaryWrapper}>
                 <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>Subtotal</Text>
+                    <Text style={styles.summaryLabel}>Suma Bases</Text>
                     <Text style={styles.summaryValue}>{formatCurrency(document.subtotal)}</Text>
                 </View>
+
+                {document.discount_total > 0 && (
+                    <View style={styles.summaryRow}>
+                        <Text style={styles.discountLabel}>Total Descuento</Text>
+                        <Text style={styles.discountValue}>-{formatCurrency(document.discount_total)}</Text>
+                    </View>
+                )}
+
                 {document.tax_summaries?.map((tax, i) => (
-                    <View key={`${tax.tax_rate_id || tax.rate}-${i}`} style={styles.summaryRow}>
-                        <Text style={styles.summaryLabel}>IVA ({tax.rate}%)</Text>
+                    <View key={`${tax.name}-${tax.rate}-${i}`} style={styles.summaryRow}>
+                        <Text style={styles.summaryLabel}>
+                            {tax.name} ({tax.rate}%)
+                        </Text>
                         <Text style={styles.summaryValue}>{formatCurrency(tax.tax_amount)}</Text>
                     </View>
                 ))}
+
                 <View style={styles.totalRow}>
-                    <Text style={styles.totalLabel}>Total</Text>
+                    <Text style={styles.totalLabel}>Total Neto</Text>
                     <Text style={styles.totalValue}>{formatCurrency(document.total)}</Text>
                 </View>
             </View>

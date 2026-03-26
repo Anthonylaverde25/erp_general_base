@@ -10,7 +10,6 @@ import {
 import { DocumentEntity, DocumentLine } from '@/domain/entities/documents/DocumentEntity';
 import { CompanyEntity } from '@/domain/entities/companies/Company';
 import { Box, Typography, useTheme, LinearProgress, Tooltip } from '@mui/material';
-import { DocumentBreadcrumb } from '../DocumentBreadcrumb';
 import { formatDate } from './components/pdf/PDFUtils';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
@@ -49,28 +48,26 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
     }, [isDark]);
 
     const columnDefs = useMemo<ColDef<any>[]>(() => {
-        const hasPredecessors = document.predecessors && document.predecessors.length > 1;
+        const hasPredecessors = document.predecessors && document.predecessors.length > 0;
+        const hasDiscounts = document.lines.some(line => line.discount_percent > 0);
         
         const defs: ColDef<any>[] = [];
         
+        // 1. Column: Source (Origin)
         if (hasPredecessors) {
             defs.push({
                 headerName: 'Origen',
                 field: 'source_document_number',
-                flex: 1.5,
+                flex: 1.2,
                 cellRenderer: (params: any) => {
                     const rowIndex = params.node.rowIndex;
                     const rowData = params.data;
                     const prevRowData = params.api.getDisplayedRowAtIndex(rowIndex - 1)?.data;
-                    
-                    // Only show if it's the first row or the source document changed
                     const isFirstOfGroup = !prevRowData || prevRowData.source_document_number !== rowData.source_document_number;
-                    
                     if (!isFirstOfGroup) return null;
-
                     return (
                         <Box className="flex items-center h-full">
-                            <Typography className="text-blue-600 dark:text-blue-400 font-black italic tracking-tight" style={{ fontSize: '11px' }}>
+                            <Typography className="text-blue-600 dark:text-blue-400 font-black italic tracking-tight" style={{ fontSize: '10px' }}>
                                 #{rowData.source_document_number || 'S/N'}
                             </Typography>
                         </Box>
@@ -80,128 +77,157 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
             });
         }
 
-        defs.push(
-            {
-                headerName: 'Descripción',
-                field: 'name',
-                flex: 4,
-                cellRenderer: (params: any) => (
-                    <Box className="flex flex-col py-1.5">
-                        <Typography style={{ fontSize: '13px', fontWeight: 600 }}>{params.value}</Typography>
-                        {params.data.description && (
-                            <Typography variant="caption" color="text.secondary" className="leading-tight italic">
-                                {params.data.description}
-                            </Typography>
-                        )}
-                    </Box>
-                ),
-                autoHeight: true,
-            },
-            {
-                headerName: 'Cant.',
-                field: 'quantity',
-                flex: 1.2,
-                type: 'numericColumn',
-                cellRenderer: (params: any) => {
-                    const line = params.data as DocumentLine;
-                    const isProcessable = ['QUO', 'PQUO', 'ORD', 'PORD', 'DLV', 'PDLV'].includes(document.document_type_code || '');
-                    
-                    if (!isProcessable) return (
-                        <Typography style={{ fontSize: '13px', fontWeight: 600 }}>{line.quantity}</Typography>
-                    );
+        // 2. Column: Description
+        defs.push({
+            headerName: 'Descripción',
+            field: 'name',
+            flex: 2.2,
+            cellRenderer: (params: any) => (
+                <Box className="flex flex-col py-1.5">
+                    <Typography style={{ fontSize: '13px', fontWeight: 600 }}>
+                        {params.data.item_code ? `[${params.data.item_code}] ` : ''}{params.value}
+                    </Typography>
+                    {params.data.description && (
+                        <Typography variant="caption" color="text.secondary" className="leading-tight italic">
+                            {params.data.description}
+                        </Typography>
+                    )}
+                </Box>
+            ),
+            autoHeight: true,
+        });
 
-                    const progress = (line.processed_quantity / line.quantity) * 100;
-                    const isDone = progress >= 99.9;
-
-                    return (
-                        <Tooltip title={`Procesado: ${line.processed_quantity} de ${line.quantity}`}>
-                            <Box className="flex flex-col w-full px-2 py-1">
-                                <Box className="flex justify-between items-baseline mb-0.5">
-                                    <Typography style={{ fontSize: '12px', fontWeight: 700 }}>
-                                        {line.quantity}
-                                    </Typography>
-                                    {line.processed_quantity > 0 && (
-                                        <Typography variant="caption" sx={{ color: isDone ? 'success.main' : 'warning.main', fontWeight: 800, fontSize: '9px' }}>
-                                            {line.processed_quantity} OK
-                                        </Typography>
-                                    )}
-                                </Box>
+        // 3. Column: Quantity
+        defs.push({
+            headerName: 'Cant.',
+            field: 'quantity',
+            flex: 1,
+            type: 'numericColumn',
+            cellRenderer: (params: any) => {
+                const line = params.data as DocumentLine;
+                const isProcessable = ['QUO', 'PQUO', 'ORD', 'PORD', 'DLV', 'PDLV'].includes(document.document_type_code || '');
+                if (!isProcessable) return (
+                    <Typography style={{ fontSize: '13px', fontWeight: 700 }}>
+                        {line.quantity}
+                    </Typography>
+                );
+                const progress = (line.processed_quantity / line.quantity) * 100;
+                const isDone = progress >= 99.9;
+                return (
+                    <Tooltip title={`Procesado: ${line.processed_quantity} de ${line.quantity}`}>
+                        <Box className="flex flex-col w-full px-2 py-1">
+                            <Box className="flex justify-between items-baseline mb-0.5">
+                                <Typography style={{ fontSize: '12px', fontWeight: 700 }}>
+                                    {line.quantity}
+                                </Typography>
                                 {line.processed_quantity > 0 && (
-                                    <LinearProgress 
-                                        variant="determinate" 
-                                        value={progress} 
-                                        sx={{ 
-                                            height: 3, 
-                                            borderRadius: 1,
-                                            bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                                            '& .MuiLinearProgress-bar': {
-                                                bgcolor: isDone ? '#22c55e' : '#f59e0b'
-                                            }
-                                        }} 
-                                    />
+                                    <Typography variant="caption" sx={{ color: isDone ? 'success.main' : 'warning.main', fontWeight: 800, fontSize: '9px' }}>
+                                        {line.processed_quantity} OK
+                                    </Typography>
                                 )}
                             </Box>
-                        </Tooltip>
-                    );
-                },
-                cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
+                            {line.processed_quantity > 0 && (
+                                <LinearProgress 
+                                    variant="determinate" 
+                                    value={progress} 
+                                    sx={{ 
+                                        height: 3, 
+                                        borderRadius: 1,
+                                        bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                        '& .MuiLinearProgress-bar': { bgcolor: isDone ? '#22c55e' : '#f59e0b' }
+                                    }} 
+                                />
+                            )}
+                        </Box>
+                    </Tooltip>
+                );
             },
-            {
-                headerName: 'Precio',
-                field: 'unit_price',
-                flex: 1.5,
-                valueFormatter: (p) => formatCurrency(p.value),
-                type: 'numericColumn',
-                cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
-            },
-            {
-                headerName: 'Imp.',
-                valueGetter: (p) => `${p.data.taxes?.[0]?.percentage || 0}%`,
+            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
+        });
+
+        // 4. Column: Unit (New!)
+        defs.push({
+            headerName: 'Ud.',
+            field: 'unit_short_name',
+            flex: 0.7,
+            cellRenderer: (params: any) => (
+                <Typography style={{ fontSize: '11px', fontWeight: 600, color: isDark ? '#94a3b8' : '#64748b' }} className="uppercase tracking-tighter">
+                    {params.value || '-'}
+                </Typography>
+            ),
+            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
+        });
+
+        // 5. Column: Price
+        defs.push({
+            headerName: 'Precio',
+            field: 'unit_price',
+            flex: 1.4,
+            valueFormatter: (p) => formatCurrency(p.value),
+            type: 'numericColumn',
+            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
+        });
+
+        // 6. Column: Discount % (Conditional)
+        if (hasDiscounts) {
+            defs.push({
+                headerName: 'Dto.%',
+                field: 'discount_percent',
                 flex: 1,
+                valueFormatter: (p) => p.value > 0 ? `${p.value}%` : '-',
                 type: 'numericColumn',
-                cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
-            },
-            {
-                headerName: 'Total',
-                field: 'line_total',
-                flex: 1.5,
-                valueFormatter: (p) => formatCurrency(p.value),
-                cellStyle: (params) => ({
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    fontWeight: 700,
-                    color: isDark ? '#60a5fa' : '#0f172a'
-                }),
-                type: 'numericColumn',
-            }
-        );
+                cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', color: '#f59e0b', fontWeight: 600 },
+            });
+        }
+
+        // 7. Column: Taxes
+        defs.push({
+            headerName: 'Imp.',
+            field: 'tax_labels',
+            flex: 1.5,
+            cellRenderer: (params: any) => (
+                <Typography style={{ fontSize: '10px', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                    {params.value || '-'}
+                </Typography>
+            ),
+            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
+        });
+
+        // 8. Column: Line Total
+        defs.push({
+            headerName: 'Total',
+            field: 'line_total',
+            flex: 1.5,
+            valueFormatter: (p) => formatCurrency(p.value),
+            cellStyle: (params) => ({
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                fontWeight: 700,
+                color: isDark ? '#60a5fa' : '#0f172a'
+            }),
+            type: 'numericColumn',
+        });
 
         return defs;
-    }, [isDark, document.predecessors]);
+    }, [isDark, document.predecessors, document.lines, document.document_type_code]);
 
-    const LINES_PER_PAGE = 25; // More lines as we removed header rows
+    const LINES_PER_PAGE = 25;
     const pages = useMemo(() => {
         if (!document.lines || document.lines.length === 0) return [[]];
-
-        // Sort lines by predecessor order ("en serie")
         const sortedLines = [...document.lines].sort((a, b) => {
             const indexA = document.predecessors?.findIndex(p => p.id === a.source_document_id) ?? -1;
             const indexB = document.predecessors?.findIndex(p => p.id === b.source_document_id) ?? -1;
             return indexA - indexB;
         });
-        
         return chunkArray(sortedLines, LINES_PER_PAGE);
-    }, [document.lines]);
+    }, [document.lines, document.predecessors]);
 
     const totalPages = pages.length;
-
-    // Generar un validation URL falso/genérico para el ejemplo profesional
     const validationUrl = `https://erp.tuempresa.com/verify/${document.id || document.number_serie}`;
 
     return (
         <div className="flex flex-col gap-6 items-center w-full">
-
             {pages.map((pageLines, pageIndex) => {
                 const isFirstPage = pageIndex === 0;
                 const isLastPage = pageIndex === totalPages - 1;
@@ -213,10 +239,8 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                         id={`invoice-sheet-page-${pageIndex + 1}`}
                         style={{ fontFamily: "'Inter', sans-serif" }}
                     >
-                        {/* Top Bar Accent */}
                         <div className="h-1 w-full bg-[#0f172a] dark:bg-blue-500" />
 
-                        {/* Visual Status Stamp (Restored Center Position, Overlays Content) */}
                         {isFirstPage && (document.document_type_code === 'QUO' || document.document_type_code === 'PQUO') &&
                             (document.status?.key === 'approved' || document.status?.key === 'rejected') && (
                                 <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-[0.12] dark:opacity-[0.22] rotate-[-35deg] border-[12px] rounded-2xl px-12 py-6 flex flex-col items-center select-none
@@ -231,7 +255,6 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                             )}
 
                         <div className="p-[1.5cm] flex flex-col flex-1">
-                            {/* Header: Full on 1st page, Mini on others */}
                             {isFirstPage ? (
                                 <>
                                     <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-10">
@@ -264,7 +287,6 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                                         </div>
                                     </div>
 
-                                    {/* Info Grid - Only first page */}
                                     <div className="grid grid-cols-2 gap-16 mt-10">
                                         <div>
                                             <p className="font-bold text-slate-400 dark:text-slate-400 uppercase text-[9px] mb-4 tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">Destinatario / Titular</p>
@@ -287,13 +309,11 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                                                     <span className="text-slate-400">Vencimiento</span>
                                                     <span className="font-medium text-slate-700 dark:text-slate-200">{formatDate(document.due_date || document.issue_date)}</span>
                                                 </div>
-                                                
                                             </div>
                                         </div>
                                     </div>
                                 </>
                             ) : (
-                                /* Mini Header for pages 2+ */
                                 <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-4">
                                     <div className="flex items-center gap-4">
                                         {activeCompany?.logo_url ? (
@@ -310,7 +330,6 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                                 </div>
                             )}
 
-                            {/* Table Section */}
                             <div className="flex-1 mt-6">
                                 <Box sx={{ height: 'auto', width: '100%', minHeight: 150 }}>
                                     <AgGridReact
@@ -319,15 +338,13 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                                         columnDefs={columnDefs}
                                         domLayout="autoHeight"
                                         headerHeight={32}
-                                        rowHeight={48}
-                                        // Disable grid scroll to ensure it fits physically
+                                        rowHeight={54}
                                         suppressScrollOnNewData={true}
                                         suppressHorizontalScroll={true}
                                     />
                                 </Box>
                             </div>
 
-                            {/* Summary + QR Section - ONLY on last page */}
                             {isLastPage && (
                                 <div className="flex justify-between items-end mt-8">
                                     <div className="w-32 h-32 flex flex-col items-center justify-center p-2 border border-slate-200 dark:border-slate-800 rounded bg-white">
@@ -335,26 +352,31 @@ export default function DocumentShowPaper({ document, activeCompany }: DocumentS
                                         <span className="text-[7px] text-slate-400 mt-2 uppercase tracking-widest">Verificación QR</span>
                                     </div>
 
-                                    <div className="w-64 space-y-1">
+                                    <div className="w-72 space-y-1">
                                         <div className="flex justify-between text-[11px] px-2 py-1">
-                                            <span className="text-slate-400">Subtotal</span>
+                                            <span className="text-slate-400 uppercase tracking-wider text-[9px]">Suma Bases</span>
                                             <span className="text-slate-900 dark:text-slate-200 font-medium">{formatCurrency(document.subtotal)}</span>
                                         </div>
+                                        {document.discount_total > 0 && (
+                                            <div className="flex justify-between text-[11px] px-2 py-1 text-orange-600 dark:text-orange-400">
+                                                <span className="uppercase tracking-wider text-[9px]">Total Descuento</span>
+                                                <span className="font-bold">-{formatCurrency(document.discount_total)}</span>
+                                            </div>
+                                        )}
                                         {document.tax_summaries?.map((tax) => (
-                                            <div key={tax.rate} className="flex justify-between text-[11px] px-2 py-1">
-                                                <span className="text-slate-400">IVA ({tax.rate}%)</span>
+                                            <div key={`${tax.name}-${tax.rate}`} className="flex justify-between text-[11px] px-2 py-1">
+                                                <span className="text-slate-400 uppercase tracking-wider text-[9px]">{tax.name} ({tax.rate}%)</span>
                                                 <span className="text-slate-900 dark:text-slate-200 font-medium">{formatCurrency(tax.tax_amount)}</span>
                                             </div>
                                         ))}
-                                        <div className="flex justify-between items-center p-3 mt-4 border-t-2 border-[#0f172a] dark:border-blue-500">
-                                            <span className="font-bold uppercase text-[10px] tracking-widest text-[#0f172a] dark:text-white">Total</span>
+                                        <div className="flex justify-between items-center p-3 mt-4 border-t-2 border-[#0f172a] dark:border-blue-500 bg-slate-50 dark:bg-slate-900/50 rounded-b">
+                                            <span className="font-black uppercase text-[11px] tracking-[0.2em] text-[#0f172a] dark:text-white">Total Neto</span>
                                             <span className="text-2xl font-black text-[#0f172a] dark:text-white">{formatCurrency(document.total)}</span>
                                         </div>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Footer Base */}
                             <div className="mt-auto pt-8 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center text-[9px] text-slate-400">
                                 <p className="italic">Generado por {activeCompany?.name}. Documento generado electrónicamente.</p>
                                 <p className="font-bold tracking-widest uppercase">Página {pageIndex + 1} de {totalPages}</p>

@@ -13,6 +13,7 @@ export const PRIMARY_COLOR = '#0f172a';
 export const SECONDARY_COLOR = '#64748b';
 export const BORDER_COLOR = '#f1f5f9';
 export const TABLE_HEADER_BG = '#f8fafc';
+export const DISCOUNT_COLOR = '#f59e0b';
 
 export const styles = StyleSheet.create({
     page: {
@@ -145,7 +146,7 @@ export const styles = StyleSheet.create({
     },
     tableRow: {
         flexDirection: 'row',
-        padding: '10 10',
+        padding: '8 10',
         borderBottomWidth: 1,
         borderBottomColor: BORDER_COLOR,
         alignItems: 'center',
@@ -153,16 +154,21 @@ export const styles = StyleSheet.create({
     tableRowEven: {
         backgroundColor: '#fafbfc',
     },
-    colOrigin: { width: '15%' },
-    colDesc: { width: '40%' },
-    colQty: { width: '10%', textAlign: 'center' },
-    colPrice: { width: '15%', textAlign: 'right' },
-    colTax: { width: '8%', textAlign: 'right' },
-    colTotal: { width: '12%', textAlign: 'right' },
+    // Updated column widths for maximum harmony
+    colOrigin: { width: '10%' },
+    colDesc: { width: '27%' },
+    colQty: { width: '8%', textAlign: 'center' },
+    colUnit: { width: '7%', textAlign: 'center' },
+    colPrice: { width: '14%', textAlign: 'right' },
+    colDiscount: { width: '8%', textAlign: 'right' },
+    colTax: { width: '12%', textAlign: 'right' },
+    colTotal: { width: '14%', textAlign: 'right' },
 
-    itemMain: { fontSize: 9, fontWeight: 'bold', color: PRIMARY_COLOR },
-    itemSub: { fontSize: 7, color: SECONDARY_COLOR, fontStyle: 'italic', marginTop: 2 },
-    itemValue: { fontSize: 9, color: SECONDARY_COLOR },
+    itemMain: { fontSize: 8.5, fontWeight: 'bold', color: PRIMARY_COLOR },
+    itemSub: { fontSize: 7, color: SECONDARY_COLOR, fontStyle: 'italic', marginTop: 1 },
+    itemValue: { fontSize: 8.5, color: SECONDARY_COLOR },
+    itemValueBold: { fontSize: 8.5, fontWeight: 'bold', color: PRIMARY_COLOR },
+    itemDiscount: { fontSize: 8.5, fontWeight: 'bold', color: DISCOUNT_COLOR },
     itemBold: { fontSize: 9, fontWeight: 'bold', color: PRIMARY_COLOR },
 
     summarySection: {
@@ -172,7 +178,7 @@ export const styles = StyleSheet.create({
         alignItems: 'flex-end',
     },
     summaryWrapper: {
-        width: 180,
+        width: 200,
     },
     summaryRow: {
         flexDirection: 'row',
@@ -180,28 +186,42 @@ export const styles = StyleSheet.create({
         padding: '4 8',
     },
     summaryLabel: {
-        fontSize: 9,
+        fontSize: 8,
         color: SECONDARY_COLOR,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
     summaryValue: {
         fontSize: 9,
         fontWeight: 'bold',
         color: '#1e293b',
     },
+    discountLabel: {
+        fontSize: 8,
+        color: DISCOUNT_COLOR,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+    },
+    discountValue: {
+        fontSize: 9,
+        fontWeight: 'bold',
+        color: DISCOUNT_COLOR,
+    },
     totalRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 10,
-        padding: '8 8',
+        padding: '10 8',
         borderTopWidth: 2,
         borderTopColor: PRIMARY_COLOR,
+        backgroundColor: '#f8fafc',
     },
     totalLabel: {
         fontSize: 10,
         fontWeight: 'bold',
         color: PRIMARY_COLOR,
         textTransform: 'uppercase',
-        letterSpacing: 1,
+        letterSpacing: 1.5,
     },
     totalValue: {
         fontSize: 16,

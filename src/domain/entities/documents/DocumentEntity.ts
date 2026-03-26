@@ -22,14 +22,19 @@ export interface DocumentLine {
     id?: number;
     document_id?: number;
     item_id?: number | null;
+    item_code?: string | null;
     name: string;
+    unit_name?: string | null;
+    unit_short_name?: string | null;
+    category_name?: string | null;
     description: string | null;
     quantity: number;
     processed_quantity: number;
     unit_price: number;
-    discount_percentage: number;
+    discount_percent: number;
     discount_amount: number;
-    line_subtotal: number;
+    tax_base: number; // line_subtotal alias
+    tax_labels?: string | null;
     tax_amount: number;
     line_total: number;
     taxes: DocumentLineTax[];
@@ -71,6 +76,7 @@ export class DocumentEntity {
         public readonly number_serie: string | null,
         public readonly external_reference: string | null,
         public readonly subtotal: number,
+        public readonly discount_total: number,
         public readonly tax_total: number,
         public readonly total: number,
         public readonly total_paid: number = 0,
@@ -124,14 +130,19 @@ export class DocumentEntity {
                 id: line.id,
                 document_id: line.document_id,
                 item_id: line.item_id ?? null,
+                item_code: line.item_code ?? null,
                 name: line.name || '',
+                unit_name: line.unit_name ?? null,
+                unit_short_name: line.unit_short_name ?? null,
+                category_name: line.category_name ?? null,
                 description: line.description || null,
                 quantity: Number(line.quantity ?? 0),
                 processed_quantity: Number(line.processed_quantity ?? 0),
                 unit_price: Number(line.unit_price ?? 0),
-                discount_percentage: Number(line.discount_percentage ?? 0),
+                discount_percent: Number(line.discount_percent ?? line.discount_percentage ?? 0),
                 discount_amount: Number(line.discount_amount ?? 0),
-                line_subtotal: Number(line.line_subtotal ?? 0),
+                tax_base: Number(line.tax_base ?? line.line_subtotal ?? 0),
+                tax_labels: line.tax_labels ?? null,
                 tax_amount: Number(line.tax_amount ?? 0),
                 line_total: Number(line.line_total ?? 0),
                 taxes: Array.isArray(line.taxes)
@@ -189,6 +200,7 @@ export class DocumentEntity {
             json.number_serie,
             json.external_reference || null,
             Number(json.subtotal ?? 0),
+            Number(json.discount_total ?? 0),
             Number(json.tax_total ?? 0),
             Number(json.total ?? 0),
             Number(json.total_paid ?? 0),
