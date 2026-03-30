@@ -19,22 +19,17 @@ interface RecordPaymentModalProps {
     document: DocumentEntity;
 }
 
-/**
- * RecordPaymentModal (Orchestrator)
- * Refactored for maintainability using modular components and custom hooks.
- */
 export function RecordPaymentModal({ open, onClose, document }: RecordPaymentModalProps) {
     const { mutate: recordPayment, isPending } = useRecordPayment();
     const { paymentMethods, isLoading: isLoadingMethods } = useIndexPaymentMethods();
 
-    const [amount, setAmount] = useState<number>(document.balance || 0);
+    const [amount, setAmount] = useState<number>(0);
     const [methodId, setMethodId] = useState<number | ''>('');
     const [reference, setReference] = useState<string>('');
     const [notes, setNotes] = useState<string>('');
     const [enableNotes, setEnableNotes] = useState<boolean>(false);
     const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
-    // Initial Filter for Invoices that can receive waterfall payment
     const initialPendingInvoices = useMemo(() => {
         if (!['DLV', 'PDLV'].includes(document.document_type_code || '')) return [];
         return document.successors.filter(s => {
@@ -46,15 +41,25 @@ export function RecordPaymentModal({ open, onClose, document }: RecordPaymentMod
         });
     }, [document]);
 
-    // Waterfall Logic Hook
-    const {
-        childInvoicesWithAllocation,
-        totalAllocated,
-        toggleInvoice
+    const { 
+        childInvoicesWithAllocation, 
+        totalAllocated, 
+        isOverAllocated,
+        toggleInvoice,
+        setManualAmount,
+        manualAmounts
     } = useWaterfallAllocation(initialPendingInvoices, amount);
 
     const handleSave = () => {
-        if (!amount || amount <= 0) return;
+        if (!amount || amount <= 0 || isOverAllocated) return;
+
+        // Construir el array de alocaciones manuales para el backend
+        const allocations = Object.entries(manualAmounts)
+            .filter(([id]) => childInvoicesWithAllocation.find(i => i.id === Number(id))?.isSelected)
+            .map(([id, val]) => ({
+                document_id: Number(id),
+                amount: val
+            }));
 
         recordPayment({
             id: String(document.id),
@@ -63,7 +68,8 @@ export function RecordPaymentModal({ open, onClose, document }: RecordPaymentMod
                 payment_date: date,
                 payment_method_id: methodId || undefined,
                 reference,
-                notes: enableNotes ? notes : undefined
+                notes: enableNotes ? notes : undefined,
+                allocations: allocations.length > 0 ? allocations : undefined
             }
         }, {
             onSuccess: () => {
@@ -86,7 +92,7 @@ export function RecordPaymentModal({ open, onClose, document }: RecordPaymentMod
             fullWidth
             PaperProps={{
                 sx: {
-                    width: '720px', // 20% less than 900px
+                    width: '720px',
                     maxWidth: '720px',
                     borderRadius: '4px',
                     bgcolor: '#ffffff',
@@ -95,15 +101,16 @@ export function RecordPaymentModal({ open, onClose, document }: RecordPaymentMod
                 }
             }}
         >
-            <RecordPaymentHeader
-                numberSerie={document.number_serie}
-                partnerName={document.partner_name}
-                onClose={onClose}
+            <RecordPaymentHeader 
+                numberSerie={document.number_serie} 
+                partnerName={document.partner_name} 
+                onClose={onClose} 
             />
 
             <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3.5 }}>
-                <RecordPaymentForm
+                <RecordPaymentForm 
                     amount={amount} setAmount={setAmount}
+                    totalBalance={document.balance || 0}
                     date={date} setDate={setDate}
                     methodId={methodId} setMethodId={setMethodId}
                     reference={reference} setReference={setReference}
@@ -114,18 +121,20 @@ export function RecordPaymentModal({ open, onClose, document }: RecordPaymentMod
                 />
 
                 {hasWaterfall && (
-                    <RecordPaymentWaterfall
-                        invoices={childInvoicesWithAllocation}
-                        onToggle={toggleInvoice}
-                        formatMoney={formatMoney}
+                    <RecordPaymentWaterfall 
+                        invoices={childInvoicesWithAllocation} 
+                        onToggle={toggleInvoice} 
+                        onManualAmount={setManualAmount}
+                        formatMoney={formatMoney} 
                     />
                 )}
             </Box>
 
-            <RecordPaymentFooter
+            <RecordPaymentFooter 
                 totalAllocated={totalAllocated}
                 amount={amount}
                 isPending={isPending}
+                isOverAllocated={isOverAllocated}
                 onClose={onClose}
                 onConfirm={handleSave}
                 formatMoney={formatMoney}

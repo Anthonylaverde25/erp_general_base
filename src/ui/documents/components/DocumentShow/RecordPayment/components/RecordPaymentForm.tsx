@@ -1,8 +1,9 @@
-import { Box, TextField, MenuItem, Typography, FormControlLabel, Switch } from '@mui/material';
+import { Box, TextField, MenuItem, Typography, FormControlLabel, Switch, Button } from '@mui/material';
 
 interface RecordPaymentFormProps {
     amount: number;
     setAmount: (val: number) => void;
+    totalBalance: number;
     date: string;
     setDate: (val: string) => void;
     methodId: number | '';
@@ -19,6 +20,7 @@ interface RecordPaymentFormProps {
 
 export function RecordPaymentForm({
     amount, setAmount,
+    totalBalance,
     date, setDate,
     methodId, setMethodId,
     reference, setReference,
@@ -27,23 +29,48 @@ export function RecordPaymentForm({
     paymentMethods,
     isLoadingMethods
 }: RecordPaymentFormProps) {
+    const formatMoney = (val: number) => {
+        return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(val);
+    };
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
             {/* Fila 1: Datos principales (3 columnas) */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2.5 }}>
-                <TextField
-                    id="filled-basic-amount"
-                    label="IMPORTE A PAGAR"
-                    variant="filled"
-                    fullWidth
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(Number(e.target.value))}
-                    InputProps={{
-                        endAdornment: <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: '#64748b' }}>EUR</Typography>,
-                        sx: { fontWeight: 800 }
-                    }}
-                />
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2.5, alignItems: 'start' }}>
+                <Box sx={{ position: 'relative' }}>
+                    <TextField
+                        id="filled-basic-amount"
+                        label="IMPORTE A PAGAR"
+                        variant="filled"
+                        fullWidth
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(Number(e.target.value))}
+                        InputProps={{
+                            endAdornment: <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: '#64748b' }}>EUR</Typography>,
+                            sx: { fontWeight: 800 }
+                        }}
+                    />
+                    <Button
+                        className='px-1'
+                        size="small"
+                        onClick={() => setAmount(totalBalance)}
+                        sx={{
+                            position: 'absolute',
+                            bottom: -25,
+                            left: 0,
+                            fontSize: '0.6rem',
+                            fontWeight: 900,
+                            color: '#005483',
+                            justifyContent: 'flex-start',
+                            p: 0,
+                            minWidth: 'auto',
+                            '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' }
+                        }}
+                    >
+                        PAGAR TOTAL: {formatMoney(totalBalance)}
+                    </Button>
+                </Box>
 
                 <TextField
                     id="filled-basic-date"
@@ -89,11 +116,11 @@ export function RecordPaymentForm({
                 <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end', pb: 1 }}>
                     <FormControlLabel
                         control={
-                            <Switch 
-                                size="small" 
-                                checked={enableNotes} 
+                            <Switch
+                                size="small"
+                                checked={enableNotes}
                                 onChange={(e) => setEnableNotes(e.target.checked)}
-                                sx={{ 
+                                sx={{
                                     '& .MuiSwitch-switchBase.Mui-checked': { color: '#005483' },
                                     '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#005483' }
                                 }}
@@ -123,7 +150,7 @@ export function RecordPaymentForm({
                     sx={{ animation: 'fadeIn 0.2s ease-in' }}
                 />
             )}
-            
+
             <style>{`
                 @keyframes fadeIn {
                     from { opacity: 0; transform: translateY(-5px); }
