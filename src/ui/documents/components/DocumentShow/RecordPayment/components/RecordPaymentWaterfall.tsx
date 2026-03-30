@@ -1,5 +1,5 @@
 import { Box, Typography, Tooltip, Paper, Checkbox } from '@mui/material';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Info } from 'lucide-react';
 
 interface WaterfallInvoice {
     id: number;
@@ -25,10 +25,26 @@ export function RecordPaymentWaterfall({ invoices, onToggle, formatMoney }: Reco
                 </Typography>
             </Box>
 
+            {/* Banner Informativo de Comportamiento por Defecto */}
+            <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'flex-start', 
+                gap: 1.5, 
+                p: 1.5, 
+                bgcolor: '#f0f7ff', 
+                borderLeft: '4px solid #005483',
+                mb: 0.5
+            }}>
+                <Info size={16} color="#005483" style={{ marginTop: 2 }} />
+                <Typography variant="caption" sx={{ color: '#005483', fontWeight: 600, lineHeight: 1.4 }}>
+                    <strong>Conciliación Automática:</strong> Por defecto, el pago consignado se aplicará prioritariamente para saldar las deudas de las facturas pendientes asociadas a este documento.
+                </Typography>
+            </Box>
+
             <Box sx={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
-                maxHeight: '280px',
+                maxHeight: '280px', 
                 overflowY: 'auto',
                 gap: 0.75
             }}>

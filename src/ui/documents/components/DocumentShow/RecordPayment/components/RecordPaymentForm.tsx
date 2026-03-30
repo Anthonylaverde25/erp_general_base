@@ -73,54 +73,57 @@ export function RecordPaymentForm({
                 </TextField>
             </Box>
 
-            {/* Fila 2: Referencia (Ancho completo) */}
-            <TextField
-                id="filled-basic-ref"
-                label="REFERENCIA / OPERACIÓN"
-                variant="filled"
-                fullWidth
-                placeholder="Ej: TRX-9920-CLIENT"
-                value={reference}
-                onChange={(e) => setReference(e.target.value)}
-            />
-
-            {/* Fila 3: Observaciones (Ancho completo, condicional) */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Box className='px-2' sx={{ display: 'flex', alignItems: 'center' }}>
+            {/* Fila 2: Referencia (80%) + Habilitar Notas (20%) */}
+            <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 2.5 }}>
+                <Box sx={{ flex: '0 0 80%' }}>
+                    <TextField
+                        id="filled-basic-ref"
+                        label="REFERENCIA / OPERACIÓN"
+                        variant="filled"
+                        fullWidth
+                        placeholder="Ej: TRX-9920-CLIENT"
+                        value={reference}
+                        onChange={(e) => setReference(e.target.value)}
+                    />
+                </Box>
+                <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end', pb: 1 }}>
                     <FormControlLabel
                         control={
-                            <Switch
-                                size="small"
-                                checked={enableNotes}
+                            <Switch 
+                                size="small" 
+                                checked={enableNotes} 
                                 onChange={(e) => setEnableNotes(e.target.checked)}
-                                sx={{
+                                sx={{ 
                                     '& .MuiSwitch-switchBase.Mui-checked': { color: '#005483' },
                                     '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#005483' }
                                 }}
                             />
                         }
                         label={
-                            <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase' }}>
-                                {enableNotes ? 'Desactivar Notas' : 'Habilitar Notas'}
+                            <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                                {enableNotes ? 'Notas ON' : 'Notas OFF'}
                             </Typography>
                         }
+                        labelPlacement="start"
                     />
                 </Box>
-                {enableNotes && (
-                    <TextField
-                        id="filled-basic-notes"
-                        label="OBSERVACIONES"
-                        variant="filled"
-                        fullWidth
-                        multiline
-                        rows={2}
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        sx={{ animation: 'fadeIn 0.2s ease-in' }}
-                    />
-                )}
             </Box>
 
+            {/* Fila 3: Observaciones (Ancho completo, condicional) */}
+            {enableNotes && (
+                <TextField
+                    id="filled-basic-notes"
+                    label="OBSERVACIONES"
+                    variant="filled"
+                    fullWidth
+                    multiline
+                    rows={2}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    sx={{ animation: 'fadeIn 0.2s ease-in' }}
+                />
+            )}
+            
             <style>{`
                 @keyframes fadeIn {
                     from { opacity: 0; transform: translateY(-5px); }
