@@ -59,6 +59,9 @@ export interface ParentDocumentInfo {
     number_serie: string;
     document_type_name: string | null;
     issue_date?: string | null;
+    total?: number;
+    total_paid?: number;
+    balance?: number;
     status?: {
         name: string;
         color: string;
@@ -182,6 +185,9 @@ export class DocumentEntity {
                 number_serie: s.number_serie,
                 document_type_name: s.document_type_name,
                 issue_date: s.issue_date || null,
+                total: s.total !== undefined ? Number(s.total) : undefined,
+                total_paid: s.total_paid !== undefined ? Number(s.total_paid) : undefined,
+                balance: s.balance !== undefined ? Number(s.balance) : undefined,
                 status: s.status || null
             }))
             : [];

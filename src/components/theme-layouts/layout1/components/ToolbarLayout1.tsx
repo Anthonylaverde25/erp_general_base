@@ -14,6 +14,7 @@ import useThemeMediaQuery from '../../../../@fuse/hooks/useThemeMediaQuery';
 import { AppBar, Divider } from '@mui/material';
 import ToolbarTheme from 'src/contexts/ToolbarTheme';
 import CompanySwitcher from '@/components/CompanySwitcher';
+import AppLauncher from '@/components/AppLauncher';
 import { QuickActionsButtonMui as ToolbarQuickActionsMui } from '../../components/ToolbarQuickActionsMui';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 
@@ -59,6 +60,7 @@ function ToolbarLayout1(props: ToolbarLayout1Props) {
 					</div>
 
 					<div className="flex items-center overflow-x-auto px-2 py-2 md:px-4">
+						<AppLauncher />
 						<ToolbarQuickActionsMui />
 						<CompanySwitcher />
 						<LanguageSwitcher />
