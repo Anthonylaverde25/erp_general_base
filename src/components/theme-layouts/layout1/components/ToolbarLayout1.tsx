@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { memo } from 'react';
 import NavbarToggleButton from 'src/components/theme-layouts/components/navbar/NavbarToggleButton';
 import themeOptions from 'src/configs/themeOptions';
-import _ from 'lodash';
+import find from 'lodash/find';
 import LightDarkModeToggle from 'src/components/LightDarkModeToggle';
 import useFuseLayoutSettings from '@fuse/core/FuseLayout/useFuseLayoutSettings';
 import FullScreenToggle from '../../components/FullScreenToggle';
@@ -14,7 +14,7 @@ import useThemeMediaQuery from '../../../../@fuse/hooks/useThemeMediaQuery';
 import { AppBar, Divider } from '@mui/material';
 import ToolbarTheme from 'src/contexts/ToolbarTheme';
 import CompanySwitcher from '@/components/CompanySwitcher';
-import AppLauncher from '@/components/AppLauncher';
+import AppLauncher from '@/components/app-launcher';
 import { QuickActionsButtonMui as ToolbarQuickActionsMui } from '../../components/ToolbarQuickActionsMui';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 
@@ -67,8 +67,8 @@ function ToolbarLayout1(props: ToolbarLayout1Props) {
 						{/* <AdjustFontSize /> */}
 						<FullScreenToggle />
 						<LightDarkModeToggle
-							lightTheme={_.find(themeOptions, { id: 'Default' })}
-							darkTheme={_.find(themeOptions, { id: 'Default Dark' })}
+							lightTheme={find(themeOptions, { id: 'Default' })}
+							darkTheme={find(themeOptions, { id: 'Default Dark' })}
 						/>
 						{/* <NavigationSearch /> */}
 						<QuickPanelToggleButton />
