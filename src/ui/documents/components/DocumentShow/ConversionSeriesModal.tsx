@@ -1,10 +1,10 @@
-import { Box, MenuItem, CircularProgress, TextField, Typography, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
+import { Box, MenuItem, CircularProgress, TextField, Typography, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Divider } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo, useEffect } from 'react';
 import { AppFormModal } from '@/components/modals/AppFormModal';
 import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 import { NumberSeriesRepositoryCrud } from '@/infrastructure/repositories/number_series/NumberSeriesRepositoryCrud';
-import { FileText, CheckCircle } from 'lucide-react';
+import { FileText, CheckCircle, Landmark } from 'lucide-react';
 
 interface ConversionSeriesModalProps {
     open: boolean;
@@ -36,6 +36,10 @@ export function ConversionSeriesModal({
     const [selectedSeriesId, setSelectedSeriesId] = useState<number | ''>('');
     const [lineQuantities, setLineQuantities] = useState<Record<number, number>>({});
     const selectedStatusKey = 'issued'; 
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(amount);
+    };
 
     useEffect(() => {
         if (open && document.lines) {
@@ -141,14 +145,40 @@ export function ConversionSeriesModal({
             isConfirmDisabled={!selectedSeriesId || isConverting || isTotalProcessZero}
             PaperProps={{ 
                 sx: { 
-                    width: mode === 'full' ? '400px' : '750px', 
+                    width: mode === 'full' ? '400px' : '720px', 
                     maxWidth: '95vw',
-                    borderRadius: '12px',
-                    boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+                    borderRadius: '4px',
+                    bgcolor: '#ffffff',
+                    boxShadow: '0 24px 48px -12px rgba(0,0,0,0.18)',
+                    overflow: 'hidden'
                 } 
             }}
         >
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{
+                    px: 3,
+                    py: 2,
+                    bgcolor: '#f8fafc',
+                    borderBottom: '1px solid #e2e8f0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box sx={{ bgcolor: '#005483', p: 0.8, borderRadius: '4px', display: 'flex', color: 'white' }}>
+                            <FileText size={18} />
+                        </Box>
+                        <Box>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
+                                {title || (mode === 'full' ? 'Facturación Directa' : 'Certificación por Líneas')}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+                                {document.number_serie} • {document.partner_name}
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Box>
+
                 {isLoadingSeries ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
                         <CircularProgress size={28} thickness={4} color="secondary" />
@@ -182,6 +212,39 @@ export function ConversionSeriesModal({
                                         ))}
                                     </TextField>
                                 </Box>
+
+                                {(document.total_paid || 0) > 0 && (
+                                    <Box sx={{
+                                        mt: 1.5,
+                                        p: 2,
+                                        borderRadius: '4px',
+                                        bgcolor: '#f0fdf4',
+                                        border: '1px solid #dcfce7',
+                                        borderLeft: '4px solid #10b981',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 2
+                                    }}>
+                                        <Box sx={{ 
+                                            p: 0.8, 
+                                            bgcolor: '#dcfce7', 
+                                            color: '#166534', 
+                                            borderRadius: '4px',
+                                            display: 'flex'
+                                        }}>
+                                            <Landmark size={18} />
+                                        </Box>
+                                        <Box>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#14532d', lineHeight: 1.2, mb: 0.2 }}>
+                                                Abono Registrado en Albarán
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: '#166534', fontSize: '12.5px', fontWeight: 600 }}>
+                                                Este documento ya cuenta con un pago de <span style={{ fontWeight: 900 }}>{formatCurrency(document.total_paid || 0)}</span>. 
+                                                El sistema aplicará este saldo a la factura resultante.
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                )}
                                 
                                 {previewNumber && (
                                     <Box sx={{
@@ -189,18 +252,20 @@ export function ConversionSeriesModal({
                                         flexDirection: 'column',
                                         alignItems: 'flex-start',
                                         width: '100%',
-                                        px: 1.5,
-                                        py: 1,
-                                        borderLeft: '3px solid',
-                                        borderColor: 'indigo.400',
-                                        bgcolor: 'indigo.50/50',
-                                        borderRadius: '0 4px 4px 0'
+                                        mt: 1.5,
+                                        px: 2,
+                                        py: 1.5,
+                                        borderLeft: '4px solid #005483',
+                                        bgcolor: '#f0f9ff',
+                                        border: '1px solid #e0f2fe',
+                                        borderLeftColor: '#005483',
+                                        borderRadius: '4px'
                                     }}>
-                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'indigo.600', textTransform: 'uppercase', fontSize: '10px', mb: 0.5 }}>
-                                            Nº Documento Oficial
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#005483', textTransform: 'uppercase', fontSize: '10px', mb: 0.5, letterSpacing: '0.5px' }}>
+                                            Nº Documento Oficial a Generar
                                         </Typography>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <Typography variant="body1" sx={{ fontWeight: 800, color: 'indigo.900', letterSpacing: '1px', fontSize: '16px' }}>
+                                            <Typography variant="body1" sx={{ fontWeight: 900, color: '#0c4a6e', letterSpacing: '1px', fontSize: '16px' }}>
                                                 {previewNumber}
                                             </Typography>
                                         </Box>
@@ -213,22 +278,22 @@ export function ConversionSeriesModal({
                             {mode === 'partial' && (
                                 <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 900, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '1px' }}>
                                             Líneas a Procesar
                                         </Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            Cantidades para este documento.
+                                        <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+                                            Seleccione las cantidades para la facturación parcial.
                                         </Typography>
                                     </Box>
                                     
-                                    <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: '8px', overflow: 'hidden', border: '1px solid', borderColor: 'grey.200' }}>
+                                    <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: '4px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: 'none' }}>
                                         <Table size="small">
                                             <TableHead>
-                                                <TableRow sx={{ bgcolor: 'grey.50' }}>
-                                                    <TableCell sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200' }}>Producto</TableCell>
-                                                    <TableCell align="center" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200', width: '100px' }}>Estado</TableCell>
-                                                    <TableCell align="center" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200', width: '80px' }}>Pend.</TableCell>
-                                                    <TableCell align="right" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: 'text.secondary', borderBottom: '1px solid', borderColor: 'grey.200', width: '160px' }}>Cantidad</TableCell>
+                                                <TableRow sx={{ bgcolor: '#f8fafc' }}>
+                                                    <TableCell sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>Producto / Servicio</TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: '#64748b', borderBottom: '1px solid #e2e8f0', width: '100px' }}>Estado</TableCell>
+                                                    <TableCell align="center" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: '#64748b', borderBottom: '1px solid #e2e8f0', width: '80px' }}>Pend.</TableCell>
+                                                    <TableCell align="right" sx={{ fontWeight: 800, py: 1.5, fontSize: '11px', textTransform: 'uppercase', color: '#64748b', borderBottom: '1px solid #e2e8f0', width: '140px' }}>A Facturar</TableCell>
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
@@ -240,13 +305,13 @@ export function ConversionSeriesModal({
                                                         <TableRow 
                                                             key={line.id} 
                                                             sx={{ 
-                                                                '&:hover': { bgcolor: 'grey.50' },
-                                                                transition: 'background-color 0.2s',
-                                                                '& td': { py: 1.5, px: 2, borderBottom: '1px solid', borderColor: 'grey.100' }
+                                                                '&:hover': { bgcolor: '#f1f5f9' },
+                                                                transition: 'background-color 0.1s',
+                                                                '& td': { py: 1, px: 2, borderBottom: '1px solid #f1f5f9' }
                                                             }}
                                                         >
                                                             <TableCell>
-                                                                <Typography variant="body2" sx={{ fontWeight: 700, color: isDone ? 'text.disabled' : 'text.primary', fontSize: '13px' }}>
+                                                                <Typography variant="body2" sx={{ fontWeight: 700, color: isDone ? '#94a3b8' : '#1e293b', fontSize: '13px' }}>
                                                                     {line.name}
                                                                 </Typography>
                                                             </TableCell>
@@ -255,19 +320,19 @@ export function ConversionSeriesModal({
                                                                     display: 'inline-flex', 
                                                                     px: 1, 
                                                                     py: 0.25, 
-                                                                    borderRadius: '4px', 
+                                                                    borderRadius: '2px', 
                                                                     fontSize: '9px', 
-                                                                    fontWeight: 800,
-                                                                    bgcolor: isDone ? 'success.50' : 'info.50',
-                                                                    color: isDone ? 'success.700' : 'info.700',
+                                                                    fontWeight: 900,
+                                                                    bgcolor: isDone ? '#f0fdf4' : '#eff6ff',
+                                                                    color: isDone ? '#166534' : '#1e40af',
                                                                     border: '1px solid',
-                                                                    borderColor: isDone ? 'success.100' : 'info.100'
+                                                                    borderColor: isDone ? '#bbf7d0' : '#bfdbfe'
                                                                 }}>
-                                                                    {isDone ? 'PROCESADO' : 'PENDIENTE'}
+                                                                    {isDone ? 'COMPLETO' : 'PENDIENTE'}
                                                                 </Box>
                                                             </TableCell>
                                                             <TableCell align="center">
-                                                                <Typography variant="body2" sx={{ fontWeight: 700, color: isDone ? 'text.disabled' : 'text.primary', fontSize: '13px' }}>
+                                                                <Typography variant="body2" sx={{ fontWeight: 800, color: isDone ? '#94a3b8' : '#0f172a', fontSize: '13px' }}>
                                                                     {pending.toFixed(2)}
                                                                 </Typography>
                                                             </TableCell>
@@ -275,20 +340,20 @@ export function ConversionSeriesModal({
                                                                 {!isDone ? (
                                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-end' }}>
                                                                         <TextField
-                                                                            id="filled-basic"
+                                                                            id="quantity-input"
                                                                             type="number"
                                                                             size="small"
                                                                             variant="filled"
                                                                             value={lineQuantities[line.id!] || 0}
                                                                             onChange={(e) => handleQuantityChange(line.id!, e.target.value, pending)}
                                                                             inputProps={{ 
-                                                                                style: { textAlign: 'right', fontWeight: 700, fontSize: '13px', paddingTop: '8px' } 
+                                                                                style: { textAlign: 'right', fontWeight: 800, fontSize: '13px', paddingTop: '8px', color: '#005483' } 
                                                                             }}
-                                                                            sx={{ width: '90px', '& .MuiFilledInput-root': { height: '36px' } }}
+                                                                            sx={{ width: '85px', '& .MuiFilledInput-root': { height: '32px', borderRadius: '4px' } }}
                                                                         />
                                                                     </Box>
                                                                 ) : (
-                                                                    <CheckCircle className="text-emerald-500" size={18} />
+                                                                    <CheckCircle className="text-emerald-600" size={16} />
                                                                 )}
                                                             </TableCell>
                                                         </TableRow>
@@ -297,6 +362,58 @@ export function ConversionSeriesModal({
                                             </TableBody>
                                         </Table>
                                     </TableContainer>
+
+                                    {/* Bloque de Resumen de Totales - Estilo Waterfall */}
+                                    <Box sx={{
+                                        mt: 2,
+                                        p: 2,
+                                        bgcolor: '#f8fafc',
+                                        borderRadius: '4px',
+                                        border: '1px solid #e2e8f0',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: 1.5
+                                    }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Typography variant="body2" sx={{ fontWeight: 600, color: '#64748b' }}>
+                                                Total de Mercancía Seleccionada
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ fontWeight: 800, color: '#0f172a' }}>
+                                                {formatCurrency(Object.entries(lineQuantities).reduce((acc, [id, qty]) => {
+                                                    const line = document.lines.find(l => l.id === Number(id));
+                                                    return acc + (qty * (line?.unit_price || 0));
+                                                }, 0))}
+                                            </Typography>
+                                        </Box>
+
+                                        {(document.total_paid || 0) > 0 && (
+                                            <>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Landmark size={14} className="text-emerald-600" />
+                                                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'emerald.700' }}>
+                                                            Abono del Albarán Aplicable
+                                                        </Typography>
+                                                    </Box>
+                                                    <Typography variant="body2" sx={{ fontWeight: 800, color: 'emerald.700' }}>
+                                                        - {formatCurrency(document.total_paid || 0)}
+                                                    </Typography>
+                                                </Box>
+                                                <Divider sx={{ borderStyle: 'dashed' }} />
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#005483', textTransform: 'uppercase' }}>
+                                                        Saldo Neto en Factura Hija
+                                                    </Typography>
+                                                    <Typography variant="h6" sx={{ fontWeight: 900, color: '#005483' }}>
+                                                        {formatCurrency(Math.max(0, Object.entries(lineQuantities).reduce((acc, [id, qty]) => {
+                                                            const line = document.lines.find(l => l.id === Number(id));
+                                                            return acc + (qty * (line?.unit_price || 0));
+                                                        }, 0) - (document.total_paid || 0)))}
+                                                    </Typography>
+                                                </Box>
+                                            </>
+                                        )}
+                                    </Box>
                                 </Box>
                             )}
                         </Box>
