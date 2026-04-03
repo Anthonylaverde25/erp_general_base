@@ -9,6 +9,7 @@ import JwtAuthContext from '@auth/services/jwt/JwtAuthContext';
 import { JwtAuthContextType } from '@auth/services/jwt/JwtAuthContext';
 import { HTTPError } from 'ky';
 import { IUser } from '@/types/user.types';
+import { postMessageToPos } from '@/utils/posWindowRef';
 
 export type JwtSignInPayload = {
 	email: string;
@@ -156,6 +157,12 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 	 */
 	const signOut: JwtAuthContextType['signOut'] = useCallback(async () => {
 		try {
+			// Notify the POS window via cross-origin postMessage before invalidating the token
+			const posOrigin = window.location.hostname === 'localhost'
+				? 'http://localhost:4000'
+				: `https://pos.${window.location.hostname.replace('app.', '')}`;
+			postMessageToPos({ type: 'LOGOUT_EVENT', source: 'ERP' }, posOrigin);
+
 			await authLogout();
 		} catch (error) {
 			console.error('Logout failed:', error);

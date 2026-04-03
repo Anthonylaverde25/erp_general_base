@@ -13,6 +13,7 @@ import {
 	Monitor
 } from 'lucide-react';
 import { usePosLaunch } from '@/features/pos/hooks/usePosLaunch';
+import { setPosWindowRef } from '@/utils/posWindowRef';
 import { LauncherApp, LauncherExtension } from '../types';
 
 export function useLauncherApps() {
@@ -61,10 +62,12 @@ export function useLauncherApps() {
 				try {
 					const { data } = await launchPos();
 					const originB64 = btoa(window.location.origin);
-					window.open(`${posUrl}?lt=${data.launch_token}&tu=${originB64}`, '_blank', 'noopener,noreferrer');
+					const posWindow = window.open(`${posUrl}?lt=${data.launch_token}&tu=${originB64}`, '_blank');
+					setPosWindowRef(posWindow);
 				} catch (error) {
 					console.error('Failed to get POS launch token:', error);
-					window.open(posUrl, '_blank', 'noopener,noreferrer');
+					const posWindow = window.open(posUrl, '_blank');
+					setPosWindowRef(posWindow);
 				}
 			}
 		},
