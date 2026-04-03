@@ -82,6 +82,13 @@ export async function authUpdateDbUser(user: PartialDeep<User>): Promise<Respons
 }
 
 /**
+ * Sign out
+ */
+export async function authLogout(): Promise<void> {
+	await axiosInstance.post('auth/logout');
+}
+
+/**
  * Create user
  */
 export async function authCreateDbUser(user: PartialDeep<User>): Promise<User> {

@@ -9,7 +9,7 @@ export type JwtAuthContextType = FuseAuthProviderState<IUser> & {
 	updateUser: (U: PartialDeep<IUser>, options?: { onlyLocal?: boolean }) => Promise<Response>;
 	signIn?: (credentials: JwtSignInPayload) => Promise<{ user: IUser; access_token: string } | null>;
 	signUp?: (U: JwtSignUpPayload) => Promise<{ user: IUser; access_token: string } | null>;
-	signOut?: () => void;
+	signOut?: () => Promise<void> | void;
 	refreshToken?: () => Promise<string | Response>;
 };
 

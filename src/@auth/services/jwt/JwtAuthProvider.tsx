@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useImperativeHandle } from 'react';
 import { FuseAuthProviderComponentProps, FuseAuthProviderState } from '@fuse/core/FuseAuthProvider/types/FuseAuthTypes';
 import useLocalStorage from '@fuse/hooks/useLocalStorage';
-import { authRefreshToken, authSignIn, authSignInWithToken, authSignUp, authUpdateDbUser } from '@auth/authApi';
+import { authRefreshToken, authSignIn, authSignInWithToken, authSignUp, authUpdateDbUser, authLogout } from '@auth/authApi';
 import { User } from '../../user';
 import { removeGlobalHeaders, setGlobalHeaders } from '@/utils/api';
 import { isTokenValid } from './utils/jwtUtils';
@@ -154,14 +154,20 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 	/**
 	 * Sign out
 	 */
-	const signOut: JwtAuthContextType['signOut'] = useCallback(() => {
-		removeTokenStorageValue();
-		removeGlobalHeaders(['Authorization']);
-		setAuthState({
-			authStatus: 'unauthenticated',
-			isAuthenticated: false,
-			user: null
-		});
+	const signOut: JwtAuthContextType['signOut'] = useCallback(async () => {
+		try {
+			await authLogout();
+		} catch (error) {
+			console.error('Logout failed:', error);
+		} finally {
+			removeTokenStorageValue();
+			removeGlobalHeaders(['Authorization']);
+			setAuthState({
+				authStatus: 'unauthenticated',
+				isAuthenticated: false,
+				user: null
+			});
+		}
 	}, [removeTokenStorageValue]);
 
 	/**
