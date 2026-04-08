@@ -173,8 +173,8 @@ export function DocumentCreateProvider({
     const onSubmitIssue = handleSubmit(
         async (values) => {
             const nextStatus = copy.nextStatus || "issued";
-            // Mandatory check for series ONLY on non-draft flows that require numbering
-            if (!values.number_series_id && !['QUO', 'PQUO', 'DLV', 'PDLV'].includes(currentDocumentType?.code)) {
+            // Mandatory check for series ONLY on non-draft sales flows that require numbering
+            if (operation === 'sale' && !values.number_series_id && !['QUO', 'DLV'].includes(currentDocumentType?.code)) {
                 alert("Para procesar el documento es obligatorio seleccionar una serie de numeración.");
                 return;
             }
