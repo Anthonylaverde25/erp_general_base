@@ -11,11 +11,11 @@ interface DocumentShowFloatingToolbarProps {
     onDuplicateClick?: () => void
 }
 
-export function DocumentShowFloatingToolbar({ 
-    className, 
+export function DocumentShowFloatingToolbar({
+    className,
     document,
-    onMoreClick, 
-    onPaymentClick, 
+    onMoreClick,
+    onPaymentClick,
     onDetailsClick,
     onDuplicateClick,
 }: DocumentShowFloatingToolbarProps) {
@@ -44,7 +44,11 @@ export function DocumentShowFloatingToolbar({
             {/* Share & More */}
             <ToolbarButton icon={Share2} label="Compartir" />
 
-            <ToolbarButton icon={CreditCard} label="Consignar pago" onClick={onPaymentClick} />
+            {
+                document.canReceivePayments() && (
+                    <ToolbarButton icon={CreditCard} label="Consignar pago" onClick={onPaymentClick} />
+                )
+            }
             <ToolbarButton icon={MoreHorizontal} label="Más" onClick={onMoreClick} />
         </div>
     )

@@ -7,6 +7,7 @@ import { DocumentPageFooter } from "./components/paper/DocumentPageFooter";
 import { DocumentPageSummary } from "./components/paper/DocumentPageSummary";
 import { DocumentPaperHeader } from "./components/paper/DocumentPaperHeader";
 import { QuoteStatusWatermark } from "./components/paper/QuoteStatusWatermark";
+import DocumentSuccessorAlert from "./DocumentSuccessorAlert";
 import {
   chunkArray,
   LINES_PER_PAGE,
@@ -24,6 +25,12 @@ export default function DocumentShowPaper({
 }: DocumentShowPaperProps) {
   const muiTheme = useTheme();
   const isDark = muiTheme.palette.mode === "dark";
+
+  console.log("document", document.canReceivePayments());
+  console.log("document status", document.documentStatus);
+  // console.log("¿Es instancia?", document instanceof DocumentEntity);
+  // console.log("Método:", document.canReceivePayments);
+
 
   const isProcessableDocType = [
     "QUO",
@@ -49,12 +56,12 @@ export default function DocumentShowPaper({
   }, [document.lines, document.predecessors]);
 
   const totalPages = pages.length;
-  const validationUrl = `https://erp.tuempresa.com/verify/${
-    document.id || document.number_serie
-  }`;
+  const validationUrl = `https://erp.tuempresa.com/verify/${document.id || document.number_serie
+    }`;
 
   return (
     <div className="flex flex-col gap-6 items-center w-full">
+      <DocumentSuccessorAlert document={document} />
       {pages.map((pageLines, pageIndex) => {
         const isFirstPage = pageIndex === 0;
         const isLastPage = pageIndex === totalPages - 1;

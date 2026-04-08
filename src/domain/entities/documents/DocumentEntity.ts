@@ -58,6 +58,7 @@ export interface ParentDocumentInfo {
     id: number;
     number_serie: string;
     document_type_name: string | null;
+    document_type_code?: string | null;
     issue_date?: string | null;
     total?: number;
     total_paid?: number;
@@ -118,14 +119,18 @@ export class DocumentEntity {
         const defaultContact = contactList.find((contact: any) => contact?.default);
         const fallbackContact = contactList[0];
 
-        const predecessors: ParentDocumentInfo[] = Array.isArray(json.predecessors) 
+        const predecessors: ParentDocumentInfo[] = Array.isArray(json.predecessors)
             ? json.predecessors.map((p: any) => ({
                 id: Number(p.id),
                 number_serie: p.number_serie,
-                document_type_name: p.document_type_name,
+                document_type_name: p.document_type_name || null,
+                document_type_code: p.document_type_code || null,
                 issue_date: p.issue_date || null,
+                total: p.total !== undefined ? Number(p.total) : undefined,
+                total_paid: p.total_paid !== undefined ? Number(p.total_paid) : undefined,
+                balance: p.balance !== undefined ? Number(p.balance) : undefined,
                 status: p.status || null
-            })) 
+            }))
             : [];
 
         const lines: DocumentLine[] = Array.isArray(json.lines)
@@ -183,7 +188,8 @@ export class DocumentEntity {
             ? json.successors.map((s: any) => ({
                 id: Number(s.id),
                 number_serie: s.number_serie,
-                document_type_name: s.document_type_name,
+                document_type_name: s.document_type_name || null,
+                document_type_code: s.document_type_code || null,
                 issue_date: s.issue_date || null,
                 total: s.total !== undefined ? Number(s.total) : undefined,
                 total_paid: s.total_paid !== undefined ? Number(s.total_paid) : undefined,
@@ -231,5 +237,25 @@ export class DocumentEntity {
             predecessors,
             successors
         );
+    }
+
+    public canReceivePayments(): boolean {
+        if (this.document_type_code === 'DLV' && this.status.key === 'invoiced') {
+            return false;
+        }
+        return true;
+    }
+
+    static getDocumentLink(id: number | string, operation: 'sale' | 'purchase'): string {
+        const module = operation === 'sale' ? 'sales' : 'purchases';
+        return `/${module}/view/${id}`;
+    }
+
+    get viewLink(): string {
+        return DocumentEntity.getDocumentLink(this.id, this.operation);
+    }
+
+    get documentStatus() {
+        return this.status?.key;
     }
 }
