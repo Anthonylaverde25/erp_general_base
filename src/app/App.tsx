@@ -16,6 +16,7 @@ import { NavbarContextProvider } from '@/components/theme-layouts/components/nav
 import { QuickPanelProvider } from '@/components/theme-layouts/components/quickPanel/contexts/QuickPanelContext/QuickPanelContextProvider';
 import RootThemeProvider from '@/contexts/RootThemeProvider';
 import { NavigationContextProvider } from '@/components/theme-layouts/components/navigation/contexts/NavigationContextProvider';
+import BroadcastingProvider from '@/providers/BroadcastingProvider';
 import ReactQueryProvider from '@/providers/ReactQueryProvider';
 import { Toaster } from 'sonner';
 
@@ -37,41 +38,43 @@ function App() {
 				>
 					<ReactQueryProvider>
 						<Authentication>
-							<FuseSettingsProvider>
-								<I18nProvider>
-									{/* Theme Provider */}
-									<RootThemeProvider>
-										<MainThemeProvider>
-											<NavbarContextProvider>
-												<NavigationContextProvider>
-													<FuseDialogContextProvider>
-														{/* Notistack Notification Provider */}
-														<SnackbarProvider
-															maxSnack={5}
-															anchorOrigin={{
-																vertical: 'bottom',
-																horizontal: 'right'
-															}}
-															classes={{
-																containerRoot:
-																	'bottom-0 right-0 mb-13 md:mb-17 mr-2 lg:mr-20 z-99'
-															}}
-														>
-															<QuickPanelProvider>
-																<FuseLayout layouts={themeLayouts} />
-															</QuickPanelProvider>
-														</SnackbarProvider>
-													</FuseDialogContextProvider>
-												</NavigationContextProvider>
-											</NavbarContextProvider>
-											<Toaster
-												richColors
-												position="bottom-right"
-											/>
-										</MainThemeProvider>
-									</RootThemeProvider>
-								</I18nProvider>
-							</FuseSettingsProvider>
+							<BroadcastingProvider>
+								<FuseSettingsProvider>
+									<I18nProvider>
+										{/* Theme Provider */}
+										<RootThemeProvider>
+											<MainThemeProvider>
+												<NavbarContextProvider>
+													<NavigationContextProvider>
+														<FuseDialogContextProvider>
+															{/* Notistack Notification Provider */}
+															<SnackbarProvider
+																maxSnack={5}
+																anchorOrigin={{
+																	vertical: 'bottom',
+																	horizontal: 'right'
+																}}
+																classes={{
+																	containerRoot:
+																		'bottom-0 right-0 mb-13 md:mb-17 mr-2 lg:mr-20 z-99'
+																}}
+															>
+																<QuickPanelProvider>
+																	<FuseLayout layouts={themeLayouts} />
+																</QuickPanelProvider>
+															</SnackbarProvider>
+														</FuseDialogContextProvider>
+													</NavigationContextProvider>
+												</NavbarContextProvider>
+												<Toaster
+													richColors
+													position="bottom-right"
+												/>
+											</MainThemeProvider>
+										</RootThemeProvider>
+									</I18nProvider>
+								</FuseSettingsProvider>
+							</BroadcastingProvider>
 						</Authentication>
 					</ReactQueryProvider>
 				</LocalizationProvider>
