@@ -1,23 +1,29 @@
 import FusePageCarded from '@fuse/core/FusePageCarded';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useIndexDocuments } from '@/features/documents/hooks/useIndexDocuments';
 import GroupedInvoicesTable from './components/grouped-invoices-table';
 import GroupedBillingStats from './components/GroupedBillingStats';
 import DocumentsHeader from '../components/DocumentsHeader';
+import { SAP_THEME } from './components/grouped-invoices-table/theme';
 
-const Root = styled(FusePageCarded)(() => ({
+const Root = styled(FusePageCarded)(({ theme }) => ({
+	padding: '0!important',
 	'& .container': {
 		maxWidth: '100%!important',
 		display: 'flex',
 		flexDirection: 'column',
+		backgroundColor: (props) => props.theme.palette?.background?.default || '#f8fafc',
+	},
+	'& .FusePageCarded-content': {
+		backgroundColor: (props) => props.theme.palette?.background?.default || '#f8fafc',
 	}
 }));
 
 /**
  * GroupedInvoicesPage
- * Vista Workbench para la Facturación Agrupada.
+ * Vista Workbench para la Facturación Agrupada rediseñada bajo SAP Fiori Horizon.
  */
 export default function GroupedInvoicesPage() {
 	const { t } = useTranslation('navigation');
@@ -33,24 +39,24 @@ export default function GroupedInvoicesPage() {
 	return (
 		<Root
 			header={
-				<Box>
+				<Box className='mb-3' sx={{ bgcolor: 'background.paper' }}>
 					<DocumentsHeader
 						operation="sale"
 						title={t('GROUPED_INVOICES') || 'Facturación Agrupada'}
 					/>
-					<Box className="p-2 mb-3">
+					<Box sx={{ p: 2, pb: 1 }}>
 						<GroupedBillingStats documents={documents || []} />
 					</Box>
 				</Box>
 			}
 			content={
 				<Box>
-					<GroupedInvoicesTable
+					< GroupedInvoicesTable
 						documents={documents}
 						isLoading={isLoading}
 						onStatusUpdated={refetch}
 					/>
-				</Box>
+				</Box >
 			}
 		/>
 	);

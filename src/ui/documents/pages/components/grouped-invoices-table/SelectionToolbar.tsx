@@ -1,6 +1,5 @@
 import { Box, Stack, Typography, Button, Divider, alpha } from '@mui/material';
-import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { FileStack, X } from 'lucide-react';
+import { FileStack, X, Copy } from 'lucide-react';
 import { SAP_THEME } from './theme';
 
 interface SelectionToolbarProps {
@@ -17,108 +16,106 @@ export default function SelectionToolbar({ selectedCount, totalAmount, onCancel,
     return (
         <Box
             sx={{
-                position: 'sticky', top: 0, zIndex: 10,
-                bgcolor: 'rgba(255, 255, 255, 0.85)',
-                backdropFilter: 'blur(10px)',
-                borderBottom: `2px solid ${SAP_THEME.primary}`,
-                boxShadow: '0 4px 20px -5px rgba(0,0,0,0.1)',
+                position: 'sticky', 
+                top: 0, 
+                zIndex: 200,
+                bgcolor: (theme) => alpha(theme.palette?.background?.paper || '#ffffff', 0.90),
+                backdropFilter: 'blur(8px)',
+                borderBottom: (theme) => `2px solid ${theme.palette?.primary?.main || SAP_THEME.primary}`,
+                boxShadow: (theme) => theme.shadows?.[2] || '0 2px 8px rgba(0,0,0,0.05)',
                 mb: 0.5,
                 transition: SAP_THEME.transition
             }}
         >
-            <Box className="flex flex-col md:flex-row items-center justify-between p-3 gap-4">
-                <Stack direction="row" alignItems="center" spacing={4} divider={<Divider orientation="vertical" flexItem sx={{ bgcolor: SAP_THEME.border, height: 28, my: 'auto' }} />}>
+            <Box className="flex flex-col md:flex-row items-center justify-between p-1.5 gap-4">
+                <Stack 
+                    direction="row" 
+                    alignItems="center" 
+                    spacing={4} 
+                    divider={<Divider orientation="vertical" flexItem sx={{ height: 24, my: 'auto' }} />}
+                >
                     <Box>
-                        <Typography variant="caption" sx={{ color: SAP_THEME.textSecondary, fontWeight: 700, textTransform: 'uppercase', display: 'block', letterSpacing: 1 }}>
-                            Selección
+                        <Typography sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: 1 }}>
+                            Seleccionados
                         </Typography>
-                        <Typography variant="h5" fontWeight={800} color="primary.main" sx={{ letterSpacing: -1 }}>
-                            {selectedCount} <Typography component="span" variant="body1" sx={{ fontWeight: 500, color: 'text.secondary' }}>{selectedCount === 1 ? 'Ítem' : 'Ítems'}</Typography>
+                        <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, color: (theme) => theme.palette?.primary?.main || SAP_THEME.primary, letterSpacing: -0.5, lineHeight: 1 }}>
+                            {selectedCount} <Typography component="span" sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{selectedCount === 1 ? 'ÍTÉM' : 'ÍTÉMS'}</Typography>
                         </Typography>
                     </Box>
 
                     <Box>
-                        <Typography variant="caption" sx={{ color: SAP_THEME.textSecondary, fontWeight: 700, textTransform: 'uppercase', display: 'block', letterSpacing: 1 }}>
+                        <Typography sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: 1 }}>
                             Importe Acumulado
                         </Typography>
-                        <Typography variant="h5" fontWeight={900} sx={{ letterSpacing: -1 }}>
+                        <Typography sx={{ fontSize: '1.25rem', fontWeight: 900, color: 'text.primary', letterSpacing: -0.5, lineHeight: 1 }}>
                             {formatCurrency(totalAmount)}
                         </Typography>
                     </Box>
                 </Stack>
 
-                <Stack direction="row" spacing={1.5}>
+                <Stack direction="row" spacing={1}>
                     <Button
-                        size="medium"
+                        size="small"
                         variant="text"
-                        color="inherit"
                         onClick={onCancel}
                         sx={{ 
-                            textTransform: 'none', 
-                            fontWeight: 600, 
-                            px: 2,
-                            fontSize: '0.85rem',
-                            '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' } 
+                            textTransform: 'uppercase', 
+                            fontWeight: 700, 
+                            px: 1.5,
+                            fontSize: '0.7rem',
+                            letterSpacing: 0.5,
+                            color: 'text.secondary',
+                            '&:hover': { bgcolor: 'action.hover' } 
                         }}
-                        startIcon={<X size={18} />}
+                        startIcon={<X size={14} />}
                     >
-                        Cancelar selección
+                        Anular
                     </Button>
                     <Button
                         variant="contained"
                         disableElevation
                         onClick={onConfirm}
                         sx={{
-                            textTransform: 'none',
-                            fontWeight: 700,
-                            px: 3,
-                            py: 0.8,
-                            borderRadius: '8px',
-                            bgcolor: SAP_THEME.primary,
-                            fontSize: '0.85rem',
-                            letterSpacing: -0.1,
-                            boxShadow: `0 4px 12px -2px ${alpha(SAP_THEME.primary, 0.2)}`,
-                            transition: 'all 0.2s ease-in-out',
+                            textTransform: 'uppercase',
+                            fontWeight: 800,
+                            px: 2,
+                            py: 0.5,
+                            borderRadius: '4px',
+                            bgcolor: (theme) => theme.palette?.primary?.main || SAP_THEME.primary,
+                            color: (theme) => theme.palette?.primary?.contrastText || '#ffffff',
+                            fontSize: '0.7rem',
+                            letterSpacing: 0.5,
                             '&:hover': {
-                                bgcolor: '#064280',
-                                transform: 'translateY(-1px)',
-                                boxShadow: `0 6px 15px -3px ${alpha(SAP_THEME.primary, 0.3)}`,
-                            },
-                            '&:active': {
-                                transform: 'translateY(0px)',
+                                bgcolor: (theme) => theme.palette?.primary?.dark || '#00446a',
+                                boxShadow: '0 4px 10px rgba(0, 84, 131, 0.2)'
                             }
                         }}
-                        startIcon={<FuseSvgIcon size={18}>heroicons-outline:document-duplicate</FuseSvgIcon>}
+                        startIcon={<Copy size={16} />}
                     >
                         Generar Factura Agrupada
                     </Button>
                     <Button
-                        variant="contained"
+                        variant="outlined"
                         disableElevation
                         onClick={onConfirm2}
                         sx={{
-                            textTransform: 'none',
-                            fontWeight: 700,
-                            px: 3,
-                            py: 0.8,
-                            borderRadius: '8px',
-                            bgcolor: '#3b82f6', // blue-500
-                            fontSize: '0.85rem',
-                            letterSpacing: -0.1,
-                            boxShadow: `0 4px 12px -2px ${alpha('#3b82f6', 0.2)}`,
-                            transition: 'all 0.2s ease-in-out',
+                            textTransform: 'uppercase',
+                            fontWeight: 800,
+                            px: 2,
+                            py: 0.5,
+                            borderRadius: '4px',
+                            borderColor: (theme) => theme.palette?.primary?.main || SAP_THEME.primary,
+                            color: (theme) => theme.palette?.primary?.main || SAP_THEME.primary,
+                            fontSize: '0.7rem',
+                            letterSpacing: 0.5,
                             '&:hover': {
-                                bgcolor: '#2563eb', // blue-600
-                                transform: 'translateY(-1px)',
-                                boxShadow: `0 6px 15px -3px ${alpha('#3b82f6', 0.3)}`,
-                            },
-                            '&:active': {
-                                transform: 'translateY(0px)',
+                                bgcolor: 'action.hover',
+                                borderColor: (theme) => theme.palette?.primary?.main || SAP_THEME.primary,
                             }
                         }}
-                        startIcon={<FileStack size={18} />}
+                        startIcon={<FileStack size={14} />}
                     >
-                        Generar Facturación Agrupada 2
+                        Multifacturación
                     </Button>
                 </Stack>
             </Box>

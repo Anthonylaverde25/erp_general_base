@@ -8,7 +8,7 @@ export type NextAction = {
   variant: "indigo" | "green";
 };
 
-const INVOICE_CODES = ["INV", "PINV"];
+const INVOICE_CODES = ["INV", "PINV", "TKT", "CN", "PCN"];
 const DELIVERY_CODES = ["DLV", "PDLV"];
 const QUOTE_CODES = ["QUO", "PQUO"];
 const PURCHASE_ORDER_CODES = ["PORD"];

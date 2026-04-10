@@ -48,6 +48,7 @@ export function LifecycleStepper({
   if (!steps) return <div />;
 
   const currentIdx = steps.findIndex((step) => step.key === currentKey);
+  console.log('steps', steps)
 
   return (
     <ol className="flex items-center h-full">
@@ -147,7 +148,7 @@ export function PostDeliveredActions({
   onOpenPurchaseOrder: () => void;
 }) {
   const navigate = useNavigate();
-  
+
   // States for Albaran Split Button
   const [openAlbaran, setOpenAlbaran] = useState(false);
   const anchorRefAlbaran = useRef<HTMLDivElement>(null);

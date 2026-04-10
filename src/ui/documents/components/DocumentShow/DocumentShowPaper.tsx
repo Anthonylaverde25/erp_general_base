@@ -39,6 +39,7 @@ export default function DocumentShowPaper({
     "PORD",
     "DLV",
     "PDLV",
+    "TKT",
   ].includes(document.document_type_code || "");
   const hasPredecessors = (document.predecessors?.length ?? 0) > 0;
   const hasDiscounts = document.lines.some((line) => line.discount_percent > 0);

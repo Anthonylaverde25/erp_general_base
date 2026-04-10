@@ -1,6 +1,7 @@
-import { Box, Paper, Typography, Avatar } from "@mui/material";
+import { Box, Paper, Typography, alpha } from "@mui/material";
 import { FileText, Users, Calculator } from "lucide-react";
 import { DocumentEntity } from "@/domain/entities/documents/DocumentEntity";
+import { SAP_THEME } from "./grouped-invoices-table/theme";
 
 interface GroupedBillingStatsProps {
 	documents: DocumentEntity[];
@@ -16,22 +17,25 @@ export default function GroupedBillingStats({ documents }: GroupedBillingStatsPr
 
 	const stats = [
 		{
-			label: 'Total Pendiente',
+			label: 'TOTAL PENDIENTE',
 			value: formatCurrency(totalPending),
 			subtitle: 'Importe bruto a facturar',
-			icon: <Calculator size={18} />
+			icon: <Calculator size={16} />,
+			color: SAP_THEME.primary,
 		},
 		{
-			label: 'Documentos',
+			label: 'DOCUMENTOS',
 			value: documents.length.toString(),
 			subtitle: 'Albaranes listos para procesar',
-			icon: <FileText size={18} />
+			icon: <FileText size={16} />,
+			color: '#64748b', // Technical slate gray
 		},
 		{
-			label: 'Partners',
+			label: 'PARTNERS',
 			value: uniquePartners.toString(),
 			subtitle: 'Clientes con deuda pendiente',
-			icon: <Users size={18} />
+			icon: <Users size={16} />,
+			color: '#64748b', // Technical slate gray
 		}
 	];
 
@@ -40,50 +44,85 @@ export default function GroupedBillingStats({ documents }: GroupedBillingStatsPr
 			sx={{
 				display: 'grid',
 				gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
-				gap: 2
+				gap: 2,
+				mb: 1
 			}}
 		>
 			{stats.map((stat) => (
 				<Paper
 					key={stat.label}
-					variant="outlined"
+					elevation={0}
 					sx={{
-						p: 3,
-						borderColor: 'divider',
+						p: 2.5,
+						border: (theme) => `1px solid ${theme.palette.divider}`,
+						borderLeft: `4px solid ${stat.color}`,
+						borderRadius: SAP_THEME.borderRadius,
 						bgcolor: 'background.paper',
 						display: 'flex',
 						flexDirection: 'column',
-						gap: 2
+						justifyContent: 'center',
+						gap: 1.5,
+						transition: SAP_THEME.transition,
+						'&:hover': {
+							boxShadow: (theme) => theme.shadows[1],
+							transform: 'translateY(-1px)'
+						}
 					}}
 				>
-					<Box className="flex items-center gap-3">
-						<Avatar sx={{ width: 32, height: 32, bgcolor: 'action.selected', color: 'text.primary' }}>{stat.icon}</Avatar>
-						<Box>
+					<Box className="flex items-center justify-between">
+						<Box className="flex items-center gap-2">
+							<Box 
+								sx={{ 
+									p: 0.75, 
+									borderRadius: '4px', 
+									bgcolor: alpha(stat.color, 0.08), 
+									color: stat.color,
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center'
+								}}
+							>
+								{stat.icon}
+							</Box>
 							<Typography
-								variant="body2"
-								fontWeight={600}
-								sx={{ fontSize: '0.85rem' }}
+								sx={{ 
+									fontSize: '0.65rem', 
+									fontWeight: 800, 
+									color: 'text.secondary',
+									letterSpacing: 1,
+									textTransform: 'uppercase'
+								}}
 							>
 								{stat.label}
-							</Typography>
-							<Typography
-								variant="caption"
-								color="text.secondary"
-							>
-								{stat.subtitle}
 							</Typography>
 						</Box>
 					</Box>
 
-					<Typography
-						sx={{
-							fontSize: '1.5rem',
-							fontWeight: 800,
-							color: 'text.primary'
-						}}
-					>
-						{stat.value}
-					</Typography>
+					<Box>
+						<Typography
+							sx={{
+								fontSize: '1.75rem',
+								fontWeight: 900,
+								color: stat.color === SAP_THEME.primary ? SAP_THEME.primary : 'text.primary',
+								lineHeight: 1,
+								letterSpacing: -1
+							}}
+						>
+							{stat.value}
+						</Typography>
+						<Typography
+							variant="caption"
+							sx={{ 
+								color: 'text.secondary', 
+								fontWeight: 500,
+								mt: 0.5,
+								display: 'block',
+								opacity: 0.8
+							}}
+						>
+							{stat.subtitle}
+						</Typography>
+					</Box>
 				</Paper>
 			))}
 		</Box>
