@@ -64,7 +64,8 @@ const navigationConfig: FuseNavItemType[] = [
 						type: 'item',
 						icon: 'lucide:receipt',
 						url: '/sales/INV?item_type=product',
-						quickCreateUrl: '/sales/create/INV?item_type=product'					},
+						quickCreateUrl: '/sales/create/INV?item_type=product'
+					},
 					{
 						id: 'sales.quotes',
 						title: 'Presupuestos',
@@ -296,6 +297,7 @@ const navigationConfig: FuseNavItemType[] = [
 		type: 'group',
 		icon: 'lucide:wallet',
 		children: [
+
 			{
 				id: 'accounting',
 				title: 'Accounting',
@@ -379,6 +381,24 @@ const navigationConfig: FuseNavItemType[] = [
 						icon: 'lucide:wallet'
 					}
 				]
+			}
+		]
+	},
+	{
+		id: 'caja',
+		title: 'Caja',
+		translate: 'CAJA',
+		subtitle: 'Caja',
+		type: 'group',
+		icon: 'lucide:users-2',
+		children: [
+			{
+				id: 'caja.caja',
+				title: 'Caja',
+				translate: 'CAJA',
+				type: 'item',
+				url: '/cash-register',
+				icon: 'lucide:cash-register'
 			}
 		]
 	},
