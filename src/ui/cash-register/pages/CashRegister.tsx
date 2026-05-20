@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import FusePageCarded from '@fuse/core/FusePageCarded';
+import FusePageSimple from '@fuse/core/FusePageSimple';
 import { Box, Typography, Snackbar, Alert, useTheme } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import { History as HistoryIcon } from 'lucide-react';
@@ -10,10 +10,20 @@ import CashRegisterMetrics from '../components/CashRegisterMetrics';
 import CashRegisterActionBar from '../components/CashRegisterActionBar';
 import CashRegisterReconciliationDialog from '../components/CashRegisterReconciliationDialog';
 
-const Root = styled(FusePageCarded)(() => ({
-	'& .container': {
-		maxWidth: '100%!important'
-	}
+const Root = styled(FusePageSimple)(({ theme }) => ({
+	'& .FusePageSimple-header': {
+		backgroundColor: theme.vars.palette.background.paper,
+		borderBottomWidth: 1,
+		borderStyle: 'solid',
+		borderColor: theme.vars.palette.divider,
+	},
+	'& .FusePageSimple-content': {
+		display: 'flex',
+		flexDirection: 'column',
+		flex: '1 1 auto',
+		padding: 0,
+		backgroundColor: theme.vars.palette.background.default,
+	},
 }));
 
 export default function CashRegister() {
@@ -49,7 +59,7 @@ export default function CashRegister() {
 				}
 
 				content={
-					<Box sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+					<Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', bgcolor: 'background.default', p: 3, gap: 4 }}>
 						{/* Fila superior de Métricas e Información */}
 						<CashRegisterMetrics
 							saldoInicial={saldoInicial}
@@ -84,6 +94,7 @@ export default function CashRegister() {
 						<CashRegisterTable onPendingUpdate={setPendingApprovals} />
 					</Box>
 				}
+				scroll="content"
 			/>
 
 			<CashRegisterReconciliationDialog

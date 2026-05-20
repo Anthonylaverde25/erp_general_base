@@ -1,14 +1,25 @@
-import FusePageCarded from '@fuse/core/FusePageCarded';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import styled from 'styled-components';
+import FusePageSimple from '@fuse/core/FusePageSimple';
+import { styled } from '@mui/material/styles';
+import { Box } from '@mui/material';
 import ItemsHeader from '../components/ItemsHeader';
 import ItemsTabView from '../components/ItemsTabView';
 
-const Root = styled(FusePageCarded)(() => ({
-	'& .container': {
-		maxWidth: '100%!important'
-	}
+const Root = styled(FusePageSimple)(({ theme }) => ({
+	'& .FusePageSimple-header': {
+		backgroundColor: theme.vars.palette.background.paper,
+		borderBottomWidth: 1,
+		borderStyle: 'solid',
+		borderColor: theme.vars.palette.divider,
+	},
+	'& .FusePageSimple-content': {
+		display: 'flex',
+		flexDirection: 'column',
+		flex: '1 1 auto',
+		padding: 0,
+		backgroundColor: theme.vars.palette.background.default,
+	},
 }));
 
 export default function ItemsPage() {
@@ -36,11 +47,14 @@ export default function ItemsPage() {
 				/>
 			}
 			content={
-				<ItemsTabView
-					currentTab={currentTab}
-					onTabChange={handleTabChange}
-				/>
+				<Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', bgcolor: 'background.default', p: 3 }}>
+					<ItemsTabView
+						currentTab={currentTab}
+						onTabChange={handleTabChange}
+					/>
+				</Box>
 			}
+			scroll="content"
 		/>
 	);
 }

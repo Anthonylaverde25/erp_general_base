@@ -1,7 +1,6 @@
-import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { Save } from '@mui/icons-material';
-import { Button, Typography } from '@mui/material';
-import PageBreadcrumb from '@/components/PageBreadcrumb';
+import { Button, CircularProgress } from '@mui/material';
+import { Save } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 type CreateItemPageHeaderProps = {
 	itemType: 'physical' | 'service';
@@ -22,73 +21,61 @@ function CreateItemPageHeader({
 }: CreateItemPageHeaderProps) {
 	const isEditMode = mode === 'edit';
 
+	const titleText =
+		itemType === 'service'
+			? isEditMode
+				? 'Editar Servicio'
+				: 'Nuevo Servicio'
+			: isEditMode
+				? 'Editar Producto'
+				: 'Nuevo Producto';
+
+	const subtitleText =
+		itemType === 'service'
+			? isEditMode
+				? 'Actualiza la información del servicio.'
+				: 'Información necesaria para registrar un nuevo servicio.'
+			: isEditMode
+				? 'Actualiza la información del producto físico.'
+				: 'Información necesaria para registrar un nuevo producto físico.';
+
 	return (
-		<div className="bg-background-default flex w-full flex-1 flex-col items-center justify-between space-y-2 border-b p-0 pb-4 sm:flex-row sm:space-y-0">
-			<div className="flex flex-col items-start">
-				<PageBreadcrumb className="mb-4" />
-				<div className="flex items-center gap-3">
+		<PageHeader
+			title={titleText}
+			subtitle={subtitleText}
+			onBack={onCancel}
+			actions={
+				<>
 					<Button
-						className="text-text-secondary hover:text-text-primary h-8 w-8 min-w-0 rounded-full p-0"
+						variant="text"
+						color="inherit"
 						onClick={onCancel}
+						disabled={isLoading}
+						className="px-4"
+						sx={{ textTransform: 'none', fontWeight: 700 }}
 					>
-						<FuseSvgIcon>heroicons-outline:arrow-left</FuseSvgIcon>
+						Cancelar
 					</Button>
-					<div>
-						<Typography
-							variant="h2"
-							className="text-text-primary text-2xl font-bold tracking-tight"
-						>
-							{itemType === 'service'
-								? isEditMode
-									? 'Editar Servicio'
-									: 'Nuevo Servicio'
-								: isEditMode
-									? 'Editar Producto'
-									: 'Nuevo Producto'}
-						</Typography>
-						<Typography
-							variant="body2"
-							className="text-text-secondary"
-						>
-							{itemType === 'service'
-								? isEditMode
-									? 'Actualiza la información del servicio.'
-									: 'Información necesaria para registrar un nuevo servicio.'
-								: isEditMode
-									? 'Actualiza la información del producto físico.'
-									: 'Información necesaria para registrar un nuevo producto físico.'}
-						</Typography>
-					</div>
-				</div>
-			</div>
-			<div className="flex gap-3">
-				<Button
-					variant="text"
-					color="inherit"
-					onClick={onCancel}
-					disabled={isLoading}
-					className="px-4"
-				>
-					Cancelar
-				</Button>
-				<Button
-					onClick={onSave}
-					variant="contained"
-					color="secondary"
-					disabled={!isValid || isLoading}
-					startIcon={isLoading ? undefined : <Save />}
-					className="px-6 shadow-none hover:shadow-sm"
-				>
-					{isLoading
-						? isEditMode
-							? 'Actualizando...'
-							: 'Guardando...'
-						: isEditMode
-							? `Actualizar ${itemType === 'service' ? 'Servicio' : 'Producto'}`
-							: `Guardar ${itemType === 'service' ? 'Servicio' : 'Producto'}`}
-				</Button>
-			</div>
-		</div>
+					<Button
+						onClick={onSave}
+						variant="contained"
+						color="secondary"
+						disabled={!isValid || isLoading}
+						startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : <Save size={18} />}
+						className="px-6 shadow-none hover:shadow-sm"
+						sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '4px' }}
+					>
+						{isLoading
+							? isEditMode
+								? 'Actualizando...'
+								: 'Guardando...'
+							: isEditMode
+								? `Actualizar ${itemType === 'service' ? 'Servicio' : 'Producto'}`
+								: `Guardar ${itemType === 'service' ? 'Servicio' : 'Producto'}`}
+					</Button>
+				</>
+			}
+		/>
 	);
 }
 

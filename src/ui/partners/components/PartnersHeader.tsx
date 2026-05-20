@@ -1,7 +1,7 @@
-import { Button, ButtonGroup, Typography, Box, Stack, useTheme } from '@mui/material';
+import { Button } from '@mui/material';
 import { Link } from 'react-router';
-import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import PageBreadcrumb from '@/components/PageBreadcrumb';
+import { Plus, UserPlus } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 interface PartnersHeaderProps {
 	onCreate?: () => void;
@@ -18,57 +18,39 @@ const TAB_TITLES: Record<string, string> = {
 
 function PartnersHeader(props: PartnersHeaderProps) {
 	const { onCreate, selectedTab = 'all' } = props;
-	const theme = useTheme();
 
 	const title = TAB_TITLES[selectedTab] || 'Socios';
 
 	return (
-		<Box
-			className="container"
-			sx={{ p: 0, pb: 2 }}
-		>
-			<PageBreadcrumb className="mb-4" />
-			<Stack
-				direction="row"
-				justifyContent="space-between"
-				alignItems="center"
-				spacing={2}
-			>
-				<Box>
-					<Typography
-						variant="h2"
-						className="text-3xl font-bold tracking-tight"
-					>
-						{title}
-					</Typography>
-					<Typography
-						variant="subtitle1"
-						color="text.secondary"
-					>
-						Manage your business partners
-					</Typography>
-				</Box>
-				<ButtonGroup
-					variant="contained"
-					color="secondary"
-					aria-label="create partner button group"
-				>
+		<PageHeader
+			title={title}
+			subtitle="Gestiona la información de tus socios comerciales, clientes y proveedores."
+			actions={
+				<>
 					<Button
-						startIcon={<FuseSvgIcon size={20}>heroicons-outline:plus</FuseSvgIcon>}
 						onClick={onCreate}
+						variant="outlined"
+						color="secondary"
+						size="small"
+						startIcon={<Plus size={18} />}
+						sx={{ textTransform: 'none', fontWeight: 700, borderRadius: '4px' }}
 					>
-						Create Partner
+						Crear Socio (Rápido)
 					</Button>
 					<Button
 						component={Link}
 						to="create"
-						startIcon={<FuseSvgIcon size={20}>heroicons-outline:plus-circle</FuseSvgIcon>}
+						variant="contained"
+						color="secondary"
+						size="small"
+						startIcon={<UserPlus size={18} />}
+						sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '4px' }}
 					>
-						Create Partner 2
+						Crear Socio (Detallado)
 					</Button>
-				</ButtonGroup>
-			</Stack>
-		</Box>
+				</>
+			}
+		/>
 	);
 }
 

@@ -1,6 +1,6 @@
 import IconButton from '@mui/material/IconButton';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { useQuickPanelContext } from './contexts/QuickPanelContext/useQuickPanelContext';
+import { Link } from 'react-router';
 
 type QuickPanelToggleButtonProps = {
 	className?: string;
@@ -11,12 +11,12 @@ type QuickPanelToggleButtonProps = {
  * The quick panel toggle button.
  */
 function QuickPanelToggleButton(props: QuickPanelToggleButtonProps) {
-	const { className = '', children = <FuseSvgIcon>lucide:bookmark</FuseSvgIcon> } = props;
-	const { toggleQuickPanel } = useQuickPanelContext();
+	const { className = '', children = <FuseSvgIcon>lucide:settings</FuseSvgIcon> } = props;
 
 	return (
 		<IconButton
-			onClick={() => toggleQuickPanel()}
+			component={Link}
+			to="/apps/settings"
 			className={className}
 		>
 			{children}

@@ -1,7 +1,7 @@
 import { MouseEvent, useState } from 'react';
-import { Add, ArrowDropDown } from '@mui/icons-material';
-import { Box, Button, ButtonGroup, Menu, MenuItem, Stack, Typography, useTheme } from '@mui/material';
-import PageBreadcrumb from '@/components/PageBreadcrumb';
+import { Button, ButtonGroup, Menu, MenuItem } from '@mui/material';
+import { Plus, ChevronDown } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 export type DocumentsHeaderProps = {
 	operation: 'purchase' | 'sale';
@@ -14,16 +14,15 @@ export type DocumentsHeaderProps = {
 const HEADER_COPY: Record<DocumentsHeaderProps['operation'], { title: string; subtitle: string }> = {
 	purchase: {
 		title: 'Documentos de Compra',
-		subtitle: 'Gestiona los documentos de compra'
+		subtitle: 'Gestiona los documentos de compra.'
 	},
 	sale: {
 		title: 'Documentos de Venta',
-		subtitle: 'Gestiona los documentos de venta'
+		subtitle: 'Gestiona los documentos de venta.'
 	}
 };
 
 function DocumentsHeader({ operation, onCreate, onCreateInvoice, onCreateDraft, title }: DocumentsHeaderProps) {
-	const theme = useTheme();
 	const copy = HEADER_COPY[operation];
 	const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
 	const isMenuOpen = Boolean(menuAnchorEl);
@@ -50,83 +49,63 @@ function DocumentsHeader({ operation, onCreate, onCreateInvoice, onCreateDraft, 
 		handleMenuClose();
 	};
 
-	return (
-		<Box
-			className="container"
-			sx={{ p: 0, pb: 2 }}
-		>
-			<PageBreadcrumb className="mb-4" />
-			<Stack
-				direction="row"
-				justifyContent="space-between"
-				alignItems="center"
-				spacing={2}
+	const actions = operation === 'sale' ? (
+		<>
+			<ButtonGroup
+				variant="contained"
+				color="secondary"
+				size="small"
+				disableElevation
+				sx={{ borderRadius: '4px' }}
 			>
-				<Box>
-					<Typography
-						variant="h2"
-						className="text-3xl font-bold tracking-tight"
-					>
-						{title || copy.title}
-					</Typography>
-					<Typography
-						variant="subtitle1"
-						color="text.secondary"
-					>
-						{copy.subtitle}
-					</Typography>
-				</Box>
-				{operation === 'sale' ? (
-					<>
-						<ButtonGroup
-							variant="contained"
-							color="secondary"
-							size="small"
-							disableElevation
-						>
-							<Button
-								onClick={handleCreatePrimary}
-								sx={{ textTransform: 'none', fontWeight: 600, gap: 1 }}
-							>
-								<Add sx={{ fontSize: 18 }} />
-								Nuevo
-							</Button>
-							<Button
-								size="small"
-								aria-controls={isMenuOpen ? 'create-invoice-menu' : undefined}
-								aria-expanded={isMenuOpen ? 'true' : undefined}
-								aria-haspopup="menu"
-								onClick={handleMenuToggle}
-								sx={{ minWidth: 36, px: 0.5 }}
-							>
-								<ArrowDropDown />
-							</Button>
-						</ButtonGroup>
-						<Menu
-							id="create-invoice-menu"
-							anchorEl={menuAnchorEl}
-							open={isMenuOpen}
-							onClose={handleMenuClose}
-						>
-							<MenuItem onClick={handleCreatePrimary}>Nuevo</MenuItem>
-							<MenuItem onClick={handleCreateDraft}>Crear borrador</MenuItem>
-						</Menu>
-					</>
-				) : (
-					<Button
-						onClick={onCreate}
-						variant="contained"
-						color="secondary"
-						size="small"
-						disableElevation
-						sx={{ textTransform: 'none', fontWeight: 600, gap: 1 }}
-					>
-						<Add sx={{ fontSize: 18 }} />
-						Nuevo Documento
-					</Button>
-				)}
-			</Stack>
-		</Box>
+				<Button
+					onClick={handleCreatePrimary}
+					sx={{ textTransform: 'none', fontWeight: 800, gap: 1, borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }}
+					startIcon={<Plus size={18} />}
+				>
+					Nuevo
+				</Button>
+				<Button
+					size="small"
+					aria-controls={isMenuOpen ? 'create-invoice-menu' : undefined}
+					aria-expanded={isMenuOpen ? 'true' : undefined}
+					aria-haspopup="menu"
+					onClick={handleMenuToggle}
+					sx={{ minWidth: 36, px: 0.5, borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }}
+				>
+					<ChevronDown size={16} />
+				</Button>
+			</ButtonGroup>
+			<Menu
+				id="create-invoice-menu"
+				anchorEl={menuAnchorEl}
+				open={isMenuOpen}
+				onClose={handleMenuClose}
+			>
+				<MenuItem onClick={handleCreatePrimary}>Nuevo</MenuItem>
+				<MenuItem onClick={handleCreateDraft}>Crear borrador</MenuItem>
+			</Menu>
+		</>
+	) : (
+		<Button
+			onClick={onCreate}
+			variant="contained"
+			color="secondary"
+			size="small"
+			disableElevation
+			startIcon={<Plus size={18} />}
+			sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '4px' }}
+		>
+			Nuevo Documento
+		</Button>
+	);
+
+	return (
+		<PageHeader
+			title={title || copy.title}
+			subtitle={copy.subtitle}
+			actions={actions}
+		/>
 	);
 }
 

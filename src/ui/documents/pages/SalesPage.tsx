@@ -1,14 +1,25 @@
-import FusePageCarded from '@fuse/core/FusePageCarded';
+import FusePageSimple from '@fuse/core/FusePageSimple';
 import { useIndexDocuments } from '@/features/documents/hooks/useIndexDocuments';
 import DocumentTable from '../components/DocumentTable';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
+import { Box } from '@mui/material';
 import DocumentsHeader from '../components/DocumentsHeader';
 import { useNavigate, useParams, useLocation } from 'react-router';
 
-const Root = styled(FusePageCarded)(() => ({
-	'& .container': {
-		maxWidth: '100%!important'
-	}
+const Root = styled(FusePageSimple)(({ theme }) => ({
+	'& .FusePageSimple-header': {
+		backgroundColor: theme.vars.palette.background.paper,
+		borderBottomWidth: 1,
+		borderStyle: 'solid',
+		borderColor: theme.vars.palette.divider,
+	},
+	'& .FusePageSimple-content': {
+		display: 'flex',
+		flexDirection: 'column',
+		flex: '1 1 auto',
+		padding: 0,
+		backgroundColor: theme.vars.palette.background.default,
+	},
 }));
 
 export default function SalesPage() {
@@ -47,13 +58,16 @@ export default function SalesPage() {
 				/>
 			}
 			content={
-				<DocumentTable
-					documents={documents}
-					isLoading={isLoading}
-					operation="sale"
-					onStatusUpdated={() => refetch()}
-				/>
+				<Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', bgcolor: 'background.default', p: 3 }}>
+					<DocumentTable
+						documents={documents}
+						isLoading={isLoading}
+						operation="sale"
+						onStatusUpdated={() => refetch()}
+					/>
+				</Box>
 			}
+			scroll="content"
 		/>
 	);
 }

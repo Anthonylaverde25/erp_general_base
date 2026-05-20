@@ -3,12 +3,29 @@ import { useParams } from 'react-router';
 import FuseLoading from '@fuse/core/FuseLoading';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { Box, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useShowItem } from '@/features/items/hooks/useShowItem';
 import ItemProfileHeader from '../components/profile/ItemProfileHeader';
 import ItemProfileSidebar from '../components/profile/ItemProfileSidebar';
 import ItemProfileOverview from '../components/profile/ItemProfileOverview';
 import ItemMovementHistoryTable from '../components/profile/ItemMovementHistoryTable';
 import ItemInventoryStoreTable from '../components/profile/ItemInventoryStoreTable';
+
+const Root = styled(FusePageSimple)(({ theme }) => ({
+	'& .FusePageSimple-header': {
+		backgroundColor: theme.vars.palette.background.paper,
+		borderBottomWidth: 1,
+		borderStyle: 'solid',
+		borderColor: theme.vars.palette.divider,
+	},
+	'& .FusePageSimple-content': {
+		display: 'flex',
+		flexDirection: 'column',
+		flex: '1 1 auto',
+		padding: 0,
+		backgroundColor: theme.vars.palette.background.default,
+	},
+}));
 
 export default function ItemDetailPage() {
 	const { id } = useParams<{ id: string }>();
@@ -35,7 +52,7 @@ export default function ItemDetailPage() {
 	}
 
 	return (
-		<FusePageSimple
+		<Root
 			header={
 				<ItemProfileHeader
 					item={item}
@@ -44,51 +61,53 @@ export default function ItemDetailPage() {
 				/>
 			}
 			content={
-				<Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper' }}>
-					{tabValue === 0 && (
-						<Box
-							className="flex flex-col md:flex-row"
-							sx={{ height: { xs: 'auto', md: '100%' }, borderColor: '#E6EAF0' }}
-						>
-							<ItemProfileSidebar item={item} />
-							<ItemProfileOverview item={item} />
-						</Box>
-					)}
-
-					{tabValue === 1 && (
-						<Box className="flex flex-col xl:flex-row gap-6 p-6 items-start w-full" sx={{ bgcolor: 'background.paper' }}>
-							<div className="flex-1 w-full flex flex-col gap-2">
-								<Typography
-									variant="h6"
-									fontWeight={700}
-								>
-									Inventario por almacén
-								</Typography>
-								<ItemInventoryStoreTable inventory={item.inventory} />
-							</div>
-
-							<div className="flex-[2] w-full flex flex-col gap-2">
-								<Typography
-									variant="h6"
-									fontWeight={700}
-								>
-									Historial de movimientos
-								</Typography>
-								<ItemMovementHistoryTable itemId={item.id} />
-							</div>
-						</Box>
-					)}
-
-					{tabValue === 2 && (
-						<Box sx={{ p: 3 }}>
-							<Typography
-								variant="h6"
-								color="text.secondary"
+				<Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', bgcolor: 'background.default' }}>
+					<Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper' }}>
+						{tabValue === 0 && (
+							<Box
+								className="flex flex-col md:flex-row"
+								sx={{ height: { xs: 'auto', md: '100%' }, borderColor: '#E6EAF0' }}
 							>
-								Actividad detallada próximamente.
-							</Typography>
-						</Box>
-					)}
+								<ItemProfileSidebar item={item} />
+								<ItemProfileOverview item={item} />
+							</Box>
+						)}
+
+						{tabValue === 1 && (
+							<Box className="flex flex-col xl:flex-row gap-6 p-6 items-start w-full" sx={{ bgcolor: 'background.paper' }}>
+								<div className="flex-1 w-full flex flex-col gap-2">
+									<Typography
+										variant="h6"
+										fontWeight={700}
+									>
+										Inventario por almacén
+									</Typography>
+									<ItemInventoryStoreTable inventory={item.inventory} />
+								</div>
+
+								<div className="flex-[2] w-full flex flex-col gap-2">
+									<Typography
+										variant="h6"
+										fontWeight={700}
+									>
+										Historial de movimientos
+									</Typography>
+									<ItemMovementHistoryTable itemId={item.id} />
+								</div>
+							</Box>
+						)}
+
+						{tabValue === 2 && (
+							<Box sx={{ p: 3 }}>
+								<Typography
+									variant="h6"
+									color="text.secondary"
+								>
+									Actividad detallada próximamente.
+								</Typography>
+							</Box>
+						)}
+					</Box>
 				</Box>
 			}
 			scroll="content"

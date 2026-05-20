@@ -11,11 +11,17 @@ import { IDepartment } from '@/types/department.types';
 const Root = styled(FusePageSimple)(({ theme }) => ({
 	'& .FusePageSimple-header': {
 		backgroundColor: theme.vars.palette.background.paper,
-		borderBottom: 'none'
+		borderBottomWidth: 1,
+		borderStyle: 'solid',
+		borderColor: theme.vars.palette.divider,
 	},
 	'& .FusePageSimple-content': {
-		backgroundColor: theme.vars.palette.background.paper
-	}
+		display: 'flex',
+		flexDirection: 'column',
+		flex: '1 1 auto',
+		padding: 0,
+		backgroundColor: theme.vars.palette.background.default,
+	},
 }));
 
 // Recursive function to find a department and its breadcrumb path
@@ -105,11 +111,11 @@ export default function DepartmentsPage() {
 				/>
 			}
 			content={
-				<Box className="h-full w-full overflow-y-auto p-4">
+				<Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', bgcolor: 'background.default', p: 3 }}>
 					<DepartmentOverview departmentId={selectedDepartmentId} />
 				</Box>
 			}
-			scroll="page"
+			scroll="content"
 		/>
 	);
 }

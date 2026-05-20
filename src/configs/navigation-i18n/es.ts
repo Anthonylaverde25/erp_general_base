@@ -1,9 +1,15 @@
 const locale = {
 	// Módulos principales
 	DASHBOARD: 'Panel de Control',
+	CONTROL_PANEL: 'Panel de Control',
+	CATALOGS: 'Catálogos',
+	PARTNERS: 'Socios de Negocio',
+	ITEMS: 'Artículos',
 
 	// Grupos
 	OPERATIONS: 'Operaciones',
+	ITEMS_GROUP: 'Artículos',
+	SERVICES_GROUP: 'Servicios',
 	FINANCE: 'Finanzas',
 	HUMAN_RESOURCES_GROUP: 'Recursos Humanos',
 	ANALYTICS: 'Análisis',

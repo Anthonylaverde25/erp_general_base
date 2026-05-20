@@ -1,6 +1,7 @@
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { TextFieldProps } from '@mui/material';
+import { Box, TextFieldProps } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -20,6 +21,22 @@ import CreateItemPricingSection from '../create-item/CreateItemPricingSection';
 import CreateItemServiceSection from '../create-item/CreateItemServiceSection';
 import CreateItemStockSection from '../create-item/CreateItemStockSection';
 import CreateItemTrackingSection from '../create-item/CreateItemTrackingSection';
+
+const Root = styled(FusePageSimple)(({ theme }) => ({
+	'& .FusePageSimple-header': {
+		backgroundColor: theme.vars.palette.background.paper,
+		borderBottomWidth: 1,
+		borderStyle: 'solid',
+		borderColor: theme.vars.palette.divider,
+	},
+	'& .FusePageSimple-content': {
+		display: 'flex',
+		flexDirection: 'column',
+		flex: '1 1 auto',
+		padding: 0,
+		backgroundColor: theme.vars.palette.background.default,
+	},
+}));
 
 type ItemFormContainerProps = {
 	mode: 'create' | 'edit';
@@ -166,7 +183,7 @@ function ItemFormContainer({
 
 	return (
 		<FormProvider {...methods}>
-			<FusePageSimple
+			<Root
 				header={
 					<CreateItemPageHeader
 						itemType={itemType}
@@ -178,58 +195,60 @@ function ItemFormContainer({
 					/>
 				}
 				content={
-					<div className="mx-auto w-full max-w-5xl p-8">
-						<form className="flex flex-col gap-8">
-							<CreateItemGeneralSection
-								isLoading={isSubmitting}
-								itemType={itemType}
-								textFieldProps={textFieldProps}
-								families={families}
-								mainCategories={mainCategories}
-								selectedCategoryId={selectedCategoryId}
-								subCategories={subCategories}
-								unitTypes={unitTypes}
-								imagePreview={imagePreview}
-								onRemoveImage={handleRemoveImage}
-								dropzone={dropzone}
-							/>
+					<Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', bgcolor: 'background.default' }}>
+						<div className="mx-auto w-full max-w-5xl p-8">
+							<form className="flex flex-col gap-8">
+								<CreateItemGeneralSection
+									isLoading={isSubmitting}
+									itemType={itemType}
+									textFieldProps={textFieldProps}
+									families={families}
+									mainCategories={mainCategories}
+									selectedCategoryId={selectedCategoryId}
+									subCategories={subCategories}
+									unitTypes={unitTypes}
+									imagePreview={imagePreview}
+									onRemoveImage={handleRemoveImage}
+									dropzone={dropzone}
+								/>
 
-							<CreateItemPricingSection
-								isLoading={isSubmitting}
-								textFieldProps={textFieldProps}
-								taxRates={taxRates}
-							/>
+								<CreateItemPricingSection
+									isLoading={isSubmitting}
+									textFieldProps={textFieldProps}
+									taxRates={taxRates}
+								/>
 
-							{itemType === 'service' && (
-								<CreateItemServiceSection
+								{itemType === 'service' && (
+									<CreateItemServiceSection
+										isLoading={isSubmitting}
+										textFieldProps={textFieldProps}
+									/>
+								)}
+
+								{itemType === 'physical' && (
+									<CreateItemStockSection
+										mode={mode}
+										isLoading={isSubmitting}
+										textFieldProps={textFieldProps}
+										stores={stores}
+									/>
+								)}
+
+								{itemType === 'physical' && (
+									<CreateItemTrackingSection
+										isLoading={isSubmitting}
+										textFieldProps={textFieldProps}
+										partners={partners}
+									/>
+								)}
+
+								<CreateItemDescriptionSection
 									isLoading={isSubmitting}
 									textFieldProps={textFieldProps}
 								/>
-							)}
-
-							{itemType === 'physical' && (
-								<CreateItemStockSection
-									mode={mode}
-									isLoading={isSubmitting}
-									textFieldProps={textFieldProps}
-									stores={stores}
-								/>
-							)}
-
-							{itemType === 'physical' && (
-								<CreateItemTrackingSection
-									isLoading={isSubmitting}
-									textFieldProps={textFieldProps}
-									partners={partners}
-								/>
-							)}
-
-							<CreateItemDescriptionSection
-								isLoading={isSubmitting}
-								textFieldProps={textFieldProps}
-							/>
-						</form>
-					</div>
+							</form>
+						</div>
+					</Box>
 				}
 				scroll="content"
 			/>

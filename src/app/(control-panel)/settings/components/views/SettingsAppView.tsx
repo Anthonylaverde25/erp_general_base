@@ -7,25 +7,29 @@ import usePathname from '@fuse/hooks/usePathname';
 import SettingsAppSidebarContent from '../ui/SettingsAppSidebarContent';
 import SettingsAppHeader from '../ui/SettingsAppHeader';
 import { styled } from '@mui/material/styles';
+import { Box } from '@mui/material';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
-	'& .FusePageSimple-contentWrapper': {
-		paddingTop: 2,
-		paddingLeft: 2
+	'& .FusePageSimple-header': {
+		backgroundColor: theme.vars.palette.background.paper,
+		borderBottomWidth: 1,
+		borderStyle: 'solid',
+		borderColor: theme.vars.palette.divider,
 	},
 	'& .FusePageSimple-content': {
-		boxShadow: theme.vars.shadows[2],
-		borderRadius: '12px 0 0 0',
-		[theme.breakpoints.down('md')]: {
-			borderRadius: '12px 12px 0 0'
-		},
-		backgroundColor: theme.vars.palette.background.paper
+		display: 'flex',
+		flexDirection: 'column',
+		flex: '1 1 auto',
+		padding: 0,
+		backgroundColor: theme.vars.palette.background.default,
 	},
 	'& .FusePageSimple-sidebarWrapper': {
-		border: 'none'
+		borderRightWidth: 1,
+		borderStyle: 'solid',
+		borderColor: theme.vars.palette.divider,
 	},
 	'& .FusePageSimple-sidebarContent': {
-		backgroundColor: theme.vars.palette.background.default
+		backgroundColor: theme.vars.palette.background.paper,
 	}
 }));
 
@@ -33,9 +37,6 @@ type SettingsAppProps = {
 	children?: React.ReactNode;
 };
 
-/**
- * The notes app.
- */
 function SettingsAppView(props: SettingsAppProps) {
 	const { children } = props;
 	const pathname = usePathname();
@@ -54,14 +55,15 @@ function SettingsAppView(props: SettingsAppProps) {
 
 	return (
 		<Root
+			header={
+				<SettingsAppHeader
+					onSetSidebarOpen={setLeftSidebarOpen}
+				/>
+			}
 			content={
-				<div className="flex-auto p-4 md:p-6">
-					<SettingsAppHeader
-						className="mb-4"
-						onSetSidebarOpen={setLeftSidebarOpen}
-					/>
+				<Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', bgcolor: 'background.default', p: 3 }}>
 					{children}
-				</div>
+				</Box>
 			}
 			leftSidebarProps={{
 				open: leftSidebarOpen,
@@ -71,7 +73,7 @@ function SettingsAppView(props: SettingsAppProps) {
 				content: <SettingsAppSidebarContent onSetSidebarOpen={setLeftSidebarOpen} />,
 				width: 320
 			}}
-			scroll={isMobile ? 'page' : 'content'}
+			scroll="content"
 		/>
 	);
 }

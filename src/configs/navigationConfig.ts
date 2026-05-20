@@ -19,28 +19,45 @@ const navigationConfig: FuseNavItemType[] = [
 		url: '/'
 	},
 	{
-		id: 'partners',
-		title: 'partners',
-		translate: 'PARTNERS',
-		type: 'item',
-		icon: 'lucide:users',
-		url: '/partners'
+		id: 'catalogs',
+		title: 'Catálogos',
+		translate: 'CATALOGS',
+		type: 'collapse',
+		icon: 'lucide:folder-open',
+		children: [
+			{
+				id: 'partners',
+				title: 'Partners',
+				translate: 'PARTNERS',
+				type: 'item',
+				icon: 'lucide:users',
+				url: '/partners'
+			},
+			{
+				id: 'items',
+				title: 'Items',
+				translate: 'ITEMS',
+				type: 'item',
+				icon: 'heroicons-outline:cube',
+				url: '/items'
+			},
+			{
+				id: 'departments',
+				title: 'Departments',
+				translate: 'DEPARTMENTS',
+				type: 'item',
+				icon: 'lucide:building-2',
+				url: '/departments'
+			}
+		]
 	},
 	{
-		id: 'items',
-		title: 'Items',
-		translate: 'ITEMS',
+		id: 'caja.caja',
+		title: 'Caja',
+		translate: 'CAJA',
 		type: 'item',
-		icon: 'heroicons-outline:cube',
-		url: '/items'
-	},
-	{
-		id: 'departments',
-		title: 'Departments',
-		translate: 'DEPARTMENTS',
-		type: 'item',
-		icon: 'lucide:building-2',
-		url: '/departments'
+		url: '/cash-register',
+		icon: 'lucide:credit-card',
 	},
 	{
 		id: 'operations-items',
@@ -289,221 +306,153 @@ const navigationConfig: FuseNavItemType[] = [
 			}
 		]
 	},
-	{
-		id: 'finance',
-		title: 'Finance',
-		translate: 'FINANCE',
-		subtitle: 'Accounting & Payments',
-		type: 'group',
-		icon: 'lucide:wallet',
-		children: [
+	// {
+	// 	id: 'finance',
+	// 	title: 'Finance',
+	// 	translate: 'FINANCE',
+	// 	subtitle: 'Accounting & Payments',
+	// 	type: 'group',
+	// 	icon: 'lucide:wallet',
+	// 	children: [
 
-			{
-				id: 'accounting',
-				title: 'Accounting',
-				translate: 'ACCOUNTING',
-				type: 'collapse',
-				icon: 'lucide:calculator',
-				children: [
-					{
-						id: 'accounting.accounts',
-						title: 'Chart of Accounts',
-						translate: 'CHART_OF_ACCOUNTS',
-						type: 'item',
-						url: '/accounting/accounts',
-						icon: 'lucide:list'
-					},
-					{
-						id: 'accounting.journal-entries',
-						title: 'Journal Entries',
-						translate: 'JOURNAL_ENTRIES',
-						type: 'item',
-						url: '/accounting/journal-entries',
-						icon: 'lucide:book-open'
-					},
-					{
-						id: 'accounting.payments',
-						title: 'Payments',
-						translate: 'PAYMENTS',
-						type: 'item',
-						url: '/accounting/payments',
-						icon: 'lucide:credit-card'
-					},
-					{
-						id: 'accounting.bank-accounts',
-						title: 'Bank Accounts',
-						translate: 'BANK_ACCOUNTS',
-						type: 'item',
-						url: '/accounting/bank-accounts',
-						icon: 'lucide:landmark'
-					}
-				]
-			}
-		]
-	},
-	{
-		id: 'human-resources',
-		title: 'Human Resources',
-		translate: 'HUMAN_RESOURCES_GROUP',
-		subtitle: 'Employee Management',
-		type: 'group',
-		icon: 'lucide:users-2',
-		children: [
-			{
-				id: 'hr',
-				title: 'HR Management',
-				translate: 'HR_MANAGEMENT',
-				type: 'collapse',
-				icon: 'lucide:users-2',
-				children: [
-					{
-						id: 'hr.employees',
-						title: 'Employees',
-						translate: 'EMPLOYEES',
-						type: 'item',
-						url: '/hr/employees',
-						icon: 'lucide:user'
-					},
-					{
-						id: 'hr.attendance',
-						title: 'Attendance',
-						translate: 'ATTENDANCE',
-						type: 'item',
-						url: '/hr/attendance',
-						icon: 'lucide:calendar-check'
-					},
-					{
-						id: 'hr.payroll',
-						title: 'Payroll',
-						translate: 'PAYROLL',
-						type: 'item',
-						url: '/hr/payroll',
-						icon: 'lucide:wallet'
-					}
-				]
-			}
-		]
-	},
-	{
-		id: 'caja',
-		title: 'Caja',
-		translate: 'CAJA',
-		subtitle: 'Caja',
-		type: 'group',
-		icon: 'lucide:users-2',
-		children: [
-			{
-				id: 'caja.caja',
-				title: 'Caja',
-				translate: 'CAJA',
-				type: 'item',
-				url: '/cash-register',
-				icon: 'lucide:cash-register'
-			}
-		]
-	},
-	{
-		id: 'analytics',
-		title: 'Analytics',
-		translate: 'ANALYTICS',
-		subtitle: 'Reports & Insights',
-		type: 'group',
-		icon: 'lucide:bar-chart-3',
-		children: [
-			{
-				id: 'reports',
-				title: 'Reports',
-				translate: 'REPORTS',
-				type: 'collapse',
-				icon: 'lucide:bar-chart',
-				children: [
-					{
-						id: 'reports.sales',
-						title: 'Sales Reports',
-						translate: 'SALES_REPORTS',
-						type: 'item',
-						url: '/reports/sales',
-						icon: 'lucide:trending-up'
-					},
-					{
-						id: 'reports.purchases',
-						title: 'Purchase Reports',
-						translate: 'PURCHASE_REPORTS',
-						type: 'item',
-						url: '/reports/purchases',
-						icon: 'lucide:trending-down'
-					},
-					{
-						id: 'reports.inventory',
-						title: 'Inventory Reports',
-						translate: 'INVENTORY_REPORTS',
-						type: 'item',
-						url: '/reports/inventory',
-						icon: 'lucide:pie-chart'
-					},
-					{
-						id: 'reports.financial',
-						title: 'Financial Reports',
-						translate: 'FINANCIAL_REPORTS',
-						type: 'item',
-						url: '/reports/financial',
-						icon: 'lucide:line-chart'
-					}
-				]
-			}
-		]
-	},
-	{
-		id: 'administration',
-		title: 'Administration',
-		translate: 'ADMINISTRATION',
-		subtitle: 'System Configuration',
-		type: 'group',
-		icon: 'lucide:cog',
-		children: [
-			{
-				id: 'settings',
-				title: 'Settings',
-				translate: 'SETTINGS',
-				type: 'collapse',
-				icon: 'lucide:settings',
-				children: [
-					{
-						id: 'settings.company',
-						title: 'Company',
-						translate: 'COMPANY',
-						type: 'item',
-						url: '/apps/settings',
-						icon: 'lucide:building'
-					},
-					{
-						id: 'settings.users',
-						title: 'Users',
-						translate: 'USERS',
-						type: 'item',
-						url: '/settings/users',
-						icon: 'lucide:user-cog'
-					},
-					{
-						id: 'settings.roles',
-						title: 'Roles & Permissions',
-						translate: 'ROLES_PERMISSIONS',
-						type: 'item',
-						url: '/settings/roles',
-						icon: 'lucide:shield'
-					},
-					{
-						id: 'settings.taxes',
-						title: 'Taxes',
-						translate: 'TAXES',
-						type: 'item',
-						url: '/settings/taxes',
-						icon: 'lucide:percent'
-					}
-				]
-			}
-		]
-	}
+	// 		{
+	// 			id: 'accounting',
+	// 			title: 'Accounting',
+	// 			translate: 'ACCOUNTING',
+	// 			type: 'collapse',
+	// 			icon: 'lucide:calculator',
+	// 			children: [
+	// 				{
+	// 					id: 'accounting.accounts',
+	// 					title: 'Chart of Accounts',
+	// 					translate: 'CHART_OF_ACCOUNTS',
+	// 					type: 'item',
+	// 					url: '/accounting/accounts',
+	// 					icon: 'lucide:list'
+	// 				},
+	// 				{
+	// 					id: 'accounting.journal-entries',
+	// 					title: 'Journal Entries',
+	// 					translate: 'JOURNAL_ENTRIES',
+	// 					type: 'item',
+	// 					url: '/accounting/journal-entries',
+	// 					icon: 'lucide:book-open'
+	// 				},
+	// 				{
+	// 					id: 'accounting.payments',
+	// 					title: 'Payments',
+	// 					translate: 'PAYMENTS',
+	// 					type: 'item',
+	// 					url: '/accounting/payments',
+	// 					icon: 'lucide:credit-card'
+	// 				},
+	// 				{
+	// 					id: 'accounting.bank-accounts',
+	// 					title: 'Bank Accounts',
+	// 					translate: 'BANK_ACCOUNTS',
+	// 					type: 'item',
+	// 					url: '/accounting/bank-accounts',
+	// 					icon: 'lucide:landmark'
+	// 				}
+	// 			]
+	// 		}
+	// 	]
+	// },
+	// {
+	// 	id: 'human-resources',
+	// 	title: 'Human Resources',
+	// 	translate: 'HUMAN_RESOURCES_GROUP',
+	// 	subtitle: 'Employee Management',
+	// 	type: 'group',
+	// 	icon: 'lucide:users-2',
+	// 	children: [
+	// 		{
+	// 			id: 'hr',
+	// 			title: 'HR Management',
+	// 			translate: 'HR_MANAGEMENT',
+	// 			type: 'collapse',
+	// 			icon: 'lucide:users-2',
+	// 			children: [
+	// 				{
+	// 					id: 'hr.employees',
+	// 					title: 'Employees',
+	// 					translate: 'EMPLOYEES',
+	// 					type: 'item',
+	// 					url: '/hr/employees',
+	// 					icon: 'lucide:user'
+	// 				},
+	// 				{
+	// 					id: 'hr.attendance',
+	// 					title: 'Attendance',
+	// 					translate: 'ATTENDANCE',
+	// 					type: 'item',
+	// 					url: '/hr/attendance',
+	// 					icon: 'lucide:calendar-check'
+	// 				},
+	// 				{
+	// 					id: 'hr.payroll',
+	// 					title: 'Payroll',
+	// 					translate: 'PAYROLL',
+	// 					type: 'item',
+	// 					url: '/hr/payroll',
+	// 					icon: 'lucide:wallet'
+	// 				}
+	// 			]
+	// 		}
+	// 	]
+	// },
+
+	// {
+	// 	id: 'analytics',
+	// 	title: 'Analytics',
+	// 	translate: 'ANALYTICS',
+	// 	subtitle: 'Reports & Insights',
+	// 	type: 'group',
+	// 	icon: 'lucide:bar-chart-3',
+	// 	children: [
+	// 		{
+	// 			id: 'reports',
+	// 			title: 'Reports',
+	// 			translate: 'REPORTS',
+	// 			type: 'collapse',
+	// 			icon: 'lucide:bar-chart',
+	// 			children: [
+	// 				{
+	// 					id: 'reports.sales',
+	// 					title: 'Sales Reports',
+	// 					translate: 'SALES_REPORTS',
+	// 					type: 'item',
+	// 					url: '/reports/sales',
+	// 					icon: 'lucide:trending-up'
+	// 				},
+	// 				{
+	// 					id: 'reports.purchases',
+	// 					title: 'Purchase Reports',
+	// 					translate: 'PURCHASE_REPORTS',
+	// 					type: 'item',
+	// 					url: '/reports/purchases',
+	// 					icon: 'lucide:trending-down'
+	// 				},
+	// 				{
+	// 					id: 'reports.inventory',
+	// 					title: 'Inventory Reports',
+	// 					translate: 'INVENTORY_REPORTS',
+	// 					type: 'item',
+	// 					url: '/reports/inventory',
+	// 					icon: 'lucide:pie-chart'
+	// 				},
+	// 				{
+	// 					id: 'reports.financial',
+	// 					title: 'Financial Reports',
+	// 					translate: 'FINANCIAL_REPORTS',
+	// 					type: 'item',
+	// 					url: '/reports/financial',
+	// 					icon: 'lucide:line-chart'
+	// 				}
+	// 			]
+	// 		}
+	// 	]
+	// }
 ];
 
 export default navigationConfig;

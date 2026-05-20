@@ -1,6 +1,6 @@
-import { Typography, Box, Stack, useTheme, Button } from '@mui/material';
-import { Add } from '@mui/icons-material';
-import PageBreadcrumb from '@/components/PageBreadcrumb';
+import { Button } from '@mui/material';
+import { Plus } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 interface ItemsHeaderProps {
 	onCreate?: () => void;
@@ -9,7 +9,6 @@ interface ItemsHeaderProps {
 
 function ItemsHeader(props: ItemsHeaderProps) {
 	const { onCreate, currentTab } = props;
-	const theme = useTheme();
 
 	const getButtonText = () => {
 		switch (currentTab) {
@@ -34,43 +33,23 @@ function ItemsHeader(props: ItemsHeaderProps) {
 	};
 
 	return (
-		<Box
-			className="container"
-			sx={{ p: 0, pb: 2 }}
-		>
-			<PageBreadcrumb className="mb-4" />
-			<Stack
-				direction="row"
-				justifyContent="space-between"
-				alignItems="center"
-				spacing={2}
-			>
-				<Box>
-					<Typography
-						variant="h2"
-						className="text-3xl font-bold tracking-tight"
-					>
-						{getTitleText()}
-					</Typography>
-					<Typography
-						variant="subtitle1"
-						color="text.secondary"
-					>
-						Manage your inventory items
-					</Typography>
-				</Box>
+		<PageHeader
+			title={getTitleText()}
+			subtitle="Gestiona el inventario de productos y servicios."
+			actions={
 				<Button
 					onClick={onCreate}
 					variant="contained"
+					color="secondary"
 					size="small"
 					disableElevation
-					sx={{ textTransform: 'none', fontWeight: 600, gap: 1 }}
+					startIcon={<Plus size={18} />}
+					sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '4px' }}
 				>
-					<Add sx={{ fontSize: 18 }} />
 					{getButtonText()}
 				</Button>
-			</Stack>
-		</Box>
+			}
+		/>
 	);
 }
 

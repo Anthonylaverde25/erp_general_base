@@ -1,9 +1,15 @@
 const locale = {
 	// Main modules
 	DASHBOARD: 'Dashboard',
+	CONTROL_PANEL: 'Control Panel',
+	CATALOGS: 'Catalogs',
+	PARTNERS: 'Partners',
+	ITEMS: 'Items',
 
 	// Groups
 	OPERATIONS: 'Operations',
+	ITEMS_GROUP: 'Items',
+	SERVICES_GROUP: 'Services',
 	FINANCE: 'Finance',
 	HUMAN_RESOURCES_GROUP: 'Human Resources',
 	ANALYTICS: 'Analytics',
