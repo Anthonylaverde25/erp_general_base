@@ -20,7 +20,62 @@ const Root = styled('div')(({ theme }) => ({
 		...theme.applyStyles('light', {
 			boxShadow: `inset 0 0 0 20px ${'rgba(0, 0, 0, 0.37)'}`
 		})
-	}
+	},
+	...theme.applyStyles('light', {
+		backgroundColor: '#303952 !important',
+		color: '#ffffff !important',
+		'& .fuse-list-item-icon': {
+			color: 'rgba(255, 255, 255, 0.7) !important',
+		},
+		'& .fuse-list-item-title': {
+			color: '#ffffff !important',
+		},
+		'& .fuse-list-item-subtitle': {
+			color: 'rgba(255, 255, 255, 0.5) !important',
+		},
+		'& .MuiTypography-colorSecondary': {
+			color: 'rgba(255, 255, 255, 0.5) !important',
+		},
+		'& .MuiButton-root': {
+			color: 'rgba(255, 255, 255, 0.85) !important',
+			'&:hover': {
+				backgroundColor: 'rgba(255, 255, 255, 0.08) !important',
+			},
+			'&.active': {
+				backgroundColor: 'rgba(255, 255, 255, 0.15) !important',
+				color: '#ffffff !important',
+				'& .fuse-list-item-icon': {
+					color: '#ffffff !important',
+				}
+			}
+		},
+		'& .arrow-icon': {
+			color: 'rgba(255, 255, 255, 0.7) !important',
+		},
+		'& .collapse-children': {
+			'& > .MuiCollapse-wrapper': {
+				borderColor: 'rgba(255, 255, 255, 0.15) !important',
+			}
+		},
+		'& .logo-text .MuiTypography-root': {
+			color: '#ffffff !important',
+		},
+		'& .user-menu': {
+			color: '#ffffff !important',
+			'&:hover': {
+				backgroundColor: 'rgba(255, 255, 255, 0.08) !important',
+			},
+			'& .title': {
+				color: '#ffffff !important',
+			},
+			'& .title + .MuiTypography-root': {
+				color: 'rgba(255, 255, 255, 0.5) !important',
+			},
+			'& .info-icon, & .arrow': {
+				color: 'rgba(255, 255, 255, 0.7) !important',
+			}
+		}
+	})
 }));
 
 const StyledContent = styled(FuseScrollbars)(() => ({

@@ -4,6 +4,8 @@ import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 import { Link } from 'react-router';
 import { format } from 'date-fns';
 
+const currencyFormatter = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+
 export const getDocumentColumns = (
     operation: 'sale' | 'purchase',
     onStatusClick?: (document: DocumentEntity) => void
@@ -18,7 +20,7 @@ export const getDocumentColumns = (
             Cell: ({ row }) => {
                 const doc = row.original;
                 return (
-                    <Box className="flex flex-col py-1">
+                    <Box className="flex flex-col py-0.5">
                         <Typography
                             variant="body2"
                             fontWeight={600}
@@ -27,6 +29,8 @@ export const getDocumentColumns = (
                             sx={{
                                 textDecoration: 'none',
                                 color: 'inherit',
+                                fontSize: '0.8125rem',
+                                lineHeight: 1.2,
                                 '&:hover': {
                                     color: 'primary.main',
                                     textDecoration: 'underline'
@@ -35,7 +39,7 @@ export const getDocumentColumns = (
                         >
                             {doc.number_serie || (operation === 'purchase' && doc.external_reference ? doc.external_reference : (doc.status?.key === 'draft' ? '(Borrador)' : 'Sin número'))}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem', lineHeight: 1.2 }}>
                             {doc.document_type_name}
                         </Typography>
                     </Box>
@@ -60,11 +64,11 @@ export const getDocumentColumns = (
                 };
 
                 return (
-                    <Box className="flex items-center gap-3 py-1">
+                    <Box className="flex items-center gap-2 py-0.5">
                         <Avatar
                             sx={{
-                                width: 32,
-                                height: 32,
+                                width: 28,
+                                height: 28,
                                 bgcolor: '#1976d2',
                                 fontSize: '0.75rem',
                                 fontWeight: 600
@@ -73,10 +77,10 @@ export const getDocumentColumns = (
                             {getInitials(name)}
                         </Avatar>
                         <Box className="flex flex-col">
-                            <Typography variant="body2" fontWeight={600}>
+                            <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.8125rem', lineHeight: 1.2 }}>
                                 {name}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem', lineHeight: 1.2 }}>
                                 {doc.partner_email || 'Sin email'}
                             </Typography>
                         </Box>
@@ -144,7 +148,7 @@ export const getDocumentColumns = (
             size: 120,
             Cell: ({ row }) => (
                 <Typography variant="body2" fontWeight={600}>
-                    {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(row.original.total)}
+                    {currencyFormatter.format(row.original.total)}
                 </Typography>
             )
         }

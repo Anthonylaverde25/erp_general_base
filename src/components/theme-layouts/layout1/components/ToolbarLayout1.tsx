@@ -12,6 +12,7 @@ import QuickPanelToggleButton from '../../components/quickPanel/QuickPanelToggle
 import { Layout1ConfigDefaultsType } from '@/components/theme-layouts/layout1/Layout1Config';
 import useThemeMediaQuery from '../../../../@fuse/hooks/useThemeMediaQuery';
 import { AppBar, Divider } from '@mui/material';
+import { Theme } from '@mui/material/styles';
 import ToolbarTheme from 'src/contexts/ToolbarTheme';
 import CompanySwitcher from '@/components/CompanySwitcher';
 import AppLauncher from '@/components/app-launcher';
@@ -37,9 +38,39 @@ function ToolbarLayout1(props: ToolbarLayout1Props) {
 			<AppBar
 				id="fuse-toolbar"
 				className={clsx('relative z-20 flex', className)}
-				sx={(theme) => ({
+				sx={(theme: Theme) => ({
 					backgroundColor: theme.vars.palette.background.default,
-					color: theme.vars.palette.text.primary
+					color: theme.vars.palette.text.primary,
+					boxShadow: 'none',
+					borderBottom: `1px solid ${theme.vars.palette.divider}`,
+					...theme.applyStyles('light', {
+						backgroundColor: '#303952 !important',
+						color: '#ffffff !important',
+						borderBottom: '1px solid rgba(255, 255, 255, 0.1) !important',
+						'& .MuiSvgIcon-root, & .MuiIconButton-root': {
+							color: '#ffffff !important',
+						},
+						'& .MuiButton-root': {
+							color: '#ffffff !important',
+							borderColor: 'rgba(255, 255, 255, 0.15) !important',
+							backgroundColor: 'rgba(255, 255, 255, 0.08) !important',
+							'&:hover': {
+								backgroundColor: 'rgba(255, 255, 255, 0.15) !important',
+							},
+							'& .MuiSvgIcon-root': {
+								color: '#ffffff !important',
+							}
+						},
+						'& .MuiTypography-root': {
+							color: '#ffffff !important',
+						},
+						'& .MuiDivider-root': {
+							borderColor: 'rgba(255, 255, 255, 0.15) !important',
+						},
+						'& .fuse-list-item-icon, & .arrow-icon': {
+							color: '#ffffff !important',
+						}
+					})
 				})}
 			>
 				<Toolbar className="min-h-12 p-0 md:min-h-16">
@@ -57,15 +88,15 @@ function ToolbarLayout1(props: ToolbarLayout1Props) {
 						)}
 
 						{!isMobile && <NavigationShortcuts />}
+						{!isMobile && <FullScreenToggle />}
 					</div>
 
-					<div className="flex items-center overflow-x-auto px-2 py-2 md:px-4">
+					<div className="flex items-center overflow-x-auto px-2 py-2 md:px-4 gap-2.5">
 						<AppLauncher />
 						<ToolbarQuickActionsMui />
 						<CompanySwitcher />
 						<LanguageSwitcher />
 						{/* <AdjustFontSize /> */}
-						<FullScreenToggle />
 						<LightDarkModeToggle
 							lightTheme={find(themeOptions, { id: 'Default' })}
 							darkTheme={find(themeOptions, { id: 'Default Dark' })}

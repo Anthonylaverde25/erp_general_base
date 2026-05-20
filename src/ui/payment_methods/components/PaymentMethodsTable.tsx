@@ -64,22 +64,82 @@ export default function PaymentMethodsTable(props: PaymentMethodsTableProps) {
 	};
 
 	return (
-		<TableContainer>
-			<Table sx={{ minWidth: 650 }}>
+		<TableContainer sx={{ borderRadius: 0 }}>
+			<Table sx={{ minWidth: 650, borderCollapse: 'collapse', border: `1px solid ${theme.palette.divider}` }}>
 				<TableHead>
-					<TableRow
-						sx={{
-							backgroundColor: alpha(theme.palette.primary.main, 0.15),
-							borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`
-						}}
-					>
-						<TableCell sx={{ pl: 3, fontWeight: 700 }}>Nombre</TableCell>
-						<TableCell sx={{ fontWeight: 700 }}>Tipo</TableCell>
-						<TableCell sx={{ fontWeight: 700 }}>Descripción</TableCell>
-						<TableCell sx={{ fontWeight: 700 }}>Estado</TableCell>
+					<TableRow>
+						<TableCell
+							sx={{
+								width: 50,
+								textAlign: 'center',
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							#
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Nombre
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Tipo
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Descripción
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Estado
+						</TableCell>
 						<TableCell
 							align="right"
-							sx={{ pr: 3, fontWeight: 700 }}
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
 						>
 							Acciones
 						</TableCell>
@@ -87,60 +147,99 @@ export default function PaymentMethodsTable(props: PaymentMethodsTableProps) {
 				</TableHead>
 
 				<TableBody>
-					{paymentMethods?.map((paymentMethod) => {
+					{paymentMethods?.map((paymentMethod, index) => {
 						const typeConfig = getTypeConfig(paymentMethod.type);
 						return (
 							<TableRow
 								key={paymentMethod.id}
 								hover
 								sx={{
-									transition: 'all 0.2s ease',
-									'&:last-child td': { borderBottom: 0 },
-									'&:nth-of-type(odd)': {
-										backgroundColor: alpha(theme.palette.action.hover, 0.4)
-									},
-									'&:nth-of-type(even)': {
-										backgroundColor: 'transparent'
-									},
+									backgroundColor:
+										index % 2 === 0
+											? 'transparent'
+											: theme.palette.mode === 'dark'
+												? 'rgba(255, 255, 255, 0.02)'
+												: 'rgba(0, 0, 0, 0.01)',
 									'&:hover': {
-										backgroundColor: alpha(theme.palette.primary.main, 0.08)
+										backgroundColor:
+											theme.palette.mode === 'dark'
+												? 'rgba(255, 255, 255, 0.06)'
+												: 'rgba(0, 0, 0, 0.03)'
 									}
 								}}
 							>
+								{/* # */}
+								<TableCell
+									sx={{
+										width: 50,
+										textAlign: 'center',
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`,
+										color: theme.palette.text.secondary
+									}}
+								>
+									{index + 1}
+								</TableCell>
+
 								{/* Nombre */}
-								<TableCell sx={{ pl: 3 }}>
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
 									<Typography
 										variant="subtitle2"
-										fontWeight={600}
+										sx={{ fontSize: '0.8125rem', fontWeight: 600 }}
 									>
 										{paymentMethod.name}
 									</Typography>
 								</TableCell>
 
 								{/* Tipo */}
-								<TableCell>
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
 									<Stack
 										direction="row"
 										alignItems="center"
 										spacing={1}
 									>
 										<FuseSvgIcon
-											size={18}
+											size={16}
 											sx={{ color: typeConfig.color }}
 										>
 											{typeConfig.icon}
 										</FuseSvgIcon>
-										<Typography variant="body2">{typeConfig.label}</Typography>
+										<Typography sx={{ fontSize: '0.8125rem' }}>{typeConfig.label}</Typography>
 									</Stack>
 								</TableCell>
 
 								{/* Descripción */}
-								<TableCell>
-									<Typography variant="body2">{paymentMethod.description || '-'}</Typography>
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
+									<Typography sx={{ fontSize: '0.8125rem' }}>{paymentMethod.description || '-'}</Typography>
 								</TableCell>
 
 								{/* Estado */}
-								<TableCell>
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
 									<Tooltip
 										title={paymentMethod.is_active ? 'Desactivar método' : 'Activar método'}
 										placement="top"
@@ -157,14 +256,18 @@ export default function PaymentMethodsTable(props: PaymentMethodsTableProps) {
 								{/* Acciones */}
 								<TableCell
 									align="right"
-									sx={{ pr: 3 }}
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
 								>
 									<Tooltip title="Editar método">
 										<IconButton
 											size="small"
 											onClick={() => onEdit(paymentMethod.id!)}
 										>
-											<FuseSvgIcon size={20}>heroicons-outline:pencil-square</FuseSvgIcon>
+											<FuseSvgIcon size={18}>heroicons-outline:pencil-square</FuseSvgIcon>
 										</IconButton>
 									</Tooltip>
 									<Tooltip title="Eliminar método">
@@ -173,7 +276,7 @@ export default function PaymentMethodsTable(props: PaymentMethodsTableProps) {
 											color="error"
 											onClick={() => onDelete(paymentMethod.id!)}
 										>
-											<FuseSvgIcon size={20}>heroicons-outline:trash</FuseSvgIcon>
+											<FuseSvgIcon size={18}>heroicons-outline:trash</FuseSvgIcon>
 										</IconButton>
 									</Tooltip>
 								</TableCell>
@@ -184,9 +287,9 @@ export default function PaymentMethodsTable(props: PaymentMethodsTableProps) {
 					{(!paymentMethods || paymentMethods.length === 0) && (
 						<TableRow>
 							<TableCell
-								colSpan={5}
+								colSpan={6}
 								align="center"
-								sx={{ py: 8 }}
+								sx={{ py: 8, border: `1px solid ${theme.palette.divider}` }}
 							>
 								<Typography
 									variant="body2"

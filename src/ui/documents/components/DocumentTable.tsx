@@ -3,6 +3,7 @@ import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 import { getDocumentColumns } from './DocumentColumns';
 import DataTable from '@/components/data-table/DataTable';
 import { MenuItem, ListItemIcon, Box, Stack, Divider, Typography, Button } from '@mui/material';
+import { Theme } from '@mui/material/styles';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useNavigate } from 'react-router';
 import DocumentStatusModal from './status-modal';
@@ -52,17 +53,55 @@ export default function DocumentTable(props: DocumentTableProps) {
                 onRowSelectionChange={setRowSelection}
                 enablePagination
                 enableRowSelection={true}
+                enableRowNumbers
+                rowNumberDisplayMode="static"
                 initialState={{
                     density: 'compact',
                     pagination: { pageSize: 15, pageIndex: 0 },
-                    columnPinning: { right: ['mrt-row-actions'] },
+                    columnPinning: { left: ['mrt-row-numbers'], right: ['mrt-row-actions'] },
                     showGlobalFilter: true
+                }}
+                muiTableProps={{
+                    sx: {
+                        borderCollapse: 'collapse',
+                        border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
+                        '& .MuiTableCell-root': {
+                            border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
+                            padding: '6px 10px',
+                            fontSize: '0.8125rem',
+                            borderRadius: 0,
+                        },
+                        '& .MuiTableCell-root .MuiTypography-body2': {
+                            fontSize: '0.8125rem',
+                        },
+                        '& .MuiTableCell-root .MuiTypography-caption': {
+                            fontSize: '0.7rem',
+                        },
+                        '& .MuiTableHead-root .MuiTableCell-root': {
+                            backgroundColor: (theme: Theme) =>
+                                theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+                            fontWeight: 700,
+                            color: 'text.primary',
+                        }
+                    }
                 }}
                 muiTableBodyRowProps={({ row }) => ({
                     onClick: () => navigate(`${basePath}/view/${row.original.id}`),
                     sx: {
                         cursor: 'pointer',
-                        backgroundColor: row.index % 2 === 0 ? 'transparent' : 'action.hover',
+                        backgroundColor: (theme: Theme) =>
+                            row.index % 2 === 0
+                                ? 'transparent'
+                                : theme.palette.mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.02)'
+                                    : 'rgba(0, 0, 0, 0.01)',
+                        '&:hover': {
+                            backgroundColor: (theme: Theme) =>
+                                theme.palette.mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.06)'
+                                    : 'rgba(0, 0, 0, 0.03)',
+                        },
+                        boxShadow: 'none',
                     }
                 })}
                 renderRowActionMenuItems={({ closeMenu, row }) => [

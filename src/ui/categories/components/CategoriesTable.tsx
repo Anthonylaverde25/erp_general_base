@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { CategoryEntity } from '@/domain/entities/categories/CategoryEntity';
+import React from 'react';
 
 interface CategoriesTableProps {
 	categories: CategoryEntity[] | undefined;
@@ -40,22 +41,84 @@ export default function CategoriesTable(props: CategoriesTableProps) {
 	const theme = useTheme();
 
 	return (
-		<TableContainer>
-			<Table sx={{ minWidth: 650 }}>
+		<TableContainer sx={{ borderRadius: 0 }}>
+			<Table sx={{ minWidth: 650, borderCollapse: 'collapse', border: `1px solid ${theme.palette.divider}` }}>
 				<TableHead>
-					<TableRow
-						sx={{
-							backgroundColor: alpha(theme.palette.primary.main, 0.15),
-							borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`
-						}}
-					>
-						<TableCell sx={{ pl: 3, fontWeight: 700 }}>Name</TableCell>
-						<TableCell sx={{ fontWeight: 700 }}>Description</TableCell>
-						{showParentColumn && <TableCell sx={{ fontWeight: 700 }}>Parent Category</TableCell>}
-						<TableCell sx={{ fontWeight: 700 }}>Active</TableCell>
+					<TableRow>
+						<TableCell
+							sx={{
+								width: 50,
+								textAlign: 'center',
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							#
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Name
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Description
+						</TableCell>
+						{showParentColumn && (
+							<TableCell
+								sx={{
+									fontWeight: 700,
+									p: '6px 10px',
+									fontSize: '0.8125rem',
+									border: `1px solid ${theme.palette.divider}`,
+									backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+									color: theme.palette.text.primary
+								}}
+							>
+								Parent Category
+							</TableCell>
+						)}
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Active
+						</TableCell>
 						<TableCell
 							align="right"
-							sx={{ pr: 3, fontWeight: 700 }}
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
 						>
 							Actions
 						</TableCell>
@@ -66,9 +129,9 @@ export default function CategoriesTable(props: CategoriesTableProps) {
 					{isLoading ? (
 						<TableRow>
 							<TableCell
-								colSpan={showParentColumn ? 5 : 4}
+								colSpan={showParentColumn ? 6 : 5}
 								align="center"
-								sx={{ py: 8 }}
+								sx={{ py: 8, border: `1px solid ${theme.palette.divider}` }}
 							>
 								<Typography
 									variant="body2"
@@ -85,7 +148,7 @@ export default function CategoriesTable(props: CategoriesTableProps) {
 								enableGrouping && (!prevCategory || prevCategory.parent_id !== category.parent_id);
 
 							return (
-								<>
+								<React.Fragment key={category.id}>
 									{showGroupHeader && (
 										<TableRow
 											sx={{
@@ -93,12 +156,17 @@ export default function CategoriesTable(props: CategoriesTableProps) {
 											}}
 										>
 											<TableCell
-												colSpan={showParentColumn ? 5 : 4}
-												sx={{ py: 1, pl: 3 }}
+												colSpan={showParentColumn ? 6 : 5}
+												sx={{
+													py: 1,
+													pl: 3,
+													border: `1px solid ${theme.palette.divider}`,
+													backgroundColor: theme.palette.mode === 'dark' ? '#1e2122' : '#f8f9fa'
+												}}
 											>
 												<Typography
 													variant="subtitle1"
-													fontWeight={700}
+													sx={{ fontSize: '0.875rem', fontWeight: 700 }}
 													color="text.primary"
 												>
 													{category.parent_name || 'Uncategorized'}
@@ -107,47 +175,82 @@ export default function CategoriesTable(props: CategoriesTableProps) {
 										</TableRow>
 									)}
 									<TableRow
-										key={category.id}
 										hover
 										sx={{
-											transition: 'all 0.2s ease',
-											'&:last-child td': { borderBottom: 0 },
-											'&:nth-of-type(odd)': {
-												backgroundColor: alpha(theme.palette.action.hover, 0.04), // Keeping 0.04 for now if user wants subtle, but I will prompt to 0.4 if strictly matching.
-												// Wait, I strictly promised to match BankAccountsTable which has 0.4
-												backgroundColor: alpha(theme.palette.action.hover, 0.4)
-											},
-											'&:nth-of-type(even)': {
-												backgroundColor: 'transparent'
-											},
+											backgroundColor:
+												index % 2 === 0
+													? 'transparent'
+													: theme.palette.mode === 'dark'
+														? 'rgba(255, 255, 255, 0.02)'
+														: 'rgba(0, 0, 0, 0.01)',
 											'&:hover': {
-												backgroundColor: alpha(theme.palette.primary.main, 0.08)
+												backgroundColor:
+													theme.palette.mode === 'dark'
+														? 'rgba(255, 255, 255, 0.06)'
+														: 'rgba(0, 0, 0, 0.03)'
 											}
 										}}
 									>
-										<TableCell sx={{ pl: enableGrouping ? 5 : 3 }}>
+										{/* # */}
+										<TableCell
+											sx={{
+												width: 50,
+												textAlign: 'center',
+												p: '6px 10px',
+												fontSize: '0.8125rem',
+												border: `1px solid ${theme.palette.divider}`,
+												color: theme.palette.text.secondary
+											}}
+										>
+											{index + 1}
+										</TableCell>
+
+										<TableCell
+											sx={{
+												pl: enableGrouping ? 5 : 3,
+												p: '6px 10px',
+												fontSize: '0.8125rem',
+												border: `1px solid ${theme.palette.divider}`
+											}}
+										>
 											<Typography
 												variant="subtitle2"
-												fontWeight={600}
+												sx={{ fontSize: '0.8125rem', fontWeight: 600 }}
 											>
 												{category.name}
 											</Typography>
 										</TableCell>
-										<TableCell>
+										<TableCell
+											sx={{
+												p: '6px 10px',
+												fontSize: '0.8125rem',
+												border: `1px solid ${theme.palette.divider}`
+											}}
+										>
 											<Typography
-												variant="body2"
 												noWrap
-												sx={{ maxWidth: 300 }}
+												sx={{ fontSize: '0.8125rem', maxWidth: 300 }}
 											>
 												{category.description || '-'}
 											</Typography>
 										</TableCell>
 										{showParentColumn && (
-											<TableCell>
+											<TableCell
+												sx={{
+													p: '6px 10px',
+													fontSize: '0.8125rem',
+													border: `1px solid ${theme.palette.divider}`
+												}}
+											>
 												{category.parent_name ? (
 													<Chip
 														label={category.parent_name}
 														size="small"
+														sx={{
+															borderRadius: 0,
+															fontSize: '0.75rem',
+															height: 20
+														}}
 														variant="outlined"
 														color="info"
 													/>
@@ -156,7 +259,13 @@ export default function CategoriesTable(props: CategoriesTableProps) {
 												)}
 											</TableCell>
 										)}
-										<TableCell>
+										<TableCell
+											sx={{
+												p: '6px 10px',
+												fontSize: '0.8125rem',
+												border: `1px solid ${theme.palette.divider}`
+											}}
+										>
 											<Switch
 												checked={category.is_active}
 												onChange={() => onStatusChange(category)}
@@ -166,7 +275,11 @@ export default function CategoriesTable(props: CategoriesTableProps) {
 										</TableCell>
 										<TableCell
 											align="right"
-											sx={{ pr: 3 }}
+											sx={{
+												p: '6px 10px',
+												fontSize: '0.8125rem',
+												border: `1px solid ${theme.palette.divider}`
+											}}
 										>
 											<Stack
 												direction="row"
@@ -179,7 +292,7 @@ export default function CategoriesTable(props: CategoriesTableProps) {
 														size="small"
 														onClick={() => onEdit(category)}
 													>
-														<FuseSvgIcon size={20}>
+														<FuseSvgIcon size={18}>
 															heroicons-outline:pencil-square
 														</FuseSvgIcon>
 													</IconButton>
@@ -190,21 +303,21 @@ export default function CategoriesTable(props: CategoriesTableProps) {
 														size="small"
 														onClick={() => onDelete(category.id)}
 													>
-														<FuseSvgIcon size={20}>heroicons-outline:trash</FuseSvgIcon>
+														<FuseSvgIcon size={18}>heroicons-outline:trash</FuseSvgIcon>
 													</IconButton>
 												</Tooltip>
 											</Stack>
 										</TableCell>
 									</TableRow>
-								</>
+								</React.Fragment>
 							);
 						})
 					) : (
 						<TableRow>
 							<TableCell
-								colSpan={showParentColumn ? 5 : 4}
+								colSpan={showParentColumn ? 6 : 5}
 								align="center"
-								sx={{ py: 8 }}
+								sx={{ py: 8, border: `1px solid ${theme.palette.divider}` }}
 							>
 								<Typography
 									variant="body2"

@@ -20,6 +20,13 @@ This document governs the development of the main React/Vite admin panel ERP app
 5. **Typographical Hierarchy:** Heavy weights (`fontWeight: 800/900`) for critical values; small muted text for metadata (captions).
 6. **Selection and States:** Use thick left borders (e.g., `borderLeft: '4px solid #005483'`) to show selection in lists or slim cards.
 7. **Info Banners:** Use information boxes with colored left borders to explain automatic operations.
+8. **Spreadsheet-Style Datatables (MUI & MRT):**
+   - Always enable static row numbers (`enableRowNumbers: true`, `rowNumberDisplayMode: 'static'`).
+   - Pin the row numbers column (`'mrt-row-numbers'`) to the left and row actions (`'mrt-row-actions'`) to the right inside `columnPinning`.
+   - Disable column resizing to avoid formatting issues, allowing horizontal scrolling for flexible columns instead.
+   - Enclose every cell in a 1px solid divider grid (`borderCollapse: 'collapse'`, `border: '1px solid divider'`) via `muiTableProps.sx`.
+   - Format headers with a neutral light/dark gray background (`#f1f3f4` / `#242a2b`), bold font weight, and sharp borders.
+   - Maintain high information density (`density: 'compact'`), with tight cell padding (`6px 10px`), small font size (`0.8125rem`), and smaller custom elements (e.g. avatars at `28px` / `30px`).
 
 ---
 

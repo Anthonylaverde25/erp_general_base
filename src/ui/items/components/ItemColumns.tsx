@@ -35,14 +35,14 @@ export const ItemColumns: MRT_ColumnDef<ItemEntity>[] = [
 			};
 
 			return (
-				<Box className="flex items-center gap-3 py-1">
+				<Box className="flex items-center gap-2 py-0.5">
 					<Avatar
 						src={item.image}
 						sx={{
-							width: 38,
-							height: 38,
+							width: 28,
+							height: 28,
 							bgcolor: stringToColor(name),
-							fontSize: '0.875rem',
+							fontSize: '0.75rem',
 							fontWeight: 600
 						}}
 					>
@@ -52,12 +52,14 @@ export const ItemColumns: MRT_ColumnDef<ItemEntity>[] = [
 						<Typography
 							variant="body2"
 							fontWeight={600}
+							sx={{ fontSize: '0.8125rem', lineHeight: 1.2 }}
 						>
 							{name}
 						</Typography>
 						<Typography
 							variant="caption"
 							color="text.secondary"
+							sx={{ fontSize: '0.7rem', lineHeight: 1.2 }}
 						>
 							{item.sku || 'SKU | No aplica'}
 						</Typography>

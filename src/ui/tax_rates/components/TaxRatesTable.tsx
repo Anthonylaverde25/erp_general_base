@@ -26,22 +26,82 @@ export default function TaxRatesTable(props: TaxRatesTableProps) {
 	const theme = useTheme();
 
 	return (
-		<TableContainer>
-			<Table sx={{ minWidth: 650 }}>
+		<TableContainer sx={{ borderRadius: 0 }}>
+			<Table sx={{ minWidth: 650, borderCollapse: 'collapse', border: `1px solid ${theme.palette.divider}` }}>
 				<TableHead>
-					<TableRow
-						sx={{
-							backgroundColor: alpha(theme.palette.primary.main, 0.15),
-							borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`
-						}}
-					>
-						<TableCell sx={{ pl: 3, fontWeight: 700 }}>Name</TableCell>
-						<TableCell sx={{ fontWeight: 700 }}>Description</TableCell>
-						<TableCell sx={{ fontWeight: 700 }}>Percentage (%)</TableCell>
-						<TableCell sx={{ fontWeight: 700 }}>Tax Type</TableCell>
+					<TableRow>
+						<TableCell
+							sx={{
+								width: 50,
+								textAlign: 'center',
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							#
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Name
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Description
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Percentage (%)
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Tax Type
+						</TableCell>
 						<TableCell
 							align="right"
-							sx={{ pr: 3, fontWeight: 700 }}
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
 						>
 							Actions
 						</TableCell>
@@ -50,38 +110,87 @@ export default function TaxRatesTable(props: TaxRatesTableProps) {
 
 				<TableBody>
 					{taxRates && taxRates.length > 0 ? (
-						taxRates.map((taxRate) => (
+						taxRates.map((taxRate, index) => (
 							<TableRow
 								key={taxRate.id}
 								hover
 								sx={{
-									transition: 'all 0.2s ease',
-									'&:last-child td': { borderBottom: 0 },
-									'&:nth-of-type(odd)': {
-										backgroundColor: alpha(theme.palette.action.hover, 0.4)
-									},
-									'&:nth-of-type(even)': {
-										backgroundColor: 'transparent'
-									},
+									backgroundColor:
+										index % 2 === 0
+											? 'transparent'
+											: theme.palette.mode === 'dark'
+												? 'rgba(255, 255, 255, 0.02)'
+												: 'rgba(0, 0, 0, 0.01)',
 									'&:hover': {
-										backgroundColor: alpha(theme.palette.primary.main, 0.08)
+										backgroundColor:
+											theme.palette.mode === 'dark'
+												? 'rgba(255, 255, 255, 0.06)'
+												: 'rgba(0, 0, 0, 0.03)'
 									}
 								}}
 							>
-								<TableCell sx={{ pl: 3 }}>
+								{/* # */}
+								<TableCell
+									sx={{
+										width: 50,
+										textAlign: 'center',
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`,
+										color: theme.palette.text.secondary
+									}}
+								>
+									{index + 1}
+								</TableCell>
+
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
 									<Typography
 										variant="subtitle2"
-										fontWeight={600}
+										sx={{ fontSize: '0.8125rem', fontWeight: 600 }}
 									>
 										{taxRate.name}
 									</Typography>
 								</TableCell>
-								<TableCell>No aplica</TableCell>
-								<TableCell>{taxRate.percentage}%</TableCell>
-								<TableCell>{taxRate.tax_type?.name || '-'}</TableCell>
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
+									<Typography sx={{ fontSize: '0.8125rem' }}>No aplica</Typography>
+								</TableCell>
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
+									<Typography sx={{ fontSize: '0.8125rem' }}>{taxRate.percentage}%</Typography>
+								</TableCell>
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
+									<Typography sx={{ fontSize: '0.8125rem' }}>{taxRate.tax_type?.name || '-'}</Typography>
+								</TableCell>
 								<TableCell
 									align="right"
-									sx={{ pr: 3 }}
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
 								>
 									<Stack
 										direction="row"
@@ -94,7 +203,7 @@ export default function TaxRatesTable(props: TaxRatesTableProps) {
 												size="small"
 												onClick={() => onEdit(taxRate)}
 											>
-												<FuseSvgIcon size={20}>heroicons-outline:pencil-square</FuseSvgIcon>
+												<FuseSvgIcon size={18}>heroicons-outline:pencil-square</FuseSvgIcon>
 											</IconButton>
 										</Tooltip>
 										<Tooltip title="Delete">
@@ -103,7 +212,7 @@ export default function TaxRatesTable(props: TaxRatesTableProps) {
 												size="small"
 												onClick={() => onDelete(taxRate.id!)}
 											>
-												<FuseSvgIcon size={20}>heroicons-outline:trash</FuseSvgIcon>
+												<FuseSvgIcon size={18}>heroicons-outline:trash</FuseSvgIcon>
 											</IconButton>
 										</Tooltip>
 									</Stack>
@@ -113,9 +222,9 @@ export default function TaxRatesTable(props: TaxRatesTableProps) {
 					) : (
 						<TableRow>
 							<TableCell
-								colSpan={5}
+								colSpan={6}
 								align="center"
-								sx={{ py: 8 }}
+								sx={{ py: 8, border: `1px solid ${theme.palette.divider}` }}
 							>
 								<Typography
 									variant="body2"

@@ -24,7 +24,7 @@ export default function UserDataTable(props: MaterialReactTableProps<IUser>) {
 				showColumnFilters: false,
 				showGlobalFilter: true,
 				columnPinning: {
-					left: ['mrt-row-expand', 'mrt-row-select'],
+					left: ['mrt-row-numbers', 'mrt-row-expand', 'mrt-row-select'],
 					right: ['mrt-row-actions']
 				},
 				pagination: { pageIndex: 0, pageSize: 25 }
@@ -39,6 +39,8 @@ export default function UserDataTable(props: MaterialReactTableProps<IUser>) {
 			enableFacetedValues: true,
 			enableRowActions: true,
 			enableRowSelection: true,
+			enableRowNumbers: true,
+			rowNumberDisplayMode: 'static',
 			enableStickyHeader: true,
 			enableStickyFooter: true,
 			enableSorting: false,
@@ -49,22 +51,19 @@ export default function UserDataTable(props: MaterialReactTableProps<IUser>) {
 			// Enhanced table styling
 			muiTableProps: {
 				sx: {
+					borderCollapse: 'collapse',
+					border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
 					'& .MuiTableCell-root': {
-						borderRight: '1px solid',
-						borderRightColor: (theme: Theme) => theme.palette.divider,
-						'&:last-child': {
-							borderRight: 'none'
-						}
+						border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
+						padding: '6px 10px',
+						fontSize: '0.8125rem',
+						borderRadius: 0
 					},
 					'& .MuiTableHead-root .MuiTableCell-root': {
 						backgroundColor: (theme: Theme) =>
-							theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
-						fontWeight: 600,
-						fontSize: '0.8125rem',
-						textTransform: 'uppercase',
-						letterSpacing: '0.3px',
-						borderBottom: '1px solid',
-						borderBottomColor: (theme: Theme) => theme.palette.divider
+							theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+						fontWeight: 700,
+						color: 'text.primary'
 					},
 					'& .MuiTableBody-root .MuiTableRow-root': {
 						'&:hover': {

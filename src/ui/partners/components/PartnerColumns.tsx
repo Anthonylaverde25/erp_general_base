@@ -35,13 +35,13 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
 			};
 
 			return (
-				<Box className="flex items-center gap-3 py-1">
+				<Box className="flex items-center gap-2 py-0.5">
 					<Avatar
 						sx={{
-							width: 38,
-							height: 38,
+							width: 28,
+							height: 28,
 							bgcolor: stringToColor(name),
-							fontSize: '0.875rem',
+							fontSize: '0.75rem',
 							fontWeight: 600
 						}}
 					>
@@ -51,12 +51,14 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
 						<Typography
 							variant="body2"
 							fontWeight={600}
+							sx={{ fontSize: '0.8125rem', lineHeight: 1.2 }}
 						>
 							{name}
 						</Typography>
 						<Typography
 							variant="caption"
 							color="text.secondary"
+							sx={{ fontSize: '0.7rem', lineHeight: 1.2 }}
 						>
 							{partner.comercial_name || 'Nombre comercial | No aplica'}
 						</Typography>
@@ -110,6 +112,7 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
 						<Typography
 							variant="body2"
 							color="text.secondary"
+							sx={{ fontSize: '0.8125rem' }}
 						>
 							Dirección | No aplica
 						</Typography>
@@ -122,6 +125,7 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
 					<Typography
 						variant="body2"
 						className="truncate"
+						sx={{ fontSize: '0.8125rem', lineHeight: 1.2 }}
 					>
 						{address.street || 'Calle desconocida'}
 					</Typography>
@@ -129,6 +133,7 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
 						variant="caption"
 						color="text.secondary"
 						className="block truncate"
+						sx={{ fontSize: '0.7rem', lineHeight: 1.2 }}
 					>
 						{address.city} {address.postal_code}, {address.country}
 					</Typography>
@@ -151,6 +156,7 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
 						<Typography
 							variant="body2"
 							color="text.secondary"
+							sx={{ fontSize: '0.8125rem' }}
 						>
 							Contacto | No aplica
 						</Typography>
@@ -163,12 +169,14 @@ export const PartnerColumns: MRT_ColumnDef<PartnerEntity>[] = [
 					<Typography
 						variant="body2"
 						className="truncate"
+						sx={{ fontSize: '0.8125rem', lineHeight: 1.2 }}
 					>
 						{contact.email || 'Email | No aplica'}
 					</Typography>
 					<Typography
 						variant="caption"
 						color="text.secondary"
+						sx={{ fontSize: '0.7rem', lineHeight: 1.2 }}
 					>
 						{contact.phone || 'Teléfono | No aplica'}
 					</Typography>

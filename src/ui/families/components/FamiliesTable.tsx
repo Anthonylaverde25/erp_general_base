@@ -29,22 +29,82 @@ export default function FamiliesTable(props: FamiliesTableProps) {
 	const theme = useTheme();
 
 	return (
-		<TableContainer>
-			<Table sx={{ minWidth: 650 }}>
+		<TableContainer sx={{ borderRadius: 0 }}>
+			<Table sx={{ minWidth: 650, borderCollapse: 'collapse', border: `1px solid ${theme.palette.divider}` }}>
 				<TableHead>
-					<TableRow
-						sx={{
-							backgroundColor: alpha(theme.palette.primary.main, 0.15),
-							borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`
-						}}
-					>
-						<TableCell sx={{ pl: 3, fontWeight: 700 }}>Name</TableCell>
-						<TableCell sx={{ fontWeight: 700 }}>Profit %</TableCell>
-						<TableCell sx={{ fontWeight: 700 }}>Tax Rate</TableCell>
-						<TableCell sx={{ fontWeight: 700 }}>Active</TableCell>
+					<TableRow>
+						<TableCell
+							sx={{
+								width: 50,
+								textAlign: 'center',
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							#
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Name
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Profit %
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Tax Rate
+						</TableCell>
+						<TableCell
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
+						>
+							Active
+						</TableCell>
 						<TableCell
 							align="right"
-							sx={{ pr: 3, fontWeight: 700 }}
+							sx={{
+								fontWeight: 700,
+								p: '6px 10px',
+								fontSize: '0.8125rem',
+								border: `1px solid ${theme.palette.divider}`,
+								backgroundColor: theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+								color: theme.palette.text.primary
+							}}
 						>
 							Actions
 						</TableCell>
@@ -55,9 +115,9 @@ export default function FamiliesTable(props: FamiliesTableProps) {
 					{isLoading ? (
 						<TableRow>
 							<TableCell
-								colSpan={5}
+								colSpan={6}
 								align="center"
-								sx={{ py: 8 }}
+								sx={{ py: 8, border: `1px solid ${theme.palette.divider}` }}
 							>
 								<Typography
 									variant="body2"
@@ -68,44 +128,94 @@ export default function FamiliesTable(props: FamiliesTableProps) {
 							</TableCell>
 						</TableRow>
 					) : families && families.length > 0 ? (
-						families.map((family) => (
+						families.map((family, index) => (
 							<TableRow
 								key={family.id}
 								hover
 								sx={{
-									transition: 'all 0.2s ease',
-									'&:last-child td': { borderBottom: 0 },
-									'&:nth-of-type(odd)': {
-										backgroundColor: alpha(theme.palette.action.hover, 0.4)
-									},
-									'&:nth-of-type(even)': {
-										backgroundColor: 'transparent'
-									},
+									backgroundColor:
+										index % 2 === 0
+											? 'transparent'
+											: theme.palette.mode === 'dark'
+												? 'rgba(255, 255, 255, 0.02)'
+												: 'rgba(0, 0, 0, 0.01)',
 									'&:hover': {
-										backgroundColor: alpha(theme.palette.primary.main, 0.08)
+										backgroundColor:
+											theme.palette.mode === 'dark'
+												? 'rgba(255, 255, 255, 0.06)'
+												: 'rgba(0, 0, 0, 0.03)'
 									}
 								}}
 							>
-								<TableCell sx={{ pl: 3 }}>
+								{/* # */}
+								<TableCell
+									sx={{
+										width: 50,
+										textAlign: 'center',
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`,
+										color: theme.palette.text.secondary
+									}}
+								>
+									{index + 1}
+								</TableCell>
+
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
 									<Typography
 										variant="subtitle2"
-										fontWeight={600}
+										sx={{ fontSize: '0.8125rem', fontWeight: 600 }}
 									>
 										{family.name}
 									</Typography>
 								</TableCell>
-								<TableCell>{family.percentage}%</TableCell>
-								<TableCell>{family.tax_rates?.map((t) => t.name).join(', ') || '-'}</TableCell>
-								<TableCell>
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
+									<Typography sx={{ fontSize: '0.8125rem' }}>{family.percentage}%</Typography>
+								</TableCell>
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
+									<Typography sx={{ fontSize: '0.8125rem' }}>
+										{family.tax_rates?.map((t) => t.name).join(', ') || '-'}
+									</Typography>
+								</TableCell>
+								<TableCell
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
+								>
 									<Switch
 										checked={family.is_active}
 										onChange={() => onStatusChange(family)}
 										inputProps={{ 'aria-label': 'controlled' }}
+										size="small"
 									/>
 								</TableCell>
 								<TableCell
 									align="right"
-									sx={{ pr: 3 }}
+									sx={{
+										p: '6px 10px',
+										fontSize: '0.8125rem',
+										border: `1px solid ${theme.palette.divider}`
+									}}
 								>
 									<Stack
 										direction="row"
@@ -118,7 +228,7 @@ export default function FamiliesTable(props: FamiliesTableProps) {
 												size="small"
 												onClick={() => onEdit(family)}
 											>
-												<FuseSvgIcon size={20}>heroicons-outline:pencil-square</FuseSvgIcon>
+												<FuseSvgIcon size={18}>heroicons-outline:pencil-square</FuseSvgIcon>
 											</IconButton>
 										</Tooltip>
 										<Tooltip title="Delete">
@@ -127,7 +237,7 @@ export default function FamiliesTable(props: FamiliesTableProps) {
 												size="small"
 												onClick={() => onDelete(family.id)}
 											>
-												<FuseSvgIcon size={20}>heroicons-outline:trash</FuseSvgIcon>
+												<FuseSvgIcon size={18}>heroicons-outline:trash</FuseSvgIcon>
 											</IconButton>
 										</Tooltip>
 									</Stack>
@@ -137,9 +247,9 @@ export default function FamiliesTable(props: FamiliesTableProps) {
 					) : (
 						<TableRow>
 							<TableCell
-								colSpan={5}
+								colSpan={6}
 								align="center"
-								sx={{ py: 8 }}
+								sx={{ py: 8, border: `1px solid ${theme.palette.divider}` }}
 							>
 								<Typography
 									variant="body2"

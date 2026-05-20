@@ -25,7 +25,7 @@ export default function TeamTable(props: TeamTableProps) {
 			)}
 			enableRowSelection
 			initialState={{
-				density: 'comfortable',
+				density: 'compact',
 				pagination: { pageSize: 10, pageIndex: 0 }
 			}}
 			muiTablePaperProps={{
