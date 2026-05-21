@@ -12,11 +12,13 @@ export const defaultCreatePartnerValues: PartnerFormType = {
 	grouped_billing: false,
 	currency_id: '',
 	website: '',
+	address_id: undefined,
 	address_street: '',
 	address_city: '',
 	address_state: '',
 	address_postal_code: '',
 	address_country: '',
+	contact_id: undefined,
 	contact_email: '',
 	contact_phone: '',
 	bank_accounts: [],
@@ -42,12 +44,14 @@ export const defaultUpdatePartnerValues = (data?: any): PartnerFormType => {
 		currency_id: String(data?.currency_id || ''),
 		website: data?.website || '',
 
+		address_id: defaultAddress?.id || undefined,
 		address_street: defaultAddress?.street || '',
 		address_city: defaultAddress?.city || '',
 		address_state: defaultAddress?.state || '',
 		address_postal_code: defaultAddress?.postal_code || '',
 		address_country: defaultAddress?.country || '',
 
+		contact_id: defaultContact?.id || undefined,
 		contact_email: defaultContact?.email || '',
 		contact_phone: defaultContact?.phone || '',
 

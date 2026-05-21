@@ -11,10 +11,11 @@ import {
 	ToggleButton,
 	ToggleButtonGroup,
 	Stack,
-	Fade
+	Fade,
+	IconButton
 } from '@mui/material';
 
-import { Save, Close } from '@mui/icons-material';
+import { Save, Close, Person, AccountBalance, Settings } from '@mui/icons-material';
 
 import { partnerSchema, PartnerFormType } from '@/schemas/partners/partners.schema';
 import { defaultCreatePartnerValues, defaultUpdatePartnerValues } from '@/schemas/partners/partners.defaults';
@@ -116,28 +117,39 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
 	return (
 		<>
 			<Fade in={true}>
-				<FormProvider {...methods}>
-					<form
+				<div>
+					<FormProvider {...methods}>
+						<form
 						onSubmit={handleSubmit(onSubmit)}
 						className="flex h-[700px] flex-col"
 					>
-						<Box className="flex-none p-6 pb-2">
-							<Typography
-								variant="h6"
-								fontWeight={700}
-								color="text.primary"
-							>
-								{data ? 'Editar Socio' : 'Crear Socio'}
-							</Typography>
-							<Typography
-								variant="body2"
-								color="text.secondary"
-							>
-								{data
-									? 'Actualice los detalles del socio.'
-									: 'Introduzca los detalles del nuevo socio.'}
-							</Typography>
-						</Box>
+							<Box className="flex-none p-6 pb-2 flex items-center justify-between">
+								<Box>
+									<Typography
+										variant="h6"
+										fontWeight={700}
+										color="text.primary"
+									>
+										{data ? 'Editar Socio' : 'Crear Socio'}
+									</Typography>
+									<Typography
+										variant="body2"
+										color="text.secondary"
+									>
+										{data
+											? 'Actualice los detalles del socio.'
+											: 'Introduzca los detalles del nuevo socio.'}
+									</Typography>
+								</Box>
+								<IconButton
+									onClick={onCancel}
+									disabled={isLoading}
+									size="small"
+									aria-label="close"
+								>
+									<Close fontSize="small" />
+								</IconButton>
+							</Box>
 
 						<Box className="flex-none px-6 py-2">
 							<PartnerHeaderSection
@@ -155,16 +167,33 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
 								value={tabValue}
 								onChange={handleTabChange}
 								aria-label="partner settings tabs"
+								sx={{
+									minHeight: 40,
+									'& .MuiTab-root': {
+										minHeight: 40,
+										py: 1,
+										fontSize: '0.8125rem',
+										textTransform: 'none',
+										fontWeight: 600,
+										gap: 1
+									}
+								}}
 							>
 								<Tab
+									icon={<Person fontSize="small" />}
+									iconPosition="start"
 									label="Principal"
 									{...a11yProps(0)}
 								/>
 								<Tab
+									icon={<AccountBalance fontSize="small" />}
+									iconPosition="start"
 									label="Cuentas"
 									{...a11yProps(1)}
 								/>
 								<Tab
+									icon={<Settings fontSize="small" />}
+									iconPosition="start"
 									label="Preferencias"
 									{...a11yProps(2)}
 								/>
@@ -266,8 +295,9 @@ export function PartnersForm({ data, onCancel, onSuccess }: PartnersFormProps) {
 								{isLoading ? 'Guardando...' : data ? 'Actualizar' : 'Crear Socio'}
 							</Button>
 						</Stack>
-					</form>
-				</FormProvider>
+						</form>
+					</FormProvider>
+				</div>
 			</Fade>
 
 			<PublicOrganismModal

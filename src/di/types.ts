@@ -73,6 +73,7 @@ export const TYPES = {
 	IDocumentTypeRepository: Symbol.for('IDocumentTypeRepository'),
 	IndexDocumentTypesUseCase: Symbol.for('IndexDocumentTypesUseCase'),
 	IndexDocumentTypesByModuleUseCase: Symbol.for('IndexDocumentTypesByModuleUseCase'),
+	IndexDocumentTypesByCategoryUseCase: Symbol.for('IndexDocumentTypesByCategoryUseCase'),
 
 	// Number Series
 	INumberSeriesRepository: Symbol.for('INumberSeriesRepository'),

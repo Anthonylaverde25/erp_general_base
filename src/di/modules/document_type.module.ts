@@ -4,6 +4,7 @@ import { IDocumentTypeRepository } from '@/domain/entities/document_types/reposi
 import { DocumentTypeRepositoryCrud } from '@/infrastructure/repositories/document_types/DocumentTypeRepositoryCrud';
 import { IndexDocumentTypesUseCase } from '@/application/use_cases/document_types/IndexDocumentTypesUseCase';
 import { IndexDocumentTypesByModuleUseCase } from '@/application/use_cases/document_types/IndexDocumentTypesByModuleUseCase';
+import { IndexDocumentTypesByCategoryUseCase } from '@/application/use_cases/document_types/IndexDocumentTypesByCategoryUseCase';
 
 export function registerDocumentTypeModule(container: Container) {
 	// Repository
@@ -14,4 +15,7 @@ export function registerDocumentTypeModule(container: Container) {
 	container
 		.bind<IndexDocumentTypesByModuleUseCase>(TYPES.IndexDocumentTypesByModuleUseCase)
 		.to(IndexDocumentTypesByModuleUseCase);
+	container
+		.bind<IndexDocumentTypesByCategoryUseCase>(TYPES.IndexDocumentTypesByCategoryUseCase)
+		.to(IndexDocumentTypesByCategoryUseCase);
 }

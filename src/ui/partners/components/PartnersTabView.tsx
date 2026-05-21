@@ -4,6 +4,7 @@ import { useIndexPartners } from '@/features/partners/hooks/useIndexPartners';
 import { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import PartnerTable from './PartnerTable';
 import { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router';
 import UpdatePartnerModal from './modals/UpdatePartnerModal';
 import PartnerDetailDrawer from './PartnerDetailDrawer';
 
@@ -17,8 +18,10 @@ export default function PartnersTabView({ currentTab, onTabChange }: PartnersTab
 	// const [currentTab, setCurrentTab] = useState('all'); // Moved to parent
 	const [filteredGeneralType, setFilteredGeneralType] = useState<string>('all');
 
-	const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
-	const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+	const [searchParams, setSearchParams] = useSearchParams();
+	const editParam = searchParams.get('edit');
+	const selectedPartnerId = editParam ? Number(editParam) : null;
+	const isUpdateModalOpen = !!editParam;
 
 	// Drawer state
 	const [drawerOpen, setDrawerOpen] = useState(false);
@@ -68,13 +71,19 @@ export default function PartnersTabView({ currentTab, onTabChange }: PartnersTab
 	}, [partners, currentTab, filteredGeneralType]);
 
 	const handleEdit = (partner: PartnerEntity) => {
-		setSelectedPartnerId(partner.id);
-		setIsUpdateModalOpen(true);
+		setSearchParams((prev) => {
+			const next = new URLSearchParams(prev);
+			next.set('edit', partner.id.toString());
+			return next;
+		});
 	};
 
 	const handleCloseUpdateModal = () => {
-		setIsUpdateModalOpen(false);
-		setSelectedPartnerId(null);
+		setSearchParams((prev) => {
+			const next = new URLSearchParams(prev);
+			next.delete('edit');
+			return next;
+		});
 	};
 
 	const handleRowClick = (partner: PartnerEntity) => {

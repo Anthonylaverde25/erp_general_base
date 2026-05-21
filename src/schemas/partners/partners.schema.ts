@@ -14,6 +14,7 @@ export const partnerSchema = z.object({
 	website: z.string().url('URL inválida').optional().or(z.literal('')),
 
 	// Address fields
+	address_id: z.number().optional(),
 	address_street: z.string().optional(),
 	address_city: z.string().optional(),
 	address_state: z.string().optional(),
@@ -21,6 +22,7 @@ export const partnerSchema = z.object({
 	address_country: z.string().optional(),
 
 	// Contact fields
+	contact_id: z.number().optional(),
 	contact_email: z.string().email('Email inválido').optional().or(z.literal('')),
 	contact_phone: z.string().optional(),
 

@@ -1,4 +1,6 @@
-import { AppFormModal } from '@/components/modals/AppFormModal';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import FuseLoading from '@fuse/core/FuseLoading';
 import { PartnersForm } from '../forms/PartnersForm';
 import { useShowPartner } from '@/features/partners/hooks/useShowPartner';
 
@@ -9,23 +11,30 @@ interface UpdatePartnerModalProps {
 }
 
 export default function UpdatePartnerModal({ open, onClose, partnerId }: UpdatePartnerModalProps) {
+	const { partner, isLoading } = useShowPartner(partnerId || 0);
+
 	if (!partnerId) return null;
 
-	const { partner, isLoading } = useShowPartner(partnerId);
-
 	return (
-		<AppFormModal
-			isOpen={open}
+		<Dialog
+			open={open}
 			onClose={onClose}
-			key={partnerId}
+			fullWidth
 			maxWidth="md"
-			title="Editar Socio"
-			hideCancel
-			actions={<></>}
+			PaperProps={{
+				sx: {
+					bgcolor: 'background.default',
+					minHeight: '600px',
+					width: '100%',
+					borderRadius: 2
+				}
+			}}
 		>
-			<div className="p-0">
+			<DialogContent className="bg-background-default overflow-y-auto p-0">
 				{isLoading || !partner ? (
-					<div className="p-4 text-center">Cargando...</div>
+					<div className="p-8 text-center flex items-center justify-center min-h-[600px]">
+						<FuseLoading />
+					</div>
 				) : (
 					<PartnersForm
 						data={partner}
@@ -33,7 +42,8 @@ export default function UpdatePartnerModal({ open, onClose, partnerId }: UpdateP
 						onSuccess={onClose}
 					/>
 				)}
-			</div>
-		</AppFormModal>
+			</DialogContent>
+		</Dialog>
 	);
 }
+

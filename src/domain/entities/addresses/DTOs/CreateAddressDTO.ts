@@ -1,4 +1,5 @@
 export interface CreateAddressDTO {
+	id?: number;
 	street: string;
 	street_2?: string | null;
 	city: string;

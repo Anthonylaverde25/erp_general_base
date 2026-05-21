@@ -1,5 +1,5 @@
 import { MaterialReactTable, useMaterialReactTable, MaterialReactTableProps, MRT_Icons } from 'material-react-table';
-import _ from 'lodash';
+import defaultsDeep from 'lodash/defaultsDeep';
 import { useMemo } from 'react';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { Theme } from '@mui/material/styles';
@@ -32,13 +32,13 @@ function DataTable<TData>(props: MaterialReactTableProps<TData>) {
 	const isMobile = useThemeMediaQuery((theme) => theme.breakpoints.down('lg'));
 	const defaults = useMemo(
 		() =>
-			_.defaults(rest, {
+			defaultsDeep(rest, {
 				initialState: {
 					density: 'compact',
 					showColumnFilters: false,
 					showGlobalFilter: true,
 					columnPinning: {
-						left: isMobile ? [] : ['mrt-row-expand', 'mrt-row-select'],
+						left: isMobile ? [] : ['mrt-row-numbers', 'mrt-row-expand', 'mrt-row-select'],
 						right: isMobile ? [] : ['mrt-row-actions']
 					},
 					pagination: {
@@ -46,6 +46,9 @@ function DataTable<TData>(props: MaterialReactTableProps<TData>) {
 					},
 					enableFullScreenToggle: false
 				},
+				enableRowNumbers: true,
+				rowNumberDisplayMode: 'static',
+				enableColumnResizing: false,
 				enableFullScreenToggle: false,
 				enableColumnFilterModes: true,
 				enableColumnOrdering: true,
@@ -54,10 +57,28 @@ function DataTable<TData>(props: MaterialReactTableProps<TData>) {
 				enableFacetedValues: true,
 				enableRowActions: true,
 				enableRowSelection: true,
+				muiTableProps: {
+					sx: {
+						borderCollapse: 'collapse',
+						border: (theme: Theme) => `1px solid ${theme.vars.palette.divider}`,
+						'& .MuiTableCell-root': {
+							border: (theme: Theme) => `1px solid ${theme.vars.palette.divider}`,
+							padding: '6px 10px',
+							fontSize: '0.8125rem',
+							borderRadius: 0
+						},
+						'& .MuiTableHead-root .MuiTableCell-root': {
+							backgroundColor: (theme: Theme) =>
+								theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+							fontWeight: 700,
+							color: 'text.primary'
+						}
+					}
+				},
 				muiTopToolbarProps: {
 					sx: {
 						backgroundColor: (theme: Theme) =>
-							theme.palette.mode === 'dark' ? '#2d3436' : '#f8f9fa',
+							theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
 						borderBottom: (theme: Theme) => `1px solid ${theme.vars.palette.divider}`,
 					}
 				},
@@ -114,26 +135,18 @@ function DataTable<TData>(props: MaterialReactTableProps<TData>) {
 				muiTableBodyRowProps: ({ row, table }) => {
 					const { density } = table.getState();
 
-					if (density === 'compact') {
-						return {
-							sx: {
-								backgroundColor: row.index % 2 === 0 ? 'transparent' : 'action.hover',
-								borderBottom: (theme: Theme) => `1px solid ${theme.vars.palette.divider}`,
-								opacity: 1,
-								boxShadow: 'none',
-								height: row.getIsPinned() ? `${37}px` : undefined
-							}
-						};
-					}
-
 					return {
 						sx: {
 							backgroundColor: row.index % 2 === 0 ? 'transparent' : 'action.hover',
 							borderBottom: (theme: Theme) => `1px solid ${theme.vars.palette.divider}`,
 							opacity: 1,
 							boxShadow: 'none',
-							// Set a fixed height for pinned rows
-							height: row.getIsPinned() ? `${density === 'comfortable' ? 53 : 69}px` : undefined
+							height: row.getIsPinned() ? `${37}px` : undefined,
+							'&:hover': {
+								backgroundColor: (theme: Theme) =>
+									theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+								transition: 'background-color 0.2s ease'
+							}
 						}
 					};
 				},
@@ -158,11 +171,13 @@ function DataTable<TData>(props: MaterialReactTableProps<TData>) {
 							column.getIsPinned()
 								? theme.vars.palette.background.paper
 								: theme.palette.mode === 'dark'
-									? '#2d3436'
-									: '#f8f9fa',
+									? '#242a2b'
+									: '#f1f3f4',
 						borderBottom: (theme: Theme) => `1px solid ${theme.vars.palette.divider}`,
+						borderRight: (theme: Theme) => `1px solid ${theme.vars.palette.divider}`,
 						fontWeight: 700,
-						fontSize: 13
+						fontSize: '0.8125rem',
+						padding: '6px 10px'
 					}
 				}),
 				mrtTheme: (theme) => ({

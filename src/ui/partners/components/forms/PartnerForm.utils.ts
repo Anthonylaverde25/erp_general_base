@@ -17,6 +17,7 @@ export const mapPartnerFormToDTO = (
 
 	if (values.address_street || values.address_city) {
 		address.push({
+			id: values.address_id,
 			street: values.address_street || '',
 			city: values.address_city || '',
 			state: values.address_state || '',
@@ -30,6 +31,7 @@ export const mapPartnerFormToDTO = (
 
 	if (values.contact_email || values.contact_phone) {
 		contact.push({
+			id: values.contact_id,
 			email: values.contact_email || '',
 			phone: values.contact_phone || '',
 			default: true

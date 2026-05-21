@@ -15,30 +15,9 @@ const SettingsAppNavigation: FuseNavItemType = {
 			url: '/apps/settings/account',
 			subtitle: 'Administra tu perfil público e información privada'
 		},
-		{
-			id: 'apps.settings.security',
-			icon: 'lucide:lock',
-			title: 'Seguridad',
-			type: 'item',
-			url: '/apps/settings/security',
-			subtitle: 'Administra tu contraseña y verificación en 2 pasos'
-		},
-		{
-			id: 'apps.settings.planBilling',
-			icon: 'lucide:credit-card',
-			title: 'Plan y Facturación',
-			type: 'item',
-			url: '/apps/settings/plan-billing',
-			subtitle: 'Administra tu plan de suscripción y método de pago'
-		},
-		{
-			id: 'apps.settings.notifications',
-			icon: 'lucide:bell',
-			title: 'Notificaciones',
-			type: 'item',
-			url: '/apps/settings/notifications',
-			subtitle: 'Gestiona cuándo y cómo recibirás notificaciones'
-		},
+
+
+
 		{
 			id: 'apps.settings.team',
 			icon: 'lucide:users',
@@ -127,14 +106,7 @@ const SettingsAppNavigation: FuseNavItemType = {
 			url: '/apps/settings/subcategories',
 			subtitle: 'Gestiona las subcategorías de tus productos'
 		},
-		{
-			id: 'apps.settings.partners',
-			icon: 'lucide:users',
-			title: 'Partners',
-			type: 'item',
-			url: '/apps/settings/partners',
-			subtitle: 'Gestiona tus socios comerciales'
-		},
+
 		{
 			id: 'apps.settings.unitTypes',
 			icon: 'lucide:ruler',
