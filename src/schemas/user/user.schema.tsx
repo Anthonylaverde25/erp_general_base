@@ -6,7 +6,7 @@ export const createUserSchema = z
 		email: z.string().email('Debe ingresar un email válido').min(1, 'El email es requerido'),
 		password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
 		password_confirmation: z.string().min(1, 'Debe confirmar la contraseña'),
-		role_id: z.number({ required_error: 'Debe seleccionar un rol' }),
+		role_id: z.number({ required_error: 'Debe seleccionar un rol' }).min(1, 'Debe seleccionar un rol'),
 		phone: z.string().optional()
 	})
 	.refine((data) => data.password === data.password_confirmation, {
@@ -23,7 +23,7 @@ export const updateUserSchema = z
 		email: z.string().email('Debe ingresar un email válido').min(1, 'El email es requerido'),
 		password: z.string().optional(),
 		password_confirmation: z.string().optional(),
-		role_id: z.number({ required_error: 'Debe seleccionar un rol' }),
+		role_id: z.number({ required_error: 'Debe seleccionar un rol' }).min(1, 'Debe seleccionar un rol'),
 		phone: z.string().optional()
 	})
 	.refine(

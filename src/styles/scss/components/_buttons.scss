@@ -1,14 +1,17 @@
 .MuiButton-root.btn-primary {
-
-
     background-color: #1f2937;
     color: white;
     padding: 6px 16px;
     border-radius: 5px;
     cursor: pointer;
     text-align: center;
-
     box-shadow: none !important;
+
+    &:disabled {
+        background-color: #e2e8f0 !important;
+        color: #94a3b8 !important;
+        cursor: not-allowed;
+    }
 }
 
 .MuiButton-root.btn-secondary {
@@ -19,6 +22,11 @@
     cursor: pointer;
     text-align: center;
     font-weight: bold;
-
     box-shadow: none !important;
+
+    &:disabled {
+        background-color: #f1f5f9 !important;
+        color: #cbd5e1 !important;
+        cursor: not-allowed;
+    }
 }

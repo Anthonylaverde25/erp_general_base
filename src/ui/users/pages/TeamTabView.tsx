@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { Button, Stack, Box } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 
 import useIndexUser from '@/features/users/hooks/useIndexUsers';
 import TeamTable from '../component/TeamTable';
-import TeamTableSimple from '../component/TeamTableSimple';
 import CreateUserButton from '@/ui/users/component/CreateUserButton';
 import UpdateUserModal from '@/ui/users/component/modals/UpdateUserModal';
 import { IUser } from '@/types/user.types';
@@ -52,13 +51,6 @@ export default function TeamTabView() {
 				users={users}
 				onEdit={handleEditUser}
 			/>
-
-			<Box sx={{ my: 4 }}>
-				<TeamTableSimple
-					users={users}
-					onEdit={handleEditUser}
-				/>
-			</Box>
 
 			{selectedId && (
 				<UpdateUserModal

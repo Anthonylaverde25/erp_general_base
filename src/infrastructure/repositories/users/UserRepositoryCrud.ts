@@ -22,9 +22,10 @@ export class UserRepositoryCrud implements IUserCrudRepository {
 	}
 
 	async create(data: UserEntity): Promise<{ user: UserEntity; message: string }> {
+		const payload = data.toPlainObject();
 		const {
 			data: { user, message }
-		} = await axiosInstance.post('users', data);
+		} = await axiosInstance.post('users', payload);
 
 		return {
 			user: UserMapper.fromDetailDTO(user),
