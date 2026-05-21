@@ -3,7 +3,8 @@ import {
 	ICashRegisterCurrentSession,
 	ICloseSessionPayload,
 	IOpenSessionPayload,
-	IRecordMovementPayload
+	IRecordMovementPayload,
+	ICreateCashRegisterPayload
 } from '@/types/cash-register.types';
 
 export interface ICashRegisterRepository {
@@ -12,4 +13,6 @@ export interface ICashRegisterRepository {
 	openSession(payload: IOpenSessionPayload): Promise<{ message?: string }>;
 	closeSession(payload: ICloseSessionPayload): Promise<{ message?: string }>;
 	recordMovement(payload: IRecordMovementPayload): Promise<{ message?: string }>;
+	toggleMovementChecked(movementId: number): Promise<{ message?: string }>;
+	create(payload: ICreateCashRegisterPayload): Promise<{ message?: string; data?: ICashRegister }>;
 }

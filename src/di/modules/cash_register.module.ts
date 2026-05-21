@@ -7,6 +7,8 @@ import { OpenSessionUseCase } from '@/application/cash-register/OpenSessionUseCa
 import { CloseSessionUseCase } from '@/application/cash-register/CloseSessionUseCase';
 import { RecordMovementUseCase } from '@/application/cash-register/RecordMovementUseCase';
 import { IndexCashRegistersUseCase } from '@/application/cash-register/IndexCashRegistersUseCase';
+import { ToggleMovementCheckedUseCase } from '@/application/cash-register/ToggleMovementCheckedUseCase';
+import { CreateCashRegisterUseCase } from '@/application/cash-register/CreateCashRegisterUseCase';
 
 export const registerCashRegisterModule = (container: Container) => {
 	container.bind<ICashRegisterRepository>(TYPES.ICashRegisterRepository).to(CashRegisterRepositoryImpl).inSingletonScope();
@@ -15,4 +17,6 @@ export const registerCashRegisterModule = (container: Container) => {
 	container.bind<CloseSessionUseCase>(TYPES.CloseSessionUseCase).to(CloseSessionUseCase);
 	container.bind<RecordMovementUseCase>(TYPES.RecordMovementUseCase).to(RecordMovementUseCase);
 	container.bind<IndexCashRegistersUseCase>(TYPES.IndexCashRegistersUseCase).to(IndexCashRegistersUseCase);
+	container.bind<ToggleMovementCheckedUseCase>(TYPES.ToggleMovementCheckedUseCase).to(ToggleMovementCheckedUseCase);
+	container.bind<CreateCashRegisterUseCase>(TYPES.CreateCashRegisterUseCase).to(CreateCashRegisterUseCase);
 };

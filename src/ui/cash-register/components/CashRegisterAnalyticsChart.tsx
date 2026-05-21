@@ -5,30 +5,27 @@ import ReactECharts from 'echarts-for-react';
 
 interface CashRegisterAnalyticsChartProps {
 	view: 'all' | 'ingresos' | 'egresos';
+	analytics: {
+		name: string;
+		ingresos: number;
+		egresos: number;
+		saldo_neto: number;
+	}[];
 }
 
 const currencyFormatter = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' });
 
-const rawData = [
-	{ name: '08:00', ingresos: 500, egresos: 200 },
-	{ name: '10:00', ingresos: 1200, egresos: 400 },
-	{ name: '12:00', ingresos: 2100, egresos: 800 },
-	{ name: '14:00', ingresos: 1800, egresos: 1200 },
-	{ name: '16:00', ingresos: 2800, egresos: 1500 },
-	{ name: '18:00', ingresos: 3500, egresos: 1800 },
-	{ name: '20:00', ingresos: 4200, egresos: 2100 }
-];
-
-export default function CashRegisterAnalyticsChart({ view }: CashRegisterAnalyticsChartProps) {
+export default function CashRegisterAnalyticsChart({ view, analytics }: CashRegisterAnalyticsChartProps) {
 	const theme = useTheme();
 
 	const chartData = useMemo(() => {
-		let total = 0;
-		return rawData.map((item) => {
-			total += item.ingresos - item.egresos;
-			return { ...item, saldoNeto: total };
-		});
-	}, []);
+		return analytics.map((item) => ({
+			name: item.name,
+			ingresos: item.ingresos,
+			egresos: item.egresos,
+			saldoNeto: item.saldo_neto
+		}));
+	}, [analytics]);
 
 	const series = useMemo(() => {
 		const common = {

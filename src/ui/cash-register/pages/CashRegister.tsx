@@ -35,7 +35,6 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 
 export default function CashRegister() {
 	const theme = useTheme();
-	const [pendingApprovals, setPendingApprovals] = useState(0);
 	const [isReconciliationOpen, setIsReconciliationOpen] = useState(false);
 	const [showSuccess, setShowSuccess] = useState(false);
 	const [movementDialogType, setMovementDialogType] = useState<'deposit' | 'withdrawal' | null>(null);
@@ -54,12 +53,19 @@ export default function CashRegister() {
 				opening_balance: 0,
 				total_inflows: 0,
 				total_outflows: 0,
-				calculated_balance: 0
+				calculated_balance: 0,
+				balance: 0,
+				balance_percentage: 0,
+				pending_approvals: 0,
+				analytics: []
 			},
 		[currentSessionData]
 	);
 	const movements = currentSessionData?.movements ?? [];
 	const registerName = currentSessionData?.cash_register_name ?? 'TERMINAL';
+	const pendingApprovals = currentSessionData?.summary?.pending_approvals ?? 0;
+
+	console.log('currentSessionData', currentSessionData);
 
 	return (
 		<>
@@ -85,7 +91,7 @@ export default function CashRegister() {
 								/>
 
 								<Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-									<CashRegisterAnalytics />
+									<CashRegisterAnalytics analytics={summary.analytics ?? []} />
 									<Box
 										sx={{
 											borderLeft: '4px solid #005483',
@@ -104,7 +110,7 @@ export default function CashRegister() {
 									</Box>
 								</Box>
 
-								<CashRegisterTable movements={movements} onPendingUpdate={setPendingApprovals} />
+								<CashRegisterTable movements={movements} />
 							</>
 						) : (
 							<Box

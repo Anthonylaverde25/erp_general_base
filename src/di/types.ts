@@ -189,4 +189,6 @@ export const TYPES = {
 	CloseSessionUseCase: Symbol.for('CloseSessionUseCase'),
 	RecordMovementUseCase: Symbol.for('RecordMovementUseCase'),
 	IndexCashRegistersUseCase: Symbol.for('IndexCashRegistersUseCase'),
+	ToggleMovementCheckedUseCase: Symbol.for('ToggleMovementCheckedUseCase'),
+	CreateCashRegisterUseCase: Symbol.for('CreateCashRegisterUseCase'),
 };

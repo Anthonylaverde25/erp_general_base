@@ -24,6 +24,7 @@ export interface ICashRegisterMovement {
 	notes?: string;
 	created_at: string;
 	payment_method?: string;
+	checked?: boolean;
 }
 
 export interface ICashRegisterSummary {
@@ -31,6 +32,15 @@ export interface ICashRegisterSummary {
 	total_inflows: number;
 	total_outflows: number;
 	calculated_balance: number;
+	balance?: number;
+	balance_percentage?: number;
+	pending_approvals?: number;
+	analytics?: {
+		name: string;
+		ingresos: number;
+		egresos: number;
+		saldo_neto: number;
+	}[];
 }
 
 export interface ICashRegisterCurrentSession {
@@ -56,4 +66,8 @@ export interface IRecordMovementPayload {
 	amount: number;
 	payment_method_id?: number;
 	notes?: string;
+}
+
+export interface ICreateCashRegisterPayload {
+	name: string;
 }

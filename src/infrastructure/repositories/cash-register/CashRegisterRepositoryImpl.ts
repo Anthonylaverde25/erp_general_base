@@ -6,7 +6,8 @@ import {
 	ICashRegisterCurrentSession,
 	ICloseSessionPayload,
 	IOpenSessionPayload,
-	IRecordMovementPayload
+	IRecordMovementPayload,
+	ICreateCashRegisterPayload
 } from '@/types/cash-register.types';
 
 @injectable()
@@ -61,5 +62,15 @@ export class CashRegisterRepositoryImpl implements ICashRegisterRepository {
 	async recordMovement(payload: IRecordMovementPayload): Promise<{ message?: string }> {
 		const { data } = await axiosInstance.post('cash-registers/movements', payload);
 		return { message: data?.message };
+	}
+
+	async toggleMovementChecked(movementId: number): Promise<{ message?: string }> {
+		const { data } = await axiosInstance.patch(`cash-registers/movements/${movementId}/toggle-checked`);
+		return { message: data?.message };
+	}
+
+	async create(payload: ICreateCashRegisterPayload): Promise<{ message?: string; data?: ICashRegister }> {
+		const { data } = await axiosInstance.post('cash-registers', payload);
+		return { message: data?.message, data: data?.data };
 	}
 }

@@ -1,30 +1,52 @@
-import { useMemo, useEffect } from 'react';
-import { Box, Typography, useTheme, IconButton, Tooltip, Card } from '@mui/material';
+import { useMemo } from 'react';
+import { Box, Typography, useTheme, IconButton, Tooltip, Card, Checkbox } from '@mui/material';
 import { ArrowUpCircle, ArrowDownCircle, MoreHorizontal, Eye } from 'lucide-react';
 import DataTable from '@/components/data-table/DataTable';
 import { MRT_ColumnDef } from 'material-react-table';
 import { ICashRegisterMovement } from '@/types/cash-register.types';
+import useToggleMovementChecked from '@/features/cash-register/hooks/useToggleMovementChecked';
 
 interface CashRegisterTableProps {
 	movements: ICashRegisterMovement[];
-	onPendingUpdate?: (count: number) => void;
 }
 
-export default function CashRegisterTable({ movements, onPendingUpdate }: CashRegisterTableProps) {
+export default function CashRegisterTable({ movements }: CashRegisterTableProps) {
 	const theme = useTheme();
-
-	useEffect(() => {
-		onPendingUpdate?.(0);
-	}, [movements, onPendingUpdate]);
+	const toggleMutation = useToggleMovementChecked();
 
 	const columns = useMemo<MRT_ColumnDef<ICashRegisterMovement>[]>(
 		() => [
+			{
+				id: 'checked_status',
+				header: 'Verificado',
+				size: 110,
+				Cell: ({ row }) => {
+					const isChecked = row.original.checked ?? false;
+					return (
+						<Checkbox
+							size="small"
+							checked={isChecked}
+							onChange={() => {
+								const id = Number(row.original.id);
+								toggleMutation.mutate(id);
+							}}
+							sx={{
+								color: 'text.secondary',
+								'&.Mui-checked': {
+									color: 'primary.main',
+								},
+							}}
+						/>
+					);
+				}
+			},
 			{
 				accessorKey: 'type',
 				header: 'Tipo',
 				Cell: ({ cell }) => {
 					const value = String(cell.getValue<string>());
-					const isDeposit = value.toLowerCase() === 'deposit';
+					const isDeposit = value.toLowerCase() === 'payment';
+					console.log('valor', value);
 					return (
 						<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 							{isDeposit ? (
@@ -38,7 +60,6 @@ export default function CashRegisterTable({ movements, onPendingUpdate }: CashRe
 				},
 				size: 130
 			},
-			{ accessorKey: 'id', header: 'ID', size: 120 },
 			{
 				accessorKey: 'amount',
 				header: 'Monto',
@@ -66,7 +87,7 @@ export default function CashRegisterTable({ movements, onPendingUpdate }: CashRe
 				size: 140
 			}
 		],
-		[theme.palette]
+		[theme.palette, toggleMutation]
 	);
 
 	return (
@@ -85,12 +106,16 @@ export default function CashRegisterTable({ movements, onPendingUpdate }: CashRe
 				</IconButton>
 			</Box>
 
-			<Card sx={{ borderRadius: '4px', border: 'none', boxShadow: 'none' }}>
+			<Card sx={{ borderRadius: '0', border: 'none', boxShadow: 'none' }}>
 				<DataTable<ICashRegisterMovement>
 					columns={columns}
 					data={movements}
-					enableRowSelection
+					enableRowSelection={false}
 					enableRowActions
+					enableRowNumbers
+					rowNumberDisplayMode="static"
+					enableColumnResizing={false}
+					getRowId={(row) => String(row.id)}
 					renderRowActionMenuItems={() => [
 						<Tooltip title="Ver Detalle" key="view">
 							<IconButton size="small">
@@ -98,7 +123,37 @@ export default function CashRegisterTable({ movements, onPendingUpdate }: CashRe
 							</IconButton>
 						</Tooltip>
 					]}
-					initialState={{ density: 'comfortable', showGlobalFilter: true }}
+					initialState={{
+						density: 'compact',
+						showGlobalFilter: true,
+						columnPinning: {
+							left: ['mrt-row-numbers'],
+							right: ['mrt-row-actions']
+						}
+					}}
+					muiTableProps={{
+						sx: {
+							borderCollapse: 'collapse',
+							border: (theme) => `1px solid ${theme.palette.divider}`,
+							'& th, & td': {
+								border: (theme) => `1px solid ${theme.palette.divider}`,
+							},
+						},
+					}}
+					muiTableHeadCellProps={{
+						sx: {
+							backgroundColor: (theme) =>
+								theme.palette.mode === 'dark' ? '#242a2b' : '#f1f3f4',
+							fontWeight: 700,
+							border: (theme) => `1px solid ${theme.palette.divider}`,
+						},
+					}}
+					muiTableBodyCellProps={{
+						sx: {
+							padding: '6px 10px',
+							fontSize: '0.8125rem',
+						},
+					}}
 				/>
 			</Card>
 		</Box>

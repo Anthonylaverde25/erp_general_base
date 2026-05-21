@@ -3,11 +3,20 @@ import { Box, Collapse } from '@mui/material';
 import CashRegisterAnalyticsHeader from './CashRegisterAnalyticsHeader';
 import CashRegisterAnalyticsChart from './CashRegisterAnalyticsChart';
 
+interface CashRegisterAnalyticsProps {
+	analytics: {
+		name: string;
+		ingresos: number;
+		egresos: number;
+		saldo_neto: number;
+	}[];
+}
+
 /**
  * Módulo de Analítica de Caja (Orquestador)
  * Coordina el estado de visualización entre los controles y el gráfico.
  */
-export default function CashRegisterAnalytics() {
+export default function CashRegisterAnalytics({ analytics }: CashRegisterAnalyticsProps) {
 	const [view, setView] = useState<'all' | 'ingresos' | 'egresos'>('all');
 	const [showChart, setShowChart] = useState(true);
 
@@ -26,6 +35,7 @@ export default function CashRegisterAnalytics() {
 				<Box sx={{ mt: 2 }}>
 					<CashRegisterAnalyticsChart 
 						view={view} 
+						analytics={analytics}
 					/>
 				</Box>
 			</Collapse>
