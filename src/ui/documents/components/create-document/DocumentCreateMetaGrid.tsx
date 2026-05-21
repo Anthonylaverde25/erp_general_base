@@ -7,7 +7,7 @@ import { PartnerAutocomplete } from "./PartnerAutocomplete";
 import { useParams } from "react-router";
 
 export default function DocumentCreateMetaGrid() {
-  const { register, control } = useFormContext<DocumentFormValues>();
+  const { register, control, formState: { errors } } = useFormContext<DocumentFormValues>();
   const {
     partnerOptions,
     sourcePartner,
@@ -20,6 +20,7 @@ export default function DocumentCreateMetaGrid() {
   } = useDocumentCreate();
 
   const selectedPartnerId = useWatch({ control, name: "partner_id" });
+  const issueDate = useWatch({ control, name: "issue_date" });
   const selectedPartner = partnerOptions.find((p) => String(p.id) === String(selectedPartnerId)) || (String(sourcePartner?.id) === String(selectedPartnerId) ? sourcePartner : undefined);
   const { code } = useParams();
   const isQuoteDocument = ['QUO', 'PQUO'].includes(code?.toUpperCase() || '');
@@ -99,9 +100,25 @@ export default function DocumentCreateMetaGrid() {
               onChange={field.onChange}
               placeholder="Fecha de vencimiento"
               disabled={isReadOnly}
+              className={errors.due_date ? 'doc-input-error' : ''}
+              minDate={issueDate}
             />
           )}
         />
+        {errors.due_date && (
+          <span
+            className="doc-error-text"
+            style={{
+              color: 'var(--doc-danger, #ef4444)',
+              fontSize: '11px',
+              marginTop: '2px',
+              display: 'block',
+              fontWeight: 600,
+            }}
+          >
+            {errors.due_date.message}
+          </span>
+        )}
       </div>
 
       <div className="doc-meta-cell">

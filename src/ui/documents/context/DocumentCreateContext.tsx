@@ -180,7 +180,14 @@ export function DocumentCreateProvider({
             }
             return submitWithStatus(nextStatus)(values);
         },
-        (errors) => console.error("Validation Errors on Issue:", errors)
+        (errors) => {
+            console.error("Validation Errors on Issue:", errors);
+            if (errors.due_date) {
+                alert(errors.due_date.message);
+            } else {
+                alert("Por favor, revise los errores en el formulario.");
+            }
+        }
     );
 
     const value: DocumentCreateContextValue = {

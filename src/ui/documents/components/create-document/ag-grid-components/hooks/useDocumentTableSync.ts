@@ -15,7 +15,7 @@ export function useDocumentTableSync() {
         if (formLines && formLines.length > 0) {
             return formLines as DocumentLineItem[];
         }
-        return [makeEmptyLine('01'), makeEmptyLine('02')];
+        return [makeEmptyLine('01')];
     });
 
     // Watch form lines — when reset() or values prop updates the form, sync to AG Grid

@@ -207,12 +207,12 @@ export default function DocumentCreateLinesTableMui({
         name: 'lines',
     });
 
-    // Initialize default 2 lines if empty on mount — skip in edit mode (data comes from reset())
+    // Initialize default 1 line if empty on mount — skip in edit mode (data comes from reset())
     useEffect(() => {
         if (isEditMode || isLoadingDocument || isReadOnly || isRestricted) return;
         const currentLines = getValues('lines');
         if (!currentLines || currentLines.length === 0) {
-            append([makeEmptyLine(), makeEmptyLine()]);
+            append(makeEmptyLine());
         }
     }, [append, getValues, isEditMode, isLoadingDocument, isReadOnly, isRestricted]);
 

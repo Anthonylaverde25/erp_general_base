@@ -153,7 +153,7 @@ export function useDocumentForm({ code, itemType, isEditMode, existingDocument, 
             apply_retention: true,
             auto_send: false,
             item_type: itemType,
-            lines: [makeEmptyLine(0), makeEmptyLine(1)],
+            lines: [makeEmptyLine(0)],
         },
     });
 

@@ -38,6 +38,16 @@ export const documentSchema = z.object({
     auto_send: z.boolean().optional().default(false),
     item_type: z.enum(["product", "service"]),
     lines: z.array(documentLineSchema).min(1, "Debe haber al menos una línea"),
+}).refine((data) => {
+    // If due_date is not set, it is valid
+    if (!data.due_date || data.due_date === "") {
+        return true;
+    }
+    // Compare dates alphabetically since they are formatted as YYYY-MM-DD
+    return data.due_date >= data.issue_date;
+}, {
+    message: "La fecha de vencimiento no puede ser menor a la fecha del documento",
+    path: ["due_date"],
 });
 
 export type DocumentLineTax = z.infer<typeof documentLineTaxSchema>;

@@ -12,12 +12,14 @@ interface DatePickerProps {
     placeholder?: string;
     className?: string;
     disabled?: boolean;
+    minDate?: string;
 }
 
-export default function DatePicker({ value, onChange, placeholder = 'Seleccionar fecha', className = '', disabled = false }: DatePickerProps) {
+export default function DatePicker({ value, onChange, placeholder = 'Seleccionar fecha', className = '', disabled = false, minDate }: DatePickerProps) {
     const [open, setOpen] = useState(false);
 
     const selectedDate = value ? new Date(value + 'T00:00:00') : undefined;
+    const minDateObj = minDate ? new Date(minDate + 'T00:00:00') : undefined;
 
     const handleSelect = (day: Date | undefined) => {
         if (day && !disabled) {
@@ -75,6 +77,7 @@ export default function DatePicker({ value, onChange, placeholder = 'Seleccionar
                         locale={es}
                         showOutsideDays
                         style={{ fontSize: '13px' }}
+                        disabled={minDateObj ? { before: minDateObj } : undefined}
                     />
                 </Popover.Content>
             </Popover.Portal>
