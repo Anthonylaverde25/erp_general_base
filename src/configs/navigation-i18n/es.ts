@@ -3,6 +3,9 @@ const locale = {
 	DASHBOARD: 'Panel de Control',
 	CONTROL_PANEL: 'Panel de Control',
 	CATALOGS: 'Catálogos',
+	CAJA: 'Caja',
+	CASH_REGISTER_ACTIVE: 'Caja Activa',
+	CASH_REGISTERS_CREATED: 'Cajas Creadas',
 	PARTNERS: 'Socios de Negocio',
 	ITEMS: 'Artículos',
 

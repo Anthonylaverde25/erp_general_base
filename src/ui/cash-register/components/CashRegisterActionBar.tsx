@@ -3,13 +3,15 @@ import { PlusCircle, MinusCircle, Download } from 'lucide-react';
 
 interface CashRegisterActionBarProps {
 	isOpen: boolean;
+	onDeposit: () => void;
+	onWithdrawal: () => void;
 }
 
 /**
  * Barra de Acciones Operativas de la Caja
  * Centraliza los movimientos de liquidez y exportación.
  */
-export default function CashRegisterActionBar({ isOpen }: CashRegisterActionBarProps) {
+export default function CashRegisterActionBar({ isOpen, onDeposit, onWithdrawal }: CashRegisterActionBarProps) {
 	const theme = useTheme();
 
 	return (
@@ -34,6 +36,7 @@ export default function CashRegisterActionBar({ isOpen }: CashRegisterActionBarP
 					color="success"
 					startIcon={<PlusCircle size={16} />}
 					disabled={!isOpen}
+					onClick={onDeposit}
 					sx={{ borderRadius: '4px', textTransform: 'none', fontWeight: 700, bgcolor: 'background.paper' }}
 				>
 					Ingresar Fondo
@@ -44,6 +47,7 @@ export default function CashRegisterActionBar({ isOpen }: CashRegisterActionBarP
 					color="error"
 					startIcon={<MinusCircle size={16} />}
 					disabled={!isOpen}
+					onClick={onWithdrawal}
 					sx={{ borderRadius: '4px', textTransform: 'none', fontWeight: 700, bgcolor: 'background.paper' }}
 				>
 					Retirar Efectivo

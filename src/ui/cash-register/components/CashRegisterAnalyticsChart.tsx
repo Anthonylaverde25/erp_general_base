@@ -1,20 +1,13 @@
 import { useMemo } from 'react';
-import { Box, Paper, Stack, Typography, useTheme, alpha } from '@mui/material';
-import {
-	LineChart,
-	Line,
-	XAxis,
-	YAxis,
-	CartesianGrid,
-	Tooltip as RechartsTooltip,
-	ResponsiveContainer,
-	Legend,
-	ReferenceLine
-} from 'recharts';
+import { Box, useTheme } from '@mui/material';
+import { alpha } from '@mui/material/styles';
+import ReactECharts from 'echarts-for-react';
 
 interface CashRegisterAnalyticsChartProps {
 	view: 'all' | 'ingresos' | 'egresos';
 }
+
+const currencyFormatter = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' });
 
 const rawData = [
 	{ name: '08:00', ingresos: 500, egresos: 200 },
@@ -23,163 +16,223 @@ const rawData = [
 	{ name: '14:00', ingresos: 1800, egresos: 1200 },
 	{ name: '16:00', ingresos: 2800, egresos: 1500 },
 	{ name: '18:00', ingresos: 3500, egresos: 1800 },
-	{ name: '20:00', ingresos: 4200, egresos: 2100 },
+	{ name: '20:00', ingresos: 4200, egresos: 2100 }
 ];
 
-/**
- * Tooltip personalizado adaptado al estilo minimalista propuesto
- */
-const CustomTooltip = ({ active, payload, label }: any) => {
-	const theme = useTheme();
-	if (active && payload && payload.length) {
-		const ingresos = payload.find((p: any) => p.dataKey === 'ingresos')?.value || 0;
-		const egresos = payload.find((p: any) => p.dataKey === 'egresos')?.value || 0;
-		const saldo = payload.find((p: any) => p.dataKey === 'saldoNeto')?.value || 0;
-
-		return (
-			<Paper sx={{ 
-				p: 2, 
-				bgcolor: 'background.paper', 
-				border: `1px solid ${theme.palette.divider}`, 
-				boxShadow: theme.shadows[4],
-				borderRadius: '4px'
-			}}>
-				<Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ mb: 1.5, display: 'block', textTransform: 'uppercase' }}>
-					{label}
-				</Typography>
-				<Stack spacing={1}>
-					<Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 4 }}>
-						<Typography variant="caption" fontWeight={600} color="text.secondary">Ingresos:</Typography>
-						<Typography variant="caption" fontWeight={700} color="primary.main">
-							{ingresos.toLocaleString('es-ES', { style: 'currency', currency: 'USD' })}
-						</Typography>
-					</Box>
-					<Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 4 }}>
-						<Typography variant="caption" fontWeight={600} color="text.secondary">Egresos:</Typography>
-						<Typography variant="caption" fontWeight={700} color="error.main">
-							{egresos.toLocaleString('es-ES', { style: 'currency', currency: 'USD' })}
-						</Typography>
-					</Box>
-					<Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1, pt: 1, borderTop: `1px dashed ${theme.palette.divider}` }}>
-						<Typography variant="caption" fontWeight={800} color="text.primary">Liquidez:</Typography>
-						<Typography variant="caption" fontWeight={900} color="info.main">
-							{saldo.toLocaleString('es-ES', { style: 'currency', currency: 'USD' })}
-						</Typography>
-					</Box>
-				</Stack>
-			</Paper>
-		);
-	}
-	return null;
-};
-
-/**
- * Núcleo del Gráfico Analítico (Versión LineChart Minimalista)
- * Basado en la propuesta técnica del Señor Anthony.
- */
 export default function CashRegisterAnalyticsChart({ view }: CashRegisterAnalyticsChartProps) {
 	const theme = useTheme();
 
-	// Calcular Saldo Neto Acumulado
 	const chartData = useMemo(() => {
 		let total = 0;
-		return rawData.map(item => {
-			total += (item.ingresos - item.egresos);
+		return rawData.map((item) => {
+			total += item.ingresos - item.egresos;
 			return { ...item, saldoNeto: total };
 		});
 	}, []);
 
+	const series = useMemo(() => {
+		const common = {
+			type: 'line' as const,
+			smooth: true,
+			symbol: 'none',
+			lineStyle: { width: 2 },
+			areaStyle: {},
+			emphasis: { focus: 'series' as const },
+			showSymbol: false
+		};
+
+		const dataIngresos = chartData.map((item) => item.ingresos);
+		const dataEgresos = chartData.map((item) => item.egresos);
+		const dataSaldo = chartData.map((item) => item.saldoNeto);
+
+		if (view === 'ingresos') {
+			return [
+				{
+					...common,
+					name: 'Ingresos',
+					data: dataIngresos,
+					stack: 'total',
+					itemStyle: { color: theme.palette.primary.main },
+					lineStyle: { ...common.lineStyle, color: theme.palette.primary.main },
+					areaStyle: { color: alpha(theme.palette.primary.main, 0.28) }
+				}
+			];
+		}
+
+		if (view === 'egresos') {
+			return [
+				{
+					...common,
+					name: 'Egresos',
+					data: dataEgresos,
+					stack: 'total',
+					itemStyle: { color: theme.palette.error.main },
+					lineStyle: { ...common.lineStyle, color: theme.palette.error.main },
+					areaStyle: { color: alpha(theme.palette.error.main, 0.24) }
+				}
+			];
+		}
+
+		return [
+			{
+				...common,
+				name: 'Ingresos',
+				data: dataIngresos,
+				stack: 'total',
+				itemStyle: { color: theme.palette.primary.main },
+				lineStyle: { ...common.lineStyle, color: theme.palette.primary.main },
+				areaStyle: { color: alpha(theme.palette.primary.main, 0.28) }
+			},
+			{
+				...common,
+				name: 'Egresos',
+				data: dataEgresos,
+				stack: 'total',
+				itemStyle: { color: theme.palette.error.main },
+				lineStyle: { ...common.lineStyle, color: theme.palette.error.main },
+				areaStyle: { color: alpha(theme.palette.error.main, 0.24) }
+			},
+			{
+				...common,
+				name: 'Saldo Acumulado',
+				data: dataSaldo,
+				stack: undefined,
+				itemStyle: { color: theme.palette.info.main },
+				lineStyle: { ...common.lineStyle, color: theme.palette.info.main, type: 'dashed' },
+				areaStyle: undefined
+			}
+		];
+	}, [chartData, theme.palette.error.main, theme.palette.info.main, theme.palette.primary.main, view]);
+
+	const option = useMemo(
+		() => ({
+			animationDuration: 300,
+			grid: {
+				top: 16,
+				left: 12,
+				right: 12,
+				bottom: 92,
+				containLabel: true
+			},
+			legend: {
+				show: true,
+				bottom: 8,
+				icon: 'circle',
+				itemWidth: 8,
+				itemHeight: 8,
+				textStyle: {
+					color: theme.palette.text.secondary,
+					fontSize: 11
+				}
+			},
+			tooltip: {
+				trigger: 'axis',
+				axisPointer: { type: 'line' },
+				backgroundColor: theme.palette.background.paper,
+				borderColor: theme.palette.divider,
+				borderWidth: 1,
+				textStyle: { color: theme.palette.text.primary },
+				formatter: (params: any[]) => {
+					const axisLabel = params?.[0]?.axisValue ?? '';
+					const dataIndex = params?.[0]?.dataIndex ?? 0;
+					const getVal = (name: string) => Number(params.find((p) => p.seriesName === name)?.value ?? 0);
+					const ingresos = getVal('Ingresos');
+					const egresos = getVal('Egresos');
+					const saldoNeto = chartData[dataIndex]?.saldoNeto ?? 0;
+					const showIngresos = view === 'all' || view === 'ingresos';
+					const showEgresos = view === 'all' || view === 'egresos';
+					const showLiquidity = view === 'all';
+
+					return `
+						<div style="min-width: 200px;">
+							<div style="font-size: 11px; font-weight: 800; margin-bottom: 8px;">${axisLabel}</div>
+							${
+								showIngresos
+									? `<div style="display:flex; justify-content:space-between; gap:16px; font-size:11px;">
+										<span>Ingresos:</span>
+										<span style="font-weight:700; color:${theme.palette.primary.main};">${currencyFormatter.format(ingresos)}</span>
+									</div>`
+									: ''
+							}
+							${
+								showEgresos
+									? `<div style="display:flex; justify-content:space-between; gap:16px; font-size:11px; margin-top: 4px;">
+										<span>Egresos:</span>
+										<span style="font-weight:700; color:${theme.palette.error.main};">${currencyFormatter.format(egresos)}</span>
+									</div>`
+									: ''
+							}
+							${
+								showLiquidity
+									? `<div style="display:flex; justify-content:space-between; gap:16px; font-size:11px; margin-top: 8px; padding-top: 8px; border-top:1px dashed ${theme.palette.divider};">
+										<span style="font-weight:800;">Liquidez:</span>
+										<span style="font-weight:900; color:${theme.palette.info.main};">${currencyFormatter.format(saldoNeto)}</span>
+									</div>`
+									: ''
+							}
+						</div>
+					`;
+				}
+			},
+			dataZoom: [
+				{
+					type: 'inside',
+					xAxisIndex: 0,
+					filterMode: 'none'
+				},
+				{
+					type: 'slider',
+					xAxisIndex: 0,
+					height: 20,
+					bottom: 30,
+					borderColor: theme.palette.divider,
+					backgroundColor: alpha(theme.palette.text.secondary, 0.06),
+					fillerColor: alpha(theme.palette.primary.main, 0.22),
+					handleStyle: {
+						color: theme.palette.primary.main
+					},
+					textStyle: {
+						color: theme.palette.text.secondary,
+						fontSize: 10
+					}
+				}
+			],
+			xAxis: {
+				type: 'category',
+				data: chartData.map((item) => item.name),
+				axisTick: { show: false },
+				axisLine: { lineStyle: { color: theme.palette.divider } },
+				axisLabel: { color: theme.palette.text.secondary, fontSize: 11 }
+			},
+			yAxis: {
+				type: 'value',
+				axisTick: { show: false },
+				axisLine: { show: false },
+				splitLine: { lineStyle: { color: theme.palette.divider, type: 'dashed' } },
+				axisLabel: {
+					color: theme.palette.text.secondary,
+					fontSize: 11,
+					formatter: (value: number) => `$${value}`
+				}
+			},
+			series
+		}),
+		[
+			chartData,
+			series,
+			theme.palette.background.paper,
+			theme.palette.divider,
+			theme.palette.error.main,
+			theme.palette.info.main,
+			theme.palette.primary.main,
+			theme.palette.text.primary,
+			theme.palette.text.secondary
+		]
+	);
+
 	return (
 		<Box sx={{ width: '100%', height: 400, mt: 2 }}>
-			<ResponsiveContainer width="100%" height="100%">
-				<LineChart 
-					data={chartData} 
-					margin={{ top: 10, right: 10, left: 0, bottom: 5 }}
-				>
-					<CartesianGrid 
-						strokeDasharray="3 3" 
-						vertical={true} 
-						stroke={theme.palette.divider} 
-						opacity={0.8} 
-					/>
-					
-					<ReferenceLine y={0} stroke={theme.palette.text.disabled} strokeDasharray="3 3" />
-
-					<XAxis 
-						dataKey="name" 
-						axisLine={false}
-						tickLine={false}
-						tick={{ fill: theme.palette.text.secondary, fontSize: 11, fontWeight: 500 }}
-						dy={10}
-					/>
-					
-					<YAxis 
-						width={60}
-						axisLine={false}
-						tickLine={false}
-						tick={{ fill: theme.palette.text.secondary, fontSize: 11, fontWeight: 500 }}
-						tickFormatter={(value) => `$${value}`}
-					/>
-
-					<RechartsTooltip 
-						content={<CustomTooltip />}
-						cursor={{ stroke: theme.palette.divider, strokeWidth: 1 }}
-					/>
-					
-					<Legend 
-						verticalAlign="bottom"
-						align="center"
-						height={36}
-						iconType="circle"
-						iconSize={8}
-						wrapperStyle={{ paddingTop: '20px' }}
-						formatter={(value) => (
-							<span style={{ color: theme.palette.text.secondary, fontSize: '10px', fontWeight: 500, textTransform: 'capitalize', marginLeft: '4px' }}>
-								{value}
-							</span>
-						)}
-					/>
-
-					{(view === 'all' || view === 'ingresos') && (
-						<Line
-							type="monotone"
-							dataKey="ingresos"
-							name="Ingresos"
-							stroke={theme.palette.primary.main}
-							strokeWidth={2}
-							dot={{ fill: theme.palette.background.paper, strokeWidth: 2, r: 4 }}
-							activeDot={{ r: 6, stroke: theme.palette.background.paper, strokeWidth: 2 }}
-						/>
-					)}
-
-					{(view === 'all' || view === 'egresos') && (
-						<Line
-							type="monotone"
-							dataKey="egresos"
-							name="Egresos"
-							stroke={theme.palette.error.main}
-							strokeWidth={2}
-							dot={{ fill: theme.palette.background.paper, strokeWidth: 2, r: 4 }}
-							activeDot={{ r: 6, stroke: theme.palette.background.paper, strokeWidth: 2 }}
-						/>
-					)}
-
-					{view === 'all' && (
-						<Line
-							type="monotone"
-							dataKey="saldoNeto"
-							name="Saldo Acumulado"
-							stroke={theme.palette.info.main}
-							strokeWidth={3}
-							strokeDasharray="5 5"
-							dot={{ fill: theme.palette.info.main, r: 3 }}
-							activeDot={{ r: 8, stroke: theme.palette.background.paper, strokeWidth: 2 }}
-						/>
-					)}
-					
-					{/* RechartsDevtools se habilitará cuando la dependencia esté disponible */}
-				</LineChart>
-			</ResponsiveContainer>
+			<ReactECharts option={option} style={{ width: '100%', height: '100%' }} notMerge />
 		</Box>
 	);
 }

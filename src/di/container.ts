@@ -17,6 +17,7 @@ import { registerFamilyModule } from './modules/family.module';
 import { registerPartnerModule } from './modules/partner.module';
 import { registerCurrenciesModule } from './modules/currencies.module';
 import { registerItemModule } from './modules/item.module';
+import { registerCashRegisterModule } from './modules/cash_register.module';
 
 const container = new Container();
 
@@ -38,6 +39,7 @@ registerFamilyModule(container);
 registerPartnerModule(container);
 registerCurrenciesModule(container);
 registerItemModule(container);
+registerCashRegisterModule(container);
 
 import { UnitTypeModule } from './modules/unit_types.module';
 import { UnitsModule } from './modules/units.module';

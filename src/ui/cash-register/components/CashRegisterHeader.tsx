@@ -7,9 +7,10 @@ interface CashRegisterHeaderProps {
 	isOpen: boolean;
 	onClose: () => void;
 	isLocked?: boolean;
+	registerName?: string;
 }
 
-export default function CashRegisterHeader({ isOpen, onClose, isLocked = false }: CashRegisterHeaderProps) {
+export default function CashRegisterHeader({ isOpen, onClose, isLocked = false, registerName = 'TERMINAL' }: CashRegisterHeaderProps) {
 	const theme = useTheme();
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const openMenu = Boolean(anchorEl);
@@ -47,7 +48,7 @@ export default function CashRegisterHeader({ isOpen, onClose, isLocked = false }
 					bgcolor: isOpen ? 'success.main' : 'error.main'
 				}} />
 				<Typography variant="caption" color={isOpen ? 'success.dark' : 'error.dark'} fontWeight={700}>
-					TERMINAL #01 - {isOpen ? 'ABIERTA' : 'CERRADA'}
+					{registerName} - {isOpen ? 'ABIERTA' : 'CERRADA'}
 				</Typography>
 			</Box>
 		</Stack>

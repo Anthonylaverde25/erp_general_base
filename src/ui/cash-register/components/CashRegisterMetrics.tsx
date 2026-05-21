@@ -1,9 +1,9 @@
-import { Box, Typography, Card, Divider, Button, useTheme, alpha } from '@mui/material';
-import { Landmark, Scale, Clock, CheckCircle, AlertCircle, PlusCircle, MinusCircle } from 'lucide-react';
+import { Box, Typography, Card, Divider, useTheme, alpha } from '@mui/material';
+import { Landmark, Scale, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { ICashRegisterSummary } from '@/types/cash-register.types';
 
 interface CashRegisterMetricsProps {
-	saldoInicial: number;
-	saldoActual: number;
+	summary: ICashRegisterSummary;
 	pendingApprovals: number;
 }
 
@@ -49,6 +49,7 @@ function CashRegisterSaldosCard({ saldoInicial, saldoActual }: { saldoInicial: n
  */
 function CashRegisterBalanceCard({ saldoInicial, balance }: { saldoInicial: number; balance: number }) {
 	const theme = useTheme();
+	const percentage = saldoInicial > 0 ? ((balance / saldoInicial) * 100).toFixed(1) : '0.0';
 	return (
 		<Card sx={{ 
 			p: 2.5, 
@@ -67,7 +68,7 @@ function CashRegisterBalanceCard({ saldoInicial, balance }: { saldoInicial: numb
 					{balance >= 0 ? '+' : ''}{balance.toLocaleString('es-ES', { style: 'currency', currency: 'USD' })}
 				</Typography>
 				<Typography variant="caption" color={balance >= 0 ? 'success.main' : 'error.main'} fontWeight={700}>
-					({balance >= 0 ? '↑' : '↓'} {((balance / saldoInicial) * 100).toFixed(1)}%)
+					({balance >= 0 ? '↑' : '↓'} {percentage}%)
 				</Typography>
 			</Box>
 		</Card>
@@ -140,7 +141,9 @@ function CashRegisterClosureStatus({ isLocked }: { isLocked: boolean }) {
 /**
  * Componente Principal de Métricas de Caja
  */
-export default function CashRegisterMetrics({ saldoInicial, saldoActual, pendingApprovals }: CashRegisterMetricsProps) {
+export default function CashRegisterMetrics({ summary, pendingApprovals }: CashRegisterMetricsProps) {
+	const saldoInicial = summary?.opening_balance ?? 0;
+	const saldoActual = summary?.calculated_balance ?? 0;
 	const balance = saldoActual - saldoInicial;
 	const isLocked = pendingApprovals > 0;
 

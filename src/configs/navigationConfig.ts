@@ -54,10 +54,28 @@ const navigationConfig: FuseNavItemType[] = [
 	{
 		id: 'caja.caja',
 		title: 'Caja',
+		subtitle: 'Apertura, cierre y gestión de cajas',
 		translate: 'CAJA',
-		type: 'item',
-		url: '/cash-register',
+		type: 'collapse',
 		icon: 'lucide:credit-card',
+		children: [
+			{
+				id: 'caja.active',
+				title: 'Caja Activa',
+				translate: 'CASH_REGISTER_ACTIVE',
+				type: 'item',
+				url: '/cash-register',
+				icon: 'lucide:play-circle'
+			},
+			{
+				id: 'caja.registers',
+				title: 'Cajas Creadas',
+				translate: 'CASH_REGISTERS_CREATED',
+				type: 'item',
+				url: '/cash-register/registers',
+				icon: 'lucide:list'
+			}
+		]
 	},
 	{
 		id: 'operations-items',
