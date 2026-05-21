@@ -59,13 +59,15 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 
 			if (isTokenValid(accessToken)) {
 				try {
-					const response = await authSignInWithToken(accessToken);
-					const userDataRaw = (await response.json()) as IUser;
+					const userDataRaw = await authSignInWithToken(accessToken);
 					const userData = { ...userDataRaw, role: userDataRaw.role?.code } as unknown as IUser;
+					setGlobalHeaders({ Authorization: `Bearer ${accessToken}` });
 					return userData;
 				} catch (error) {
 					if (error instanceof HTTPError) {
 						console.error('Auto login failed:', error.response.status);
+					} else {
+						console.error('Auto login failed:', error);
 					}
 
 					return false;

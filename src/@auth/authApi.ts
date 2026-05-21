@@ -21,12 +21,14 @@ export async function authRefreshToken(): Promise<Response> {
 }
 
 /**
- * Sign in with token
+ * Restore session using the stored access token
  */
-export async function authSignInWithToken(accessToken: string): Promise<Response> {
-	return api.get('mock/auth/sign-in-with-token', {
+export async function authSignInWithToken(accessToken: string): Promise<IUser> {
+	const { data } = await axiosInstance.get<{ user: IUser }>('auth/me', {
 		headers: { Authorization: `Bearer ${accessToken}` }
 	});
+
+	return data.user;
 }
 
 /**`

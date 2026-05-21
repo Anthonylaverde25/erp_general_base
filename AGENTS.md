@@ -48,5 +48,5 @@ Before finishing any task, the following tools MUST be executed:
 ---
 
 ## 🛠 Skills & Workflows
-- **Skill:** [vercel-react-best-practices](file:///Users/anthonylaverde/Desktop/erp_anthony_daniel/.agents/skills/vercel-react-best-practices/SKILL.md)
-- **Skill:** [react-doctor](file:///Users/anthonylaverde/Desktop/erp_anthony_daniel/.agents/skills/react-doctor/SKILL.md)
+- **Skill:** [vercel-react-best-practices](file:///Users/danielmiranda/Develoment/Proyecto_DA/ERP-FINAL/.agents/skills/vercel-react-best-practices/SKILL.md)
+- **Skill:** [react-doctor](file:///Users/danielmiranda/Develoment/Proyecto_DA/ERP-FINAL/.agents/skills/react-doctor/SKILL.md)
