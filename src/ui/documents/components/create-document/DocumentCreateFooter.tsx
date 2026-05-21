@@ -14,6 +14,9 @@ export default function DocumentCreateFooter({
   const { register } = useFormContext<DocumentFormValues>();
   const { totals, isReadOnly } = useDocumentCreate();
 
+  console.log("totals", totals);
+  console.log("register", register);
+
   return (
     <footer className="doc-footer">
       <div className="doc-footer-section doc-footer-params">
@@ -86,6 +89,12 @@ export default function DocumentCreateFooter({
             <span>IVA Total</span>
             <strong>{totals.taxAmount}</strong>
           </div>
+          {totals.hasSurcharge && (
+            <div>
+              <span>Recargo Equiv.</span>
+              <strong>{totals.surcharge}</strong>
+            </div>
+          )}
           <div>
             <span className="doc-text-danger">Retención IRPF</span>
             <strong className="doc-text-danger">{totals.withholding}</strong>

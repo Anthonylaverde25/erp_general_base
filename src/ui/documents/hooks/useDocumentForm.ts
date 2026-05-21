@@ -39,7 +39,11 @@ export function mapDocumentToFormValues(doc: DocumentEntity): Partial<DocumentFo
                 taxes: line.taxes ? line.taxes.map((t: any) => ({
                     id: t.tax_rate_id ?? t.id ?? 0,
                     name: t.name ?? "",
-                    rate: t.percentage ?? 0,
+                    rate: t.percentage ?? t.rate ?? 0,
+                    tax_type_id: t.tax_type_id,
+                    tax_type_code: t.tax_type_code ?? t.tax_type?.code,
+                    operation: t.tax_operation ?? t.operation ?? "add",
+                    tax_operation: t.tax_operation ?? t.operation ?? "add",
                 })) : [],
                 subtotal: String(line.line_subtotal),
             }))

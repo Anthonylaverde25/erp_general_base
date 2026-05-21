@@ -95,7 +95,6 @@ export function DocumentCreateProvider({
     });
     const { watch, setValue, handleSubmit } = methods;
     const formLines = watch("lines");
-    const applyRetention = watch("apply_retention");
 
     // ─── Current document type ───────────────────────────────────────────────
     const currentDocumentType = useMemo(() => {
@@ -114,7 +113,7 @@ export function DocumentCreateProvider({
     useDocumentNumberSeries({ numberSeries, isEditMode, watch, setValue });
 
     // ─── Totals ─────────────────────────────────────────────────────────────
-    const totals = useDocumentTotals(formLines, applyRetention);
+    const totals = useDocumentTotals(formLines);
 
     // ─── Submit ─────────────────────────────────────────────────────────────
     const { submitWithStatus, isPending: isCreating } = useDocumentSubmit({

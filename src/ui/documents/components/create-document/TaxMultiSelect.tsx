@@ -58,7 +58,17 @@ export function TaxMultiSelect({ taxes, onChange, usePortal = false, disabled = 
     // Available options: exclude tax_rates whose tax_type_id is already present in the line
     const availableOptions = useMemo(() => {
         if (!allTaxRates) return [];
-        const usedTaxTypeIds = new Set(taxes.map(t => t.tax_type_id));
+        const usedTaxTypeIds = new Set<number>();
+        taxes.forEach(t => {
+            if (t.tax_type_id !== undefined) {
+                usedTaxTypeIds.add(t.tax_type_id);
+            } else {
+                const matched = allTaxRates.find(r => r.id === t.id);
+                if (matched && matched.tax_type_id !== undefined) {
+                    usedTaxTypeIds.add(matched.tax_type_id);
+                }
+            }
+        });
         return allTaxRates.filter(tr => !usedTaxTypeIds.has(tr.tax_type_id));
     }, [allTaxRates, taxes]);
 
@@ -80,6 +90,7 @@ export function TaxMultiSelect({ taxes, onChange, usePortal = false, disabled = 
             name: taxRate.name,
             rate: taxRate.percentage,
             tax_type_id: taxRate.tax_type_id,
+            tax_type_code: taxRate.tax_type?.code,
             operation: (taxRate.tax_type?.operation as 'add' | 'subtract') ?? 'add',
         };
         onChange([...taxes, newTax]);
@@ -132,7 +143,7 @@ export function TaxMultiSelect({ taxes, onChange, usePortal = false, disabled = 
                                 cursor: 'pointer',
                                 fontSize: '12px',
                                 display: 'flex',
-                                justify_content: 'space-between',
+                                justifyContent: 'space-between',
                                 alignItems: 'center',
                                 borderBottom: '1px solid #f5f5f5',
                             }}
@@ -167,7 +178,7 @@ export function TaxMultiSelect({ taxes, onChange, usePortal = false, disabled = 
             }}
         >
             {taxes.length === 0 && (
-                <span style={{ color: '#ccc', fontSize: '11px' }}>—</span>
+                <span style={{ color: '#ccc', fontSize: '11px' }}>-</span>
             )}
             {taxes.map(tax => (
                 <Chip

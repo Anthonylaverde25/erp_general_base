@@ -82,16 +82,25 @@ function AutocompleteCell({
         committedRef.current = true;
         const price = operation === 'sale' ? selected.sale_price : (selected.purchase_price ?? selected.sale_price);
         const updatedPrice = String(price ?? 0);
+        const qty = '1';
+
+        const net = Number(qty) * Number(updatedPrice);
+        let taxAmount = 0;
+        (selected.tax_rates ?? []).forEach(t => {
+            const amount = net * (t.rate / 100);
+            taxAmount += t.operation === 'subtract' ? -amount : amount;
+        });
+        const calculatedSubtotal = (net + taxAmount).toFixed(2);
 
         onCommit(index, {
             item_id: selected.id,
             code: selected.sku || selected.name,
             description: selected.description || selected.name,
             unitPrice: updatedPrice,
-            quantity: '1',
+            quantity: qty,
             unit_name: selected.unit?.name,
             taxes: selected.tax_rates ?? [],
-            subtotal: String(1 * Number(updatedPrice)),
+            subtotal: calculatedSubtotal,
         });
     };
 
@@ -387,7 +396,7 @@ export default function DocumentCreateLinesTableMui({
                                                 disabled={isActionDisabled}
                                                 onChange={(newTaxes) => {
                                                     if (!isActionDisabled) {
-                                                        update(index, { ...item, taxes: newTaxes });
+                                                        commitLinePatch(index, { taxes: newTaxes });
                                                     }
                                                 }}
                                             />

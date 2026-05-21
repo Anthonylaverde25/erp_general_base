@@ -62,6 +62,14 @@ export const ItemAutocompleteCellEditor = forwardRef(
             const updatedPrice = String(price ?? 0);
             const qty = row.quantity === '0' ? '1' : (row.quantity || '1');
 
+            const net = Number(qty) * Number(updatedPrice);
+            let taxAmount = 0;
+            (item.tax_rates ?? []).forEach(t => {
+                const amount = net * (t.rate / 100);
+                taxAmount += t.operation === 'subtract' ? -amount : amount;
+            });
+            const calculatedSubtotal = (net + taxAmount).toFixed(2);
+
             // Build updated row — do NOT mutate props.node.data directly
             const updatedRow: DocumentLineItem = {
                 ...row,
@@ -72,7 +80,7 @@ export const ItemAutocompleteCellEditor = forwardRef(
                 quantity: qty,
                 unit_name: item.unit?.name,
                 taxes: item.tax_rates ?? [],
-                subtotal: String(Number(qty) * Number(updatedPrice)),
+                subtotal: calculatedSubtotal,
             };
 
             // Send the updated row to the parent via custom event

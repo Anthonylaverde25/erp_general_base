@@ -1,5 +1,5 @@
 import type { GridApi } from 'ag-grid-community';
-import type { DocumentLineItem } from '../../types';
+import type { DocumentLineItem } from '../types';
 
 export function makeEmptyLine(presetId?: string): DocumentLineItem {
     return {

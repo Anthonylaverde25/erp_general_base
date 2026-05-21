@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import type { DocumentFormValues } from "../schemas/documentSchema";
 import type { DocumentFooterTotals } from "../components/create-document/types";
+import { useIndexTaxRates } from "@/features/tax_rates/hooks/useIndexTaxRates";
 
 const eurFormatter = new Intl.NumberFormat("es-ES", {
     style: "currency",
@@ -8,16 +9,19 @@ const eurFormatter = new Intl.NumberFormat("es-ES", {
 });
 
 /**
- * Computes formatted footer totals (taxBase, taxAmount, withholding, netPayable)
+ * Computes formatted footer totals (taxBase, taxAmount, withholding, surcharge, netPayable, hasSurcharge)
  * reactively from the current form line values.
  */
 export function useDocumentTotals(
     formLines: DocumentFormValues["lines"],
-    applyRetention: boolean,
 ): DocumentFooterTotals {
+    const { data: allTaxRates } = useIndexTaxRates();
+
     return useMemo(() => {
         let taxBaseValue = 0;
         let taxAmountValue = 0;
+        let withholdingValue = 0;
+        let surchargeValue = 0;
 
         (formLines ?? []).forEach((line) => {
             const qty = Number(line.quantity) || 0;
@@ -28,18 +32,36 @@ export function useDocumentTotals(
             taxBaseValue += lineBase;
 
             (line.taxes ?? []).forEach((tax) => {
-                taxAmountValue += lineBase * (tax.rate / 100);
+                const taxVal = lineBase * (tax.rate / 100);
+                
+                // Retrieve tax type code from tax item, or lookup in allTaxRates by rate ID
+                let typeCode = tax.tax_type_code;
+                if (!typeCode && allTaxRates) {
+                    const matchedRate = allTaxRates.find((r) => r.id === tax.id);
+                    if (matchedRate && matchedRate.tax_type) {
+                        typeCode = matchedRate.tax_type.code;
+                    }
+                }
+
+                if (typeCode === "surcharge") {
+                    surchargeValue += taxVal;
+                } else if (tax.operation === "subtract" || tax.tax_operation === "subtract" || typeCode === "withholding") {
+                    withholdingValue += taxVal;
+                } else {
+                    taxAmountValue += taxVal;
+                }
             });
         });
 
-        const withholdingValue = applyRetention ? taxBaseValue * 0.15 : 0;
-        const netValue = taxBaseValue + taxAmountValue - withholdingValue;
+        const netValue = taxBaseValue + taxAmountValue + surchargeValue - withholdingValue;
 
         return {
             taxBase: eurFormatter.format(taxBaseValue),
             taxAmount: eurFormatter.format(taxAmountValue),
-            withholding: eurFormatter.format(-withholdingValue),
+            withholding: eurFormatter.format(withholdingValue > 0 ? -withholdingValue : 0),
+            surcharge: eurFormatter.format(surchargeValue),
             netPayable: eurFormatter.format(netValue),
+            hasSurcharge: surchargeValue > 0,
         };
-    }, [formLines, applyRetention]);
+    }, [formLines, allTaxRates]);
 }

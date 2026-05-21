@@ -14,6 +14,7 @@ export interface DocumentLineTaxItem {
 	name: string;
 	rate: number;
 	tax_type_id: number;
+	tax_type_code?: string;
 	operation: 'add' | 'subtract';
 }
 
@@ -36,7 +37,9 @@ export interface DocumentFooterTotals {
 	taxBase: string;
 	taxAmount: string;
 	withholding: string;
+	surcharge: string;
 	netPayable: string;
+	hasSurcharge: boolean;
 }
 
 export interface DocumentGridThemeOption {
@@ -121,7 +124,7 @@ export function makeEmptyLine(index: number): DocumentLineItem {
 		code: '',
 		description: '',
 		quantity: '1',
-		unit_code: undefined,
+		unit_name: undefined,
 		unitPrice: '0',
 		discount: '0',
 		taxes: [],

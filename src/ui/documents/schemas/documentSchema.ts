@@ -4,6 +4,10 @@ export const documentLineTaxSchema = z.object({
     id: z.number(),
     name: z.string(),
     rate: z.number(),
+    tax_type_id: z.number().optional(),
+    tax_type_code: z.string().optional(),
+    operation: z.enum(["add", "subtract"]).optional().default("add"),
+    tax_operation: z.string().optional(),
 });
 
 export const documentLineSchema = z.object({

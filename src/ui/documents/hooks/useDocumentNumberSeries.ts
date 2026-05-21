@@ -25,16 +25,20 @@ export function useDocumentNumberSeries({
     useEffect(() => {
         if (isEditMode || !numberSeries || numberSeries.length === 0) return;
 
-        // Si el usuario ha seleccionado una serie, previsualizamos el numero
-        if (selectedNumberSeries) {
-            const activeSeries = numberSeries.find(
-                (ns) => String(ns.id) === String(selectedNumberSeries),
-            );
+        // If no series is selected, select the first one by default
+        if (!selectedNumberSeries) {
+            setValue("number_series_id", String(numberSeries[0].id));
+            return;
+        }
 
-            if (activeSeries) {
-                const nextNum = String(activeSeries.current_number + 1).padStart(6, "0");
-                setValue("number", `${activeSeries.serie}-${activeSeries.year}-${nextNum}`);
-            }
+        // Si el usuario ha seleccionado una serie, previsualizamos el numero
+        const activeSeries = numberSeries.find(
+            (ns) => String(ns.id) === String(selectedNumberSeries),
+        );
+
+        if (activeSeries) {
+            const nextNum = String(activeSeries.current_number + 1).padStart(6, "0");
+            setValue("number", `${activeSeries.serie}-${activeSeries.year}-${nextNum}`);
         } else {
             setValue("number", "");
         }
