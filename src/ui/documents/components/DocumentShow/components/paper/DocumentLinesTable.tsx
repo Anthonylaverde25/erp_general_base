@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import {
   Box,
   LinearProgress,
@@ -11,7 +12,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { DocumentLine } from "@/domain/entities/documents/DocumentEntity";
+import { DocumentLine, ParentDocumentInfo } from "@/domain/entities/documents/DocumentEntity";
 import { formatCurrency } from "./paperUtils";
 
 interface DocumentLinesTableProps {
@@ -21,7 +22,21 @@ interface DocumentLinesTableProps {
   hasDiscounts: boolean;
   isProcessableDocType: boolean;
   descriptionMinWidth: number;
+  predecessors?: ParentDocumentInfo[];
 }
+
+const getSourceDocumentLabel = (
+  line: DocumentLine,
+  predecessors?: ParentDocumentInfo[],
+) => {
+  if (!line.source_document_id && !line.source_document_number) return null;
+  const pred = predecessors?.find((p) => p.id === line.source_document_id);
+  if (pred) {
+    const docTypeName = pred.document_type_name || "Documento";
+    return `Origen: ${docTypeName} #${pred.number_serie}`;
+  }
+  return `Origen: #${line.source_document_number || "S/N"}`;
+};
 
 export function DocumentLinesTable({
   pageLines,
@@ -30,6 +45,7 @@ export function DocumentLinesTable({
   hasDiscounts,
   isProcessableDocType,
   descriptionMinWidth,
+  predecessors,
 }: DocumentLinesTableProps) {
   return (
     <TableContainer
@@ -58,62 +74,55 @@ export function DocumentLinesTable({
           tableLayout: "auto",
           width: "max-content",
           minWidth: "100%",
+          borderCollapse: "collapse",
           "& .MuiTableCell-root": {
-            px: 1.75,
-            py: 1.35,
-            verticalAlign: "top",
+            px: 1.5,
+            py: 1,
+            verticalAlign: "middle",
+            borderRight: isDark ? "1px solid #1e293b" : "1px solid #e2e8f0",
+            borderBottom: isDark ? "1px solid #1e293b" : "1px solid #e2e8f0",
+          },
+          "& .MuiTableCell-root:last-child": {
+            borderRight: "none",
           },
           "& .MuiTableCell-head": {
-            py: 1.6,
+            py: 1.2,
+            backgroundColor: isDark ? "#1e293b" : "#f1f5f9",
+            fontWeight: 800,
+            fontSize: "11px",
+            color: isDark ? "#f8fafc" : "#0f172a",
+            borderBottom: isDark ? "1px solid #334155" : "1px solid #cbd5e1",
+            borderRight: isDark ? "1px solid #334155" : "1px solid #cbd5e1",
           },
         }}
       >
         <TableHead>
-          <TableRow
-            sx={{
-              backgroundColor: isDark ? "#1e293b" : "#f8fafc",
-            }}
-          >
-            {hasPredecessors && (
-              <TableCell
-                sx={{
-                  fontWeight: 800,
-                  fontSize: "11px",
-                  color: isDark ? "#f8fafc" : "#0f172a",
-                  width: "1%",
-                  whiteSpace: "nowrap",
-                  borderBottom: isDark
-                    ? "1px solid #334155"
-                    : "1px solid #e2e8f0",
-                }}
-              >
-                Origen
-              </TableCell>
-            )}
+          <TableRow>
             <TableCell
+              align="center"
               sx={{
-                fontWeight: 800,
-                fontSize: "11px",
-                color: isDark ? "#f8fafc" : "#0f172a",
-                minWidth: descriptionMinWidth,
-                borderBottom: isDark
-                  ? "1px solid #334155"
-                  : "1px solid #e2e8f0",
+                width: "40px",
+                minWidth: "40px",
+                maxWidth: "40px",
+                userSelect: "none",
+                color: isDark ? "#94a3b8" : "#64748b",
               }}
             >
-              Descripcion
+              #
+            </TableCell>
+
+            <TableCell
+              sx={{
+                minWidth: descriptionMinWidth,
+              }}
+            >
+              Descripción
             </TableCell>
             <TableCell
               align="center"
               sx={{
-                fontWeight: 800,
-                fontSize: "11px",
-                color: isDark ? "#f8fafc" : "#0f172a",
                 width: "1%",
                 whiteSpace: "nowrap",
-                borderBottom: isDark
-                  ? "1px solid #334155"
-                  : "1px solid #e2e8f0",
               }}
             >
               Cant.
@@ -121,14 +130,8 @@ export function DocumentLinesTable({
             <TableCell
               align="center"
               sx={{
-                fontWeight: 800,
-                fontSize: "11px",
-                color: isDark ? "#f8fafc" : "#0f172a",
                 width: "1%",
                 whiteSpace: "nowrap",
-                borderBottom: isDark
-                  ? "1px solid #334155"
-                  : "1px solid #e2e8f0",
               }}
             >
               Ud.
@@ -136,14 +139,8 @@ export function DocumentLinesTable({
             <TableCell
               align="right"
               sx={{
-                fontWeight: 800,
-                fontSize: "11px",
-                color: isDark ? "#f8fafc" : "#0f172a",
                 width: "1%",
                 whiteSpace: "nowrap",
-                borderBottom: isDark
-                  ? "1px solid #334155"
-                  : "1px solid #e2e8f0",
               }}
             >
               Precio
@@ -152,14 +149,8 @@ export function DocumentLinesTable({
               <TableCell
                 align="right"
                 sx={{
-                  fontWeight: 800,
-                  fontSize: "11px",
-                  color: isDark ? "#f8fafc" : "#0f172a",
                   width: "1%",
                   whiteSpace: "nowrap",
-                  borderBottom: isDark
-                    ? "1px solid #334155"
-                    : "1px solid #e2e8f0",
                 }}
               >
                 Dto.%
@@ -168,14 +159,8 @@ export function DocumentLinesTable({
             <TableCell
               align="right"
               sx={{
-                fontWeight: 800,
-                fontSize: "11px",
-                color: isDark ? "#f8fafc" : "#0f172a",
                 width: "1%",
                 whiteSpace: "nowrap",
-                borderBottom: isDark
-                  ? "1px solid #334155"
-                  : "1px solid #e2e8f0",
               }}
             >
               Impuestos
@@ -183,14 +168,8 @@ export function DocumentLinesTable({
             <TableCell
               align="right"
               sx={{
-                fontWeight: 800,
-                fontSize: "11px",
-                color: isDark ? "#f8fafc" : "#0f172a",
                 width: "1%",
                 whiteSpace: "nowrap",
-                borderBottom: isDark
-                  ? "1px solid #334155"
-                  : "1px solid #e2e8f0",
               }}
             >
               Total
@@ -209,211 +188,210 @@ export function DocumentLinesTable({
               : 0;
             const isDone = progress >= 99.9;
 
+            const showGroupHeader = isFirstOfGroup && (line.source_document_number || line.source_document_id);
+            const groupLabel = showGroupHeader ? getSourceDocumentLabel(line, predecessors) : null;
+
             return (
-              <TableRow
-                key={line.id || `${line.name}-${rowIndex}`}
-                sx={{
-                  "&:nth-of-type(odd)": {
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.02)"
-                      : "#fbfcfd",
-                  },
-                }}
-              >
-                {hasPredecessors && (
+              <Fragment key={line.id || `${line.name}-${rowIndex}`}>
+                {groupLabel && (
+                  <TableRow
+                    sx={{
+                      backgroundColor: isDark
+                        ? "rgba(37, 99, 235, 0.08)"
+                        : "rgba(37, 99, 235, 0.05)",
+                    }}
+                  >
+                    <TableCell
+                      colSpan={hasDiscounts ? 8 : 7}
+                      sx={{
+                        py: 0.75,
+                        px: 1.5,
+                        fontWeight: 800,
+                        fontSize: "11px",
+                        color: "#2563eb",
+                        borderRight: "none",
+                        borderBottom: isDark ? "1px solid #1e293b" : "1px solid #e2e8f0",
+                      }}
+                    >
+                      {groupLabel}
+                    </TableCell>
+                  </TableRow>
+                )}
+                <TableRow
+                  sx={{
+                    "&:nth-of-type(odd)": {
+                      backgroundColor: isDark
+                        ? "rgba(255,255,255,0.01)"
+                        : "#fcfdfe",
+                    },
+                    "&:hover": {
+                      backgroundColor: isDark
+                        ? "rgba(96, 165, 250, 0.06) !important"
+                        : "rgba(37, 99, 235, 0.03) !important",
+                    },
+                    transition: "background-color 0.1s ease",
+                  }}
+                >
+                  <TableCell
+                    align="center"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "11px",
+                      color: isDark ? "#64748b" : "#94a3b8",
+                      backgroundColor: isDark ? "#1e293b" : "#f8fafc",
+                      borderRight: isDark ? "1px solid #334155" : "1px solid #cbd5e1",
+                      userSelect: "none",
+                    }}
+                  >
+                    {rowIndex + 1}
+                  </TableCell>
+
                   <TableCell
                     sx={{
-                      fontSize: "10px",
-                      borderBottom: isDark
-                        ? "1px solid #1e293b"
-                        : "1px solid #f1f5f9",
-                      color: "#2563eb",
-                      fontWeight: 800,
-                      fontStyle: "italic",
+                      width: descriptionMinWidth,
+                      minWidth: descriptionMinWidth,
+                      maxWidth: descriptionMinWidth,
+                      whiteSpace: "normal",
+                      wordBreak: "break-word",
+                      overflowWrap: "anywhere",
                     }}
                   >
-                    {isFirstOfGroup
-                      ? `#${line.source_document_number || "S/N"}`
-                      : ""}
-                  </TableCell>
-                )}
-
-                <TableCell
-                  sx={{
-                    width: descriptionMinWidth,
-                    minWidth: descriptionMinWidth,
-                    maxWidth: descriptionMinWidth,
-                    borderBottom: isDark
-                      ? "1px solid #1e293b"
-                      : "1px solid #f1f5f9",
-                    whiteSpace: "normal",
-                    wordBreak: "break-word",
-                    overflowWrap: "anywhere",
-                  }}
-                >
-                  <Box className="flex flex-col gap-1">
-                    <Typography style={{ fontSize: "13px", fontWeight: 600 }}>
-                      {line.item_code ? `[${line.item_code}] ` : ""}
-                      {line.name}
-                    </Typography>
-                    {line.description && (
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        className="leading-tight italic"
-                      >
-                        {line.description}
+                    <Box className="flex flex-col gap-1">
+                      <Typography style={{ fontSize: "13px", fontWeight: 600 }}>
+                        {line.name}
                       </Typography>
-                    )}
-                  </Box>
-                </TableCell>
+                    </Box>
+                  </TableCell>
 
-                <TableCell
-                  align="center"
-                  sx={{
-                    width: "1%",
-                    whiteSpace: "nowrap",
-                    borderBottom: isDark
-                      ? "1px solid #1e293b"
-                      : "1px solid #f1f5f9",
-                  }}
-                >
-                  {!isProcessableDocType ? (
-                    <Typography style={{ fontSize: "13px", fontWeight: 700 }}>
-                      {line.quantity}
-                    </Typography>
-                  ) : (
-                    <Tooltip
-                      title={`Procesado: ${line.processed_quantity} de ${line.quantity}`}
-                    >
-                      <Box className="flex flex-col w-full px-2 py-1">
-                        <Box className="flex justify-between items-baseline mb-0.5">
-                          <Typography
-                            style={{ fontSize: "12px", fontWeight: 700 }}
-                          >
-                            {line.quantity}
-                          </Typography>
-                          {line.processed_quantity > 0 && (
+                  <TableCell
+                    align="center"
+                    sx={{
+                      width: "1%",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {!isProcessableDocType ? (
+                      <Typography style={{ fontSize: "13px", fontWeight: 700 }}>
+                        {line.quantity}
+                      </Typography>
+                    ) : (
+                      <Tooltip
+                        title={`Procesado: ${line.processed_quantity} de ${line.quantity}`}
+                      >
+                        <Box className="flex flex-col w-full px-2 py-1">
+                          <Box className="flex justify-between items-baseline mb-0.5">
                             <Typography
-                              variant="caption"
-                              sx={{
-                                color: isDone ? "success.main" : "warning.main",
-                                fontWeight: 800,
-                                fontSize: "9px",
-                              }}
+                              style={{ fontSize: "12px", fontWeight: 700 }}
                             >
-                              {line.processed_quantity} OK
+                              {line.quantity}
                             </Typography>
+                            {line.processed_quantity > 0 && (
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: isDone ? "success.main" : "warning.main",
+                                  fontWeight: 800,
+                                  fontSize: "9px",
+                                }}
+                              >
+                                {line.processed_quantity} OK
+                              </Typography>
+                            )}
+                          </Box>
+                          {line.processed_quantity > 0 && (
+                            <LinearProgress
+                              variant="determinate"
+                              value={progress}
+                              sx={{
+                                height: 3,
+                                borderRadius: 1,
+                                bgcolor: isDark
+                                  ? "rgba(255,255,255,0.1)"
+                                  : "rgba(0,0,0,0.05)",
+                                "& .MuiLinearProgress-bar": {
+                                  bgcolor: isDone ? "#22c55e" : "#f59e0b",
+                                },
+                              }}
+                            />
                           )}
                         </Box>
-                        {line.processed_quantity > 0 && (
-                          <LinearProgress
-                            variant="determinate"
-                            value={progress}
-                            sx={{
-                              height: 3,
-                              borderRadius: 1,
-                              bgcolor: isDark
-                                ? "rgba(255,255,255,0.1)"
-                                : "rgba(0,0,0,0.05)",
-                              "& .MuiLinearProgress-bar": {
-                                bgcolor: isDone ? "#22c55e" : "#f59e0b",
-                              },
-                            }}
-                          />
-                        )}
-                      </Box>
-                    </Tooltip>
-                  )}
-                </TableCell>
+                      </Tooltip>
+                    )}
+                  </TableCell>
 
-                <TableCell
-                  align="center"
-                  sx={{
-                    width: "1%",
-                    whiteSpace: "nowrap",
-                    borderBottom: isDark
-                      ? "1px solid #1e293b"
-                      : "1px solid #f1f5f9",
-                  }}
-                >
-                  <Typography
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      color: isDark ? "#94a3b8" : "#64748b",
+                  <TableCell
+                    align="center"
+                    sx={{
+                      width: "1%",
+                      whiteSpace: "nowrap",
                     }}
-                    className="uppercase tracking-tighter"
                   >
-                    {line.unit_short_name || "-"}
-                  </Typography>
-                </TableCell>
+                    <Typography
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        color: isDark ? "#94a3b8" : "#64748b",
+                      }}
+                      className="uppercase tracking-tighter"
+                    >
+                      {line.unit_short_name || "-"}
+                    </Typography>
+                  </TableCell>
 
-                <TableCell
-                  align="right"
-                  sx={{
-                    width: "1%",
-                    whiteSpace: "nowrap",
-                    borderBottom: isDark
-                      ? "1px solid #1e293b"
-                      : "1px solid #f1f5f9",
-                    fontSize: "12px",
-                  }}
-                >
-                  {formatCurrency(line.unit_price)}
-                </TableCell>
-
-                {hasDiscounts && (
                   <TableCell
                     align="right"
                     sx={{
                       width: "1%",
                       whiteSpace: "nowrap",
-                      borderBottom: isDark
-                        ? "1px solid #1e293b"
-                        : "1px solid #f1f5f9",
                       fontSize: "12px",
-                      color: "#f59e0b",
-                      fontWeight: 600,
                     }}
                   >
-                    {line.discount_percent > 0
-                      ? `${line.discount_percent}%`
-                      : "-"}
+                    {formatCurrency(line.unit_price)}
                   </TableCell>
-                )}
 
-                <TableCell
-                  align="right"
-                  sx={{
-                    width: "1%",
-                    whiteSpace: "nowrap",
-                    borderBottom: isDark
-                      ? "1px solid #1e293b"
-                      : "1px solid #f1f5f9",
-                    fontSize: "10px",
-                    fontWeight: 500,
-                  }}
-                >
-                  {line.tax_labels || "-"}
-                </TableCell>
+                  {hasDiscounts && (
+                    <TableCell
+                      align="right"
+                      sx={{
+                        width: "1%",
+                        whiteSpace: "nowrap",
+                        fontSize: "12px",
+                        color: "#f59e0b",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {line.discount_percent > 0
+                        ? `${line.discount_percent}%`
+                        : "-"}
+                    </TableCell>
+                  )}
 
-                <TableCell
-                  align="right"
-                  sx={{
-                    width: "1%",
-                    whiteSpace: "nowrap",
-                    borderBottom: isDark
-                      ? "1px solid #1e293b"
-                      : "1px solid #f1f5f9",
-                    fontSize: "12px",
-                    fontWeight: 700,
-                    color: isDark ? "#60a5fa" : "#0f172a",
-                  }}
-                >
-                  {formatCurrency(line.line_total)}
-                </TableCell>
-              </TableRow>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      width: "1%",
+                      whiteSpace: "nowrap",
+                      fontSize: "10px",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {line.tax_labels || "-"}
+                  </TableCell>
+
+                  <TableCell
+                    align="right"
+                    sx={{
+                      width: "1%",
+                      whiteSpace: "nowrap",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      color: isDark ? "#60a5fa" : "#0f172a",
+                    }}
+                  >
+                    {formatCurrency(line.line_total)}
+                  </TableCell>
+                </TableRow>
+              </Fragment>
             );
           })}
         </TableBody>

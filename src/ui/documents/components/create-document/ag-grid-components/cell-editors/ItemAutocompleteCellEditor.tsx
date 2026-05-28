@@ -74,7 +74,7 @@ export const ItemAutocompleteCellEditor = forwardRef(
             const updatedRow: DocumentLineItem = {
                 ...row,
                 item_id: item.id,
-                code: item.sku || item.name,
+                code: item.name,
                 description: item.description || item.name,
                 unitPrice: updatedPrice,
                 quantity: qty,

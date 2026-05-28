@@ -97,6 +97,7 @@ export default function DocumentShowPaper({
                   hasDiscounts={hasDiscounts}
                   isProcessableDocType={isProcessableDocType}
                   descriptionMinWidth={descriptionMinWidth}
+                  predecessors={document.predecessors}
                 />
               </div>
 

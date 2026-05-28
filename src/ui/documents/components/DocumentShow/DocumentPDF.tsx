@@ -43,7 +43,6 @@ const DocumentPDF = ({ document, activeCompany }: DocumentPDFProps) => {
     generateQR();
   }, [validationUrl]);
 
-  const LINES_PER_PAGE = 20;
   const pages = useMemo(() => {
     if (!document.lines || document.lines.length === 0) return [[]];
 
@@ -60,8 +59,23 @@ const DocumentPDF = ({ document, activeCompany }: DocumentPDFProps) => {
       return indexA - indexB;
     });
 
-    return chunkArray(sortedLines, LINES_PER_PAGE);
-  }, [document.lines]);
+    const chunks = [];
+    let currentChunk = [];
+    let limit = 8; // Page 1 limit due to large header + info grid
+
+    for (const line of sortedLines) {
+      currentChunk.push(line);
+      if (currentChunk.length === limit) {
+        chunks.push(currentChunk);
+        currentChunk = [];
+        limit = 16; // Page 2+ limit
+      }
+    }
+    if (currentChunk.length > 0) {
+      chunks.push(currentChunk);
+    }
+    return chunks;
+  }, [document.lines, document.predecessors]);
 
   const totalPages = pages.length;
 
@@ -95,6 +109,7 @@ const DocumentPDF = ({ document, activeCompany }: DocumentPDFProps) => {
               hasPredecessors={
                 document.predecessors && document.predecessors.length > 1
               }
+              predecessors={document.predecessors}
             />
 
             {/* Summary Section (QR + Totals, ONLY on last page) */}

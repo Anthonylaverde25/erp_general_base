@@ -94,7 +94,7 @@ function AutocompleteCell({
 
         onCommit(index, {
             item_id: selected.id,
-            code: selected.sku || selected.name,
+            code: selected.name,
             description: selected.description || selected.name,
             unitPrice: updatedPrice,
             quantity: qty,

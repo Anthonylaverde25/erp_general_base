@@ -11,7 +11,7 @@ export const PDFInfoGrid = ({ document }: PDFInfoGridProps) => {
   return (
     <View style={styles.infoSection}>
       <View style={styles.infoBox}>
-        <Text style={styles.infoLabel}>Destinatario / Titular rrr</Text>
+        <Text style={styles.infoLabel}>Destinatario / Titular</Text>
         <Text style={styles.infoName}>{document.partner_name || ""}</Text>
         <Text style={styles.infoText}>{document.partner_address || ""}</Text>
         <Text style={styles.infoText}>{document.partner_email || ""}</Text>
