@@ -1,6 +1,7 @@
 const locale = {
 	// Main modules
 	DASHBOARD: 'Dashboard',
+	DELIVERY: 'Delivery',
 	CONTROL_PANEL: 'Control Panel',
 	CATALOGS: 'Catalogs',
 	CAJA: 'Cash Register',

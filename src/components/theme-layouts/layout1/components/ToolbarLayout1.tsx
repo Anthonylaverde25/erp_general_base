@@ -18,6 +18,8 @@ import CompanySwitcher from '@/components/CompanySwitcher';
 import AppLauncher from '@/components/app-launcher';
 import { QuickActionsButtonMui as ToolbarQuickActionsMui } from '../../components/ToolbarQuickActionsMui';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
+import CompanyLogoHeader from '@/components/CompanyLogoHeader';
+
 
 type ToolbarLayout1Props = {
 	className?: string;
@@ -86,6 +88,8 @@ function ToolbarLayout1(props: ToolbarLayout1Props) {
 								/>
 							</>
 						)}
+
+						<CompanyLogoHeader />
 
 						{!isMobile && <NavigationShortcuts />}
 						{!isMobile && <FullScreenToggle />}

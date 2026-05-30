@@ -13,6 +13,8 @@ import UserMenu from '../../components/UserMenu';
 import QuickPanelToggleButton from '../../components/quickPanel/QuickPanelToggleButton';
 import useThemeMediaQuery from '../../../../@fuse/hooks/useThemeMediaQuery';
 import ToolbarTheme from '@/contexts/ToolbarTheme';
+import CompanyLogoHeader from '@/components/CompanyLogoHeader';
+
 
 type ToolbarLayout2Props = {
 	className?: string;
@@ -37,8 +39,10 @@ function ToolbarLayout2(props: ToolbarLayout2Props) {
 				elevation={0}
 			>
 				<Toolbar className="container min-h-12 p-0 md:min-h-16 lg:px-8">
-					<div className="flex flex-1 gap-2">
+					<div className="flex flex-1 items-center gap-2">
 						{config.navbar.display && isMobile && <NavbarToggleButton className="h-9 w-9 p-0" />}
+
+						<CompanyLogoHeader />
 
 						{!isMobile && <NavigationShortcuts />}
 					</div>

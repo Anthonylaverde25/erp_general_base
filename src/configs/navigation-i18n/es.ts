@@ -1,6 +1,7 @@
 const locale = {
 	// Módulos principales
 	DASHBOARD: 'Panel de Control',
+	DELIVERY: 'Entregas',
 	CONTROL_PANEL: 'Panel de Control',
 	CATALOGS: 'Catálogos',
 	CAJA: 'Caja',

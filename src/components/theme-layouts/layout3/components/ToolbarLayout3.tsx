@@ -13,6 +13,9 @@ import QuickPanelToggleButton from '../../components/quickPanel/QuickPanelToggle
 import Logo from '../../components/Logo';
 import useThemeMediaQuery from '../../../../@fuse/hooks/useThemeMediaQuery';
 import ToolbarTheme from '@/contexts/ToolbarTheme';
+import useActiveCompany from '@/features/companies/useActiveCompany';
+import CompanyLogoHeader from '@/components/CompanyLogoHeader';
+
 
 type ToolbarLayout3Props = {
 	className?: string;
@@ -25,6 +28,7 @@ function ToolbarLayout3(props: ToolbarLayout3Props) {
 	const { className = '' } = props;
 	const { config } = useFuseLayoutSettings();
 	const isMobile = useThemeMediaQuery((theme) => theme.breakpoints.down('lg'));
+	const activeCompany = useActiveCompany();
 
 	return (
 		<ToolbarTheme>
@@ -36,10 +40,14 @@ function ToolbarLayout3(props: ToolbarLayout3Props) {
 				elevation={0}
 			>
 				<Toolbar className="container min-h-12 gap-2 p-0 md:min-h-16 lg:px-8">
-					<div className={clsx('flex gap-2')}>
+					<div className={clsx('flex items-center gap-2')}>
 						{config.navbar.display && isMobile && <NavbarToggleButton className="h-9 w-9 p-0" />}
 
-						{!isMobile && <Logo />}
+						{activeCompany?.logo_url ? (
+							<CompanyLogoHeader />
+						) : (
+							!isMobile && <Logo />
+						)}
 					</div>
 
 					<div className="flex flex-auto items-center justify-end overflow-x-auto">

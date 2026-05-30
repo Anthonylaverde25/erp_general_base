@@ -30,29 +30,62 @@ export const PDFHeader = ({ document, activeCompany, isFirstPage }: PDFHeaderPro
 
     return (
         <View style={styles.header}>
-            <View style={styles.companyInfo}>
+            {/* Top Row: Logo & Document Title */}
+            <View style={styles.topRow}>
                 {activeCompany?.logo_url ? (
                     <Image src={activeCompany.logo_url} style={styles.logo} />
                 ) : (
                     <Text style={styles.logoPlaceholder}>{activeCompany?.name || ''}</Text>
                 )}
-                <Text style={styles.companyText}>{activeCompany?.name || ''}</Text>
-                {activeCompany?.cif && <Text style={styles.companyText}>CIF: {activeCompany.cif}</Text>}
-                <Text style={styles.companyText}>{activeCompany?.address || ''}</Text>
+                <Text style={styles.invoiceTitle}>{document.document_type_name || 'Documento'}</Text>
             </View>
 
-            <View style={styles.headerRight}>
-                <Text style={styles.invoiceTitle}>{document.document_type_name || 'Documento'}</Text>
-                <View style={styles.metaGrid}>
-                    <View style={styles.metaItem}>
-                        <Text style={styles.metaLabel}>Nº Documento</Text>
-                        <Text style={styles.metaValue}>#{document.number_serie || '(Borrador)'}</Text>
-                    </View>
-                    <View style={styles.metaItem}>
-                        <Text style={styles.metaLabel}>Fecha</Text>
-                        <Text style={styles.metaValue}>{formatDate(document.issue_date)}</Text>
-                    </View>
+            {/* Middle Row: Company Info & Document Number */}
+            <View style={styles.middleRow}>
+                <View style={styles.companyInfo}>
+                    <Text style={[styles.companyText, { fontWeight: 'bold', color: '#0f172a', fontSize: 9 }]}>
+                        {activeCompany?.name || ''}
+                    </Text>
+                    {activeCompany?.cif && <Text style={styles.companyText}>NIF/CIF: {activeCompany.cif}</Text>}
+                    {activeCompany?.addresses?.[0] ? (
+                        <>
+                            <Text style={styles.companyText}>{activeCompany.addresses[0].street}</Text>
+                            {activeCompany.addresses[0].street_2 ? (
+                                <Text style={styles.companyText}>{activeCompany.addresses[0].street_2}</Text>
+                            ) : null}
+                            <Text style={styles.companyText}>
+                                {activeCompany.addresses[0].postal_code} {activeCompany.addresses[0].city} ({activeCompany.addresses[0].state})
+                            </Text>
+                        </>
+                    ) : (
+                        activeCompany?.address ? <Text style={styles.companyText}>{activeCompany.address}</Text> : null
+                    )}
+                    {activeCompany?.contacts?.[0]?.phone && (
+                        <Text style={styles.companyText}>Tel: {activeCompany.contacts[0].phone}</Text>
+                    )}
+                    {activeCompany?.contacts?.[0]?.email && (
+                        <Text style={styles.companyText}>Email: {activeCompany.contacts[0].email}</Text>
+                    )}
                 </View>
+
+                <View style={styles.numberContainer}>
+                    <Text style={styles.numberLabel}>Nº Documento</Text>
+                    <Text style={styles.numberValue}>#{document.number_serie || '(Borrador)'}</Text>
+                </View>
+            </View>
+
+            {/* Bottom Row: Dates Bar */}
+            <View style={styles.datesBar}>
+                <View style={styles.dateItem}>
+                    <Text style={styles.dateLabel}>Fecha Emisión: </Text>
+                    <Text style={styles.dateValue}>{formatDate(document.issue_date)}</Text>
+                </View>
+                {document.due_date && (
+                    <View style={styles.dateItem}>
+                        <Text style={styles.dateLabel}>Fecha Vencimiento: </Text>
+                        <Text style={styles.dateValue}>{formatDate(document.due_date)}</Text>
+                    </View>
+                )}
             </View>
         </View>
     );

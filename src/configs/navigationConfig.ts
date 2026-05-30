@@ -19,6 +19,14 @@ const navigationConfig: FuseNavItemType[] = [
 		url: '/'
 	},
 	{
+		id: 'delivery',
+		title: 'Delivery',
+		translate: 'DELIVERY',
+		type: 'item',
+		icon: 'lucide:truck',
+		url: '/delivery'
+	},
+	{
 		id: 'catalogs',
 		title: 'Catálogos',
 		translate: 'CATALOGS',

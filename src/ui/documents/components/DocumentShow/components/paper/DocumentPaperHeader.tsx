@@ -17,13 +17,13 @@ export function DocumentPaperHeader({
   if (isFirstPage) {
     return (
       <>
-        <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-10">
-          <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-8">
+          <div className="flex flex-col gap-3">
             {activeCompany?.logo_url ? (
               <img
                 src={activeCompany.logo_url}
                 alt="Logo"
-                className="h-10 w-auto object-contain"
+                className="h-20 w-auto object-contain self-start"
               />
             ) : (
               <Typography
@@ -33,12 +33,23 @@ export function DocumentPaperHeader({
                 {activeCompany?.name}
               </Typography>
             )}
-            <div className="text-[10px] text-slate-500 leading-relaxed max-w-[250px]">
-              <p className="font-bold text-slate-700 dark:text-slate-300">
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed max-w-[300px] mt-2">
+              <p className="font-bold text-slate-800 dark:text-slate-200 text-xs">
                 {activeCompany?.name}
               </p>
-              <p>CIF: {activeCompany?.cif || ""}</p>
-              <p>{activeCompany?.address}</p>
+              {activeCompany?.cif && <p>NIF/CIF: {activeCompany.cif}</p>}
+              {activeCompany?.addresses?.[0] ? (
+                <p>
+                  {activeCompany.addresses[0].street}
+                  {activeCompany.addresses[0].street_2 ? `, ${activeCompany.addresses[0].street_2}` : ""}
+                  <br />
+                  {activeCompany.addresses[0].postal_code} {activeCompany.addresses[0].city} ({activeCompany.addresses[0].state})
+                </p>
+              ) : (
+                activeCompany?.address && <p>{activeCompany.address}</p>
+              )}
+              {activeCompany?.contacts?.[0]?.phone && <p>Tel: {activeCompany.contacts[0].phone}</p>}
+              {activeCompany?.contacts?.[0]?.email && <p>Email: {activeCompany.contacts[0].email}</p>}
             </div>
           </div>
 
@@ -46,23 +57,33 @@ export function DocumentPaperHeader({
             <Typography className="text-[#0f172a] dark:text-blue-400 font-black text-3xl mb-4 tracking-widest uppercase">
               {document.document_type_name || "Documento"}
             </Typography>
-            <div className="flex gap-10 justify-end">
-              <div className="flex flex-col items-end">
-                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            <div className="flex border-y border-slate-200 dark:border-slate-800 py-3 px-4 gap-8 justify-end items-center bg-slate-50/50 dark:bg-slate-900/10 rounded-[2px]">
+              <div className="flex flex-col items-end border-r border-slate-200 dark:border-slate-800 pr-8">
+                <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">
                   Nº Documento
                 </span>
-                <span className="text-[12px] font-black text-[#0f172a] dark:text-white">
+                <span className="text-[12px] font-black text-[#0f172a] dark:text-white font-mono">
                   #{document.number_serie || "(Borrador)"}
                 </span>
               </div>
-              <div className="flex flex-col items-end">
-                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                  Fecha
+              <div className={document.due_date ? "flex flex-col items-end border-r border-slate-200 dark:border-slate-800 pr-8" : "flex flex-col items-end"}>
+                <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">
+                  Fecha Emisión
                 </span>
-                <span className="text-[12px] font-bold text-[#0f172a] dark:text-white">
+                <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200">
                   {formatDate(document.issue_date)}
                 </span>
               </div>
+              {document.due_date && (
+                <div className="flex flex-col items-end">
+                  <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">
+                    Fecha Vencimiento
+                  </span>
+                  <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200">
+                    {formatDate(document.due_date)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -112,7 +133,7 @@ export function DocumentPaperHeader({
           <img
             src={activeCompany.logo_url}
             alt="Logo"
-            className="h-6 w-auto object-contain opacity-50 grayscale"
+            className="h-8 w-auto object-contain opacity-50 grayscale"
           />
         ) : (
           <Typography

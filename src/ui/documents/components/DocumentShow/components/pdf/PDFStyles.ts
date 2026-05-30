@@ -39,19 +39,30 @@ export const styles = StyleSheet.create({
     backgroundColor: PRIMARY_COLOR,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 40,
+    flexDirection: "column",
+    marginBottom: 30,
     borderBottomWidth: 1,
     borderBottomColor: BORDER_COLOR,
-    paddingBottom: 30,
+    paddingBottom: 20,
+  },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 15,
+  },
+  middleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    marginBottom: 20,
   },
   companyInfo: {
     flexDirection: "column",
   },
   logo: {
-    height: 35,
-    marginBottom: 10,
+    height: 65,
+    marginBottom: 0,
   },
   logoPlaceholder: {
     fontSize: 14,
@@ -74,16 +85,50 @@ export const styles = StyleSheet.create({
     color: PRIMARY_COLOR,
     textTransform: "uppercase",
     letterSpacing: 2,
-    marginBottom: 15,
   },
-  metaGrid: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    gap: 25,
-  },
-  metaItem: {
+  numberContainer: {
     flexDirection: "column",
     alignItems: "flex-end",
+  },
+  numberLabel: {
+    fontSize: 7,
+    fontWeight: "bold",
+    color: SECONDARY_COLOR,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 2,
+  },
+  numberValue: {
+    fontSize: 13,
+    fontWeight: "bold",
+    color: PRIMARY_COLOR,
+  },
+  datesBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderTopWidth: 1,
+    borderTopColor: "#e2e8f0",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e2e8f0",
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    backgroundColor: "#fafafa",
+  },
+  dateItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  dateLabel: {
+    fontSize: 7.5,
+    fontWeight: "bold",
+    color: SECONDARY_COLOR,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  dateValue: {
+    fontSize: 8.5,
+    fontWeight: "bold",
+    color: PRIMARY_COLOR,
   },
   metaLabel: {
     fontSize: 7,
@@ -377,7 +422,7 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
   },
   miniHeaderLogo: {
-    height: 20,
+    height: 26,
     opacity: 0.5,
   },
   miniHeaderText: {
@@ -434,3 +479,4 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 });
+
