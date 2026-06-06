@@ -47,6 +47,8 @@ export default function DocumentShowFloatingActions({
     setBudgetModalOpen,
   } = actions;
 
+  const isRectifiable = (docTypeCode === "INV" || docTypeCode === "TKT") && ["issued", "partially_collected", "collected"].includes(statusKey);
+
   return (
     <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 h-10 shrink-0">
       <LifecycleStepper steps={steps} currentKey={statusKey} />
@@ -58,6 +60,9 @@ export default function DocumentShowFloatingActions({
           isRevertible={canRevert(statusKey)}
           disableRevert={isUpdating}
           onRevert={() => handleStatusChange("draft")}
+          isRectifiable={isRectifiable}
+          onRectify={() => actions.setRectificationModalOpen(true)}
+          disableRectify={state.isRectifying}
         />
 
         {showPostDeliveredActions && (

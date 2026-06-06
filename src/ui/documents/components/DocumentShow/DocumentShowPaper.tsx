@@ -98,6 +98,7 @@ export default function DocumentShowPaper({
                   isProcessableDocType={isProcessableDocType}
                   descriptionMinWidth={descriptionMinWidth}
                   predecessors={document.predecessors}
+                  isCreditNote={document.document_type_code === 'CRN' || document.document_type_code === 'PCN'}
                 />
               </div>
 

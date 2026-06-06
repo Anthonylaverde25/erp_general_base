@@ -8,6 +8,7 @@ interface SidebarInfoSectionProps {
 }
 
 export const SidebarInfoSection = ({ document }: SidebarInfoSectionProps) => {
+  const isCreditNote = document.document_type_code === 'CRN' || document.document_type_code === 'PCN';
   return (
     <section>
       <div className="flex justify-between items-center mb-6">
@@ -26,7 +27,7 @@ export const SidebarInfoSection = ({ document }: SidebarInfoSectionProps) => {
             Total Logístico (Entrega)
           </div>
           <div className="text-3xl font-black text-gray-900 dark:text-gray-100 tracking-tight">
-            {formatCurrency(document.total)}
+            {formatCurrency(isCreditNote ? -document.total : document.total)}
           </div>
         </div>
 
@@ -59,7 +60,7 @@ export const SidebarInfoSection = ({ document }: SidebarInfoSectionProps) => {
             <div
               className={`text-lg font-bold ${document.balance > 0 ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}
             >
-              {formatCurrency(document.balance)}
+              {formatCurrency(isCreditNote ? -document.balance : document.balance)}
             </div>
           </div>
           {document.total_paid > 0 && (

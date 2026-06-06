@@ -91,12 +91,18 @@ export function SecondaryActions({
   isRevertible,
   onRevert,
   disableRevert,
+  isRectifiable,
+  onRectify,
+  disableRectify,
 }: {
   document: DocumentEntity;
   activeCompany: CompanyEntity;
   isRevertible: boolean;
   onRevert: () => void;
   disableRevert: boolean;
+  isRectifiable?: boolean;
+  onRectify?: () => void;
+  disableRectify?: boolean;
 }) {
   return (
     <div className="flex items-center h-full divide-x divide-gray-200 dark:divide-gray-700">
@@ -121,6 +127,20 @@ export function SecondaryActions({
           >
             <RotateCcw className="w-3 h-3" />
             Revertir
+          </button>
+        </div>
+      )}
+
+      {isRectifiable && (
+        <div className="flex items-center px-2">
+          <button
+            type="button"
+            onClick={onRectify}
+            disabled={disableRectify}
+            className="px-2 py-1 text-[11px] font-medium text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 uppercase tracking-wide flex items-center gap-1 transition-colors disabled:opacity-40"
+          >
+            <X className="w-3 h-3" />
+            Rectificar / Anular
           </button>
         </div>
       )}

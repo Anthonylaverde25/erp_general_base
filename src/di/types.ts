@@ -183,6 +183,7 @@ export const TYPES = {
 	ConvertToPurchaseUseCase: Symbol.for('ConvertToPurchaseUseCase'),
 	RecordPaymentUseCase: Symbol.for('RecordPaymentUseCase'),
 	DuplicateDocumentUseCase: Symbol.for('DuplicateDocumentUseCase'),
+	RectifyDocumentUseCase: Symbol.for('RectifyDocumentUseCase'),
 	// Cash Register
 	ICashRegisterRepository: Symbol.for('ICashRegisterRepository'),
 	CurrentSessionUseCase: Symbol.for('CurrentSessionUseCase'),

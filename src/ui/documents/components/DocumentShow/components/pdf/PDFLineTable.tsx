@@ -7,6 +7,7 @@ interface PDFLineTableProps {
   formatCurrency: (amount: number) => string;
   hasPredecessors: boolean;
   predecessors?: ParentDocumentInfo[];
+  isCreditNote?: boolean;
 }
 
 const getSourceDocumentLabel = (
@@ -27,6 +28,7 @@ export const PDFLineTable = ({
   formatCurrency,
   hasPredecessors,
   predecessors,
+  isCreditNote = false,
 }: PDFLineTableProps) => {
   const hasDiscounts = pageLines?.some(
     (line) => (line.discount_percent || 0) > 0,
@@ -149,7 +151,7 @@ export const PDFLineTable = ({
 
               <View style={[styles.colTotal, cellStyle]}>
                 <Text style={[styles.itemBold, { textAlign: "right", width: "100%" }]}>
-                  {formatCurrency(line.line_total)}
+                  {formatCurrency(isCreditNote ? -line.line_total : line.line_total)}
                 </Text>
               </View>
             </View>

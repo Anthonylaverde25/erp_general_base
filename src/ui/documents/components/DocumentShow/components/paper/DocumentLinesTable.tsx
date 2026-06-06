@@ -23,6 +23,7 @@ interface DocumentLinesTableProps {
   isProcessableDocType: boolean;
   descriptionMinWidth: number;
   predecessors?: ParentDocumentInfo[];
+  isCreditNote?: boolean;
 }
 
 const getSourceDocumentLabel = (
@@ -46,6 +47,7 @@ export function DocumentLinesTable({
   isProcessableDocType,
   descriptionMinWidth,
   predecessors,
+  isCreditNote = false,
 }: DocumentLinesTableProps) {
   return (
     <TableContainer
@@ -388,7 +390,7 @@ export function DocumentLinesTable({
                       color: isDark ? "#60a5fa" : "#0f172a",
                     }}
                   >
-                    {formatCurrency(line.line_total)}
+                    {formatCurrency(isCreditNote ? -line.line_total : line.line_total)}
                   </TableCell>
                 </TableRow>
               </Fragment>

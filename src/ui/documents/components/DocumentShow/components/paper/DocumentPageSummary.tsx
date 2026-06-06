@@ -11,6 +11,8 @@ export function DocumentPageSummary({
   document,
   validationUrl,
 }: DocumentPageSummaryProps) {
+  const isCreditNote = document.document_type_code === 'CRN' || document.document_type_code === 'PCN';
+
   return (
     <div className="flex justify-between items-end mt-8">
       <div className="w-32 h-32 flex flex-col items-center justify-center p-2 border border-slate-200 dark:border-slate-800 rounded bg-white">
@@ -26,7 +28,7 @@ export function DocumentPageSummary({
             Suma Bases
           </span>
           <span className="text-slate-900 dark:text-slate-200 font-medium">
-            {formatCurrency(document.subtotal)}
+            {formatCurrency(isCreditNote ? -document.subtotal : document.subtotal)}
           </span>
         </div>
 
@@ -50,7 +52,7 @@ export function DocumentPageSummary({
               {tax.name} ({tax.rate}%)
             </span>
             <span className="text-slate-900 dark:text-slate-200 font-medium">
-              {formatCurrency(tax.tax_amount)}
+              {formatCurrency(isCreditNote ? -tax.tax_amount : tax.tax_amount)}
             </span>
           </div>
         ))}
@@ -60,7 +62,7 @@ export function DocumentPageSummary({
             Total Neto
           </span>
           <span className="text-2xl font-black text-[#0f172a] dark:text-white">
-            {formatCurrency(document.total)}
+            {formatCurrency(isCreditNote ? -document.total : document.total)}
           </span>
         </div>
       </div>

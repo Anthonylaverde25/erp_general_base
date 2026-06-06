@@ -1,5 +1,6 @@
 import { ConversionSeriesModal } from "./ConversionSeriesModal";
 import { BudgetToDeliveryModal } from "./BudgetToDeliveryModal";
+import { RectifyDocumentModal } from "./RectifyDocumentModal";
 import type { DocumentEntity } from "@/domain/entities/documents/DocumentEntity";
 
 interface DocumentActionModalsProps {
@@ -8,20 +9,24 @@ interface DocumentActionModalsProps {
     conversionModalOpen: boolean;
     budgetModalOpen: boolean;
     emissionModalOpen: boolean;
+    rectificationModalOpen: boolean;
     conversionMode: "full" | "partial";
     invoiceConversionMode: "full" | "partial";
     pendingStatus: string | null;
     isUpdating: boolean;
     isConverting: boolean;
+    isRectifying: boolean;
   };
   actions: {
     setConversionModalOpen: (open: boolean) => void;
     setBudgetModalOpen: (open: boolean) => void;
     setEmissionModalOpen: (open: boolean) => void;
+    setRectificationModalOpen: (open: boolean) => void;
     setPendingStatus: (status: string | null) => void;
     handleConvertToInvoice: (payload: any) => void;
     handleConvertToDelivery: (payload: any) => void;
     handleEmissionConfirm: (payload: any) => void;
+    handleRectifyDocument: (payload: any) => void;
   };
 }
 
@@ -62,6 +67,14 @@ export function DocumentActionModals({ document, state, actions }: DocumentActio
         onConvert={actions.handleConvertToDelivery}
         isConverting={state.isConverting}
         mode={state.conversionMode}
+      />
+
+      <RectifyDocumentModal
+        open={state.rectificationModalOpen}
+        onClose={() => actions.setRectificationModalOpen(false)}
+        document={document}
+        onRectify={actions.handleRectifyDocument}
+        isRectifying={state.isRectifying}
       />
     </>
   );

@@ -41,6 +41,12 @@ ModuleRegistry.registerModules([
     ColumnAutoSizeModule
 ]);
 
+const copFormatter = new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    maximumFractionDigits: 0
+});
+
 interface DocumentAgGridTableProps {
     documents: DocumentEntity[] | undefined;
     isLoading?: boolean;
@@ -209,11 +215,10 @@ export default function DocumentAgGridTable({ documents, isLoading, operation = 
             },
             cellClass: `text-right font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`,
             valueFormatter: (params) => {
-                return new Intl.NumberFormat('es-CO', {
-                    style: 'currency',
-                    currency: 'COP',
-                    maximumFractionDigits: 0
-                }).format(params.value);
+                const doc = params.data;
+                const isCreditNote = doc && (doc.document_type_code === 'CRN' || doc.document_type_code === 'PCN');
+                const val = isCreditNote ? -params.value : params.value;
+                return copFormatter.format(val);
             }
         },
         {

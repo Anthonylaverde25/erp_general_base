@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { useUpdateDocument } from "@/features/documents/hooks/useUpdateDocument";
 import { useConvertDocument } from "@/features/documents/hooks/useConvertDocument";
 import { useConvertToPurchase } from "@/features/documents/hooks/useConvertToPurchase";
+import { useRectifyDocument } from "@/features/documents/hooks/useRectifyDocument";
 import type { DocumentEntity } from "@/domain/entities/documents/DocumentEntity";
 import { 
   buildLifecycleSteps, 
@@ -21,12 +22,14 @@ export function useDocumentFloatingActions({ document }: UseDocumentFloatingActi
   const queryClient = useQueryClient();
   const { mutate: updateDocument, isPending: isUpdating } = useUpdateDocument();
   const { mutate: convertDocument, isPending: isConverting } = useConvertDocument();
+  const { mutate: rectifyDocument, isPending: isRectifying } = useRectifyDocument();
   const convertToPurchase = useConvertToPurchase();
 
   // Modal States
   const [conversionModalOpen, setConversionModalOpen] = useState(false);
   const [budgetModalOpen, setBudgetModalOpen] = useState(false);
   const [emissionModalOpen, setEmissionModalOpen] = useState(false);
+  const [rectificationModalOpen, setRectificationModalOpen] = useState(false);
   
   // Modes and Pending States
   const [conversionMode, setConversionMode] = useState<"full" | "partial">("full");
@@ -159,16 +162,33 @@ export function useDocumentFloatingActions({ document }: UseDocumentFloatingActi
     }
   };
 
+  const handleRectifyDocument = (payload: {
+    number_series_id: number;
+    reason?: string;
+  }) => {
+    rectifyDocument(
+      { id: String(document.id), payload },
+      {
+        onSuccess: (rectified) => {
+          setRectificationModalOpen(false);
+          navigate(`/${module}/view/${rectified.id}`);
+        },
+      }
+    );
+  };
+
   return {
     state: {
       conversionModalOpen,
       budgetModalOpen,
       emissionModalOpen,
+      rectificationModalOpen,
       conversionMode,
       invoiceConversionMode,
       pendingStatus,
       isUpdating,
       isConverting,
+      isRectifying,
       steps,
       nextAction,
       fastTrackAction,
@@ -183,6 +203,7 @@ export function useDocumentFloatingActions({ document }: UseDocumentFloatingActi
       setConversionModalOpen,
       setBudgetModalOpen,
       setEmissionModalOpen,
+      setRectificationModalOpen,
       setConversionMode,
       setInvoiceConversionMode,
       setPendingStatus,
@@ -191,6 +212,7 @@ export function useDocumentFloatingActions({ document }: UseDocumentFloatingActi
       handleConvertToInvoice,
       handleConvertToDelivery,
       handleConvertToPurchase,
+      handleRectifyDocument,
     },
   };
 }

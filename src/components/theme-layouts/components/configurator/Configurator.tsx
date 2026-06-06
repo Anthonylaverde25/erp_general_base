@@ -73,6 +73,10 @@ function Configurator() {
 		return null;
 	}
 
+	// Disabled: Configurator panel is no longer used
+	return null;
+
+	/*
 	return (
 		<>
 			<Root
@@ -118,6 +122,7 @@ function Configurator() {
 			/>
 		</>
 	);
+	*/
 }
 
 export default memo(Configurator);

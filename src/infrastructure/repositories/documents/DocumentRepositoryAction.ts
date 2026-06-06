@@ -41,4 +41,11 @@ export class DocumentRepositoryAction implements IDocumentActionRepository {
         } = await axiosInstance.post(`documents/${id}/duplicate`);
         return DocumentEntity.fromJson(duplicated);
     }
+
+    async rectify(id: string | number, payload?: { number_series_id?: number | ''; reason?: string }): Promise<DocumentEntity> {
+        const {
+            data: { data: rectified }
+        } = await axiosInstance.post(`documents/${id}/rectify`, payload);
+        return DocumentEntity.fromJson(rectified);
+    }
 }

@@ -11,6 +11,7 @@ import { UpdateDocumentUseCase } from '@/application/use_cases/documents/UpdateD
 import { ConvertDocumentUseCase } from '@/application/use_cases/documents/ConvertDocumentUseCase';
 import { ConvertToPurchaseUseCase } from '@/application/use_cases/documents/ConvertToPurchaseUseCase';
 import { RecordPaymentUseCase } from '@/application/use_cases/documents/RecordPaymentUseCase';
+import { RectifyDocumentUseCase } from '@/application/use_cases/documents/RectifyDocumentUseCase';
 
 export const registerDocumentModule = (container: Container) => {
     container.bind<IDocumentRepository>(TYPES.IDocumentRepository).to(DocumentRepositoryCrud).inSingletonScope();
@@ -22,4 +23,5 @@ export const registerDocumentModule = (container: Container) => {
     container.bind<ConvertDocumentUseCase>(TYPES.ConvertDocumentUseCase).to(ConvertDocumentUseCase);
     container.bind<ConvertToPurchaseUseCase>(TYPES.ConvertToPurchaseUseCase).to(ConvertToPurchaseUseCase);
     container.bind<RecordPaymentUseCase>(TYPES.RecordPaymentUseCase).to(RecordPaymentUseCase);
+    container.bind<RectifyDocumentUseCase>(TYPES.RectifyDocumentUseCase).to(RectifyDocumentUseCase);
 };

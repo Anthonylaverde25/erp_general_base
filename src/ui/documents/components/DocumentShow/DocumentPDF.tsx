@@ -22,6 +22,7 @@ interface DocumentPDFProps {
 const DocumentPDF = ({ document, activeCompany }: DocumentPDFProps) => {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const validationUrl = `https://erp.tuempresa.com/verify/${document.id || document.number_serie}`;
+  const isCreditNote = document.document_type_code === 'CRN' || document.document_type_code === 'PCN';
 
   useEffect(() => {
     const generateQR = async () => {
@@ -110,6 +111,7 @@ const DocumentPDF = ({ document, activeCompany }: DocumentPDFProps) => {
                 document.predecessors && document.predecessors.length > 1
               }
               predecessors={document.predecessors}
+              isCreditNote={isCreditNote}
             />
 
             {/* Summary Section (QR + Totals, ONLY on last page) */}
@@ -118,6 +120,7 @@ const DocumentPDF = ({ document, activeCompany }: DocumentPDFProps) => {
                 document={document}
                 qrDataUrl={qrDataUrl}
                 formatCurrency={formatCurrency}
+                isCreditNote={isCreditNote}
               />
             )}
 

@@ -7,13 +7,14 @@ interface DocumentStatsCardsProps {
   total: number;
   totalPaid: number;
   balance: number;
+  isCreditNote?: boolean;
 }
 
-export function DocumentStatsCards({ total, totalPaid, balance }: DocumentStatsCardsProps) {
+export function DocumentStatsCards({ total, totalPaid, balance, isCreditNote = false }: DocumentStatsCardsProps) {
   const stats = [
-    { label: "Total Documento", value: formatCurrency(total), color: "#111827", subtitle: "Monto bruto", icon: <FileText size={14} /> },
-    { label: "Total Cobrado", value: formatCurrency(totalPaid), color: "#10B981", subtitle: "Pagos recibidos", icon: <TrendingUp size={14} /> },
-    { label: "Pendiente", value: formatCurrency(balance), color: "#DC2626", subtitle: "Saldo por cobrar", icon: <Clock size={14} /> },
+    { label: "Total Documento", value: formatCurrency(isCreditNote ? -total : total), color: "#111827", subtitle: "Monto bruto", icon: <FileText size={14} /> },
+    { label: "Total Cobrado", value: formatCurrency(isCreditNote ? -totalPaid : totalPaid), color: "#10B981", subtitle: "Pagos recibidos", icon: <TrendingUp size={14} /> },
+    { label: "Pendiente", value: formatCurrency(isCreditNote ? -balance : balance), color: "#DC2626", subtitle: "Saldo por cobrar", icon: <Clock size={14} /> },
   ];
 
   return (

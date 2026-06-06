@@ -44,6 +44,7 @@ export default function DocumentDetailsModal({
   onClose,
   document,
 }: DocumentDetailsModalProps) {
+  const isCreditNote = document.document_type_code === 'CRN' || document.document_type_code === 'PCN';
   const totalPaid = document.total_paid || 0;
   const total = document.total || 0;
   const balance = total - totalPaid;
@@ -82,6 +83,7 @@ export default function DocumentDetailsModal({
               total={total}
               totalPaid={totalPaid}
               balance={balance}
+              isCreditNote={isCreditNote}
             />
 
             {/* Transaction History Table */}

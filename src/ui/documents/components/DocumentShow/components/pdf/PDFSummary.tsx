@@ -6,9 +6,10 @@ interface PDFSummaryProps {
     document: DocumentEntity;
     qrDataUrl: string;
     formatCurrency: (amount: number) => string;
+    isCreditNote?: boolean;
 }
 
-export const PDFSummary = ({ document, qrDataUrl, formatCurrency }: PDFSummaryProps) => {
+export const PDFSummary = ({ document, qrDataUrl, formatCurrency, isCreditNote = false }: PDFSummaryProps) => {
     return (
         <View style={styles.summarySection}>
             {/* QR Code on the left side of the summary */}
@@ -23,7 +24,7 @@ export const PDFSummary = ({ document, qrDataUrl, formatCurrency }: PDFSummaryPr
             <View style={styles.summaryWrapper}>
                 <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Suma Bases</Text>
-                    <Text style={styles.summaryValue}>{formatCurrency(document.subtotal)}</Text>
+                    <Text style={styles.summaryValue}>{formatCurrency(isCreditNote ? -document.subtotal : document.subtotal)}</Text>
                 </View>
 
                 {document.discount_total > 0 && (
@@ -38,13 +39,13 @@ export const PDFSummary = ({ document, qrDataUrl, formatCurrency }: PDFSummaryPr
                         <Text style={styles.summaryLabel}>
                             {tax.name} ({tax.rate}%)
                         </Text>
-                        <Text style={styles.summaryValue}>{formatCurrency(tax.tax_amount)}</Text>
+                        <Text style={styles.summaryValue}>{formatCurrency(isCreditNote ? -tax.tax_amount : tax.tax_amount)}</Text>
                     </View>
                 ))}
 
                 <View style={styles.totalRow}>
                     <Text style={styles.totalLabel}>Total Neto</Text>
-                    <Text style={styles.totalValue}>{formatCurrency(document.total)}</Text>
+                    <Text style={styles.totalValue}>{formatCurrency(isCreditNote ? -document.total : document.total)}</Text>
                 </View>
             </View>
         </View>
