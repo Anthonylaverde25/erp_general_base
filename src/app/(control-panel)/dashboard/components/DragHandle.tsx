@@ -22,7 +22,7 @@ function DragHandle() {
 				opacity: 0.8,
 				flexShrink: 0,
 				'&:hover': { opacity: 1, bgcolor: 'primary.main', color: 'primary.contrastText' },
-				'&:active': { cursor: 'grabbing' },
+				'&:active': { cursor: 'grabbing' }
 			}}
 		>
 			<DragIndicatorIcon fontSize="small" />

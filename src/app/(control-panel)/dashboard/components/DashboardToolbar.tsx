@@ -23,7 +23,7 @@ function DashboardToolbar({ isEditing, onToggleEdit, onResetLayout }: DashboardT
 						bgcolor: 'text.primary',
 						color: 'background.paper',
 						borderRadius: 1,
-						overflow: 'hidden',
+						overflow: 'hidden'
 					}}
 				>
 					<Button
@@ -34,13 +34,16 @@ function DashboardToolbar({ isEditing, onToggleEdit, onResetLayout }: DashboardT
 							fontWeight: 600,
 							px: 2,
 							minWidth: 'auto',
-							borderRadius: 0,
+							borderRadius: 0
 						}}
 					>
 						Resumen
 					</Button>
 					<Box sx={{ width: '1px', bgcolor: 'rgba(255,255,255,0.2)' }} />
-					<IconButton size="small" sx={{ color: 'inherit', borderRadius: 0, p: '4px' }}>
+					<IconButton
+						size="small"
+						sx={{ color: 'inherit', borderRadius: 0, p: '4px' }}
+					>
 						<MoreVertIcon fontSize="small" />
 					</IconButton>
 				</Box>
@@ -54,7 +57,7 @@ function DashboardToolbar({ isEditing, onToggleEdit, onResetLayout }: DashboardT
 						bgcolor: 'background.paper',
 						border: '1px solid',
 						borderColor: 'divider',
-						'&:hover': { bgcolor: 'action.hover' },
+						'&:hover': { bgcolor: 'action.hover' }
 					}}
 				>
 					Equipo
@@ -68,7 +71,7 @@ function DashboardToolbar({ isEditing, onToggleEdit, onResetLayout }: DashboardT
 						bgcolor: 'background.paper',
 						border: '1px solid',
 						borderColor: 'divider',
-						'&:hover': { bgcolor: 'action.hover' },
+						'&:hover': { bgcolor: 'action.hover' }
 					}}
 				>
 					Proyectos
@@ -84,7 +87,11 @@ function DashboardToolbar({ isEditing, onToggleEdit, onResetLayout }: DashboardT
 				<Box sx={{ flexGrow: 1 }} />
 
 				{isEditing && (
-					<Button size="small" onClick={onResetLayout} sx={{ textTransform: 'none', color: 'text.secondary', fontWeight: 600 }}>
+					<Button
+						size="small"
+						onClick={onResetLayout}
+						sx={{ textTransform: 'none', color: 'text.secondary', fontWeight: 600 }}
+					>
 						Restablecer Diseño
 					</Button>
 				)}
@@ -121,12 +128,16 @@ function DashboardToolbar({ isEditing, onToggleEdit, onResetLayout }: DashboardT
 						display: 'flex',
 						alignItems: 'center',
 						gap: 1,
-						fontSize: 13,
+						fontSize: 13
 					}}
 				>
 					<DragIndicatorIcon fontSize="small" />
-					<Typography variant="caption" sx={{ fontWeight: 600 }}>
-						Modo edición activo — Arrastra las tarjetas desde el ícono ⠿ · Redimensiona desde la esquina inferior derecha
+					<Typography
+						variant="caption"
+						sx={{ fontWeight: 600 }}
+					>
+						Modo edición activo — Arrastra las tarjetas desde el ícono ⠿ · Redimensiona desde la esquina
+						inferior derecha
 					</Typography>
 				</Box>
 			)}

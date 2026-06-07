@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Box } from '@mui/material';
+import { Box, alpha } from '@mui/material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 type DashGridItemProps = {
@@ -12,13 +12,10 @@ type DashGridItemProps = {
 /**
  * Lightweight wrapper for each react-grid-layout grid item.
  *
- * IMPORTANT: This component renders a plain <div> as its root element.
- * react-grid-layout clones each direct child and injects `style`, `className`,
- * and mouse event handlers. Using a complex MUI component (Paper/Card) as the
- * root would break drag/resize because those components may intercept events
- * or fail to forward injected props to the DOM.
- *
- * The visual "card" appearance is achieved with inline styles on the root <div>.
+ * It renders a flex column container:
+ * - When isEditing is true, a top-bar drag handle (.drag-handle) is rendered at the top,
+ *   and the card border turns dashed with a subtle primary color shadow.
+ * - When isEditing is false, it renders normal borders with no drag handle.
  */
 function DashGridItem({ children, isEditing, noPadding = false }: DashGridItemProps) {
 	return (
@@ -27,45 +24,58 @@ function DashGridItem({ children, isEditing, noPadding = false }: DashGridItemPr
 				height: '100%',
 				width: '100%',
 				bgcolor: 'background.paper',
-				borderRadius: '4px',
-				border: '1px solid',
-				borderColor: isEditing ? 'primary.light' : 'divider',
-				boxShadow: 1,
+				borderRadius: '8px',
+				border: isEditing ? '1px dashed' : '1px solid',
+				borderColor: isEditing ? 'primary.main' : 'divider',
+				boxShadow: isEditing ? (theme) => `0 0 0 1px ${alpha(theme.palette.primary.main, 0.15)}` : 1,
 				overflow: 'hidden',
 				display: 'flex',
 				flexDirection: 'column',
 				position: 'relative',
-				transition: 'border-color 0.2s',
+				transition: 'border-color 0.2s, box-shadow 0.2s'
 			}}
 		>
-			{/* Drag handle — only visible in edit mode */}
+			{/* Top-bar drag handle — only visible in edit mode */}
 			{isEditing && (
 				<Box
 					className="drag-handle"
 					sx={{
-						position: 'absolute',
-						top: 6,
-						right: 6,
-						zIndex: 10,
-						cursor: 'grab',
-						p: 0.5,
-						display: 'inline-flex',
+						height: '24px',
+						width: '100%',
+						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
+						bgcolor: (theme) => alpha(theme.palette.primary.main, 0.06),
+						borderBottom: '1px solid',
+						borderColor: (theme) => alpha(theme.palette.primary.main, 0.12),
 						color: 'primary.main',
-						bgcolor: 'action.hover',
-						borderRadius: '4px',
-						opacity: 0.8,
-						'&:hover': { opacity: 1, bgcolor: 'primary.main', color: 'primary.contrastText' },
-						'&:active': { cursor: 'grabbing' },
+						cursor: 'grab',
+						zIndex: 10,
+						flexShrink: 0,
+						'&:hover': {
+							bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1)
+						},
+						'&:active': {
+							cursor: 'grabbing'
+						}
 					}}
 				>
-					<DragIndicatorIcon fontSize="small" />
+					<DragIndicatorIcon sx={{ fontSize: 18 }} />
 				</Box>
 			)}
 
 			{/* Card content */}
-			<Box sx={{ p: noPadding ? 0 : 2.5, flex: 1, overflow: 'hidden' }}>{children}</Box>
+			<Box
+				sx={{
+					p: noPadding ? 0 : 2.5,
+					flex: 1,
+					overflow: 'hidden',
+					display: 'flex',
+					flexDirection: 'column'
+				}}
+			>
+				{children}
+			</Box>
 		</Box>
 	);
 }

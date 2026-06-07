@@ -1,5 +1,4 @@
 import { Box, Typography } from '@mui/material';
-import DragHandle from '../DragHandle';
 
 const accounts = [
 	'Compras de mercaderías',
@@ -8,31 +7,32 @@ const accounts = [
 	'Variación de existencias de mercaderías',
 	'Gastos en investigación y desarrollo',
 	'Arrendamientos y cánones',
-	'Reparaciones y conservación',
+	'Reparaciones y conservación'
 ];
-
-type ExpenseAccountsCardProps = {
-	isEditing: boolean;
-};
 
 /**
  * Scrollable list of expense accounts with amounts and percentages.
  * Card frame styles are provided by .react-grid-item in GridWrapper.
  */
-function ExpenseAccountsCard({ isEditing }: ExpenseAccountsCardProps) {
+function ExpenseAccountsCard() {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 			{/* Header */}
 			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
 				<Box>
-					<Typography variant="subtitle1" fontWeight={600}>
+					<Typography
+						variant="subtitle1"
+						fontWeight={600}
+					>
 						Cuentas de gasto
 					</Typography>
-					<Typography variant="body2" color="text.secondary">
+					<Typography
+						variant="body2"
+						color="text.secondary"
+					>
 						Mes actual
 					</Typography>
 				</Box>
-				{isEditing && <DragHandle />}
 			</Box>
 
 			{/* Scrollable list */}
@@ -46,7 +46,7 @@ function ExpenseAccountsCard({ isEditing }: ExpenseAccountsCardProps) {
 							alignItems: 'center',
 							py: 1.5,
 							borderBottom: idx !== accounts.length - 1 ? '1px solid' : 'none',
-							borderColor: 'divider',
+							borderColor: 'divider'
 						}}
 					>
 						<Typography

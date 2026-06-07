@@ -45,7 +45,8 @@ export default defineConfig({
 	},
 	define: {
 		'import.meta.env.VITE_PORT': JSON.stringify(process.env.PORT || 3000),
-		global: 'window'
+		global: 'window',
+		'process.env': {}
 	},
 	resolve: {
 		alias: {

@@ -9,6 +9,7 @@ import 'react-resizable/css/styles.css';
 
 // Components
 import DashboardToolbar from '../DashboardToolbar';
+import DashGridItem from '../DashGridItem';
 
 // Card components
 import KpiCard from '../cards/KpiCard';
@@ -23,7 +24,7 @@ import CriticalStockCard from '../cards/CriticalStockCard';
 // ─── react-grid-layout setup ─────────────────────────────────────────────────
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-const STORAGE_KEY = 'dashboard_layouts_v4';
+const STORAGE_KEY = 'dashboard_layouts_v5';
 
 // ─── Page root ────────────────────────────────────────────────────────────────
 const Root = styled(FusePageSimple)(({ theme }) => ({
@@ -31,44 +32,36 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 		backgroundColor: theme.vars.palette.background.paper,
 		borderBottomWidth: 1,
 		borderStyle: 'solid',
-		borderColor: theme.vars.palette.divider,
+		borderColor: theme.vars.palette.divider
 	},
-	'& .FusePageSimple-content': {},
+	'& .FusePageSimple-content': {}
 }));
 
 // ─── Grid wrapper ─────────────────────────────────────────────────────────────
-// CRITICAL: Card visual styles are applied to .react-grid-item directly.
-// This ensures react-grid-layout has full control over positioning and sizing,
-// while the card appearance (background, border, shadow) is defined at the
-// grid level — not by a wrapper component that could intercept events.
-const GridWrapper = styled('div')<{ isEditing: boolean }>(({ theme, isEditing }) => ({
-	// ── Card appearance applied to each grid item ──
+// Styles only the drag placeholder and the resize handle, since visual card styles
+// (borders, shadow, background) are now encapsulated within DashGridItem.
+// Explicitly configures pointer-events and user-select to ensure text selection
+// and mouse interaction work correctly inside cards.
+const GridWrapper = styled('div')<{ isEditing: boolean }>(({ theme }) => ({
+	// ── Card container ──
 	'& .react-grid-item': {
-		backgroundColor: theme.palette.background.paper,
-		borderRadius: 4,
-		border: `1px solid ${isEditing ? theme.palette.primary.light : theme.palette.divider}`,
-		boxShadow: theme.shadows[1],
-		overflow: 'hidden',
-		padding: 20,
-		transition: 'border-color 0.2s, box-shadow 0.2s',
-		...(isEditing && {
-			'&:hover': {
-				boxShadow: theme.shadows[4],
-				borderColor: theme.palette.primary.main,
-			},
-		}),
+		userSelect: 'text',
+		pointerEvents: 'auto'
+	},
+	'& .react-grid-item.react-draggable-dragging': {
+		userSelect: 'none'
 	},
 
 	// ── Drag placeholder ──
 	'& .react-grid-item.react-grid-placeholder': {
 		backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
 		border: `2px dashed ${theme.palette.primary.main}`,
-		borderRadius: 4,
+		borderRadius: 8,
 		opacity: 1,
 		zIndex: 2,
 		userSelect: 'none',
 		padding: 0,
-		boxShadow: 'none',
+		boxShadow: 'none'
 	},
 
 	// ── Resize handle ──
@@ -89,17 +82,17 @@ const GridWrapper = styled('div')<{ isEditing: boolean }>(({ theme, isEditing })
 			width: 8,
 			height: 8,
 			borderRight: `2px solid ${theme.palette.text.disabled}`,
-			borderBottom: `2px solid ${theme.palette.text.disabled}`,
+			borderBottom: `2px solid ${theme.palette.text.disabled}`
 		},
 		'&:hover::after': {
-			borderColor: theme.palette.primary.main,
-		},
+			borderColor: theme.palette.primary.main
+		}
 	},
 
 	// ── Drag handle ──
 	'& .drag-handle': {
-		touchAction: 'none',
-	},
+		touchAction: 'none'
+	}
 }));
 
 // ─── Layout definitions ──────────────────────────────────────────────────────
@@ -114,7 +107,7 @@ const initialLayouts = {
 		{ i: 'entradas_salidas_banco', x: 9, y: 3, w: 3, h: 5, minW: 2, minH: 3 },
 		{ i: 'resumen_gastos', x: 0, y: 8, w: 6, h: 5, minW: 3, minH: 3 },
 		{ i: 'cuentas_gasto', x: 6, y: 8, w: 6, h: 5, minW: 3, minH: 3 },
-		{ i: 'stock_critico', x: 0, y: 13, w: 6, h: 5, minW: 3, minH: 3 },
+		{ i: 'stock_critico', x: 0, y: 13, w: 6, h: 5, minW: 3, minH: 3 }
 	],
 	md: [
 		{ i: 'ventas', x: 0, y: 0, w: 5, h: 3, minW: 2, minH: 2 },
@@ -126,8 +119,8 @@ const initialLayouts = {
 		{ i: 'entradas_salidas_banco', x: 5, y: 11, w: 5, h: 5, minW: 2, minH: 3 },
 		{ i: 'resumen_gastos', x: 0, y: 16, w: 10, h: 5, minW: 4, minH: 3 },
 		{ i: 'cuentas_gasto', x: 0, y: 21, w: 10, h: 5, minW: 4, minH: 3 },
-		{ i: 'stock_critico', x: 0, y: 26, w: 10, h: 5, minW: 4, minH: 3 },
-	],
+		{ i: 'stock_critico', x: 0, y: 26, w: 10, h: 5, minW: 4, minH: 3 }
+	]
 };
 
 const GRID_BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
@@ -171,18 +164,6 @@ function DashboardView() {
 						onResetLayout={handleResetLayout}
 					/>
 
-					{/*
-					 * GridWrapper applies card styles to .react-grid-item.
-					 * Each child of ResponsiveGridLayout is a NATIVE <div>.
-					 * react-grid-layout cloneElement's each div, injecting:
-					 *   - style (position, transform, width, height)
-					 *   - className (react-grid-item, cssTransforms, etc.)
-					 *   - event handlers (onMouseDown, onTouchStart)
-					 *   - resize handle (as additional child element)
-					 *
-					 * The card content components are simple — no wrappers,
-					 * no overflow:hidden, no position:relative.
-					 */}
 					<GridWrapper isEditing={isEditing}>
 						<ResponsiveGridLayout
 							className="layout"
@@ -195,37 +176,74 @@ function DashboardView() {
 							draggableHandle=".drag-handle"
 							isDraggable={isEditing}
 							isResizable={isEditing}
-							useCSSTransforms
 						>
 							<div key="ventas">
-								<KpiCard title="Ventas" value="0,00€" isEditing={isEditing} progressPercent={0} targetValue="0,00€" targetColor="success.main" />
+								<DashGridItem isEditing={isEditing}>
+									<KpiCard
+										title="Ventas"
+										value="0,00€"
+										progressPercent={0}
+										targetValue="0,00€"
+										targetColor="success.main"
+									/>
+								</DashGridItem>
 							</div>
 							<div key="gastos">
-								<KpiCard title="Gastos" value="0,00€" isEditing={isEditing} progressPercent={0} targetValue="0,00€" targetColor="error.main" />
+								<DashGridItem isEditing={isEditing}>
+									<KpiCard
+										title="Gastos"
+										value="0,00€"
+										progressPercent={0}
+										targetValue="0,00€"
+										targetColor="error.main"
+									/>
+								</DashGridItem>
 							</div>
 							<div key="beneficio">
-								<KpiCard title="Beneficio" value="0,00€" isEditing={isEditing} />
+								<DashGridItem isEditing={isEditing}>
+									<KpiCard
+										title="Beneficio"
+										value="0,00€"
+									/>
+								</DashGridItem>
 							</div>
 							<div key="banco">
-								<BankCtaCard isEditing={isEditing} />
+								<DashGridItem isEditing={isEditing}>
+									<BankCtaCard />
+								</DashGridItem>
 							</div>
 							<div key="resumen_ventas_compras">
-								<SalesPurchasesChart isEditing={isEditing} />
+								<DashGridItem isEditing={isEditing}>
+									<SalesPurchasesChart />
+								</DashGridItem>
 							</div>
 							<div key="pagos_cobros_pendientes">
-								<PendingPaymentsCard isEditing={isEditing} />
+								<DashGridItem
+									isEditing={isEditing}
+									noPadding
+								>
+									<PendingPaymentsCard />
+								</DashGridItem>
 							</div>
 							<div key="entradas_salidas_banco">
-								<BankFlowCard isEditing={isEditing} />
+								<DashGridItem isEditing={isEditing}>
+									<BankFlowCard />
+								</DashGridItem>
 							</div>
 							<div key="resumen_gastos">
-								<ExpensesSummaryChart isEditing={isEditing} />
+								<DashGridItem isEditing={isEditing}>
+									<ExpensesSummaryChart />
+								</DashGridItem>
 							</div>
 							<div key="cuentas_gasto">
-								<ExpenseAccountsCard isEditing={isEditing} />
+								<DashGridItem isEditing={isEditing}>
+									<ExpenseAccountsCard />
+								</DashGridItem>
 							</div>
 							<div key="stock_critico">
-								<CriticalStockCard isEditing={isEditing} />
+								<DashGridItem isEditing={isEditing}>
+									<CriticalStockCard />
+								</DashGridItem>
 							</div>
 						</ResponsiveGridLayout>
 					</GridWrapper>
