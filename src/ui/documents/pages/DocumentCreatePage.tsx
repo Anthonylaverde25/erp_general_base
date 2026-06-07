@@ -8,10 +8,11 @@ import {
 	DocumentCreateMetaGrid,
 	DocumentCreateTopbar,
 	GRID_THEME_OPTIONS,
+	StockResolutionModal,
 	type DocumentGridTheme,
 	type DocumentOperation,
 } from "../components/create-document";
-import { DocumentCreateProvider } from "../context/DocumentCreateContext";
+import { DocumentCreateProvider, useDocumentCreate } from "../context/DocumentCreateContext";
 
 interface DocumentCreatePageProps {
 	operation: DocumentOperation;
@@ -55,6 +56,17 @@ export default function DocumentCreatePage({
 					/>
 				</main>
 			</Box>
+			<StockResolutionModalWrapper />
 		</DocumentCreateProvider>
+	);
+}
+
+function StockResolutionModalWrapper() {
+	const { stockConflicts, setStockConflicts } = useDocumentCreate();
+	return (
+		<StockResolutionModal
+			open={!!stockConflicts}
+			onClose={() => setStockConflicts(null)}
+		/>
 	);
 }

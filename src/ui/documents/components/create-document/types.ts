@@ -7,6 +7,7 @@ export interface DocumentCreateCopy {
 	primaryAction: string;
 	documentNumber: string;
 	topTotal: string;
+	nextStatus?: string;
 }
 
 export interface DocumentLineTaxItem {
@@ -21,6 +22,7 @@ export interface DocumentLineTaxItem {
 export interface DocumentLineItem {
 	id: string;
 	item_id?: number;
+	store_id?: number;
 	code: string;
 	description: string;
 	quantity: string;
@@ -103,8 +105,21 @@ export function getDocumentTypeCopy(
 	};
 
 	const action = labels[typeCode];
-	if (action) {
-		return { ...baseCopy, primaryAction: action };
+	const statuses: Record<string, string> = {
+		'DLV': 'delivered',
+		'PDLV': 'received',
+		'QUO': 'approved',
+		'PQUO': 'approved',
+	};
+
+	const nextStatus = statuses[typeCode];
+
+	if (action || nextStatus) {
+		return { 
+			...baseCopy, 
+			primaryAction: action || baseCopy.primaryAction,
+			nextStatus: nextStatus || baseCopy.nextStatus
+		};
 	}
 
 	return baseCopy;

@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useMemo } from "react";
-import { FormProvider, UseFormReturn } from "react-hook-form";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { FormProvider, UseFormReturn, useWatch } from "react-hook-form";
 import { useParams, useSearchParams } from "react-router";
 
 import { type DocumentFormValues } from "../schemas/documentSchema";
@@ -22,6 +22,8 @@ import { useGetDocument } from "@/features/documents/hooks/useGetDocument";
 import { useGetDocuments } from "@/features/documents/hooks/useGetDocuments";
 import useIndexNumberSeries from "@/features/number_series/hooks/useIndexNumberSeries";
 import { NumberSeriesEntity } from "@/domain/entities/number_series/NumberSeriesEntity";
+import useActiveCompany from "@/features/companies/useActiveCompany";
+import axiosInstance from "@/lib/@axios";
 
 // ─── Context Types ────────────────────────────────────────────────────────────
 
@@ -43,6 +45,18 @@ interface DocumentCreateContextValue {
     isReadOnly: boolean;
     isRestricted: boolean;
     sourcePartner?: { id: string | number; name: string; cif?: string; vat_number?: string };
+    stockConflicts: any[] | null;
+    setStockConflicts: React.Dispatch<React.SetStateAction<any[] | null>>;
+    lineStockWarnings: Record<string, {
+        available_stock: number;
+        is_insufficient: boolean;
+        deficit: number;
+        alternative_stores: any[];
+        store_id: number;
+        store_name: string;
+        is_resolved?: boolean;
+    }>;
+    setLineStockWarnings: React.Dispatch<React.SetStateAction<Record<string, any>>>;
 }
 
 const DocumentCreateContext = createContext<DocumentCreateContextValue | undefined>(undefined);
@@ -58,6 +72,7 @@ export function DocumentCreateProvider({
     operation: DocumentOperation;
     documentId?: string;
 }) {
+    let formLines: any = undefined;
     const { code } = useParams();
     const [searchParams] = useSearchParams();
     const mode = searchParams.get("mode");
@@ -69,6 +84,7 @@ export function DocumentCreateProvider({
         return ids ? ids.split(",") : [];
     }, [searchParams]);
     const isEditMode = !!documentId;
+    const [stockConflicts, setStockConflicts] = useState<any[] | null>(null);
 
     // ─── Data fetching ──────────────────────────────────────────────────────
     const { documentTypes } = useIndexDocumentTypesByModule(operation.toUpperCase());
@@ -94,7 +110,105 @@ export function DocumentCreateProvider({
         sourceDocuments 
     });
     const { watch, setValue, handleSubmit } = methods;
-    const formLines = watch("lines");
+    formLines = useWatch({
+        control: methods.control,
+        name: "lines",
+    });
+
+    const activeCompany = useActiveCompany();
+    const defaultStoreId = activeCompany?.settings?.defaultStoreId;
+
+    const [lineStockWarnings, setLineStockWarnings] = useState<Record<string, {
+        available_stock: number;
+        is_insufficient: boolean;
+        deficit: number;
+        alternative_stores: any[];
+        store_id: number;
+        store_name: string;
+        is_resolved?: boolean;
+    }>>({});
+
+    const checkLineStock = async (lineId: string, itemId: number, storeId: number, quantity: number) => {
+        try {
+            const response = await axiosInstance.get(`/items/${itemId}/stock-availability`, {
+                params: {
+                    store_id: storeId,
+                    quantity: quantity
+                }
+            });
+            const data = response.data;
+            setLineStockWarnings(prev => {
+                const updated = { ...prev };
+                if (data.is_insufficient) {
+                    updated[lineId] = {
+                        available_stock: data.available_stock,
+                        is_insufficient: true,
+                        deficit: data.deficit,
+                        alternative_stores: data.alternative_stores,
+                        store_id: storeId,
+                        store_name: data.store_name
+                    };
+                } else {
+                    delete updated[lineId];
+                }
+                return updated;
+            });
+        } catch (error) {
+            console.error("Failed to check line stock:", error);
+        }
+    };
+
+    const removeLineStockWarning = (lineId: string) => {
+        setLineStockWarnings(prev => {
+            const updated = { ...prev };
+            if (updated[lineId]) {
+                delete updated[lineId];
+                return updated;
+            }
+            return prev;
+        });
+    };
+
+    // Debounced stock checker
+    useEffect(() => {
+        // Do not check stock if loading or itemType is service
+        if (isLoadingDocument || itemType !== "product") return;
+
+        const timer = setTimeout(() => {
+            if (!formLines || formLines.length === 0) return;
+
+            // Clean up warnings for deleted lines
+            const currentLineIds = new Set(formLines.map((l: any) => l.id));
+            setLineStockWarnings(prev => {
+                const updated = { ...prev };
+                let changed = false;
+                Object.keys(updated).forEach(id => {
+                    if (!currentLineIds.has(id)) {
+                        delete updated[id];
+                        changed = true;
+                    }
+                });
+                return changed ? updated : prev;
+            });
+
+            // Check stock for each active line
+            formLines.forEach((line: any) => {
+                const itemId = Number(line.item_id);
+                const qty = Number(line.quantity);
+                const targetStoreId = Number(line.store_id || defaultStoreId);
+
+                if (itemId && qty > 0 && targetStoreId) {
+                    checkLineStock(line.id, itemId, targetStoreId, qty);
+                } else {
+                    if (line.id) {
+                        removeLineStockWarning(line.id);
+                    }
+                }
+            });
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [formLines, defaultStoreId, itemType, isLoadingDocument]);
 
     // ─── Current document type ───────────────────────────────────────────────
     const currentDocumentType = useMemo(() => {
@@ -123,7 +237,8 @@ export function DocumentCreateProvider({
         fromDocumentId,
         fromDocumentIds,
         itemType,
-        documentTypeCode: currentDocumentType?.code
+        documentTypeCode: currentDocumentType?.code,
+        setStockConflicts,
     });
 
     // ─── Partner options ─────────────────────────────────────────────────────
@@ -207,6 +322,10 @@ export function DocumentCreateProvider({
         isLoadingDocument,
         isReadOnly: isEditMode && !["draft", "validated"].includes(existingDocument?.status?.key || ""),
         isRestricted: isEditMode && existingDocument?.status?.key === "validated",
+        stockConflicts,
+        setStockConflicts,
+        lineStockWarnings,
+        setLineStockWarnings,
     };
 
     return (

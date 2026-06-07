@@ -13,6 +13,7 @@ export const documentLineTaxSchema = z.object({
 export const documentLineSchema = z.object({
     id: z.string(),
     item_id: z.number().optional(),
+    store_id: z.union([z.string(), z.number()]).optional().nullable(),
     code: z.string().optional().default(""),
     description: z.string().optional().default(""),
     quantity: z.string().default("1"),

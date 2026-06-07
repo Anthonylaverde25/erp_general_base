@@ -12,7 +12,9 @@ import {
     Box,
     InputBase,
     Paper,
+    Tooltip,
 } from '@mui/material';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { DeleteOutline, Add } from '@mui/icons-material';
 import type { DocumentLineItem, ItemSearchResult } from './types';
 import type { DocumentFormValues } from '../../schemas/documentSchema';
@@ -209,7 +211,7 @@ export default function DocumentCreateLinesTableMui({
     discountEnabled: boolean;
 }) {
     const { control, getValues } = useFormContext<DocumentFormValues>();
-    const { isEditMode, isLoadingDocument, isReadOnly, isRestricted } = useDocumentCreate();
+    const { isEditMode, isLoadingDocument, isReadOnly, isRestricted, lineStockWarnings, setStockConflicts } = useDocumentCreate();
 
     const { fields, append, remove, update } = useFieldArray({
         control,
@@ -351,15 +353,54 @@ export default function DocumentCreateLinesTableMui({
                                             />
                                         </TableCell>
                                         <TableCell align="right">
-                                            <InputBase
-                                                value={item.quantity}
-                                                onChange={(e) => updateLineField(index, 'quantity', e.target.value)}
-                                                type="number"
-                                                inputProps={{ style: { textAlign: 'right' } }}
-                                                fullWidth
-                                                disabled={isActionDisabled}
-                                                sx={{ fontSize: '13px' }}
-                                            />
+                                            <Box display="flex" alignItems="center" gap={0.5} justifyContent="flex-end">
+                                                <InputBase
+                                                    value={item.quantity}
+                                                    onChange={(e) => updateLineField(index, 'quantity', e.target.value)}
+                                                    type="number"
+                                                    inputProps={{ style: { textAlign: 'right' } }}
+                                                    fullWidth
+                                                    disabled={isActionDisabled}
+                                                    sx={{
+                                                        fontSize: '13px',
+                                                        fontWeight: lineStockWarnings[item.id] ? 700 : 'normal',
+                                                        color: lineStockWarnings[item.id] ? (lineStockWarnings[item.id].is_resolved ? '#16a34a' : '#e11d48') : 'inherit'
+                                                    }}
+                                                />
+                                                {lineStockWarnings[item.id] && (() => {
+                                                    const warning = lineStockWarnings[item.id];
+                                                    return (
+                                                        <Tooltip title={warning.is_resolved ? `Stock resuelto mediante transferencia.` : `Stock insuficiente. Disponible: ${warning.available_stock} uds. Haga clic para resolver.`} arrow>
+                                                            <IconButton
+                                                                size="small"
+                                                                disabled={!!warning.is_resolved}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setStockConflicts([{
+                                                                        line_index: index,
+                                                                        line_id: item.id,
+                                                                        item_id: item.item_id,
+                                                                        item_name: item.code || 'Artículo',
+                                                                        requested_quantity: Number(item.quantity),
+                                                                        store_id: warning.store_id,
+                                                                        store_name: warning.store_name || 'Almacén de origen',
+                                                                        available_stock: warning.available_stock,
+                                                                        alternative_stores: warning.alternative_stores,
+                                                                        is_single_line_resolution: true,
+                                                                    }]);
+                                                                }}
+                                                                sx={{
+                                                                    color: warning.is_resolved ? '#16a34a' : '#e11d48',
+                                                                    padding: '2px',
+                                                                    cursor: warning.is_resolved ? 'default' : 'pointer'
+                                                                }}
+                                                            >
+                                                                {warning.is_resolved ? <CheckCircle2 size={15} /> : <AlertCircle size={15} />}
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    );
+                                                })()}
+                                            </Box>
                                         </TableCell>
                                         <TableCell align="left">
                                             <Box component="span" sx={{ fontSize: '11px', color: 'text.secondary', fontWeight: 500, whiteSpace: 'nowrap' }}>

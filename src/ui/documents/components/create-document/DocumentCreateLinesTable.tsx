@@ -18,6 +18,7 @@ import { useDocumentCreate } from '../../context/DocumentCreateContext';
 import { ItemAutocompleteCellEditor } from './ag-grid-components/cell-editors/ItemAutocompleteCellEditor';
 import { TaxChipsCellRenderer } from './ag-grid-components/cell-renderers/TaxChipsCellRenderer';
 import { DeleteCellRenderer } from './ag-grid-components/cell-renderers/DeleteCellRenderer';
+import { QuantityCellRenderer } from './ag-grid-components/cell-renderers/QuantityCellRenderer';
 import { useDocumentTableSync } from './ag-grid-components/hooks/useDocumentTableSync';
 
 /* ─── Props ─── */
@@ -161,6 +162,7 @@ const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly 
 				width: 80, minWidth: 80,
 				editable: !isReadOnly,
 				singleClickEdit: true,
+				cellRenderer: QuantityCellRenderer,
 				cellClass: 'doc-ag-cell doc-ag-cell-right',
 			},
 			{

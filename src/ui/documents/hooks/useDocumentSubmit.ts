@@ -32,6 +32,7 @@ function buildPayload(data: DocumentFormValues, statusKey: string, itemType: str
             .filter((i) => i.code || i.description)
             .map((i) => ({
                 item_id: i.item_id || null,
+                store_id: i.store_id ? Number(i.store_id) : null,
                 name: i.code,
                 description: i.description,
                 quantity: Number(i.quantity),
@@ -51,6 +52,7 @@ interface UseDocumentSubmitOptions {
     fromDocumentIds?: string[];
     itemType: string;
     documentTypeCode?: string;
+    setStockConflicts?: (conflicts: any[] | null) => void;
 }
 
 /**
@@ -64,7 +66,8 @@ export function useDocumentSubmit({
     fromDocumentId, 
     fromDocumentIds,
     itemType,
-    documentTypeCode 
+    documentTypeCode,
+    setStockConflicts
 }: UseDocumentSubmitOptions) {
     const navigate = useNavigate();
     const { mutate: createDocument, isPending: isCreatingNew } = useCreateDocument();
@@ -72,7 +75,7 @@ export function useDocumentSubmit({
 
     const basePath = operation === "sale" ? "sales" : "purchases";
 
-    const submitWithStatus = (statusKey: "draft" | "issued") => (data: DocumentFormValues) => {
+    const submitWithStatus = (statusKey: "draft" | "issued" | string) => (data: DocumentFormValues) => {
         if (statusKey !== "draft" && operation === "sale" && !data.number_series_id) {
             alert("Debe seleccionar una Serie de Numeración para emitir o validar este documento.");
             return;
@@ -83,6 +86,15 @@ export function useDocumentSubmit({
         if (isEditMode && documentId) {
             updateDocument({ id: documentId, data: payload }, {
                 onSuccess: (res) => navigate(`/${basePath}/view/${res.id}`),
+                onError: (error: any) => {
+                    const conflicts = error.response?.data?.errors?.stock_conflicts;
+                    if (conflicts && conflicts.length > 0 && setStockConflicts) {
+                        setStockConflicts(conflicts);
+                    } else {
+                        const errMsg = error.response?.data?.message || "Error al actualizar el documento.";
+                        alert(errMsg);
+                    }
+                }
             });
         } else {
             // Priority: Multiple IDs (Aggregation) then single ID (Conversion)
@@ -94,6 +106,15 @@ export function useDocumentSubmit({
             
             createDocument(payload, {
                 onSuccess: (res) => navigate(`/${basePath}/view/${res.id}`),
+                onError: (error: any) => {
+                    const conflicts = error.response?.data?.errors?.stock_conflicts;
+                    if (conflicts && conflicts.length > 0 && setStockConflicts) {
+                        setStockConflicts(conflicts);
+                    } else {
+                        const errMsg = error.response?.data?.message || "Error al crear el documento.";
+                        alert(errMsg);
+                    }
+                }
             });
         }
     };
