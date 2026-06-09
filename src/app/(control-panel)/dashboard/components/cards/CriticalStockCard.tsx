@@ -1,93 +1,160 @@
-import { Box, Typography } from '@mui/material';
+import useActiveCompany from '@/features/companies/useActiveCompany';
+import axiosInstance from '@/lib/@axios';
+import { 
+  Box, 
+  Typography, 
+  Stack, 
+  Skeleton,
+  Button
+} from '@mui/material';
+import { useEffect, useState } from 'react';
 
-const stockItems = [
-	{ name: 'Cable de red Cat6', min: 50, current: 12 },
-	{ name: 'Router Wifi AC1200', min: 10, current: 2 },
-	{ name: 'Switch 24 puertos', min: 5, current: 0 },
-	{ name: 'Monitor 24 pulgadas', min: 15, current: 4 },
-	{ name: 'Teclado mecánico', min: 20, current: 5 }
-];
+// Skeleton minimalista (sin avatares)
+const MinimalSkeleton = () => (
+  <Stack spacing={0}>
+    {[...Array(4)].map((_, i) => (
+      <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', py: 1.5, pl: 2 }}>
+        <Box sx={{ width: '60%' }}>
+          <Skeleton variant="text" width="80%" height={24} />
+          <Skeleton variant="text" width="40%" height={16} />
+        </Box>
+        <Box sx={{ width: '20%', textAlign: 'right' }}>
+          <Skeleton variant="text" width="100%" height={28} />
+        </Box>
+      </Box>
+    ))}
+  </Stack>
+);
 
-/**
- * Critical stock card listing items below their minimum stock threshold.
- * Card frame styles are provided by .react-grid-item in GridWrapper.
- */
 function CriticalStockCard() {
-	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-			{/* Header with alert badge */}
-			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-				<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-					<Typography
-						variant="subtitle1"
-						fontWeight={600}
-					>
-						Stock Crítico
-					</Typography>
-					<Typography
-						variant="caption"
-						sx={{
-							bgcolor: 'error.main',
-							color: 'error.contrastText',
-							px: 1,
-							py: 0.5,
-							borderRadius: 1,
-							fontWeight: 600
-						}}
-					>
-						{stockItems.length} Alertas
-					</Typography>
-				</Box>
-			</Box>
+  const { id: companyId } = useActiveCompany();
+  const [loading, setLoading] = useState(false);
+  const [stockCritical, setStockCritical] = useState([]);
 
-			<Typography
-				variant="body2"
-				color="text.secondary"
-				gutterBottom
-			>
-				Artículos por debajo del stock mínimo
-			</Typography>
+  useEffect(() => {
+    const getCritical = async () => {
+      try {
+        setLoading(true);
+        const { data: { critical_stock } } = await axiosInstance.get('items/low-stock');
+        setStockCritical(critical_stock);
+      } catch (error) {
+        console.error('Error al obtener el stock crítico:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    getCritical();
+  }, [companyId]);
 
-			{/* Scrollable list */}
-			<Box sx={{ display: 'flex', flexDirection: 'column', overflowY: 'auto', flexGrow: 1, mt: 1 }}>
-				{stockItems.map((item, idx) => (
-					<Box
-						key={idx}
-						sx={{
-							display: 'flex',
-							justifyContent: 'space-between',
-							alignItems: 'center',
-							py: 1.5,
-							borderBottom: idx !== stockItems.length - 1 ? '1px solid' : 'none',
-							borderColor: 'divider'
-						}}
-					>
-						<Box>
-							<Typography
-								variant="body2"
-								fontWeight={500}
-							>
-								{item.name}
-							</Typography>
-							<Typography
-								variant="caption"
-								color="text.secondary"
-							>
-								Mínimo: {item.min}
-							</Typography>
-						</Box>
-						<Typography
-							variant="body2"
-							color="error.main"
-							fontWeight={600}
-						>
-							{item.current} disp.
-						</Typography>
-					</Box>
-				))}
-			</Box>
-		</Box>
-	);
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', pt: 1 }}>
+      
+      {/* ENCABEZADO MINIMALISTA */}
+      <Box sx={{ mb: 2, px: 1 }}>
+        <Typography variant="h6" fontWeight={700} sx={{ letterSpacing: '-0.5px' }}>
+          Stock Crítico
+        </Typography>
+        {loading ? (
+          <Skeleton variant="text" width="150px" height={20} />
+        ) : (
+          <Typography 
+            variant="body2" 
+            color={stockCritical.length > 0 ? 'error.main' : 'text.secondary'}
+            fontWeight={stockCritical.length > 0 ? 500 : 400}
+          >
+            {stockCritical.length === 0 
+              ? 'Todos los niveles son óptimos' 
+              : `${stockCritical.length} artículos requieren reposición`}
+          </Typography>
+        )}
+      </Box>
+
+      {/* LISTA DE DATOS */}
+      <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+        {loading ? (
+          <MinimalSkeleton />
+        ) : stockCritical.length === 0 ? (
+          <Box sx={{ py: 4, px: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              No hay alertas de inventario en este momento.
+            </Typography>
+          </Box>
+        ) : (
+          <Stack spacing={0}>
+            {stockCritical.map((item, index) => {
+              const isOutOfStock = item.current_stock <= 0;
+              const statusColor = isOutOfStock ? 'error.main' : 'warning.main';
+              
+              return (
+                <Box
+                  key={item.id}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    py: 1.5,
+                    px: 1.5,
+                    borderLeft: '3px solid',
+                    borderLeftColor: statusColor,
+                    borderBottom: index !== stockCritical.length - 1 ? '1px solid' : 'none',
+                    borderColor: 'divider',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    }
+                  }}
+                >
+                  {/* Datos del artículo */}
+                  <Box sx={{ flexGrow: 1, pr: 2 }}>
+                    <Typography variant="body2" fontWeight={600} color="text.primary">
+                      {item.name}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Mínimo requerido: {item.stock_min}
+                    </Typography>
+                  </Box>
+
+                  {/* Número crítico */}
+                  <Box sx={{ textAlign: 'right', minWidth: '60px' }}>
+                    <Typography 
+                      variant="body1" 
+                      fontWeight={700} 
+                      color={statusColor}
+                      sx={{ lineHeight: 1 }}
+                    >
+                      {item.current_stock}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      disp.
+                    </Typography>
+                  </Box>
+                </Box>
+              );
+            })}
+          </Stack>
+        )}
+      </Box>
+      
+      {/* ACCIÓN GLOBAL SUTIL */}
+      {!loading && stockCritical.length > 0 && (
+        <Box sx={{ pt: 1, px: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+          <Button 
+            variant="text" 
+            size="small" 
+            color="inherit" 
+            sx={{ 
+              textTransform: 'none', 
+              fontWeight: 500,
+              color: 'text.secondary',
+              '&:hover': { color: 'text.primary', bgcolor: 'transparent' }
+            }}
+          >
+            Gestionar reposiciones &rarr;
+          </Button>
+        </Box>
+      )}
+    </Box>
+  );
 }
 
 export default CriticalStockCard;
