@@ -6,5 +6,6 @@ export interface CreateAddressDTO {
 	state: string;
 	postal_code: string;
 	country: string;
+	county?: string | null;
 	default: boolean;
 }

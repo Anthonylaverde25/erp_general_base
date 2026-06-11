@@ -1,7 +1,7 @@
-import { Box, Typography, Chip, Button, Stack, IconButton, Avatar, alpha, useTheme, Tooltip } from '@mui/material';
-import { ContentCopy, MoreVert } from '@mui/icons-material';
+import { Box, Typography, Chip, Button, IconButton, Avatar, alpha, useTheme, Tooltip } from '@mui/material';
+import { ContentCopy, MoreVert, Refresh } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
-import PageBreadcrumb from '@/components/PageBreadcrumb';
+import PageHeader from '@/components/PageHeader';
 import { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import { roleLabels, typeLabels, typeIcons, roleColors } from './PartnerProfileShared';
 import PartnerCreateActionMenu from './PartnerCreateActionMenu';
@@ -18,137 +18,96 @@ export default function PartnerProfileHeader({ partner, tabValue, onTabChange }:
 
 	const name = partner.name || 'Sin nombre';
 	const accentColor = roleColors[partner.role] || theme.palette.primary.main;
+	const defaultContact = partner.contact?.find((c) => c.default) || (partner.contact?.[0] ?? null);
 
-	return (
-		<Box
-			sx={{
-				width: '100%',
-				borderBottom: 1,
-				borderColor: 'divider',
-				bgcolor: 'background.paper'
-			}}
-		>
-			{/* HEADER ZONE */}
-			<Box
+	const titleNode = (
+		<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+			<Avatar
 				sx={{
-					p: 0,
-					pb: 2,
-					background: `linear-gradient(180deg, ${alpha(accentColor, 0.08)}, transparent)`
+					width: 32,
+					height: 32,
+					bgcolor: alpha(accentColor, 0.15),
+					color: accentColor,
+					fontSize: 16,
+					fontWeight: 700
 				}}
 			>
-				{/* Top bar */}
-				<Box
-					display="flex"
-					justifyContent="space-between"
-					alignItems="center"
-				>
-					<PageBreadcrumb />
-				</Box>
+				{typeIcons[partner.type] || typeIcons['company']}
+			</Avatar>
+			<Typography
+				variant="h5"
+				sx={{ fontWeight: 900, color: 'text.primary' }}
+			>
+				{name}
+			</Typography>
+			<Chip
+				label={roleLabels[partner.role] || partner.role}
+				size="small"
+				sx={{
+					bgcolor: alpha(accentColor, 0.12),
+					color: accentColor,
+					fontWeight: 600,
+					height: 20,
+					fontSize: '0.7rem'
+				}}
+			/>
+			<Chip
+				label={typeLabels[partner.type] || partner.type}
+				size="small"
+				variant="outlined"
+				sx={{ height: 20, fontSize: '0.7rem' }}
+			/>
+		</Box>
+	);
 
-				{/* Identity row */}
-				<Box
-					sx={{
-						display: 'flex',
-						flexDirection: { xs: 'column', sm: 'row' },
-						gap: 2,
-						mt: 2,
-						alignItems: { xs: 'flex-start', sm: 'center' }
-					}}
-				>
-					<Avatar
-						sx={{
-							width: { xs: 48, sm: 56 },
-							height: { xs: 48, sm: 56 },
-							bgcolor: alpha(accentColor, 0.15),
-							color: accentColor,
-							fontSize: { xs: 24, sm: 28 },
-							fontWeight: 700
-						}}
-					>
-						{typeIcons[partner.type] || typeIcons['company']}
-					</Avatar>
-
-					<Box
-						sx={{
-							display: 'flex',
-							flexDirection: { xs: 'column', sm: 'row' },
-							width: '100%',
-							justifyContent: 'space-between',
-							gap: 2
-						}}
-					>
-						<Box>
-							<Typography
-								variant="h5"
-								fontWeight={700}
-								sx={{ lineHeight: 1.1, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
-							>
-								{name}
-							</Typography>
-
-							{partner.comercial_name && (
-								<Typography
-									variant="body2"
-									color="text.secondary"
-								>
-									{partner.comercial_name}
-								</Typography>
-							)}
-
-							<Stack
-								direction="row"
-								spacing={1}
-								mt={1}
-								flexWrap="wrap"
-								useFlexGap
-							>
-								<Chip
-									label={roleLabels[partner.role] || partner.role}
-									size="small"
-									sx={{
-										bgcolor: alpha(accentColor, 0.12),
-										color: accentColor,
-										fontWeight: 600
-									}}
-								/>
-
-								<Chip
-									label={typeLabels[partner.type] || partner.type}
-									size="small"
-									variant="outlined"
-								/>
-							</Stack>
-						</Box>
-
-						<Box
+	return (
+		<Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
+			<PageHeader
+				title={titleNode}
+				subtitle={`CIF: ${partner.cif || 'N/A'} · Contacto: ${defaultContact?.email || 'N/A'}`}
+				onBack={() => navigate('/partners')}
+				actions={
+					<>
+						<PartnerCreateActionMenu />
+						<Button
+							variant="outlined"
+							color="inherit"
+							size="small"
+							disableElevation
 							sx={{
-								display: 'flex',
-								alignItems: 'center',
+								textTransform: 'none',
+								fontWeight: 600,
+								fontSize: '0.75rem',
+								color: 'text.secondary',
+								py: 0.5,
+								px: 1.5,
+								borderRadius: '4px',
+								borderColor: 'divider',
+								bgcolor: 'transparent',
 								gap: 1,
-								alignSelf: { xs: 'flex-start', sm: 'center' }
+								'&:hover': {
+									bgcolor: 'action.hover',
+									color: 'text.primary',
+									borderColor: 'divider'
+								}
 							}}
 						>
-							<PartnerCreateActionMenu />
-							<Tooltip title="Copiar ID">
-								<IconButton size="small">
-									<ContentCopy fontSize="small" />
-								</IconButton>
-							</Tooltip>
-
+							<Refresh sx={{ fontSize: 18 }} />
+							Actualizar
+						</Button>
+						<Tooltip title="Copiar ID">
 							<IconButton size="small">
-								<MoreVert fontSize="small" />
+								<ContentCopy fontSize="small" />
 							</IconButton>
-						</Box>
-					</Box>
-				</Box>
-			</Box>
+						</Tooltip>
+						<IconButton size="small">
+							<MoreVert fontSize="small" />
+						</IconButton>
+					</>
+				}
+			/>
 
-			{/* <Divider /> */}
-
-			<Box
-				className="flex items-center gap-2 px-3 pb-3"
-				sx={{ flexWrap: 'wrap' }}
-			>
+			<Box className="flex flex-wrap items-center gap-2 px-8 pb-4">
 				{['Resumen', 'Impuestos', 'Archivos'].map((label, index) => {
 					const isActive = tabValue === index;
 					return (
@@ -156,6 +115,7 @@ export default function PartnerProfileHeader({ partner, tabValue, onTabChange }:
 							key={label}
 							onClick={(e) => onTabChange(e, index)}
 							size="small"
+							disableElevation
 							sx={{
 								textTransform: 'none',
 								fontWeight: 600,
@@ -163,14 +123,14 @@ export default function PartnerProfileHeader({ partner, tabValue, onTabChange }:
 								color: isActive ? '#ffffff' : 'text.secondary',
 								py: 0.5,
 								px: 1.5,
-								borderRadius: 0.5,
+								borderRadius: '4px',
 								border: '1px solid',
-								borderColor: isActive ? '#1b1b1b' : 'divider',
-								bgcolor: isActive ? '#1b1b1b' : 'transparent',
+								borderColor: isActive ? '#005483' : 'divider',
+								bgcolor: isActive ? '#005483' : 'transparent',
 								'&:hover': {
-									bgcolor: isActive ? '#333333' : 'action.hover',
+									bgcolor: isActive ? '#004369' : 'action.hover',
 									color: isActive ? '#ffffff' : 'text.primary',
-									borderColor: isActive ? '#1b1b1b' : 'divider'
+									borderColor: isActive ? '#005483' : 'divider'
 								}
 							}}
 						>

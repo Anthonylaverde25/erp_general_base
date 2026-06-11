@@ -1,60 +1,148 @@
-import { CardContent, Typography, Box } from "@mui/material";
+import { CardContent, Typography, Box, Divider } from "@mui/material";
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import axiosInstance from "@/lib/@axios";
 import ReactECharts from 'echarts-for-react';
 
+// Tipados estrictos
+interface PendingInvoicing {
+    count: number;
+    pendingAmount: number;
+}
+
+interface MonthlyPayment {
+    year: number;
+    month: number;
+    total_amount: number;
+}
+
 export default function PendingInvoicingCard() {
-    const [financialData, setFinancialData] = useState({ 
+    const [pendingInvoicing, setPendingInvoicing] = useState<PendingInvoicing>({ 
         count: 0, 
-        pending_amount: 0,
-        current_revenue: 25000 // Simulamos el ingreso actual facturado del mes
+        pendingAmount: 0 
+    });
+
+    const [monthlyPayments, setMonthlyPayments] = useState<MonthlyPayment[]>([]);
+    
+    const [pendingAmount, setPendingAmount] = useState<{pending_amount: number}>({
+        pending_amount: 0
     });
 
     useEffect(() => {
         const fetchPendingInvoicing = async () => {
             try {
                 const { data } = await axiosInstance.get('/dashboard/pending-invoicing');
-                setFinancialData(prev => ({ 
-                    ...prev,
+                setPendingInvoicing({ 
                     count: data.count || 0, 
-                    pending_amount: data.total_amount || 0
-                }));
+                    pendingAmount: Number(data.total_amount) || 0
+                });
             } catch (error) {
-                console.error("Error obteniendo facturación pendiente:", error);
+                console.error("Error fetching pending invoicing:", error);
             }
         }
         fetchPendingInvoicing();
     }, []);
 
-    const formatCurrency = (value) => {
+    useEffect(() => {
+        const fetchMonthlyPayments = async () => {
+            try {
+                const { data: { payment_monthly } } = await axiosInstance.get('/dashboard/monthly-payments');
+                setMonthlyPayments(payment_monthly);
+            } catch (error) {
+                console.error("Error fetching monthly payments:", error);
+            }
+        }
+        fetchMonthlyPayments();
+    }, []);
+
+    useEffect(() => {
+        const fetchPendingAmount = async () => {
+            try {
+                const { data: { pending_amount } } = await axiosInstance.get('/dashboard/pending-amount');
+                setPendingAmount({ pending_amount: Number(pending_amount) || 0 });
+            } catch (error) {
+                console.error("Error fetching pending amount:", error);
+            }
+        }
+        fetchPendingAmount();
+    }, []);
+
+    const chartData = useMemo(() => {
+        if (!monthlyPayments.length) {
+            return { labels: [], consolidated: [], pendingInvoices: [], pendingDeliveryNotes: [], currentRevenue: 0 };
+        }
+
+        const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        
+        const sortedPayments = [...monthlyPayments].sort((a, b) => {
+            if (a.year !== b.year) return a.year - b.year;
+            return a.month - b.month;
+        });
+
+        const labels: string[] = [];
+        const consolidated: number[] = [];
+        const pendingInvoices: number[] = [];
+        const pendingDeliveryNotes: number[] = [];
+        let currentRevenue = 0;
+
+        const mockHistoricalDeliveryNotes = [1200.50, 800.00, 1500.25, 3000.00, 2100.80, 1700.00];
+        const mockHistoricalDebt = [500.00, 1100.00, 900.00, 1800.00, 1300.00, 2000.00];
+
+        sortedPayments.forEach((payment, index) => {
+            const isLastItem = index === sortedPayments.length - 1;
+            const monthName = monthNames[payment.month - 1];
+            
+            labels.push(isLastItem ? `${monthName} ${payment.year} (Actual)` : `${monthName} ${payment.year}`);
+            
+            const amount = Number(payment.total_amount);
+            consolidated.push(amount);
+            
+            if (isLastItem) {
+                pendingDeliveryNotes.push(pendingInvoicing.pendingAmount);
+                pendingInvoices.push(pendingAmount.pending_amount);
+                currentRevenue = amount;
+            } else {
+                pendingDeliveryNotes.push(mockHistoricalDeliveryNotes[index % mockHistoricalDeliveryNotes.length]); 
+                pendingInvoices.push(mockHistoricalDebt[index % mockHistoricalDebt.length]);
+            }
+        });
+
+        return { labels, consolidated, pendingInvoices, pendingDeliveryNotes, currentRevenue };
+    }, [monthlyPayments, pendingInvoicing.pendingAmount, pendingAmount.pending_amount]);
+
+    // CORRECCIÓN CRÍTICA: Se exigen 2 decimales para respetar la integridad del valor real (ej: 412725.06)
+    const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('es-ES', { 
             style: 'currency', 
             currency: 'EUR',
-            maximumFractionDigits: 0 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2 
         }).format(value);
     };
 
-    const totalPotential = financialData.current_revenue + financialData.pending_amount;
-    const growthPercentage = financialData.current_revenue > 0 
-        ? ((financialData.pending_amount / financialData.current_revenue) * 100).toFixed(1)
-        : 0;
-
-    // Configuración ECharts: Gráfico de Barras Apiladas (Stacked Bar Chart)
     const getChartOptions = () => {
-        const meses = ['Feb', 'Mar', 'Abr', 'May', 'Jun (Actual)'];
-        const ingresosConsolidados = [15000, 14000, 19000, 21000, financialData.current_revenue];
-        const albaranesPendientes = [1200, 800, 1500, 3000, financialData.pending_amount || 5200]; 
-
         return {
-            grid: { top: 35, right: 20, bottom: 25, left: 50 },
+            grid: { top: 45, right: 20, bottom: 65, left: 55 }, 
+            dataZoom: [
+                { type: 'inside', start: 0, end: 100 },
+                {
+                    type: 'slider',
+                    show: true,
+                    bottom: 10,
+                    height: 24,
+                    borderColor: 'transparent',
+                    backgroundColor: '#f9fafb',
+                    fillerColor: 'rgba(25, 118, 210, 0.15)',
+                    handleStyle: { color: '#1976d2', borderColor: '#fff', borderWidth: 2 }
+                }
+            ],
             tooltip: {
                 trigger: 'axis',
-                axisPointer: { type: 'shadow' }, // Resalta la columna entera con un fondo sutil
-                valueFormatter: (value) => formatCurrency(value)
+                axisPointer: { type: 'line', lineStyle: { color: '#e5e7eb', width: 2 } },
+                valueFormatter: (value: number) => value > 0 ? formatCurrency(value) : '' 
             },
             legend: {
-                data: ['Ingreso Consolidado', 'Albaranes Pendientes'],
+                data: ['Pagos Consolidados', 'Cuentas por Cobrar', 'Albaranes Pendientes'], 
                 top: 0,
                 icon: 'circle',
                 itemWidth: 10,
@@ -62,48 +150,57 @@ export default function PendingInvoicingCard() {
             },
             xAxis: {
                 type: 'category',
-                data: meses,
+                boundaryGap: false,
+                data: chartData.labels,
                 axisLine: { show: false },
                 axisTick: { show: false },
                 axisLabel: { color: '#9e9e9e', fontSize: 12, margin: 12 },
-                splitLine: { 
-                    show: true, 
-                    lineStyle: { type: 'dashed', color: '#e5e7eb' } 
-                }
+                splitLine: { show: true, lineStyle: { type: 'dashed', color: '#f3f4f6' } }
             },
             yAxis: {
                 type: 'value',
-                splitLine: { 
-                    show: true,
-                    lineStyle: { type: 'dashed', color: '#e5e7eb' } 
-                },
+                splitLine: { show: true, lineStyle: { type: 'dashed', color: '#f3f4f6' } },
                 axisLabel: {
-                    formatter: (value) => value >= 1000 ? `${value / 1000}k` : value,
+                    // CORRECCIÓN: Evita decimales infinitos al reducir la escala a 'k' (miles) o 'M' (millones)
+                    formatter: (value: number) => {
+                        if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                        if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
+                        return value;
+                    },
                     color: '#9e9e9e',
                     fontSize: 12
                 }
             },
             series: [
                 {
-                    name: 'Ingreso Consolidado',
-                    type: 'bar',
-                    stack: 'Total', // La clave para apilar
-                    barWidth: '45%', // Barras con buen grosor
-                    itemStyle: { 
-                        color: '#1976d2', // Azul corporativo (lo seguro)
-                        borderRadius: [0, 0, 2, 2] // Redondea solo la base
-                    },
-                    data: ingresosConsolidados
+                    name: 'Pagos Consolidados',
+                    type: 'line',
+                    smooth: true,
+                    stack: 'Total',
+                    showSymbol: false,
+                    itemStyle: { color: '#1976d2' }, 
+                    areaStyle: { opacity: 0.15 },
+                    data: chartData.consolidated
+                },
+                {
+                    name: 'Cuentas por Cobrar', 
+                    type: 'line',
+                    smooth: true,
+                    stack: 'Total',
+                    showSymbol: false,
+                    itemStyle: { color: '#9c27b0' }, 
+                    areaStyle: { opacity: 0.15 },
+                    data: chartData.pendingInvoices
                 },
                 {
                     name: 'Albaranes Pendientes',
-                    type: 'bar',
-                    stack: 'Total', // Apila justo encima de la anterior
-                    itemStyle: { 
-                        color: '#ed6c02', // Naranja (la oportunidad)
-                        borderRadius: [2, 2, 0, 0] // Redondea solo el techo
-                    },
-                    data: albaranesPendientes
+                    type: 'line',
+                    smooth: true,
+                    stack: 'Total',
+                    showSymbol: false,
+                    itemStyle: { color: '#ed6c02' }, 
+                    areaStyle: { opacity: 0.15 },
+                    data: chartData.pendingDeliveryNotes
                 }
             ]
         };
@@ -123,7 +220,6 @@ export default function PendingInvoicingCard() {
         >
             <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', pb: 2 }}>
                 
-                {/* Cabecera Financiera */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                         <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: 'primary.50', color: 'primary.main', display: 'flex' }}>
@@ -131,20 +227,16 @@ export default function PendingInvoicingCard() {
                         </Box>
                         <Box>
                             <Typography variant="subtitle1" fontWeight={700} color="text.primary">
-                                Flujo de Ingresos
+                                Análisis de Flujo y Deuda
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Ingresos vs Albaranes pendientes
+                                Consolidado vs Cuentas por Cobrar
                             </Typography>
                         </Box>
                     </Box>
-                    <Typography variant="body2" fontWeight={600} color="warning.dark" sx={{ bgcolor: 'warning.light', px: 1.5, py: 0.5, borderRadius: 1 }}>
-                        {financialData.count} albaranes
-                    </Typography>
                 </Box>
 
-                {/* Gráfico de Barras Apiladas */}
-                <Box sx={{ flexGrow: 1, minHeight: 220, width: '100%', mt: 1, mb: 2 }}>
+                <Box sx={{ flexGrow: 1, minHeight: 280, width: '100%', mt: 1, mb: 2 }}>
                     <ReactECharts 
                         option={getChartOptions()} 
                         style={{ height: '100%', width: '100%' }} 
@@ -152,28 +244,32 @@ export default function PendingInvoicingCard() {
                     />
                 </Box>
 
-                {/* Insight Financiero Directo */}
-                <Box 
-                    sx={{ 
-                        display: 'flex', 
-                        flexDirection: 'column',
-                        borderTop: '1px solid', 
-                        borderColor: 'divider', 
-                        pt: 2
-                    }}
-                >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-                        <Typography variant="body1" color="text.secondary" fontWeight={500}>
-                            Ingreso Potencial Mes
-                        </Typography>
-                        <Typography variant="h6" fontWeight={800} color="text.primary">
-                            {formatCurrency(totalPotential)}
-                        </Typography>
-                    </Box>
-                    
-                    <Typography variant="body2" color="success.main" fontWeight={600}>
-                        ↑ Facturar estos albaranes sumaría un +{growthPercentage}% al mes actual.
+                <Box sx={{ borderTop: '1px solid', borderColor: 'divider', pt: 2 }}>
+                    <Typography variant="body2" color="text.secondary" fontWeight={500} mb={1}>
+                        Resumen del Mes Actual
                     </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+                        <Box>
+                            <Typography variant="caption" color="text.secondary">Ingreso Real</Typography>
+                            <Typography variant="body1" fontWeight={700} color="primary.main">
+                                {formatCurrency(chartData.currentRevenue)}
+                            </Typography>
+                        </Box>
+                        <Divider orientation="vertical" flexItem />
+                        <Box>
+                            <Typography variant="caption" color="text.secondary">Deuda (Por cobrar)</Typography>
+                            <Typography variant="body1" fontWeight={700} color="secondary.main">
+                                {formatCurrency(pendingAmount.pending_amount)}
+                            </Typography>
+                        </Box>
+                        <Divider orientation="vertical" flexItem />
+                        <Box>
+                            <Typography variant="caption" color="text.secondary">Oportunidad (Albaranes)</Typography>
+                            <Typography variant="body1" fontWeight={700} color="warning.main">
+                                {formatCurrency(pendingInvoicing.pendingAmount)}
+                            </Typography>
+                        </Box>
+                    </Box>
                 </Box>
 
             </CardContent>

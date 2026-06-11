@@ -138,6 +138,22 @@ export function PartnerContactSection({ isLoading }: PartnerContactSectionProps)
 					</div>
 					<div className="col-span-12 sm:col-span-6">
 						<Controller
+							name="address_county"
+							control={control}
+							render={({ field }) => (
+								<TextField
+									{...field}
+									{...textFieldProps}
+									label="Partido / Municipio"
+									error={!!errors.address_county}
+									helperText={errors.address_county?.message}
+									disabled={isLoading}
+								/>
+							)}
+						/>
+					</div>
+					<div className="col-span-12 sm:col-span-6">
+						<Controller
 							name="address_postal_code"
 							control={control}
 							render={({ field }) => (

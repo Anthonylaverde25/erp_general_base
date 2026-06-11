@@ -49,18 +49,25 @@ export default function PartnerProfileSidebar({ partner }: PartnerProfileSidebar
 		textTransform: 'none',
 		justifyContent: 'center',
 		fontWeight: 600,
-		fontSize: '0.8rem',
-		color: 'text.primary',
-		borderRadius: 0.5,
+		fontSize: '0.75rem',
+		color: 'text.secondary',
 		py: 0.5,
+		px: 1.5,
+		borderRadius: 0.5,
+		border: '1px solid',
 		borderColor: 'divider',
-		'&:hover': { bgcolor: 'action.hover', borderColor: 'divider' }
+		bgcolor: 'transparent',
+		'&:hover': {
+			bgcolor: 'action.hover',
+			color: 'text.primary',
+			borderColor: 'divider'
+		}
 	} as const;
 
 	return (
 		<Box
 			sx={{
-				width: { xs: '100%', md: 400 },
+				width: { xs: '100%', md: 360 },
 				flexShrink: 0,
 				borderRight: { xs: 0, md: 1 },
 				borderBottom: { xs: 1, md: 0 },
@@ -286,14 +293,19 @@ export default function PartnerProfileSidebar({ partner }: PartnerProfileSidebar
 					sx={{
 						textTransform: 'none',
 						fontWeight: 600,
-						fontSize: '0.85rem',
+						fontSize: '0.75rem',
 						justifyContent: 'flex-start',
-						borderRadius: 1,
-						py: 1,
+						borderRadius: 0.5,
+						py: 0.5,
 						px: 1.5,
 						borderColor: 'divider',
-						bgcolor: 'background.paper',
-						'&:hover': { bgcolor: 'action.hover', borderColor: 'text.secondary' }
+						bgcolor: 'transparent',
+						color: 'text.secondary',
+						'&:hover': {
+							bgcolor: 'action.hover',
+							color: 'text.primary',
+							borderColor: 'text.secondary'
+						}
 					}}
 				>
 					Ver Ficha Técnica
@@ -307,14 +319,19 @@ export default function PartnerProfileSidebar({ partner }: PartnerProfileSidebar
 					sx={{
 						textTransform: 'none',
 						fontWeight: 600,
-						fontSize: '0.85rem',
+						fontSize: '0.75rem',
 						justifyContent: 'flex-start',
-						borderRadius: 1,
-						py: 1,
+						borderRadius: 0.5,
+						py: 0.5,
 						px: 1.5,
 						borderColor: 'divider',
-						bgcolor: 'background.paper',
-						'&:hover': { bgcolor: 'action.hover', borderColor: 'text.secondary' }
+						bgcolor: 'transparent',
+						color: 'text.secondary',
+						'&:hover': {
+							bgcolor: 'action.hover',
+							color: 'text.primary',
+							borderColor: 'text.secondary'
+						}
 					}}
 				>
 					Informes de Venta
@@ -328,14 +345,19 @@ export default function PartnerProfileSidebar({ partner }: PartnerProfileSidebar
 					sx={{
 						textTransform: 'none',
 						fontWeight: 600,
-						fontSize: '0.85rem',
+						fontSize: '0.75rem',
 						justifyContent: 'flex-start',
-						borderRadius: 1,
-						py: 1,
+						borderRadius: 0.5,
+						py: 0.5,
 						px: 1.5,
 						borderColor: 'divider',
-						bgcolor: 'background.paper',
-						'&:hover': { bgcolor: 'action.hover', borderColor: 'text.secondary' }
+						bgcolor: 'transparent',
+						color: 'text.secondary',
+						'&:hover': {
+							bgcolor: 'action.hover',
+							color: 'text.primary',
+							borderColor: 'text.secondary'
+						}
 					}}
 				>
 					Informes de Compra

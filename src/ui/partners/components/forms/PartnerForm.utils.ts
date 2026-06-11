@@ -23,6 +23,7 @@ export const mapPartnerFormToDTO = (
 			state: values.address_state || '',
 			postal_code: values.address_postal_code || '',
 			country: values.address_country || '',
+			county: values.address_county || '',
 			default: true
 		});
 	}

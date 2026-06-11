@@ -20,6 +20,7 @@ export const partnerSchema = z.object({
 	address_state: z.string().optional(),
 	address_postal_code: z.string().optional(),
 	address_country: z.string().optional(),
+	address_county: z.string().optional(),
 
 	// Contact fields
 	contact_id: z.number().optional(),

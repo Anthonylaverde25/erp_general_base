@@ -4,12 +4,29 @@ import FuseLoading from '@fuse/core/FuseLoading';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 import PartnerProfileHeader from '../components/profile/PartnerProfileHeader';
 import PartnerProfileSidebar from '../components/profile/PartnerProfileSidebar';
 import PartnerProfileOverview from '../components/profile/PartnerProfileOverview';
 import PartnerProfileTaxes from '../components/profile/PartnerProfileTaxes';
 import PartnerProfileFiles from '../components/profile/PartnerProfileFiles';
+
+const Root = styled(FusePageSimple)(({ theme }) => ({
+	'& .FusePageSimple-header': {
+		backgroundColor: theme.vars.palette.background.paper,
+		borderBottomWidth: 1,
+		borderStyle: 'solid',
+		borderColor: theme.vars.palette.divider,
+	},
+	'& .FusePageSimple-content': {
+		display: 'flex',
+		flexDirection: 'column',
+		flex: '1 1 auto',
+		padding: 0,
+		backgroundColor: theme.vars.palette.background.default,
+	},
+}));
 
 export default function PartnerProfilePage() {
 	const { id } = useParams<{ id: string }>();
@@ -36,7 +53,7 @@ export default function PartnerProfilePage() {
 	}
 
 	return (
-		<FusePageSimple
+		<Root
 			header={
 				<PartnerProfileHeader
 					partner={partner}
@@ -45,23 +62,25 @@ export default function PartnerProfilePage() {
 				/>
 			}
 			content={
-				<Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper' }}>
-					{/* ── TAB: Resumen ─────────────────────────────────── */}
-					{tabValue === 0 && (
-						<Box
-							className="flex flex-col md:flex-row"
-							sx={{ height: { xs: 'auto', md: '100%' } }}
-						>
-							<PartnerProfileSidebar partner={partner} />
-							<PartnerProfileOverview partner={partner} />
-						</Box>
-					)}
+				<Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', bgcolor: 'background.default' }}>
+					<Box sx={{ width: '100%', height: '100%', bgcolor: 'background.paper' }}>
+						{/* ── TAB: Resumen ─────────────────────────────────── */}
+						{tabValue === 0 && (
+							<Box
+								className="flex flex-col md:flex-row"
+								sx={{ height: { xs: 'auto', md: '100%' }, borderColor: '#E6EAF0' }}
+							>
+								<PartnerProfileSidebar partner={partner} />
+								<PartnerProfileOverview partner={partner} />
+							</Box>
+						)}
 
-					{/* ── TAB: Impuestos ───────────────────────────────── */}
-					{tabValue === 1 && <PartnerProfileTaxes partner={partner} />}
+						{/* ── TAB: Impuestos ───────────────────────────────── */}
+						{tabValue === 1 && <PartnerProfileTaxes partner={partner} />}
 
-					{/* ── TAB: Archivos ─────────────────────────────────── */}
-					{tabValue === 2 && <PartnerProfileFiles partner={partner} />}
+						{/* ── TAB: Archivos ─────────────────────────────────── */}
+						{tabValue === 2 && <PartnerProfileFiles partner={partner} />}
+					</Box>
 				</Box>
 			}
 			scroll="content"

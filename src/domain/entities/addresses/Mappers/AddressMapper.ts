@@ -8,6 +8,7 @@ interface AddressListDTO {
 	state: string;
 	postal_code: string;
 	country: string;
+	county?: string | null;
 	default: boolean;
 }
 export class AddressMapper {
@@ -20,7 +21,8 @@ export class AddressMapper {
 			dto.postal_code,
 			dto.country,
 			dto.default,
-			dto.street_2
+			dto.street_2,
+			dto.county
 		);
 	}
 

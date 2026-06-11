@@ -18,6 +18,7 @@ export const defaultCreatePartnerValues: PartnerFormType = {
 	address_state: '',
 	address_postal_code: '',
 	address_country: '',
+	address_county: '',
 	contact_id: undefined,
 	contact_email: '',
 	contact_phone: '',
@@ -50,6 +51,7 @@ export const defaultUpdatePartnerValues = (data?: any): PartnerFormType => {
 		address_state: defaultAddress?.state || '',
 		address_postal_code: defaultAddress?.postal_code || '',
 		address_country: defaultAddress?.country || '',
+		address_county: defaultAddress?.county || '',
 
 		contact_id: defaultContact?.id || undefined,
 		contact_email: defaultContact?.email || '',

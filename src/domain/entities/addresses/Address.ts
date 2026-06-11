@@ -10,7 +10,8 @@ export class AddressEntity implements IAddress {
 		public postal_code: string,
 		public country: string,
 		public default_address: boolean,
-		public street_2?: string | null
+		public street_2?: string | null,
+		public county?: string | null
 	) {}
 
 	// Getter for interface compatibility
@@ -27,7 +28,8 @@ export class AddressEntity implements IAddress {
 			data.postal_code,
 			data.country,
 			data.default,
-			data.street_2
+			data.street_2,
+			data.county
 		);
 	}
 
@@ -40,7 +42,8 @@ export class AddressEntity implements IAddress {
 			data.postal_code,
 			data.country,
 			data.default,
-			data.street_2
+			data.street_2,
+			data.county
 		);
 	}
 
@@ -53,7 +56,8 @@ export class AddressEntity implements IAddress {
 			data.postal_code!,
 			data.country!,
 			data.default_address!,
-			data.street_2
+			data.street_2,
+			data.county
 		);
 	}
 
@@ -66,6 +70,7 @@ export class AddressEntity implements IAddress {
 			state: this.state,
 			postal_code: this.postal_code,
 			country: this.country,
+			county: this.county,
 			default: this.default_address
 		};
 	}
