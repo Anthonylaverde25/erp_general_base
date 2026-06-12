@@ -49,4 +49,15 @@ export class UserRepositoryCrud implements IUserCrudRepository {
 		const { data } = await axiosInstance.delete(`users/${id}`);
 		return data;
 	}
+
+	async associateEmployees(id: number, employeeIds: number[]): Promise<{ user: UserEntity; message: string }> {
+		const {
+			data: { user, message }
+		} = await axiosInstance.post(`users/${id}/associate-employees`, { employee_ids: employeeIds });
+
+		return {
+			user: UserMapper.fromDetailDTO(user),
+			message: message || 'Empleados asociados correctamente'
+		};
+	}
 }

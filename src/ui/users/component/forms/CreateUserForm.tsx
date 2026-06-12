@@ -1,5 +1,5 @@
 import React from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import {
 	TextField,
 	Button,
@@ -10,14 +10,15 @@ import {
 	IconButton,
 	Stack,
 	Fade,
-	Alert,
 	MenuItem
 } from '@mui/material';
-import { Visibility, VisibilityOff, Person, Lock, Shield, Save, Close } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Person, Lock, Shield, Save, Close, Badge } from '@mui/icons-material';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import useIndexRoles from '@/features/roles/hooks/useIndexRoles';
 import useCreateUser from '@/features/users/hooks/useCreateUser';
+import useIndexDepartments from '@/features/departments/hooks/useIndexDepartments';
+import useIndexJobPositions from '@/features/job-positions/hooks/useIndexJobPositions';
 import { CreateUserFormType, createUserSchema } from '@/schemas/user/user.schema';
 import { defaultCreateUserValues } from '@/schemas/user/user.defaults';
 import { ICreateUser } from '@/types/user.types';
@@ -28,13 +29,14 @@ interface CreateUserFormProps {
 }
 
 export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormProps) {
-	const { handleCreateUser, isLoading, isError } = useCreateUser();
+	const { handleCreateUser, isLoading } = useCreateUser();
 	const { roles } = useIndexRoles();
+	const { departments } = useIndexDepartments();
 
 	const [showPassword, setShowPassword] = React.useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-	const { control, formState, handleSubmit } = useForm<CreateUserFormType>({
+	const { control, formState, handleSubmit, setValue } = useForm<CreateUserFormType>({
 		mode: 'onChange',
 		resolver: zodResolver(createUserSchema),
 		defaultValues: defaultCreateUserValues
@@ -42,16 +44,29 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
 
 	const { errors, isValid } = formState;
 
+	const selectedDepartmentId = useWatch({ control, name: 'department_id' });
+	const { jobPositions } = useIndexJobPositions(selectedDepartmentId ? Number(selectedDepartmentId) : null);
+
+	// Reset job position when department changes
+	React.useEffect(() => {
+		setValue('job_position_id', 0);
+	}, [selectedDepartmentId, setValue]);
+
 	const onSubmit = async (data: CreateUserFormType) => {
 		try {
 			const payload: ICreateUser = {
 				name: data.name,
+				last_name: data.last_name,
 				email: data.email,
 				password: data.password,
 				password_confirmation: data.password_confirmation,
 				phone: data.phone || '',
 				department_ids: [],
-				role_id: data.role_id
+				role_id: data.role_id,
+				department_id: data.department_id,
+				job_position_id: data.job_position_id,
+				document_type: data.document_type,
+				document_number: data.document_number
 			};
 
 			await handleCreateUser(payload);
@@ -118,21 +133,42 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
 							/>
 
 							<Stack spacing={3}>
-								<Controller
-									name="name"
-									control={control}
-									render={({ field }) => (
-										<TextField
-											{...field}
-											label="Nombre completo"
-											placeholder="Ej: Juan Pérez García"
-											error={!!errors.name}
-											helperText={errors.name?.message}
-											fullWidth
-											variant="filled"
-										/>
-									)}
-								/>
+								<Stack
+									direction={{ xs: 'column', sm: 'row' }}
+									spacing={2}
+								>
+									<Controller
+										name="name"
+										control={control}
+										render={({ field }) => (
+											<TextField
+												{...field}
+												label="Nombre"
+												placeholder="Ej: Juan"
+												error={!!errors.name}
+												helperText={errors.name?.message}
+												fullWidth
+												variant="filled"
+											/>
+										)}
+									/>
+
+									<Controller
+										name="last_name"
+										control={control}
+										render={({ field }) => (
+											<TextField
+												{...field}
+												label="Apellido"
+												placeholder="Ej: Pérez García"
+												error={!!errors.last_name}
+												helperText={errors.last_name?.message}
+												fullWidth
+												variant="filled"
+											/>
+										)}
+									/>
+								</Stack>
 
 								<Stack
 									direction={{ xs: 'column', sm: 'row' }}
@@ -258,16 +294,137 @@ export default function CreateUserForm({ onCancel, onSuccess }: CreateUserFormPr
 										)}
 									/>
 								</Stack>
+							</Stack>
+						</Box>
 
-								<Alert
-									severity="info"
-									variant="outlined"
-									icon={<Lock fontSize="small" />}
-									sx={{ borderRadius: 1.5 }}
+						{/* Información Laboral */}
+						<Box>
+							<SectionTitle
+								icon={Badge}
+								title="Información laboral"
+							/>
+
+							<Stack spacing={3}>
+								<Stack
+									direction={{ xs: 'column', sm: 'row' }}
+									spacing={2}
 								>
-									Use una contraseña segura de al menos 8 caracteres. Se recomienda incluir
-									mayúsculas, minúsculas, números y símbolos.
-								</Alert>
+									<Controller
+										name="document_type"
+										control={control}
+										render={({ field }) => (
+											<TextField
+												{...field}
+												select
+												label="Tipo de documento"
+												error={!!errors.document_type}
+												helperText={errors.document_type?.message}
+												fullWidth
+												variant="filled"
+											>
+												<MenuItem value="DNI">DNI</MenuItem>
+												<MenuItem value="NIE">NIE</MenuItem>
+												<MenuItem value="Pasaporte">Pasaporte</MenuItem>
+												<MenuItem value="RUT">RUT</MenuItem>
+												<MenuItem value="Cédula">Cédula</MenuItem>
+											</TextField>
+										)}
+									/>
+
+									<Controller
+										name="document_number"
+										control={control}
+										render={({ field }) => (
+											<TextField
+												{...field}
+												label="Número de documento"
+												placeholder="Ej: 12345678Z"
+												error={!!errors.document_number}
+												helperText={errors.document_number?.message}
+												fullWidth
+												variant="filled"
+											/>
+										)}
+									/>
+								</Stack>
+
+								<Stack
+									direction={{ xs: 'column', sm: 'row' }}
+									spacing={2}
+								>
+									<Controller
+										name="department_id"
+										control={control}
+										render={({ field }) => (
+											<TextField
+												{...field}
+												select
+												label="Departamento"
+												error={!!errors.department_id}
+												helperText={errors.department_id?.message}
+												fullWidth
+												variant="filled"
+												value={field.value === undefined ? '' : field.value}
+												onChange={(e) => {
+													const val = Number(e.target.value);
+													field.onChange(val);
+												}}
+											>
+												<MenuItem
+													value={0}
+													disabled
+												>
+													<em>Seleccione un departamento</em>
+												</MenuItem>
+												{departments?.map((dept) => (
+													<MenuItem
+														key={dept.id}
+														value={dept.id}
+													>
+														{dept.name}
+													</MenuItem>
+												))}
+											</TextField>
+										)}
+									/>
+
+									<Controller
+										name="job_position_id"
+										control={control}
+										render={({ field }) => (
+											<TextField
+												{...field}
+												select
+												label="Puesto de trabajo"
+												error={!!errors.job_position_id}
+												helperText={errors.job_position_id?.message}
+												fullWidth
+												variant="filled"
+												value={field.value === undefined ? '' : field.value}
+												disabled={!selectedDepartmentId || selectedDepartmentId === 0}
+												onChange={(e) => {
+													const val = Number(e.target.value);
+													field.onChange(val);
+												}}
+											>
+												<MenuItem
+													value={0}
+													disabled
+												>
+													<em>Seleccione un puesto de trabajo</em>
+												</MenuItem>
+												{jobPositions?.map((pos) => (
+													<MenuItem
+														key={pos.id}
+														value={pos.id}
+													>
+														{pos.name}
+													</MenuItem>
+												))}
+											</TextField>
+										)}
+									/>
+								</Stack>
 							</Stack>
 						</Box>
 

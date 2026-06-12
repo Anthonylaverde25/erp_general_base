@@ -59,12 +59,12 @@ export default function CategoriesTabView() {
 			>
 				<div />
 				<Button
-					className="btn-primary"
 					variant="contained"
-					color="primary"
-					size="medium"
-					startIcon={<FuseSvgIcon size={20}>heroicons-outline:plus</FuseSvgIcon>}
+					color="secondary"
+					size="small"
+					startIcon={<FuseSvgIcon size={18}>heroicons-outline:plus</FuseSvgIcon>}
 					onClick={handleCreateCategory}
+					sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '4px', boxShadow: 'none' }}
 				>
 					Create Category
 				</Button>

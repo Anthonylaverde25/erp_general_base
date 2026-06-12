@@ -9,6 +9,7 @@ export const TYPES = {
 	CreateUserUseCase: Symbol.for('CreateUserUseCase'),
 	ShowUserUseCase: Symbol.for('ShowUserUseCase'),
 	UpdateUserUseCase: Symbol.for('UpdateUserUseCase'),
+	AssociateEmployeesUseCase: Symbol.for('AssociateEmployeesUseCase'),
 
 	// Roles
 	IRoleCrudRepository: Symbol.for('IRoleCrudRepository'),

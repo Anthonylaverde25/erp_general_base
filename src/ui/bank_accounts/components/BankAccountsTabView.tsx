@@ -61,12 +61,12 @@ export default function BankAccountsTabView({ createButtonText = 'Crear cuenta b
 			>
 				<div />
 				<Button
-					className="btn-primary"
 					variant="contained"
-					color="primary"
-					size="large"
-					startIcon={<FuseSvgIcon size={20}>heroicons-outline:building-library</FuseSvgIcon>}
+					color="secondary"
+					size="small"
+					startIcon={<FuseSvgIcon size={18}>heroicons-outline:building-library</FuseSvgIcon>}
 					onClick={() => setCreateModalOpen(true)}
+					sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '4px', boxShadow: 'none' }}
 				>
 					{createButtonText}
 				</Button>

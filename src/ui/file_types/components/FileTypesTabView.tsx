@@ -73,12 +73,12 @@ export default function FileTypesTabView() {
             >
                 <Typography variant="h6" fontWeight="bold">Tipos de Archivos</Typography>
                 <Button
-                    className="btn-primary"
                     variant="contained"
-                    color="primary"
-                    size="large"
-                    startIcon={<FuseSvgIcon size={20}>heroicons-outline:plus</FuseSvgIcon>}
+                    color="secondary"
+                    size="small"
+                    startIcon={<FuseSvgIcon size={18}>heroicons-outline:plus</FuseSvgIcon>}
                     onClick={handleCreate}
+                    sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '4px', boxShadow: 'none' }}
                 >
                     Crear tipo de archivo
                 </Button>

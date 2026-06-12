@@ -3,11 +3,20 @@ import { z } from 'zod';
 export const createUserSchema = z
 	.object({
 		name: z.string().min(1, 'El nombre es requerido'),
+		last_name: z.string().optional(),
 		email: z.string().email('Debe ingresar un email válido').min(1, 'El email es requerido'),
 		password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
 		password_confirmation: z.string().min(1, 'Debe confirmar la contraseña'),
 		role_id: z.number({ required_error: 'Debe seleccionar un rol' }).min(1, 'Debe seleccionar un rol'),
-		phone: z.string().optional()
+		phone: z.string().optional(),
+		department_id: z
+			.number({ required_error: 'El departamento es requerido' })
+			.min(1, 'El departamento es requerido'),
+		job_position_id: z
+			.number({ required_error: 'El puesto de trabajo es requerido' })
+			.min(1, 'El puesto de trabajo es requerido'),
+		document_type: z.string().min(1, 'El tipo de documento es requerido'),
+		document_number: z.string().min(1, 'El número de documento es requerido')
 	})
 	.refine((data) => data.password === data.password_confirmation, {
 		message: 'Las contraseñas no coinciden',

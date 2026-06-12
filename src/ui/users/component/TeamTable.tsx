@@ -6,10 +6,11 @@ import UserActionMenu from './UserActionMenu';
 interface TeamTableProps {
 	users: IUser[] | undefined;
 	onEdit: (id: number) => void;
+	onAssociateEmployees: (user: IUser) => void;
 }
 
 export default function TeamTable(props: TeamTableProps) {
-	const { users, onEdit } = props;
+	const { users, onEdit, onAssociateEmployees } = props;
 
 	return (
 		<UserDataTable
@@ -21,6 +22,7 @@ export default function TeamTable(props: TeamTableProps) {
 				<UserActionMenu
 					row={row}
 					onEdit={() => onEdit(row.original.id)}
+					onAssociateEmployees={() => onAssociateEmployees(row.original)}
 				/>
 			)}
 			enableRowSelection

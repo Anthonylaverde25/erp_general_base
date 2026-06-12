@@ -5,9 +5,10 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 interface UserActionMenuProps {
 	row: any;
 	onEdit: () => void;
+	onAssociateEmployees: () => void;
 }
 
-export default function UserActionMenu({ row, onEdit }: UserActionMenuProps) {
+export default function UserActionMenu({ row, onEdit, onAssociateEmployees }: UserActionMenuProps) {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const open = Boolean(anchorEl);
 
@@ -82,6 +83,17 @@ export default function UserActionMenu({ row, onEdit }: UserActionMenuProps) {
 						<FuseSvgIcon size={16}>heroicons-outline:pencil</FuseSvgIcon>
 					</ListItemIcon>
 					Editar
+				</MenuItem>
+				<MenuItem
+					onClick={(e) => {
+						handleClose(e);
+						onAssociateEmployees();
+					}}
+				>
+					<ListItemIcon>
+						<FuseSvgIcon size={16}>heroicons-outline:user-group</FuseSvgIcon>
+					</ListItemIcon>
+					Asociar empleado
 				</MenuItem>
 				<MenuItem
 					onClick={(e) => {

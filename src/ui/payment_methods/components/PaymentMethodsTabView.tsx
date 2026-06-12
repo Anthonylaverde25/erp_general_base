@@ -63,12 +63,12 @@ export default function PaymentMethodsTabView() {
 			>
 				<div />
 				<Button
-					className="btn-primary"
 					variant="contained"
-					color="primary"
-					size="large"
-					startIcon={<FuseSvgIcon size={20}>heroicons-outline:credit-card</FuseSvgIcon>}
+					color="secondary"
+					size="small"
+					startIcon={<FuseSvgIcon size={18}>heroicons-outline:credit-card</FuseSvgIcon>}
 					onClick={() => setCreateModalOpen(true)}
+					sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '4px', boxShadow: 'none' }}
 				>
 					Crear método de pago
 				</Button>

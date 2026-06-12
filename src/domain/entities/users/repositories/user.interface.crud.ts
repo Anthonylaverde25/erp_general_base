@@ -7,4 +7,5 @@ export interface IUserCrudRepository {
 	create(data: UserEntity): Promise<{ user: UserEntity; message: string }>;
 	update(id: number, data: UserEntity): Promise<{ user: UserEntity; message: string }>;
 	remove(id: number): Promise<{ message: string }>;
+	associateEmployees(id: number, employeeIds: number[]): Promise<{ user: UserEntity; message: string }>;
 }

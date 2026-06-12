@@ -9,12 +9,12 @@ export default function CreateUserButton() {
 	return (
 		<>
 			<Button
-				className="btn-primary"
 				variant="contained"
-				color="primary"
-				size="large"
+				color="secondary"
+				size="small"
 				startIcon={<FuseSvgIcon size={16}>heroicons-outline:user-plus</FuseSvgIcon>}
 				onClick={() => setOpen(true)}
+				sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '4px', boxShadow: 'none' }}
 			>
 				Crear usuario
 			</Button>

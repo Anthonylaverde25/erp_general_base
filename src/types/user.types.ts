@@ -22,6 +22,7 @@ export interface IUser {
 	needs_password_change?: boolean;
 	observations?: string;
 	active_company_id?: number;
+	authorized_employees?: { id: number; full_name: string }[];
 }
 
 /**
@@ -31,12 +32,17 @@ export interface IUser {
  */
 export interface ICreateUser {
 	name: string;
+	last_name?: string;
 	email: string;
 	password: string;
 	password_confirmation: string;
 	role_id: number;
 	department_ids: number[];
 	phone: string;
+	department_id: number;
+	job_position_id: number;
+	document_type: string;
+	document_number: string;
 }
 
 /**

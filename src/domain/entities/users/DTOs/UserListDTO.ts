@@ -8,4 +8,5 @@ export interface UserListDTO {
 	role: IRole | null;
 	role_ids?: number[];
 	status: string;
+	authorized_employees?: { id: number; full_name: string }[];
 }

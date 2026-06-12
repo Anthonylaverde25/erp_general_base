@@ -10,7 +10,8 @@ export class UserMapper {
 			email: dto.email,
 			role: dto.role,
 			phone: dto.phone || '', // Keep original logic for phone default
-			role_id: dto.role?.id || (dto.role_ids?.[0] ?? 0) // Keep original logic for role_id
+			role_id: dto.role?.id || (dto.role_ids?.[0] ?? 0), // Keep original logic for role_id
+			authorized_employees: dto.authorized_employees || []
 		});
 	}
 
@@ -29,7 +30,8 @@ export class UserMapper {
 			email: user.email,
 			phone: user.phone,
 			role: user.role,
-			role_id: user.role_id
+			role_id: user.role_id,
+			authorized_employees: user.authorized_employees
 		};
 	}
 }

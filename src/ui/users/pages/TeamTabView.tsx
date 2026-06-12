@@ -6,6 +6,7 @@ import useIndexUser from '@/features/users/hooks/useIndexUsers';
 import TeamTable from '../component/TeamTable';
 import CreateUserButton from '@/ui/users/component/CreateUserButton';
 import UpdateUserModal from '@/ui/users/component/modals/UpdateUserModal';
+import AssociateEmployeesModal from '@/ui/users/component/modals/AssociateEmployeesModal';
 import { IUser } from '@/types/user.types';
 
 export default function TeamTabView() {
@@ -14,9 +15,17 @@ export default function TeamTabView() {
 	const [selectedId, setSelectedId] = useState<IUser['id'] | null>(null);
 	const [updateModalOpen, setUpdateModalOpen] = useState(false);
 
+	const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
+	const [associateModalOpen, setAssociateModalOpen] = useState(false);
+
 	const handleEditUser = (id: IUser['id']) => {
 		setSelectedId(id);
 		setUpdateModalOpen(true);
+	};
+
+	const handleAssociateEmployees = (user: IUser) => {
+		setSelectedUser(user);
+		setAssociateModalOpen(true);
 	};
 
 	return (
@@ -35,11 +44,11 @@ export default function TeamTabView() {
 					alignItems="center"
 				>
 					<Button
-						className="btn-secondary"
 						variant="outlined"
 						color="secondary"
-						size="large"
+						size="small"
 						startIcon={<FuseSvgIcon size={16}>heroicons-outline:arrow-down</FuseSvgIcon>}
+						sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '4px', boxShadow: 'none' }}
 					>
 						Invitar usuario
 					</Button>
@@ -50,6 +59,7 @@ export default function TeamTabView() {
 			<TeamTable
 				users={users}
 				onEdit={handleEditUser}
+				onAssociateEmployees={handleAssociateEmployees}
 			/>
 
 			{selectedId && (
@@ -60,6 +70,17 @@ export default function TeamTabView() {
 						setSelectedId(null);
 					}}
 					userId={selectedId}
+				/>
+			)}
+
+			{selectedUser && (
+				<AssociateEmployeesModal
+					open={associateModalOpen}
+					onClose={() => {
+						setAssociateModalOpen(false);
+						setSelectedUser(null);
+					}}
+					user={selectedUser}
 				/>
 			)}
 		</div>

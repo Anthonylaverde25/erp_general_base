@@ -6,6 +6,7 @@ import { IndexUserUseCase } from '@/application/use_cases/users/IndexUserUseCase
 import { CreateUserUseCase } from '@/application/use_cases/users/CreateUserUseCase';
 import { UpdateUserUseCase } from '@/application/use_cases/users/UpdateUserUseCase';
 import { ShowUserUseCase } from '@/application/use_cases/users/ShowUserUseCase';
+import { AssociateEmployeesUseCase } from '@/application/use_cases/users/AssociateEmployeesUseCase';
 
 export const registerUserModule = (container: Container) => {
 	// //Repositories
@@ -17,4 +18,5 @@ export const registerUserModule = (container: Container) => {
 	container.bind<CreateUserUseCase>(TYPES.CreateUserUseCase).to(CreateUserUseCase);
 	container.bind<UpdateUserUseCase>(TYPES.UpdateUserUseCase).to(UpdateUserUseCase);
 	container.bind<ShowUserUseCase>(TYPES.ShowUserUseCase).to(ShowUserUseCase);
+	container.bind<AssociateEmployeesUseCase>(TYPES.AssociateEmployeesUseCase).to(AssociateEmployeesUseCase);
 };
