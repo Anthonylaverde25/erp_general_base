@@ -1,3 +1,4 @@
+import { useTenantModules } from '@/contexts/TenantModulesContext';
 import { Box, Divider, IconButton, Typography } from '@mui/material';
 import { Bell, LayoutGrid, Search, X } from 'lucide-react';
 
@@ -6,6 +7,10 @@ interface AppLauncherHeaderProps {
 }
 
 export function AppLauncherHeader({ onClose }: AppLauncherHeaderProps) {
+	const modulesInfo = useTenantModules();
+	console.log('Available Modules:', modulesInfo.available);
+	console.log('Licensed Modules:', modulesInfo.licensed);
+	console.log('Has POS Module?', modulesInfo.hasModule('pos'));
 	return (
 		<Box
 			sx={{

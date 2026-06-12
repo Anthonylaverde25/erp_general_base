@@ -19,6 +19,7 @@ import { NavigationContextProvider } from '@/components/theme-layouts/components
 import BroadcastingProvider from '@/providers/BroadcastingProvider';
 import ReactQueryProvider from '@/providers/ReactQueryProvider';
 import { Toaster } from 'sonner';
+import { TenantModulesProvider } from '@/contexts/TenantModulesContext';
 
 /**
  * The main App component.
@@ -39,7 +40,8 @@ function App() {
 					<ReactQueryProvider>
 						<Authentication>
 							<BroadcastingProvider>
-								<FuseSettingsProvider>
+								<TenantModulesProvider>
+									<FuseSettingsProvider>
 									<I18nProvider>
 										{/* Theme Provider */}
 										<RootThemeProvider>
@@ -74,6 +76,7 @@ function App() {
 										</RootThemeProvider>
 									</I18nProvider>
 								</FuseSettingsProvider>
+								</TenantModulesProvider>
 							</BroadcastingProvider>
 						</Authentication>
 					</ReactQueryProvider>

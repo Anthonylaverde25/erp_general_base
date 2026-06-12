@@ -29,6 +29,7 @@ const navigationConfig: FuseNavItemType[] = [
 	{
 		id: 'HR',
 		title: 'RRHH',
+		subtitle: 'Recursos Humanos',
 		translate: 'HR',
 		type: 'collapse',
 		icon: 'lucide:user',
@@ -36,6 +37,7 @@ const navigationConfig: FuseNavItemType[] = [
 			{
 				id: 'employees',
 				title: 'Empleados',
+				subtitle: 'Gestion de Empleados',
 				translate: 'EMPLOYEES',
 				type: 'item',
 				icon: 'lucide:users',
