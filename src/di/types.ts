@@ -110,6 +110,18 @@ export const TYPES = {
 	CreatePartnerUseCase: Symbol.for('CreatePartnerUseCase'),
 	UpdatePartnerUseCase: Symbol.for('UpdatePartnerUseCase'),
 
+	// Employees
+	EmployeeRepository: Symbol.for('EmployeeRepository'),
+	IndexEmployeesUseCase: Symbol.for('IndexEmployeesUseCase'),
+	ShowEmployeeUseCase: Symbol.for('ShowEmployeeUseCase'),
+	CreateEmployeeUseCase: Symbol.for('CreateEmployeeUseCase'),
+	UpdateEmployeeUseCase: Symbol.for('UpdateEmployeeUseCase'),
+	DeleteEmployeeUseCase: Symbol.for('DeleteEmployeeUseCase'),
+
+	// Job Positions
+	JobPositionRepository: Symbol.for('JobPositionRepository'),
+	IndexJobPositionsUseCase: Symbol.for('IndexJobPositionsUseCase'),
+
 	// Currencies
 	ICurrencyRepository: Symbol.for('ICurrencyRepository'),
 	IndexCurrenciesUseCase: Symbol.for('IndexCurrenciesUseCase'),

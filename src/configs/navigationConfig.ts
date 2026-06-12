@@ -27,6 +27,39 @@ const navigationConfig: FuseNavItemType[] = [
 		url: '/delivery'
 	},
 	{
+		id: 'HR',
+		title: 'RRHH',
+		translate: 'HR',
+		type: 'collapse',
+		icon: 'lucide:user',
+		children: [
+			{
+				id: 'employees',
+				title: 'Empleados',
+				translate: 'EMPLOYEES',
+				type: 'item',
+				icon: 'lucide:users',
+				url: '/hr/employees'
+			},
+			{
+				id: 'attendances',
+				title: 'Asistencias',
+				translate: 'ATTENDANCES',
+				type: 'item',
+				icon: 'lucide:clock',
+				url: '/hr/attendances'
+			},
+			{
+				id: 'vacations',
+				title: 'Vacaciones',
+				translate: 'VACATIONS',
+				type: 'item',
+				icon: 'lucide:sun',
+				url: '/hr/vacations'
+			}
+		]
+	},
+	{
 		id: 'catalogs',
 		title: 'Catálogos',
 		translate: 'CATALOGS',
