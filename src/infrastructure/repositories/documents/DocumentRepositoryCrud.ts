@@ -12,6 +12,23 @@ export class DocumentRepositoryCrud implements IDocumentRepository {
         return data.map((doc: any) => DocumentEntity.fromJson(doc));
     }
 
+    async indexPaginated(filters: Record<string, any> = {}): Promise<{ data: DocumentEntity[]; meta: any }> {
+        const {
+            data: { data, meta }
+        } = await axiosInstance.get('documents', { params: filters });
+        return {
+            data: data.map((doc: any) => DocumentEntity.fromJson(doc)),
+            meta
+        };
+    }
+
+    async indexAccounting(filters: Record<string, any> = {}): Promise<{ data: any[]; meta: any }> {
+        const {
+            data: { data, meta }
+        } = await axiosInstance.get('documents/accounting', { params: filters });
+        return { data, meta };
+    }
+
     async show(id: string | number): Promise<DocumentEntity> {
         const {
             data: { data }

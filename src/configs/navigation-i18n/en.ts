@@ -2,6 +2,8 @@ const locale = {
 	// Main modules
 	DASHBOARD: 'Dashboard',
 	DELIVERY: 'Delivery',
+	DELIVERY_PRODUCTS: 'Article Delivery',
+	DELIVERY_SERVICES: 'Service Orders',
 	CONTROL_PANEL: 'Control Panel',
 	CATALOGS: 'Catalogs',
 	CAJA: 'Cash Register',
@@ -53,11 +55,14 @@ const locale = {
 	BANK_ACCOUNTS: 'Bank Accounts',
 
 	// Human Resources
+	HR: 'HR',
 	HR_MANAGEMENT: 'HR Management',
 	EMPLOYEES: 'Employees',
 	DEPARTMENTS: 'Departments',
 	ATTENDANCE: 'Attendance',
+	ATTENDANCES: 'Attendances',
 	PAYROLL: 'Payroll',
+	VACATIONS: 'Vacations',
 
 	// Reports
 	REPORTS: 'Reports',
@@ -86,6 +91,7 @@ const locale = {
 	CREATE_PURCHASE_ORDER: 'New Purchase Order',
 
 	// List labels
+	LISTS: 'Lists',
 	LIST_INVOICES: 'Sales Invoices',
 	LIST_QUOTES: 'Quotes',
 	LIST_DELIVERY_NOTES: 'Sales Delivery Notes',
@@ -94,7 +100,12 @@ const locale = {
 	LIST_CREDIT_NOTES: 'Credit Notes',
 	LIST_PURCHASE_INVOICES: 'Purchase Invoices',
 	LIST_PURCHASE_DELIVERY_NOTES: 'Purchase Delivery Notes',
-	LIST_PURCHASE_ORDERS: 'Purchase Orders'
+	LIST_PURCHASE_ORDERS: 'Purchase Orders',
+	PENDING_COLLECTIONS: 'Pending Collections',
+	PENDING_PAYMENTS: 'Pending Payments',
+	ACCOUNT_LIST: 'Accounting List',
+	ACCOUNT_LIST_SALES: 'Accounting list (Sales)',
+	ACCOUNT_LIST_PURCHASES: 'Accounting list (Purchases)'
 };
 
 export default locale;

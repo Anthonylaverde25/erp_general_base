@@ -12,7 +12,7 @@ export function useRecordPayment() {
     const useCase = container.get<RecordPaymentUseCase>(TYPES.RecordPaymentUseCase);
     const queryClient = useQueryClient();
 
-    return useMutation<any, Error, { id: string; payload: { amount: number; payment_date: string; payment_method_id?: number; reference?: string; notes?: string } }>({
+    return useMutation<any, Error, { id: string; payload: { amount: number; payment_date: string; payment_method_id?: number; reference?: string; notes?: string; allocations?: { document_id: number; amount: number }[] } }>({
         mutationFn: ({ id, payload }) => useCase.execute(id, payload),
         onSuccess: (response, variables) => {
             // Display success message from API

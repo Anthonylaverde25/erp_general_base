@@ -7,7 +7,7 @@ export interface IDocumentActionRepository {
         lines?: { source_line_id: number; quantity: number }[];
     }): Promise<DocumentEntity>;
     convertToPurchase(id: string | number): Promise<DocumentEntity>;
-    recordPayment(id: string | number, payload: { amount: number; payment_date: string; payment_method_id?: number; reference?: string; notes?: string }): Promise<any>;
+    recordPayment(id: string | number, payload: { amount: number; payment_date: string; payment_method_id?: number; reference?: string; notes?: string; allocations?: { document_id: number; amount: number }[] }): Promise<any>;
     batchConvert(payload: { source_ids: (string | number)[]; number_series_id?: number | null; status_key?: string }): Promise<DocumentEntity>;
     duplicate(id: string | number): Promise<DocumentEntity>;
     rectify(id: string | number, payload?: { 

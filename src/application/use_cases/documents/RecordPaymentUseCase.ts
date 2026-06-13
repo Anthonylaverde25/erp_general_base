@@ -8,7 +8,7 @@ export class RecordPaymentUseCase {
         @inject(TYPES.IDocumentActionRepository) private repository: IDocumentActionRepository
     ) { }
 
-    async execute(id: string, payload: { amount: number; payment_date: string; payment_method_id?: number; reference?: string; notes?: string }): Promise<any> {
+    async execute(id: string, payload: { amount: number; payment_date: string; payment_method_id?: number; reference?: string; notes?: string; allocations?: { document_id: number; amount: number }[] }): Promise<any> {
         return this.repository.recordPayment(id, payload);
     }
 }

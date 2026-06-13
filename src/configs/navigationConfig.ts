@@ -20,11 +20,44 @@ const navigationConfig: FuseNavItemType[] = [
 	},
 	{
 		id: 'delivery',
-		title: 'Delivery',
+		title: 'Entregas',
 		translate: 'DELIVERY',
-		type: 'item',
+		type: 'collapse',
 		icon: 'lucide:truck',
-		url: '/delivery/DLV?item_type=service'
+		children: [
+			{
+				id: 'delivery.products',
+				title: 'Reparto de Artículos',
+				translate: 'DELIVERY_PRODUCTS',
+				type: 'item',
+				icon: 'lucide:package',
+				url: '/delivery/DLV?item_type=product'
+			},
+			{
+				id: 'delivery.services',
+				title: 'Órdenes de Servicios',
+				translate: 'DELIVERY_SERVICES',
+				type: 'item',
+				icon: 'lucide:briefcase',
+				url: '/delivery/DLV?item_type=service'
+			},
+			{
+				id: 'delivery.route-list',
+				title: 'Rutas Activas',
+				translate: 'DELIVERY_ROUTE_ACTIVE',
+				type: 'item',
+				icon: 'lucide:route',
+				url: '/delivery/route-list'
+			},
+			{
+				id: 'delivery.route-history',
+				title: 'Historial de Rutas',
+				translate: 'DELIVERY_ROUTE_HISTORY',
+				type: 'item',
+				icon: 'lucide:history',
+				url: '/delivery/route-history'
+			}
+		]
 	},
 	{
 		id: 'HR',
@@ -289,7 +322,7 @@ const navigationConfig: FuseNavItemType[] = [
 					{
 						id: 'sales.dlv.services',
 						title: 'Albaranes de Venta',
-						translate: 'LIST_DELIVERIES',
+						translate: 'LIST_DELIVERY_NOTES',
 						type: 'item',
 						icon: 'lucide:truck',
 						url: '/sales/DLV?item_type=service',
@@ -316,7 +349,7 @@ const navigationConfig: FuseNavItemType[] = [
 					{
 						id: 'purchases.pdlv.services',
 						title: 'Albaranes de Compra',
-						translate: 'LIST_RECEIPTS',
+						translate: 'LIST_PURCHASE_DELIVERY_NOTES',
 						type: 'item',
 						icon: 'lucide:truck',
 						url: '/purchases/PDLV?item_type=service',
@@ -326,6 +359,47 @@ const navigationConfig: FuseNavItemType[] = [
 			}
 		]
 	},
+  {
+    id: 'lists',
+    title: 'Listas',
+    translate: 'LISTS',
+    type: 'collapse',
+    icon: 'lucide:list',
+    children: [
+      {
+        id: 'lists.pending_collections',
+        title: 'Pendiente de cobro',
+        translate: 'PENDING_COLLECTIONS',
+        type: 'item',
+        url: '/lists/pending/INV',
+        icon: 'lucide:check-circle'
+      },
+      {
+        id: 'lists.pending_payments',
+        title: 'Pendiente de pago',
+        translate: 'PENDING_PAYMENTS',
+        type: 'item',
+        url: '/lists/pending/PINV',
+        icon: 'lucide:check-circle'
+      },
+      {
+        id: 'lists.accounting_sales',
+        title: 'Listado contable (Ventas)',
+        translate: 'ACCOUNT_LIST_SALES',
+        type: 'item',
+        url: '/lists/pending/accounting/INV',
+        icon: 'lucide:book-open'
+      },
+      {
+        id: 'lists.accounting_purchases',
+        title: 'Listado contable (Compras)',
+        translate: 'ACCOUNT_LIST_PURCHASES',
+        type: 'item',
+        url: '/lists/pending/accounting/PINV',
+        icon: 'lucide:book-open'
+      }
+    ]
+  },
 	{
 		id: 'inventory',
 		title: 'Inventory',
@@ -367,153 +441,8 @@ const navigationConfig: FuseNavItemType[] = [
 			}
 		]
 	},
-	// {
-	// 	id: 'finance',
-	// 	title: 'Finance',
-	// 	translate: 'FINANCE',
-	// 	subtitle: 'Accounting & Payments',
-	// 	type: 'group',
-	// 	icon: 'lucide:wallet',
-	// 	children: [
 
-	// 		{
-	// 			id: 'accounting',
-	// 			title: 'Accounting',
-	// 			translate: 'ACCOUNTING',
-	// 			type: 'collapse',
-	// 			icon: 'lucide:calculator',
-	// 			children: [
-	// 				{
-	// 					id: 'accounting.accounts',
-	// 					title: 'Chart of Accounts',
-	// 					translate: 'CHART_OF_ACCOUNTS',
-	// 					type: 'item',
-	// 					url: '/accounting/accounts',
-	// 					icon: 'lucide:list'
-	// 				},
-	// 				{
-	// 					id: 'accounting.journal-entries',
-	// 					title: 'Journal Entries',
-	// 					translate: 'JOURNAL_ENTRIES',
-	// 					type: 'item',
-	// 					url: '/accounting/journal-entries',
-	// 					icon: 'lucide:book-open'
-	// 				},
-	// 				{
-	// 					id: 'accounting.payments',
-	// 					title: 'Payments',
-	// 					translate: 'PAYMENTS',
-	// 					type: 'item',
-	// 					url: '/accounting/payments',
-	// 					icon: 'lucide:credit-card'
-	// 				},
-	// 				{
-	// 					id: 'accounting.bank-accounts',
-	// 					title: 'Bank Accounts',
-	// 					translate: 'BANK_ACCOUNTS',
-	// 					type: 'item',
-	// 					url: '/accounting/bank-accounts',
-	// 					icon: 'lucide:landmark'
-	// 				}
-	// 			]
-	// 		}
-	// 	]
-	// },
-	// {
-	// 	id: 'human-resources',
-	// 	title: 'Human Resources',
-	// 	translate: 'HUMAN_RESOURCES_GROUP',
-	// 	subtitle: 'Employee Management',
-	// 	type: 'group',
-	// 	icon: 'lucide:users-2',
-	// 	children: [
-	// 		{
-	// 			id: 'hr',
-	// 			title: 'HR Management',
-	// 			translate: 'HR_MANAGEMENT',
-	// 			type: 'collapse',
-	// 			icon: 'lucide:users-2',
-	// 			children: [
-	// 				{
-	// 					id: 'hr.employees',
-	// 					title: 'Employees',
-	// 					translate: 'EMPLOYEES',
-	// 					type: 'item',
-	// 					url: '/hr/employees',
-	// 					icon: 'lucide:user'
-	// 				},
-	// 				{
-	// 					id: 'hr.attendance',
-	// 					title: 'Attendance',
-	// 					translate: 'ATTENDANCE',
-	// 					type: 'item',
-	// 					url: '/hr/attendance',
-	// 					icon: 'lucide:calendar-check'
-	// 				},
-	// 				{
-	// 					id: 'hr.payroll',
-	// 					title: 'Payroll',
-	// 					translate: 'PAYROLL',
-	// 					type: 'item',
-	// 					url: '/hr/payroll',
-	// 					icon: 'lucide:wallet'
-	// 				}
-	// 			]
-	// 		}
-	// 	]
-	// },
-
-	// {
-	// 	id: 'analytics',
-	// 	title: 'Analytics',
-	// 	translate: 'ANALYTICS',
-	// 	subtitle: 'Reports & Insights',
-	// 	type: 'group',
-	// 	icon: 'lucide:bar-chart-3',
-	// 	children: [
-	// 		{
-	// 			id: 'reports',
-	// 			title: 'Reports',
-	// 			translate: 'REPORTS',
-	// 			type: 'collapse',
-	// 			icon: 'lucide:bar-chart',
-	// 			children: [
-	// 				{
-	// 					id: 'reports.sales',
-	// 					title: 'Sales Reports',
-	// 					translate: 'SALES_REPORTS',
-	// 					type: 'item',
-	// 					url: '/reports/sales',
-	// 					icon: 'lucide:trending-up'
-	// 				},
-	// 				{
-	// 					id: 'reports.purchases',
-	// 					title: 'Purchase Reports',
-	// 					translate: 'PURCHASE_REPORTS',
-	// 					type: 'item',
-	// 					url: '/reports/purchases',
-	// 					icon: 'lucide:trending-down'
-	// 				},
-	// 				{
-	// 					id: 'reports.inventory',
-	// 					title: 'Inventory Reports',
-	// 					translate: 'INVENTORY_REPORTS',
-	// 					type: 'item',
-	// 					url: '/reports/inventory',
-	// 					icon: 'lucide:pie-chart'
-	// 				},
-	// 				{
-	// 					id: 'reports.financial',
-	// 					title: 'Financial Reports',
-	// 					translate: 'FINANCIAL_REPORTS',
-	// 					type: 'item',
-	// 					url: '/reports/financial',
-	// 					icon: 'lucide:line-chart'
-	// 				}
-	// 			]
-	// 		}
-	// 	]
-	// }
+  
 ];
 
 export default navigationConfig;

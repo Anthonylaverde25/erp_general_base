@@ -21,11 +21,12 @@ import ExpensesSummaryChart from '../cards/ExpensesSummaryChart';
 import ExpenseAccountsCard from '../cards/ExpenseAccountsCard';
 import CriticalStockCard from '../cards/CriticalStockCard';
 import PendingInvoicingCard from '../cards/PendingInvoicingCard';
+import ActiveRoutesCard from '../cards/ActiveRoutesCard';
 
 // ─── react-grid-layout setup ─────────────────────────────────────────────────
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-const STORAGE_KEY = 'dashboard_layouts_v5';
+const STORAGE_KEY = 'dashboard_layouts_v6';
 
 // ─── Page root ────────────────────────────────────────────────────────────────
 const Root = styled(FusePageSimple)(({ theme }) => ({
@@ -110,7 +111,8 @@ const initialLayouts = {
     { i: 'stock_critico', x: 0, y: 13, w: 6, h: 5, minW: 3, minH: 3 },
     // CORRECCIÓN: Se coloca al lado de stock_critico (x=6) en la misma fila (y=13)
     // Ocupa 3 columnas de ancho, igual que las tarjetas superiores
-    { i: 'pending_invoicing', x: 6, y: 13, w: 3, h: 5, minW: 2, minH: 3 } 
+    { i: 'pending_invoicing', x: 6, y: 13, w: 3, h: 5, minW: 2, minH: 3 },
+    { i: 'active_routes_card', x: 9, y: 13, w: 3, h: 5, minW: 2, minH: 3 } 
   ],
   md: [
     { i: 'ventas', x: 0, y: 0, w: 5, h: 3, minW: 2, minH: 2 },
@@ -130,7 +132,8 @@ const initialLayouts = {
     
     // CORRECCIÓN: Como en md stock_critico ocupa todo el ancho (w=10),
     // esta nueva tarjeta debe ir en la fila de abajo. y = 26 + 5 (altura) = 31.
-    { i: 'pending_invoicing', x: 0, y: 31, w: 5, h: 5, minW: 3, minH: 3 }
+    { i: 'pending_invoicing', x: 0, y: 31, w: 5, h: 5, minW: 3, minH: 3 },
+    { i: 'active_routes_card', x: 5, y: 31, w: 5, h: 5, minW: 3, minH: 3 }
   ]
 };
 
@@ -259,6 +262,11 @@ function DashboardView() {
               <div key="pending_invoicing">
                 <DashGridItem isEditing={isEditing}>
                   <PendingInvoicingCard />
+                </DashGridItem>
+              </div>
+              <div key="active_routes_card">
+                <DashGridItem isEditing={isEditing}>
+                  <ActiveRoutesCard />
                 </DashGridItem>
               </div>
 

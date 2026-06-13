@@ -23,7 +23,7 @@ export class DocumentRepositoryAction implements IDocumentActionRepository {
         return DocumentEntity.fromJson(purchaseOrder);
     }
 
-    async recordPayment(id: string | number, payload: { amount: number; payment_date: string; payment_method_id?: number; reference?: string; notes?: string }): Promise<any> {
+    async recordPayment(id: string | number, payload: { amount: number; payment_date: string; payment_method_id?: number; reference?: string; notes?: string; allocations?: { document_id: number; amount: number }[] }): Promise<any> {
         const { data } = await axiosInstance.post(`documents/${id}/payments`, payload);
         return data;
     }

@@ -2,6 +2,8 @@ const locale = {
 	// Módulos principales
 	DASHBOARD: 'Panel de Control',
 	DELIVERY: 'Entregas',
+	DELIVERY_PRODUCTS: 'Reparto de Artículos',
+	DELIVERY_SERVICES: 'Órdenes de Servicios',
 	CONTROL_PANEL: 'Panel de Control',
 	CATALOGS: 'Catálogos',
 	CAJA: 'Caja',
@@ -53,11 +55,14 @@ const locale = {
 	BANK_ACCOUNTS: 'Cuentas Bancarias',
 
 	// Recursos Humanos
+	HR: 'RRHH',
 	HR_MANAGEMENT: 'Gestión de RRHH',
 	EMPLOYEES: 'Empleados',
 	DEPARTMENTS: 'Departamentos',
 	ATTENDANCE: 'Asistencia',
+	ATTENDANCES: 'Asistencias',
 	PAYROLL: 'Nómina',
+	VACATIONS: 'Vacaciones',
 
 	// Reportes
 	REPORTS: 'Reportes',
@@ -86,6 +91,7 @@ const locale = {
 	CREATE_PURCHASE_ORDER: 'Nuevo Pedido de Compra',
 
 	// Listados por Tipo
+	LISTS: 'Listas',
 	LIST_INVOICES: 'Facturas de Venta',
 	LIST_QUOTES: 'Presupuestos',
 	LIST_DELIVERY_NOTES: 'Albaranes de Venta',
@@ -94,7 +100,12 @@ const locale = {
 	LIST_CREDIT_NOTES: 'Facturas Rectificativas',
 	LIST_PURCHASE_INVOICES: 'Facturas de Compra',
 	LIST_PURCHASE_DELIVERY_NOTES: 'Albaranes de Compra',
-	LIST_PURCHASE_ORDERS: 'Pedidos de Compra'
+	LIST_PURCHASE_ORDERS: 'Pedidos de Compra',
+	PENDING_COLLECTIONS: 'Pendientes de Cobro',
+	PENDING_PAYMENTS: 'Pendientes de Pago',
+	ACCOUNT_LIST: 'Listado Contable',
+	ACCOUNT_LIST_SALES: 'Listado contable (Ventas)',
+	ACCOUNT_LIST_PURCHASES: 'Listado contable (Compras)'
 };
 
 export default locale;

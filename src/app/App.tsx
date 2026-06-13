@@ -4,7 +4,8 @@ import themeLayouts from 'src/components/theme-layouts/themeLayouts';
 import FuseSettingsProvider from '@fuse/core/FuseSettings/FuseSettingsProvider';
 import { I18nProvider } from '@i18n/I18nProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { enUS } from 'date-fns/locale/en-US';
+import { es, enUS } from 'date-fns/locale';
+import { useLanguageStore } from 'src/zustand/languageStore';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import ErrorBoundary from '@fuse/utils/ErrorBoundary';
 import Authentication from '@auth/Authentication';
@@ -25,6 +26,9 @@ import { TenantModulesProvider } from '@/contexts/TenantModulesContext';
  * The main App component.
  */
 function App() {
+	const { languageId } = useLanguageStore();
+	const adapterLocale = languageId === 'es' ? es : enUS;
+
 	const AppContextValue = {
 		routes
 	};
@@ -35,7 +39,7 @@ function App() {
 				{/* Date Picker Localization Provider */}
 				<LocalizationProvider
 					dateAdapter={AdapterDateFns}
-					adapterLocale={enUS}
+					adapterLocale={adapterLocale}
 				>
 					<ReactQueryProvider>
 						<Authentication>

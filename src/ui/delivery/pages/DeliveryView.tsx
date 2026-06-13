@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
-import { Typography, TextField, InputAdornment, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { Typography, TextField, InputAdornment, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Select, FormControl, InputLabel, FormHelperText } from '@mui/material';
 import { Search, MapPin, Clock, AlertTriangle, Plus, Minus, Layers, RotateCcw, X } from 'lucide-react';
 import clsx from 'clsx';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -8,6 +8,11 @@ import { useTheme } from '@mui/material/styles';
 import { toast } from 'sonner';
 import { useParams, Navigate, useLocation } from 'react-router';
 import { useIndexDocuments } from '@/features/documents/hooks/useIndexDocuments';
+import { useIndexEmployees } from '@/features/employees/hooks/useIndexEmployees';
+import { useCreateRoute } from '@/features/routes/hooks/useCreateRoute';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createRouteSchema, CreateRouteFormType } from '@/schemas/route/route.schema';
 
 // Import leaflet styles
 import 'leaflet/dist/leaflet.css';
@@ -15,6 +20,7 @@ import 'leaflet/dist/leaflet.css';
 // Type definitions
 interface MockOrder {
 	id: string;
+	documentId: number;
 	customer: string;
 	address: string;
 	status: 'In Transit' | 'Pending' | 'Delayed';
@@ -28,6 +34,7 @@ interface MockOrder {
 const MOCK_ORDERS: MockOrder[] = [
 	{
 		id: 'ORD-1234',
+		documentId: 0,
 		customer: 'TechLogistics Global',
 		address: 'Av. de Mayo 600, Buenos Aires',
 		status: 'In Transit',
@@ -39,6 +46,7 @@ const MOCK_ORDERS: MockOrder[] = [
 	},
 	{
 		id: 'ORD-1235',
+		documentId: 0,
 		customer: 'Horizon Retailers',
 		address: 'Honduras 4800, Palermo, Buenos Aires',
 		status: 'Pending',
@@ -50,6 +58,7 @@ const MOCK_ORDERS: MockOrder[] = [
 	},
 	{
 		id: 'ORD-1236',
+		documentId: 0,
 		customer: 'QuickDeliver Inc',
 		address: 'Av. Alvear 1800, Recoleta, Buenos Aires',
 		status: 'In Transit',
@@ -61,6 +70,7 @@ const MOCK_ORDERS: MockOrder[] = [
 	},
 	{
 		id: 'ORD-1237',
+		documentId: 0,
 		customer: 'Summit Peak Supply',
 		address: 'Juana Manso 1100, Puerto Madero, Buenos Aires',
 		status: 'Delayed',
@@ -72,6 +82,7 @@ const MOCK_ORDERS: MockOrder[] = [
 	},
 	{
 		id: 'ORD-1238',
+		documentId: 0,
 		customer: 'Apex Freight Systems',
 		address: 'Defensa 800, San Telmo, Buenos Aires',
 		status: 'In Transit',
@@ -83,6 +94,7 @@ const MOCK_ORDERS: MockOrder[] = [
 	},
 	{
 		id: 'ORD-1239',
+		documentId: 0,
 		customer: 'Bay Area Builders',
 		address: 'Baez 300, Las Cañitas, Buenos Aires',
 		status: 'Pending',
@@ -207,11 +219,13 @@ export default function DeliveryView() {
 		operation,
 		document_type_code: code,
 		item_type: itemType === 'service' ? 'service' : 'product',
+		status: 'validated',
+		exclude_active_routes: true,
 	});
 
 	const orders = useMemo<MockOrder[]>(() => {
-		if (!documents || documents.length === 0) {
-			return MOCK_ORDERS;
+		if (!documents) {
+			return [];
 		}
 
 		return documents.map((doc) => {
@@ -228,6 +242,7 @@ export default function DeliveryView() {
 
 			return {
 				id: doc.number_serie || `ORD-${doc.id}`,
+				documentId: doc.id,
 				customer: doc.partner_name || 'Cliente Genérico',
 				address: doc.partner_address || 'Dirección no registrada',
 				status: mappedStatus,
@@ -249,13 +264,24 @@ export default function DeliveryView() {
 	// Multi-select for route planning
 	const [selectedRouteOrderIds, setSelectedRouteOrderIds] = useState<string[]>([]);
 	const [isRouteModalOpen, setIsRouteModalOpen] = useState(false);
-	const [driver, setDriver] = useState('Juan Pérez');
-	const [vehicle, setVehicle] = useState('Renault Kangoo (AF 123 CD)');
-	const [notes, setNotes] = useState('');
 
 	const markerRefs = useRef<Record<string, L.Marker | null>>({});
 	const theme = useTheme();
 	const isDarkMode = theme.palette.mode === 'dark';
+
+	// Load real employees and mutation for creating routes
+	const { data: employeesData } = useIndexEmployees();
+	const employees = employeesData || [];
+	const { mutate: createRoute } = useCreateRoute();
+
+	const { control, handleSubmit, setValue, formState: { errors }, reset } = useForm<CreateRouteFormType>({
+		resolver: zodResolver(createRouteSchema),
+		defaultValues: {
+			employee_id: 0,
+			notes: '',
+			document_ids: [],
+		}
+	});
 
 	// Toggle order selection for the route
 	const toggleOrderSelection = (orderId: string) => {
@@ -287,6 +313,12 @@ export default function DeliveryView() {
 	const selectedRouteOrdersDetails = useMemo(() => {
 		return orders.filter((o) => selectedRouteOrderIds.includes(o.id));
 	}, [orders, selectedRouteOrderIds]);
+
+	// Sync document_ids array when selection changes
+	useEffect(() => {
+		const docIds = selectedRouteOrdersDetails.map(o => o.documentId).filter(id => id !== 0);
+		setValue('document_ids', docIds);
+	}, [selectedRouteOrderIds, selectedRouteOrdersDetails, setValue]);
 
 	// Calculated route distance & time
 	const calculatedDistance = useMemo(() => {
@@ -342,13 +374,18 @@ export default function DeliveryView() {
 		}
 	};
 
-	const handleConfirmRoute = () => {
-		toast.success(`Ruta de reparto despachada con éxito. Chofer: ${driver}. Vehículo: ${vehicle}.`);
-		setIsRouteModalOpen(false);
-		setSelectedRouteOrderIds([]);
-		setDriver('Juan Pérez');
-		setVehicle('Renault Kangoo (AF 123 CD)');
-		setNotes('');
+	const onConfirmRoute = (formData: CreateRouteFormType) => {
+		createRoute(formData, {
+			onSuccess: (data) => {
+				toast.success(`Ruta ${data.code} creada con éxito.`);
+				setIsRouteModalOpen(false);
+				setSelectedRouteOrderIds([]);
+				reset();
+			},
+			onError: (err) => {
+				toast.error(`Error al crear la ruta: ${err.message}`);
+			}
+		});
 	};
 
 	if (!isValidCode || !isValidItemType) {
@@ -766,52 +803,52 @@ export default function DeliveryView() {
 
 					{/* Form Fields */}
 					<div className="flex flex-col gap-4">
-						<div className="flex gap-4">
-							<FormControl fullWidth size="small">
-								<InputLabel id="driver-label">Chofer / Repartidor</InputLabel>
-								<Select
-									labelId="driver-label"
-									label="Chofer / Repartidor"
-									value={driver}
-									onChange={(e) => setDriver(e.target.value)}
-									sx={{ borderRadius: '4px' }}
-								>
-									<MenuItem value="Juan Pérez">Juan Pérez</MenuItem>
-									<MenuItem value="Carlos Gómez">Carlos Gómez</MenuItem>
-									<MenuItem value="Mariana Rodríguez">Mariana Rodríguez</MenuItem>
-								</Select>
-							</FormControl>
+						<Controller
+							name="employee_id"
+							control={control}
+							render={({ field }) => (
+								<FormControl fullWidth size="small" error={!!errors.employee_id}>
+									<InputLabel id="employee-label">Conductor / Técnico</InputLabel>
+									<Select
+										{...field}
+										labelId="employee-label"
+										label="Conductor / Técnico"
+										sx={{ borderRadius: '4px' }}
+									>
+										{employees.map((emp) => (
+											<MenuItem key={emp.id} value={emp.id}>
+												{emp.first_name} {emp.last_name}
+											</MenuItem>
+										))}
+									</Select>
+									{errors.employee_id && (
+										<FormHelperText>{errors.employee_id.message}</FormHelperText>
+									)}
+								</FormControl>
+							)}
+						/>
 
-							<FormControl fullWidth size="small">
-								<InputLabel id="vehicle-label">Vehículo</InputLabel>
-								<Select
-									labelId="vehicle-label"
-									label="Vehículo"
-									value={vehicle}
-									onChange={(e) => setVehicle(e.target.value)}
-									sx={{ borderRadius: '4px' }}
-								>
-									<MenuItem value="Renault Kangoo (AF 123 CD)">Renault Kangoo (AF 123 CD)</MenuItem>
-									<MenuItem value="Ford Transit (AE 456 XY)">Ford Transit (AE 456 XY)</MenuItem>
-									<MenuItem value="Honda Cargo 150 (A012 BCD)">Honda Cargo 150 (A012 BCD)</MenuItem>
-								</Select>
-							</FormControl>
-						</div>
-
-						<TextField
-							label="Notas de la Ruta"
-							placeholder="Ej: Entregar primero en Microcentro, el cliente de Puerto Madero tiene restricción de horario..."
-							multiline
-							rows={2}
-							size="small"
-							value={notes}
-							onChange={(e) => setNotes(e.target.value)}
-							fullWidth
-							slotProps={{
-								input: {
-									sx: { borderRadius: '4px' }
-								}
-							}}
+						<Controller
+							name="notes"
+							control={control}
+							render={({ field }) => (
+								<TextField
+									{...field}
+									label="Notas de la Ruta"
+									placeholder="Ej: Entregar primero en Microcentro, el cliente de Puerto Madero tiene restricción de horario..."
+									multiline
+									rows={2}
+									size="small"
+									error={!!errors.notes}
+									helperText={errors.notes?.message}
+									fullWidth
+									slotProps={{
+										input: {
+											sx: { borderRadius: '4px' }
+										}
+									}}
+								/>
+							)}
 						/>
 					</div>
 
@@ -850,7 +887,7 @@ export default function DeliveryView() {
 						Cancelar
 					</button>
 					<button
-						onClick={handleConfirmRoute}
+						onClick={handleSubmit(onConfirmRoute)}
 						className="px-4 py-2 bg-[#005483] hover:bg-[#004369] text-white text-xs font-bold rounded-[4px] shadow-sm transition-colors cursor-pointer"
 					>
 						Confirmar y Despachar
