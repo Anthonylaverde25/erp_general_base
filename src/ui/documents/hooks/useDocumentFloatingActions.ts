@@ -164,7 +164,10 @@ export function useDocumentFloatingActions({ document }: UseDocumentFloatingActi
 
   const handleRectifyDocument = (payload: {
     number_series_id: number;
-    reason?: string;
+    reason_id: number;
+    rectification_type_id: number;
+    rectification_modality_id: number;
+    notes?: string;
   }) => {
     rectifyDocument(
       { id: String(document.id), payload },

@@ -12,7 +12,13 @@ export function useRectifyDocument() {
     const useCase = container.get<RectifyDocumentUseCase>(TYPES.RectifyDocumentUseCase);
     const queryClient = useQueryClient();
 
-    return useMutation<DocumentEntity, Error, { id: string; payload?: { number_series_id?: number | ''; reason?: string } }>({
+    return useMutation<DocumentEntity, Error, { id: string; payload?: { 
+        number_series_id?: number | ''; 
+        reason_id?: number;
+        rectification_type_id?: number;
+        rectification_modality_id?: number;
+        notes?: string;
+    } }>({
         mutationFn: ({ id, payload }) => useCase.execute(id, payload),
         onSuccess: (_rectified, variables) => {
             // Refresh the source document (now in 'cancelled' state)

@@ -24,7 +24,7 @@ const navigationConfig: FuseNavItemType[] = [
 		translate: 'DELIVERY',
 		type: 'item',
 		icon: 'lucide:truck',
-		url: '/delivery'
+		url: '/delivery/DLV?item_type=service'
 	},
 	{
 		id: 'HR',

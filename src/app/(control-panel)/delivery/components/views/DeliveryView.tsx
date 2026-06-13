@@ -6,6 +6,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useTheme } from '@mui/material/styles';
 import { toast } from 'sonner';
+import { useParams, Navigate, useLocation } from 'react-router';
+import { useIndexDocuments } from '@/features/documents/hooks/useIndexDocuments';
 
 // Import leaflet styles
 import 'leaflet/dist/leaflet.css';
@@ -191,7 +193,55 @@ const createCustomIcon = (status: 'In Transit' | 'Pending' | 'Delayed', isFocuse
 };
 
 export default function DeliveryView() {
-	const [selectedOrderId, setSelectedOrderId] = useState<string>('ORD-1234');
+	const { code = 'DLV' } = useParams<{ code?: string }>();
+	const location = useLocation();
+	const searchParams = new URLSearchParams(location.search);
+	const itemType = searchParams.get('item_type') || 'service';
+
+	const operation: 'sale' | 'purchase' = code.startsWith('P') ? 'purchase' : 'sale';
+
+	const isValidCode = code === 'DLV' || code === 'PDLV';
+	const isValidItemType = itemType === 'service' || itemType === 'product' || itemType === 'article';
+
+	const { data: documents, isLoading } = useIndexDocuments({
+		operation,
+		document_type_code: code,
+		item_type: itemType === 'service' ? 'service' : 'product',
+	});
+
+	const orders = useMemo<MockOrder[]>(() => {
+		if (!documents || documents.length === 0) {
+			return MOCK_ORDERS;
+		}
+
+		return documents.map((doc) => {
+			let mappedStatus: 'In Transit' | 'Pending' | 'Delayed' = 'Pending';
+			if (doc.status?.key === 'sent' || doc.status?.key === 'in_transit' || doc.status?.key === 'invoiced') {
+				mappedStatus = 'In Transit';
+			} else if (doc.status?.key === 'delayed') {
+				mappedStatus = 'Delayed';
+			}
+
+			// Generate coordinates distributed around central Buenos Aires based on doc.id
+			const lat = -34.6083 + (doc.id % 7) * 0.005 - 0.015;
+			const lng = -58.3712 + ((doc.id * 3) % 7) * 0.005 - 0.015;
+
+			return {
+				id: doc.number_serie || `ORD-${doc.id}`,
+				customer: doc.partner_name || 'Cliente Genérico',
+				address: doc.partner_address || 'Dirección no registrada',
+				status: mappedStatus,
+				eta: '14:30 PM',
+				distance: `${(1.2 + (doc.id % 5) * 0.7).toFixed(1)} km`,
+				lat,
+				lng,
+				warning: doc.notes || ''
+			};
+		});
+	}, [documents]);
+
+	const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+	const activeSelectedOrderId = selectedOrderId || orders[0]?.id || '';
 	const [searchQuery, setSearchQuery] = useState('');
 	const [activeTab, setActiveTab] = useState<'All' | 'Pending' | 'In Transit' | 'Delayed'>('All');
 	const [map, setMap] = useState<L.Map | null>(null);
@@ -218,7 +268,7 @@ export default function DeliveryView() {
 
 	// Filter orders
 	const filteredOrders = useMemo(() => {
-		return MOCK_ORDERS.filter((order) => {
+		return orders.filter((order) => {
 			const matchesTab = activeTab === 'All' || order.status === activeTab;
 			const matchesSearch =
 				order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -226,30 +276,30 @@ export default function DeliveryView() {
 				order.address.toLowerCase().includes(searchQuery.toLowerCase());
 			return matchesTab && matchesSearch;
 		});
-	}, [activeTab, searchQuery]);
+	}, [orders, activeTab, searchQuery]);
 
 	// Find currently selected order object
 	const selectedOrder = useMemo(() => {
-		return MOCK_ORDERS.find((o) => o.id === selectedOrderId);
-	}, [selectedOrderId]);
+		return orders.find((o) => o.id === activeSelectedOrderId);
+	}, [orders, activeSelectedOrderId]);
 
 	// Get full details of selected route orders
 	const selectedRouteOrdersDetails = useMemo(() => {
-		return MOCK_ORDERS.filter((o) => selectedRouteOrderIds.includes(o.id));
-	}, [selectedRouteOrderIds]);
+		return orders.filter((o) => selectedRouteOrderIds.includes(o.id));
+	}, [orders, selectedRouteOrderIds]);
 
 	// Calculated route distance & time
 	const calculatedDistance = useMemo(() => {
 		let sum = 0;
 		selectedRouteOrderIds.forEach((id) => {
-			const order = MOCK_ORDERS.find((o) => o.id === id);
+			const order = orders.find((o) => o.id === id);
 			if (order) {
 				const num = parseFloat(order.distance);
 				if (!isNaN(num)) sum += num;
 			}
 		});
 		return sum.toFixed(1);
-	}, [selectedRouteOrderIds]);
+	}, [orders, selectedRouteOrderIds]);
 
 	const calculatedTime = useMemo(() => {
 		// 15 minutes per stop plus driving buffer
@@ -258,25 +308,25 @@ export default function DeliveryView() {
 
 	// Counts
 	const counts = useMemo(() => {
-		const total = MOCK_ORDERS.length;
-		const pending = MOCK_ORDERS.filter((o) => o.status === 'Pending').length;
-		const inTransit = MOCK_ORDERS.filter((o) => o.status === 'In Transit').length;
-		const delayed = MOCK_ORDERS.filter((o) => o.status === 'Delayed').length;
+		const total = orders.length;
+		const pending = orders.filter((o) => o.status === 'Pending').length;
+		const inTransit = orders.filter((o) => o.status === 'In Transit').length;
+		const delayed = orders.filter((o) => o.status === 'Delayed').length;
 		return { total, pending, inTransit, delayed };
-	}, []);
+	}, [orders]);
 
 	// Center map and open popup on selection
 	useEffect(() => {
-		if (selectedOrderId && markerRefs.current[selectedOrderId]) {
+		if (activeSelectedOrderId && markerRefs.current[activeSelectedOrderId]) {
 			const timer = setTimeout(() => {
-				const marker = markerRefs.current[selectedOrderId];
+				const marker = markerRefs.current[activeSelectedOrderId];
 				if (marker) {
 					marker.openPopup();
 				}
 			}, 100);
 			return () => clearTimeout(timer);
 		}
-	}, [selectedOrderId]);
+	}, [activeSelectedOrderId]);
 
 	const handleZoomIn = () => {
 		if (map) map.zoomIn();
@@ -300,6 +350,10 @@ export default function DeliveryView() {
 		setVehicle('Renault Kangoo (AF 123 CD)');
 		setNotes('');
 	};
+
+	if (!isValidCode || !isValidItemType) {
+		return <Navigate to="/delivery/DLV?item_type=service" replace />;
+	}
 
 	// Determine map tile provider URL based on light/dark mode
 	const tileUrl = isDarkMode
@@ -438,9 +492,13 @@ export default function DeliveryView() {
 
 				{/* Scrollable List */}
 				<div className="flex-1 overflow-y-auto p-4 space-y-3 font-sans">
-					{filteredOrders.length > 0 ? (
+					{isLoading ? (
+						<div className="text-center py-10 text-slate-400 dark:text-slate-600">
+							Cargando documentos...
+						</div>
+					) : filteredOrders.length > 0 ? (
 						filteredOrders.map((order) => {
-							const isSelected = order.id === selectedOrderId;
+							const isSelected = order.id === activeSelectedOrderId;
 							const isSelectedInRoute = selectedRouteOrderIds.includes(order.id);
 							return (
 								<div
@@ -546,7 +604,7 @@ export default function DeliveryView() {
 					<MapInstanceCapture setMap={setMap} />
 
 					{filteredOrders.map((order) => {
-						const isSelected = order.id === selectedOrderId;
+						const isSelected = order.id === activeSelectedOrderId;
 						const isSelectedInRoute = selectedRouteOrderIds.includes(order.id);
 						return (
 							<Marker

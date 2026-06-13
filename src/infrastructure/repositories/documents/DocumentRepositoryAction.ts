@@ -42,7 +42,13 @@ export class DocumentRepositoryAction implements IDocumentActionRepository {
         return DocumentEntity.fromJson(duplicated);
     }
 
-    async rectify(id: string | number, payload?: { number_series_id?: number | ''; reason?: string }): Promise<DocumentEntity> {
+    async rectify(id: string | number, payload?: { 
+        number_series_id?: number | ''; 
+        reason_id?: number;
+        rectification_type_id?: number;
+        rectification_modality_id?: number;
+        notes?: string;
+    }): Promise<DocumentEntity> {
         const {
             data: { data: rectified }
         } = await axiosInstance.post(`documents/${id}/rectify`, payload);

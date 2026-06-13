@@ -7,7 +7,7 @@ const DeliveryView = lazy(() => import('./components/views/DeliveryView'));
  * The Delivery page route.
  */
 const route: FuseRouteItemType = {
-	path: 'delivery',
+	path: 'delivery/:code?',
 	element: <DeliveryView />
 };
 

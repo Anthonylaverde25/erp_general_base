@@ -12,7 +12,10 @@ export class RectifyDocumentUseCase {
 
     async execute(id: string, payload?: { 
         number_series_id?: number | ''; 
-        reason?: string;
+        reason_id?: number;
+        rectification_type_id?: number;
+        rectification_modality_id?: number;
+        notes?: string;
     }): Promise<DocumentEntity> {
         return await this.repository.rectify(id, payload);
     }
