@@ -1,17 +1,108 @@
 import { Box, Chip, Divider, Paper, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import ReactECharts from 'echarts-for-react';
+import { useShowPartnerFinancialSummary } from '@/features/partners/hooks/useShowPartnerFinancialSummary';
+import FuseLoading from '@fuse/core/FuseLoading';
 
-const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+interface PartnerOverviewFinancialChartProps {
+	partnerId: number;
+	partnerRole: string;
+}
 
-const chartData = months.map((m) => ({
-	month: m,
-	ventas: 0,
-	compras: 0
-}));
+const formatCurrency = (val: number) => {
+	return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(val);
+};
 
-export default function PartnerOverviewFinancialChart() {
+export default function PartnerOverviewFinancialChart({ partnerId, partnerRole }: PartnerOverviewFinancialChartProps) {
 	const theme = useTheme();
+	const { summary, isLoading } = useShowPartnerFinancialSummary(partnerId);
+
+	if (isLoading) {
+		return (
+			<Paper variant="outlined" sx={{ p: 4, mb: 3, display: 'flex', justifyContent: 'center', borderColor: 'divider' }}>
+				<FuseLoading />
+			</Paper>
+		);
+	}
+
+	const salesTotal = summary?.sales_total || 0;
+	const purchasesTotal = summary?.purchases_total || 0;
+	const collectedTotal = summary?.collected_total || 0;
+	const paidTotal = summary?.paid_total || 0;
+	const pendingCollection = summary?.pending_collection || 0;
+	const pendingPayment = summary?.pending_payment || 0;
+
+	// Determine visible series based on partner's role
+	const isClient = partnerRole === 'client' || partnerRole === 'client_supplier';
+	const isSupplier = partnerRole === 'supplier' || partnerRole === 'provider' || partnerRole === 'client_supplier';
+
+	const series: any[] = [];
+	const legendData: string[] = [];
+
+	if (isClient) {
+		legendData.push('Cobros (Ingresos)');
+		series.push({
+			name: 'Cobros (Ingresos)',
+			type: 'line',
+			smooth: true,
+			showSymbol: false,
+			itemStyle: { color: '#4caf50' },
+			areaStyle: { opacity: 0.15 },
+			data: summary?.monthly_payments.map((m) => m.collected) || []
+		});
+	}
+
+	if (isSupplier) {
+		legendData.push('Pagos (Gastos)');
+		series.push({
+			name: 'Pagos (Gastos)',
+			type: 'line',
+			smooth: true,
+			showSymbol: false,
+			itemStyle: { color: '#f44336' },
+			areaStyle: { opacity: 0.15 },
+			data: summary?.monthly_payments.map((m) => m.paid) || []
+		});
+	}
+
+	const option = {
+		grid: { top: 45, right: 20, bottom: 25, left: 60 },
+		tooltip: {
+			trigger: 'axis',
+			axisPointer: { type: 'line', lineStyle: { color: theme.palette.divider, width: 2 } },
+			valueFormatter: (value: number) => formatCurrency(value)
+		},
+		legend: {
+			data: legendData,
+			top: 0,
+			icon: 'circle',
+			itemWidth: 10,
+			textStyle: { color: theme.palette.text.secondary, fontSize: 11 }
+		},
+		xAxis: {
+			type: 'category',
+			boundaryGap: false,
+			data: summary?.monthly_payments.map((m) => m.month) || [],
+			axisLine: { show: false },
+			axisTick: { show: false },
+			axisLabel: { color: theme.palette.text.secondary, fontSize: 11, margin: 12 },
+			splitLine: { show: true, lineStyle: { type: 'dashed', color: theme.palette.divider } }
+		},
+		yAxis: {
+			type: 'value',
+			splitLine: { show: true, lineStyle: { type: 'dashed', color: theme.palette.divider } },
+			axisLabel: {
+				formatter: (value: number) => {
+					if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M€`;
+					if (value >= 1000) return `${(value / 1000).toFixed(0)}k€`;
+					return `${value}€`;
+				},
+				color: theme.palette.text.secondary,
+				fontSize: 11
+			}
+		},
+		series: series
+	};
 
 	return (
 		<Paper
@@ -40,97 +131,60 @@ export default function PartnerOverviewFinancialChart() {
 						sx={{ mb: 2.5 }}
 					>
 						<Box className="flex items-center gap-4">
-							<Box className="flex items-center gap-1.5">
-								<Box sx={{ width: 10, height: 10, bgcolor: '#4caf50' }} />
-								<Typography
-									variant="body2"
-									fontWeight={600}
-									sx={{ fontSize: '0.8rem' }}
-								>
-									Ventas
-								</Typography>
-								<Typography
-									variant="body2"
-									color="text.secondary"
-									sx={{ fontSize: '0.8rem' }}
-								>
-									0,00€
-								</Typography>
-							</Box>
-							<Box className="flex items-center gap-1.5">
-								<Box sx={{ width: 10, height: 10, bgcolor: '#f44336' }} />
-								<Typography
-									variant="body2"
-									fontWeight={600}
-									sx={{ fontSize: '0.8rem' }}
-								>
-									Compras
-								</Typography>
-								<Typography
-									variant="body2"
-									color="text.secondary"
-									sx={{ fontSize: '0.8rem' }}
-								>
-									0,00€
-								</Typography>
-							</Box>
+							{isClient && (
+								<Box className="flex items-center gap-1.5">
+									<Box sx={{ width: 10, height: 10, bgcolor: '#4caf50', borderRadius: '50%' }} />
+									<Typography
+										variant="body2"
+										fontWeight={600}
+										sx={{ fontSize: '0.8rem' }}
+									>
+										Total Cobrado:
+									</Typography>
+									<Typography
+										variant="body2"
+										color="text.secondary"
+										sx={{ fontSize: '0.8rem' }}
+									>
+										{formatCurrency(collectedTotal)}
+									</Typography>
+								</Box>
+							)}
+							{isSupplier && (
+								<Box className="flex items-center gap-1.5">
+									<Box sx={{ width: 10, height: 10, bgcolor: '#f44336', borderRadius: '50%' }} />
+									<Typography
+										variant="body2"
+										fontWeight={600}
+										sx={{ fontSize: '0.8rem' }}
+									>
+										Total Pagado:
+									</Typography>
+									<Typography
+										variant="body2"
+										color="text.secondary"
+										sx={{ fontSize: '0.8rem' }}
+									>
+										{formatCurrency(paidTotal)}
+									</Typography>
+								</Box>
+							)}
 						</Box>
 						<Chip
-							label="2026"
+							label={new Date().getFullYear().toString()}
 							size="small"
 							variant="outlined"
 							sx={{ fontSize: '0.75rem', fontWeight: 600 }}
 						/>
 					</Box>
 
-					<ResponsiveContainer
-						width="100%"
-						height={260}
-					>
-						<BarChart
-							data={chartData}
-							barGap={2}
-							barSize={14}
-						>
-							<CartesianGrid
-								strokeDasharray="3 3"
-								vertical={false}
-								stroke={theme.palette.divider}
-							/>
-							<XAxis
-								dataKey="month"
-								axisLine={false}
-								tickLine={false}
-								tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
-							/>
-							<YAxis
-								axisLine={false}
-								tickLine={false}
-								tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
-								tickFormatter={(v: number) => `${v}€`}
-							/>
-							<Tooltip
-								contentStyle={{
-									background: theme.palette.background.paper,
-									border: `1px solid ${theme.palette.divider}`,
-									fontSize: 12
-								}}
-								formatter={(value: number) => [`${value.toFixed(2)}€`]}
-							/>
-							<Bar
-								dataKey="ventas"
-								fill="#4caf50"
-								radius={[2, 2, 0, 0]}
-								name="Ventas"
-							/>
-							<Bar
-								dataKey="compras"
-								fill="#f44336"
-								radius={[2, 2, 0, 0]}
-								name="Compras"
-							/>
-						</BarChart>
-					</ResponsiveContainer>
+					<Box sx={{ height: 260, width: '100%' }}>
+						<ReactECharts
+							option={option}
+							style={{ height: '100%', width: '100%' }}
+							opts={{ renderer: 'svg' }}
+						/>
+					</Box>
 				</Box>
 
 				<Box
@@ -158,12 +212,16 @@ export default function PartnerOverviewFinancialChart() {
 					</Typography>
 					<Stack spacing={1.5}>
 						{[
-							{ label: 'Total cobrado', value: '0,00€' },
-							{ label: 'Total pagado', value: '0,00€' },
-							{ label: 'Pendiente cobro', value: '0,00€' },
-							{ label: 'Pendiente pago', value: '0,00€' },
-							{ label: 'Promedio ventas', value: '0,00€' },
-							{ label: 'Promedio compras', value: '0,00€' }
+							...(isClient ? [
+								{ label: 'Facturado Ventas', value: formatCurrency(salesTotal) },
+								{ label: 'Total cobrado', value: formatCurrency(collectedTotal) },
+								{ label: 'Pendiente cobro', value: formatCurrency(pendingCollection), color: pendingCollection > 0 ? 'warning.main' : 'text.primary' }
+							] : []),
+							...(isSupplier ? [
+								{ label: 'Facturado Compras', value: formatCurrency(purchasesTotal) },
+								{ label: 'Total pagado', value: formatCurrency(paidTotal) },
+								{ label: 'Pendiente pago', value: formatCurrency(pendingPayment), color: pendingPayment > 0 ? 'error.main' : 'text.primary' }
+							] : [])
 						].map((stat, idx) => (
 							<Box
 								key={idx}
@@ -180,7 +238,7 @@ export default function PartnerOverviewFinancialChart() {
 								<Typography
 									variant="body2"
 									fontWeight={700}
-									sx={{ fontSize: '0.85rem' }}
+									sx={{ fontSize: '0.85rem', color: stat.color }}
 								>
 									{stat.value}
 								</Typography>
@@ -193,9 +251,11 @@ export default function PartnerOverviewFinancialChart() {
 					<Typography
 						variant="body2"
 						color="text.secondary"
-						sx={{ fontSize: '0.75rem' }}
+						sx={{ fontSize: '0.75rem', textAlign: 'center' }}
 					>
-						No hay presupuestos pendientes
+						{pendingCollection > 0 || pendingPayment > 0 
+							? 'Hay saldos pendientes comerciales.' 
+							: 'No hay saldos comerciales vencidos.'}
 					</Typography>
 				</Box>
 			</Box>

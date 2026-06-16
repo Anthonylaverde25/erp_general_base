@@ -188,7 +188,8 @@ function FuseNavVerticalItemBase(props: FuseNavVerticalBaseProps) {
 							className="h-6 w-6 p-0"
 							sx={{
 								flexShrink: 0,
-								opacity: 0.35,
+								color: 'white',
+								// opacity: ,
 								transition: 'opacity 0.15s, color 0.15s',
 								'&:hover': {
 									opacity: 1,
@@ -202,7 +203,7 @@ function FuseNavVerticalItemBase(props: FuseNavVerticalBaseProps) {
 								navigate(item.quickCreateUrl!);
 							}}
 						>
-							<FuseSvgIcon size={15}>lucide:plus-circle</FuseSvgIcon>
+							<FuseSvgIcon size={15}>lucide:plus</FuseSvgIcon>
 						</IconButton>
 					</Tooltip>
 				)}

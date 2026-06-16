@@ -108,7 +108,7 @@ export default function PartnerProfileHeader({ partner, tabValue, onTabChange }:
 			/>
 
 			<Box className="flex flex-wrap items-center gap-2 px-8 pb-4">
-				{['Resumen', 'Impuestos', 'Archivos'].map((label, index) => {
+				{['Resumen', 'Documentos', 'Archivos'].map((label, index) => {
 					const isActive = tabValue === index;
 					return (
 						<Button

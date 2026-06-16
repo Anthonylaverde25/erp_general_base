@@ -148,6 +148,14 @@ const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly 
 				cellClass: 'doc-ag-cell',
 				cellEditor: ItemAutocompleteCellEditor,
 				cellEditorPopup: false,
+				valueSetter: (params) => {
+					if (!params.data) return false;
+					if (params.data.code === params.newValue) return false;
+					params.data.code = params.newValue;
+					params.data.item_id = undefined;
+					params.data.unit_name = undefined;
+					return true;
+				},
 			},
 			{
 				field: 'description',

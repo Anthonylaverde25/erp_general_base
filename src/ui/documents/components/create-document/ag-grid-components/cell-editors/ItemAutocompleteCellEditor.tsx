@@ -23,23 +23,47 @@ export const ItemAutocompleteCellEditor = forwardRef(
             initialChar || (props.value as string) || ''
         );
         const [showDropdown, setShowDropdown] = useState(initialChar.length > 0);
-        const [selectedIndex, setSelectedIndex] = useState(0);
+        const [selectedIndex, setSelectedIndex] = useState(-1);
         const inputRef = useRef<HTMLInputElement>(null);
         const wrapperRef = useRef<HTMLDivElement>(null);
         const selectedItemRef = useRef<boolean>(false);
 
+        const inputValueRef = useRef(inputValue);
+        inputValueRef.current = inputValue;
+
         // Expose getValue to AG Grid — this is called when editing stops
         useImperativeHandle(ref, () => ({
-            getValue: () => inputValue,
-            isCancelAfterEnd: () => false,
+            getValue: () => {
+                console.log('[ItemAutocompleteCellEditor] getValue called, returning:', inputValueRef.current);
+                return inputValueRef.current;
+            },
+            isCancelAfterEnd: () => {
+                console.log('[ItemAutocompleteCellEditor] isCancelAfterEnd called');
+                return false;
+            },
         }));
+
+        const isCancelledRef = useRef(false);
 
         useEffect(() => {
             inputRef.current?.focus();
             if (initialChar) setQuery(initialChar);
-        }, [initialChar, setQuery]);
 
-        useEffect(() => { setSelectedIndex(0); }, [results]);
+            return () => {
+                if (!selectedItemRef.current && !isCancelledRef.current && props.node?.data) {
+                    const row = props.node.data;
+                    if (row.code !== inputValueRef.current) {
+                        const updatedRow: DocumentLineItem = {
+                            ...row,
+                            item_id: undefined,
+                            code: inputValueRef.current,
+                            unit_name: undefined,
+                        };
+                        document.dispatchEvent(new CustomEvent('doc-line-update', { detail: updatedRow }));
+                    }
+                }
+            };
+        }, [initialChar, setQuery, props.node]);
 
         const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const val = e.target.value;
@@ -47,6 +71,7 @@ export const ItemAutocompleteCellEditor = forwardRef(
             setQuery(val);
             setShowDropdown(val.length >= 1);
             selectedItemRef.current = false;
+            setSelectedIndex(-1);
         };
 
         const handleSelectItem = useCallback((item: ItemSearchResult) => {
@@ -118,6 +143,7 @@ export const ItemAutocompleteCellEditor = forwardRef(
 
         const handleKeyDown = (e: React.KeyboardEvent) => {
             if (e.key === 'Escape') {
+                isCancelledRef.current = true;
                 setShowDropdown(false);
                 props.api.stopEditing(true); // cancel
                 return;
@@ -127,15 +153,20 @@ export const ItemAutocompleteCellEditor = forwardRef(
                 if (e.key === 'ArrowDown') {
                     e.stopPropagation();
                     e.preventDefault();
-                    setSelectedIndex(prev => Math.min(prev + 1, results.length - 1));
+                    setSelectedIndex(prev => (prev === -1 ? 0 : Math.min(prev + 1, results.length - 1)));
                 } else if (e.key === 'ArrowUp') {
                     e.stopPropagation();
                     e.preventDefault();
-                    setSelectedIndex(prev => Math.max(prev - 1, 0));
+                    setSelectedIndex(prev => (prev === -1 ? results.length - 1 : Math.max(prev - 1, 0)));
                 } else if (e.key === 'Enter' || e.key === 'Tab') {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    handleSelectItem(results[selectedIndex]);
+                    if (selectedIndex >= 0) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        handleSelectItem(results[selectedIndex]);
+                    } else {
+                        // Free text — let AG Grid commit normally
+                        setShowDropdown(false);
+                    }
                 }
             } else if (e.key === 'Enter' || e.key === 'Tab') {
                 // Free text — just let AG Grid commit normally

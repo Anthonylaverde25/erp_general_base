@@ -7,6 +7,7 @@ import { collectRows, makeEmptyLine } from '../utils';
 
 export function useDocumentTableSync() {
     const { setValue, getValues, watch } = useFormContext<DocumentFormValues>();
+    console.log('watch form values', watch())
     const gridApiRef = useRef<GridApi<DocumentLineItem> | null>(null);
 
     // Initialize rows from form values — in edit mode, these will already be populated
@@ -22,6 +23,7 @@ export function useDocumentTableSync() {
     const formLines = watch('lines') as DocumentLineItem[] | undefined;
     useEffect(() => {
         if (!formLines || formLines.length === 0) return;
+        console.log('[useDocumentTableSync] watch formLines useEffect - formLines:', formLines);
         // Only sync if the data actually changed (avoid infinite loop)
         const api = gridApiRef.current;
         setRows(formLines);
@@ -81,13 +83,16 @@ export function useDocumentTableSync() {
         api.forEachNode(node => {
             if (node.data) currentGridRows.push(node.data);
         });
+        console.log('[useDocumentTableSync] handleCellValueChanged - currentGridRows:', currentGridRows);
 
         // Merge with existing master lines to preserve other sections
         const masterLines = (getValues('lines') || []) as DocumentLineItem[];
+        console.log('[useDocumentTableSync] handleCellValueChanged - masterLines:', masterLines);
         const next = masterLines.map(masterRow => {
             const updated = currentGridRows.find(r => r.id === masterRow.id);
             return updated ? updated : masterRow;
         });
+        console.log('[useDocumentTableSync] handleCellValueChanged - next:', next);
 
         setRows(next);
         syncToForm(next);

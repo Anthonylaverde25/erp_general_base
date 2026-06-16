@@ -9,13 +9,14 @@ interface PartnerProfileOverviewProps {
 	partner: PartnerEntity;
 }
 
-export default function PartnerProfileOverview({ partner: _partner }: PartnerProfileOverviewProps) {
+export default function PartnerProfileOverview({ partner }: PartnerProfileOverviewProps) {
 	return (
 		<Box sx={{ flex: 1, p: 3, overflowY: { xs: 'visible', md: 'auto' }, bgcolor: 'background.paper' }}>
 			<PartnerOverviewActions />
-			<PartnerOverviewFinancialChart />
+			<PartnerOverviewCards partnerId={partner.id} partnerRole={partner.role} />
+			<Box sx={{ mt: 3 }} />
+			<PartnerOverviewFinancialChart partnerId={partner.id} partnerRole={partner.role} />
 			<PartnerOverviewActivity />
-			<PartnerOverviewCards />
 		</Box>
 	);
 }

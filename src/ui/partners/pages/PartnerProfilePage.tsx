@@ -9,7 +9,7 @@ import { styled } from '@mui/material/styles';
 import PartnerProfileHeader from '../components/profile/PartnerProfileHeader';
 import PartnerProfileSidebar from '../components/profile/PartnerProfileSidebar';
 import PartnerProfileOverview from '../components/profile/PartnerProfileOverview';
-import PartnerProfileTaxes from '../components/profile/PartnerProfileTaxes';
+import PartnerDocumentsTab from '../components/profile/PartnerDocumentsTab';
 import PartnerProfileFiles from '../components/profile/PartnerProfileFiles';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
@@ -75,8 +75,8 @@ export default function PartnerProfilePage() {
 							</Box>
 						)}
 
-						{/* ── TAB: Impuestos ───────────────────────────────── */}
-						{tabValue === 1 && <PartnerProfileTaxes partner={partner} />}
+						{/* ── TAB: Documentos ───────────────────────────────── */}
+						{tabValue === 1 && <PartnerDocumentsTab partnerId={partner.id} />}
 
 						{/* ── TAB: Archivos ─────────────────────────────────── */}
 						{tabValue === 2 && <PartnerProfileFiles partner={partner} />}
