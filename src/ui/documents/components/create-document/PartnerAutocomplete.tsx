@@ -4,6 +4,7 @@ import { useSearchPartners } from '@/features/partners/hooks/useSearchPartners';
 import { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import { Close as CloseIcon, Add as AddIcon } from '@mui/icons-material';
 import { QuickProspectModal } from './QuickProspectModal';
+import { QuickPartnerModal } from './QuickPartnerModal';
 import { useNavigate } from 'react-router';
 
 interface PartnerAutocompleteProps {
@@ -33,6 +34,7 @@ export function PartnerAutocomplete({
     const [showDropdown, setShowDropdown] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [isProspectModalOpen, setIsProspectModalOpen] = useState(false);
+    const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     // Sync if initialPartner changes externally
@@ -109,7 +111,7 @@ export function PartnerAutocomplete({
                 if (isQuoteDocument) {
                     setIsProspectModalOpen(true);
                 } else {
-                    navigate(`/partners/create?name=${encodeURIComponent(inputValue)}`);
+                    setIsPartnerModalOpen(true);
                 }
             } else {
                 setShowDropdown(false);
@@ -139,7 +141,7 @@ export function PartnerAutocomplete({
                     onKeyDown={handleKeyDown}
                     onBlur={handleBlur}
                     disabled={disabled}
-                    placeholder="Buscar por cliente"
+                    placeholder={type === 'vendor' || type === 'supplier' ? 'Buscar por proveedor' : 'Buscar por cliente'}
                     className="doc-input doc-input-bold doc-input-primary"
                     fullWidth
                     sx={{
@@ -220,7 +222,7 @@ export function PartnerAutocomplete({
                                 if (isQuoteDocument) {
                                     setIsProspectModalOpen(true);
                                 } else {
-                                    navigate(`/partners/create?name=${encodeURIComponent(inputValue)}`);
+                                    setIsPartnerModalOpen(true);
                                 }
                             }}
                             sx={{
@@ -259,6 +261,19 @@ export function PartnerAutocomplete({
                         setIsProspectModalOpen(false);
                         applyPartner(newPartner);
                     }}
+                />
+            )}
+
+            {!disabled && (
+                <QuickPartnerModal
+                    open={isPartnerModalOpen}
+                    onClose={() => setIsPartnerModalOpen(false)}
+                    onSuccess={(newPartner) => {
+                        setIsPartnerModalOpen(false);
+                        applyPartner(newPartner);
+                    }}
+                    initialName={inputValue}
+                    partnerType={type as 'customer' | 'supplier' | 'vendor' | undefined}
                 />
             )}
         </Box>

@@ -35,7 +35,7 @@ export default function DocumentCreateMetaGrid() {
             <PartnerAutocomplete
               value={field.value}
               onChange={field.onChange}
-              type={copy.partyLabel === 'Cliente' ? 'customer' : (copy.partyLabel === 'Proveedor' ? 'supplier' : undefined)}
+              type={operation === 'sale' ? 'customer' : 'vendor'}
               disabled={isReadOnly || isRestricted}
               initialPartner={selectedPartner}
               isQuoteDocument={isQuoteDocument}
