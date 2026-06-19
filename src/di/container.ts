@@ -51,6 +51,7 @@ import { registerDepartmentModule } from './modules/department.module';
 import { registerFileTypesModule } from './modules/file_types.module';
 import { registerFilesModule } from './modules/files.module';
 import { registerDocumentModule } from './modules/document.module';
+import { registerBatchModule } from './modules/batches.module';
 
 UnitTypeModule(container);
 UnitsModule(container);
@@ -58,5 +59,6 @@ registerDepartmentModule(container);
 registerFileTypesModule(container);
 registerFilesModule(container);
 registerDocumentModule(container);
+registerBatchModule(container);
 
 export { container };

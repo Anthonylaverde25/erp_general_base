@@ -206,4 +206,10 @@ export const TYPES = {
 	IndexCashRegistersUseCase: Symbol.for('IndexCashRegistersUseCase'),
 	ToggleMovementCheckedUseCase: Symbol.for('ToggleMovementCheckedUseCase'),
 	CreateCashRegisterUseCase: Symbol.for('CreateCashRegisterUseCase'),
+
+	// Batches
+	BatchRepository: Symbol.for('BatchRepository'),
+	IndexBatchesUseCase: Symbol.for('IndexBatchesUseCase'),
+	ShowBatchUseCase: Symbol.for('ShowBatchUseCase'),
+	UpdateBatchUseCase: Symbol.for('UpdateBatchUseCase'),
 };

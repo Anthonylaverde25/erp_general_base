@@ -57,10 +57,13 @@ export const mapItemFormToDTO = (values: ItemFormType): CreateItemDTO => {
 				dimensions: buildDimensions(values),
 				is_inventoriable:
 					typeof values.is_inventoriable !== 'undefined' ? Boolean(values.is_inventoriable) : undefined,
+				has_batches:
+					typeof values.has_batches !== 'undefined' ? Boolean(values.has_batches) : undefined,
 				stock_min:
 					values.stock_min !== undefined && values.stock_min !== null ? Number(values.stock_min) : undefined,
 				has_stock_alert:
-					typeof values.has_stock_alert !== 'undefined' ? Boolean(values.has_stock_alert) : undefined
+					typeof values.has_stock_alert !== 'undefined' ? Boolean(values.has_stock_alert) : undefined,
+				procurement_type: values.procurement_type
 			}
 		};
 	}
@@ -109,8 +112,10 @@ export const mapItemToFormValues = (item: ItemEntity): ItemFormType => {
 		dimension_height: dimensions?.height,
 		dimension_unit: dimensions?.unit ?? 'cm',
 		is_inventoriable: item.physical_profile?.is_inventoriable ?? true,
+		has_batches: item.physical_profile?.has_batches ?? false,
 		stock_min: item.physical_profile?.stock_min ?? null,
 		has_stock_alert: item.physical_profile?.has_stock_alert ?? false,
+		procurement_type: item.physical_profile?.procurement_type ?? 'buy',
 		initial_stock:
 			item.inventory?.[0]?.quantity_on_hand !== undefined ? item.inventory[0].quantity_on_hand : undefined,
 		quantity: undefined,

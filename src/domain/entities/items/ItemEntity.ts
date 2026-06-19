@@ -33,8 +33,10 @@ export interface CreateItemWriteData {
 		weight?: number;
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
+		has_batches?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
+		procurement_type?: 'buy' | 'make';
 	};
 	serviceProfile?: {
 		estimated_time?: number;
@@ -63,8 +65,10 @@ export interface UpdateItemWriteData {
 		weight?: number;
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
+		has_batches?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
+		procurement_type?: 'buy' | 'make';
 	};
 	serviceProfile?: {
 		estimated_time?: number;
@@ -99,8 +103,10 @@ export interface Item {
 		weight?: number;
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
+		has_batches?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
+		procurement_type?: 'buy' | 'make';
 	} | null;
 	service_profile?: {
 		estimated_time?: number;
@@ -136,8 +142,10 @@ export class ItemEntity implements Item {
 		weight?: number;
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
+		has_batches?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
+		procurement_type?: 'buy' | 'make';
 	} | null;
 	private _service_profile?: {
 		estimated_time?: number;
@@ -174,8 +182,10 @@ export class ItemEntity implements Item {
 			weight?: number;
 			dimensions?: Record<string, unknown>;
 			is_inventoriable?: boolean;
+			has_batches?: boolean;
 			stock_min?: number;
 			has_stock_alert?: boolean;
+			procurement_type?: 'buy' | 'make';
 		} | null,
 		service_profile?: {
 			estimated_time?: number;
@@ -284,8 +294,10 @@ export class ItemEntity implements Item {
 				weight?: number;
 				dimensions?: Record<string, unknown>;
 				is_inventoriable?: boolean;
+				has_batches?: boolean;
 				stock_min?: number;
 				has_stock_alert?: boolean;
+				procurement_type?: 'buy' | 'make';
 		  }
 		| null
 		| undefined {

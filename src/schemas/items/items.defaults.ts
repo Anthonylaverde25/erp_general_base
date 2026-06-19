@@ -24,7 +24,9 @@ export const defaultCreateItemValues = {
 	dimension_height: undefined,
 	dimension_unit: 'cm',
 	is_inventoriable: true,
+	has_batches: false,
 	quantity: 0,
 	estimated_time: undefined,
-	req_scheduling: false
+	req_scheduling: false,
+	procurement_type: 'buy'
 } as unknown as ItemFormType;

@@ -171,8 +171,8 @@ export function DocumentCreateProvider({
 
     // Debounced stock checker
     useEffect(() => {
-        // Do not check stock if loading or itemType is service
-        if (isLoadingDocument || itemType !== "product") return;
+        // Do not check stock if loading, itemType is service, or it is a purchase document
+        if (isLoadingDocument || itemType !== "product" || operation === "purchase") return;
 
         const timer = setTimeout(() => {
             if (!formLines || formLines.length === 0) return;
@@ -208,7 +208,7 @@ export function DocumentCreateProvider({
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [formLines, defaultStoreId, itemType, isLoadingDocument]);
+    }, [formLines, defaultStoreId, itemType, isLoadingDocument, operation]);
 
     // ─── Current document type ───────────────────────────────────────────────
     const currentDocumentType = useMemo(() => {

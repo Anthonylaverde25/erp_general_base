@@ -19,6 +19,14 @@ const navigationConfig: FuseNavItemType[] = [
 		url: '/'
 	},
 	{
+		id: 'test-stock',
+		title: 'Test Stock',
+		translate: 'STOCK_TEST',
+		type: 'item',
+		icon: 'lucide:layout-dashboard',
+		url: '/test-stock'
+	},
+	{
 		id: 'delivery',
 		title: 'Entregas',
 		translate: 'DELIVERY',
@@ -438,6 +446,14 @@ const navigationConfig: FuseNavItemType[] = [
 				type: 'item',
 				url: '/inventory/stock-movements',
 				icon: 'lucide:arrow-right-left'
+			},
+			{
+				id: 'inventory.batches',
+				title: 'Lotes',
+				translate: 'BATCHES',
+				type: 'item',
+				url: '/inventory/batches',
+				icon: 'lucide:layers'
 			}
 		]
 	},

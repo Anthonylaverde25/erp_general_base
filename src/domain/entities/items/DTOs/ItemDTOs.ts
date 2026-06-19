@@ -58,8 +58,10 @@ export interface ItemDTO {
 		weight?: number;
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
+		has_batches?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
+		procurement_type?: 'buy' | 'make';
 	} | null;
 	service_profile?: {
 		estimated_time?: number;
@@ -90,8 +92,10 @@ export interface CreateItemDTO {
 		weight?: number;
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
+		has_batches?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
+		procurement_type?: 'buy' | 'make';
 	};
 	service_profile?: {
 		estimated_time?: number;
@@ -120,8 +124,10 @@ export interface UpdateItemDTO {
 		weight?: number;
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
+		has_batches?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
+		procurement_type?: 'buy' | 'make';
 	};
 	service_profile?: {
 		estimated_time?: number;

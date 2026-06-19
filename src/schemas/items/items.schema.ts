@@ -31,8 +31,10 @@ const physicalItemSchema = baseItemSchema.extend({
 	dimension_height: z.number().min(0).optional(),
 	dimension_unit: z.string().optional(),
 	is_inventoriable: z.boolean().optional(),
+	has_batches: z.boolean().optional(),
 	stock_min: z.number().min(0).nullable().optional(),
-	has_stock_alert: z.boolean().optional()
+	has_stock_alert: z.boolean().optional(),
+	procurement_type: z.enum(['buy', 'make']).optional()
 	// Estos campos NO existen en físico
 });
 
@@ -42,6 +44,7 @@ const serviceItemSchema = baseItemSchema.extend({
 	req_scheduling: z.boolean().optional(),
 	barcode: z.undefined().optional(),
 	is_inventoriable: z.undefined().optional(),
+	has_batches: z.undefined().optional(),
 	stock_min: z.undefined().optional(),
 	has_stock_alert: z.undefined().optional(),
 	store_id: z.undefined().optional(),
@@ -52,7 +55,8 @@ const serviceItemSchema = baseItemSchema.extend({
 	dimension_width: z.undefined().optional(),
 	dimension_height: z.undefined().optional(),
 	dimension_unit: z.undefined().optional(),
-	weight: z.undefined().optional()
+	weight: z.undefined().optional(),
+	procurement_type: z.undefined().optional()
 });
 
 export const itemSchema = z.discriminatedUnion('type', [physicalItemSchema, serviceItemSchema]);

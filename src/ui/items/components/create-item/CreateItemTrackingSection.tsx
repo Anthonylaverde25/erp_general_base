@@ -1,5 +1,5 @@
 import { Controller, useFormContext } from 'react-hook-form';
-import { Autocomplete, Chip, MenuItem, TextField, Typography, type TextFieldProps } from '@mui/material';
+import { Autocomplete, Chip, MenuItem, TextField, Typography, FormControlLabel, Switch, type TextFieldProps } from '@mui/material';
 import type { PartnerEntity } from '@/domain/entities/partners/PartnerEntity';
 import type { ItemFormType } from '@/schemas/items/items.schema';
 import CreateItemSection from './CreateItemSection';
@@ -31,6 +31,44 @@ function CreateItemTrackingSection({ isLoading, textFieldProps, partners }: Crea
 							label="Código de Barras"
 							disabled={isLoading}
 						/>
+					)}
+				/>
+
+				<div className="flex items-center">
+					<Controller
+						name="has_batches"
+						control={control}
+						render={({ field }) => (
+							<FormControlLabel
+								control={
+									<Switch
+										checked={Boolean(field.value)}
+										onChange={(event) => field.onChange(event.target.checked)}
+										disabled={isLoading}
+									/>
+								}
+								label="¿Maneja Lotes?"
+							/>
+						)}
+					/>
+				</div>
+
+				<Controller
+					name="procurement_type"
+					control={control}
+					render={({ field }) => (
+						<TextField
+							{...field}
+							{...textFieldProps}
+							select
+							label="Tipo de Abastecimiento"
+							value={field.value ?? 'buy'}
+							disabled={isLoading}
+							onChange={(event) => field.onChange(event.target.value)}
+						>
+							<MenuItem value="buy">Comprado (Reventa / Materia Prima)</MenuItem>
+							<MenuItem value="make">Fabricado (Producción Propia)</MenuItem>
+						</TextField>
 					)}
 				/>
 

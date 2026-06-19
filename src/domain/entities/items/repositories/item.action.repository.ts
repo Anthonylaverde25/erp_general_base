@@ -44,7 +44,9 @@ export interface StockMovementEntity {
 	user: StockMovementUserDTO;
 	source_store?: StockMovementStoreDTO | null;
 	destination_store?: StockMovementStoreDTO | null;
+	item?: { id: number; name: string; sku: string } | null;
 }
+
 
 export interface PaginatedStockMovements {
 	data: StockMovementEntity[];
@@ -66,5 +68,11 @@ export interface IItemActionRepository {
 
 	adjustStockEntry(data: AdjustStockEntryDTO): Promise<{ message: string; server_timestamp: string }>;
 
-	indexStockMovements(itemId: number, page?: number, perPage?: number): Promise<PaginatedStockMovements>;
+	indexStockMovements(
+		itemId?: number | null,
+		page?: number,
+		perPage?: number,
+		filters?: { partner_id?: number | null; start_date?: string | null; end_date?: string | null }
+	): Promise<PaginatedStockMovements>;
 }
+

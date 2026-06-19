@@ -48,13 +48,21 @@ export class ItemRepositoryAction implements IItemActionRepository {
 			server_timestamp
 		};
 	}
-	async indexStockMovements(itemId: number, page = 1, perPage = 15): Promise<PaginatedStockMovements> {
-		const { data } = await axiosInstance.get<PaginatedStockMovements>(`${this.baseUrl}/${itemId}/stock-movements`, {
+	async indexStockMovements(
+		itemId?: number | null,
+		page = 1,
+		perPage = 15,
+		filters?: { partner_id?: number | null; start_date?: string | null; end_date?: string | null }
+	): Promise<PaginatedStockMovements> {
+		const url = itemId ? `${this.baseUrl}/${itemId}/stock-movements` : '/stock-movements';
+		const { data } = await axiosInstance.get<PaginatedStockMovements>(url, {
 			params: {
 				page,
-				per_page: perPage
+				per_page: perPage,
+				...filters
 			}
 		});
 		return data;
 	}
 }
+

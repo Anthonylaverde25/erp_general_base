@@ -46,6 +46,7 @@ const locale = {
 	CATEGORIES: 'Categorías',
 	WAREHOUSES: 'Almacenes',
 	STOCK_MOVEMENTS: 'Movimientos de Stock',
+	BATCHES: 'Gestión de Lotes',
 
 	// Contabilidad
 	ACCOUNTING: 'Contabilidad',
