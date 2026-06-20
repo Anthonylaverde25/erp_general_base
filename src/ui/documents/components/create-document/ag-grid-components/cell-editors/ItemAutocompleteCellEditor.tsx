@@ -4,6 +4,8 @@ import type { ICellEditorParams } from 'ag-grid-community';
 import type { DocumentLineItem, ItemSearchResult } from '../../types';
 import { useSearchItems } from '@/features/items/hooks/useSearchItems';
 import { useDocumentCreate } from '../../../../context/DocumentCreateContext';
+import { useFormContext, useWatch } from 'react-hook-form';
+import type { DocumentFormValues } from '../../../../schemas/documentSchema';
 
 /* ──────────────────────────────────────────────────────────────
    Autocomplete Cell Editor
@@ -15,7 +17,9 @@ import { useDocumentCreate } from '../../../../context/DocumentCreateContext';
 export const ItemAutocompleteCellEditor = forwardRef(
     (props: ICellEditorParams<DocumentLineItem>, ref) => {
         const { itemType, operation } = useDocumentCreate();
-        const { results, setQuery, isLoading } = useSearchItems(itemType);
+        const { control } = useFormContext<DocumentFormValues>();
+        const partnerId = useWatch({ control, name: 'partner_id' });
+        const { results, setQuery, isLoading } = useSearchItems(itemType, partnerId);
 
         const initialChar =
             props.eventKey && props.eventKey.length === 1 ? props.eventKey : '';
@@ -240,6 +244,21 @@ export const ItemAutocompleteCellEditor = forwardRef(
                                     <strong>{item.sku}</strong>
                                     <span style={{ margin: '0 4px', color: '#aaa' }}>·</span>
                                     {item.name}
+                                    {item.is_associated && (
+                                        <span 
+                                            style={{ 
+                                                marginLeft: 8, 
+                                                padding: '2px 6px', 
+                                                fontSize: '12px', 
+                                                backgroundColor: '#E0F2FE', 
+                                                color: '#0369A1', 
+                                                borderRadius: '4px',
+                                                fontWeight: 600
+                                            }}
+                                        >
+                                            Asociado
+                                        </span>
+                                    )}
                                     {item.tax_rates.length > 0 && (
                                         <span style={{ marginLeft: 6, color: '#999', fontSize: '11px' }}>
                                             ({item.tax_rates.map(t => t.name).join(', ')})

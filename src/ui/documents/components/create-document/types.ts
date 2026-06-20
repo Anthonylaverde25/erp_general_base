@@ -57,6 +57,7 @@ export interface ItemSearchResult {
 	sale_price: number;
 	purchase_price?: number;
 	description: string;
+	is_associated?: boolean;
 	unit?: {
 		id: number;
 		code: string;

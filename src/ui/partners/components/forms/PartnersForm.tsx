@@ -19,7 +19,7 @@ import { Save, Close, Person, AccountBalance, Settings } from '@mui/icons-materi
 
 import { partnerSchema, PartnerFormType } from '@/schemas/partners/partners.schema';
 import { defaultCreatePartnerValues, defaultUpdatePartnerValues } from '@/schemas/partners/partners.defaults';
-import PartnerFormTabPanel from '@/ui/partners/components/PartnerFormTabPanel';
+import PartnerFormTabPanel from './PartnerFormTabPanel';
 
 import { useCreatePartner } from '@/features/partners/hooks/useCreatePartner';
 import { useUpdatePartner } from '@/features/partners/hooks/useUpdatePartner';

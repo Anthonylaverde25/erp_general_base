@@ -12,7 +12,6 @@ import {
 import { 
   AreaChart, 
   BarChart2, 
-  Eye, 
   TrendingUp, 
   TrendingDown,
   Maximize2,
@@ -25,6 +24,8 @@ interface MonthlySummary {
   name: string;
   ventas: number;
   compras: number;
+  ventas_facturado?: number;
+  compras_facturado?: number;
 }
 
 const currencyFormatter = new Intl.NumberFormat('es-ES', {
@@ -36,15 +37,15 @@ const currencyFormatter = new Intl.NumberFormat('es-ES', {
 
 const formatCurrency = (value: number) => currencyFormatter.format(value);
 
-export default function SalesPurchasesChart() {
+export default function PendingBalancesChart() {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number | null>(currentYear);
   const [data, setData] = useState<MonthlySummary[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Dynamic Chart UI state
+  // Chart UI state
   const [chartType, setChartType] = useState<'area' | 'bar'>('area');
-  const [activeSeries, setActiveSeries] = useState<string[]>(['sales', 'purchases']);
+  const [activeSeries, setActiveSeries] = useState<string[]>(['sales_pending', 'purchases_pending']);
 
   // Fullscreen support
   const containerRef = useRef<HTMLDivElement>(null);
@@ -86,7 +87,7 @@ export default function SalesPurchasesChart() {
           setData(response.data.summary || []);
         }
       } catch (error) {
-        console.error('Error fetching sales-purchases summary:', error);
+        console.error('Error fetching sales-purchases summary for pending:', error);
       } finally {
         if (active) {
           setLoading(false);
@@ -99,26 +100,22 @@ export default function SalesPurchasesChart() {
     };
   }, [selectedYear]);
 
-  // Compute accumulated totals for the header KPIs
+  // Calculate totals
   const totals = useMemo(() => {
-    let sales = 0;
-    let salesInvoiced = 0;
-    let purchases = 0;
-    let purchasesInvoiced = 0;
+    let salesPending = 0;
+    let purchasesPending = 0;
+
     data.forEach((item) => {
-      sales += item.ventas;
-      salesInvoiced += (item as any).ventas_facturado || 0;
-      purchases += item.compras;
-      purchasesInvoiced += (item as any).compras_facturado || 0;
+      const vFact = item.ventas_facturado || 0;
+      const cFact = item.compras_facturado || 0;
+      salesPending += Math.max(0, vFact - item.ventas);
+      purchasesPending += Math.max(0, cFact - item.compras);
     });
+
     return {
-      sales,
-      salesInvoiced,
-      salesPending: Math.max(0, salesInvoiced - sales),
-      purchases,
-      purchasesInvoiced,
-      purchasesPending: Math.max(0, purchasesInvoiced - purchases),
-      balance: sales - purchases
+      salesPending,
+      purchasesPending,
+      netPending: salesPending - purchasesPending
     };
   }, [data]);
 
@@ -153,33 +150,33 @@ export default function SalesPurchasesChart() {
     const months = data.map((item) => item.name);
     const series = [];
 
-    if (activeSeries.includes('sales')) {
+    if (activeSeries.includes('sales_pending')) {
       series.push({
-        name: 'Ventas (Cobrado)',
+        name: 'Pendiente Cobro',
         type: chartType === 'area' ? 'line' : 'bar',
         smooth: true,
         showSymbol: false,
-        itemStyle: { color: '#005483' },
+        itemStyle: { color: '#0284c7' },
         areaStyle: chartType === 'area' ? {
           opacity: 0.15,
-          color: '#005483'
+          color: '#0284c7'
         } : undefined,
-        data: data.map((item) => item.ventas)
+        data: data.map((item) => Math.max(0, (item.ventas_facturado || 0) - item.ventas))
       });
     }
 
-    if (activeSeries.includes('purchases')) {
+    if (activeSeries.includes('purchases_pending')) {
       series.push({
-        name: 'Compras (Pagado)',
+        name: 'Pendiente Pago',
         type: chartType === 'area' ? 'line' : 'bar',
         smooth: true,
         showSymbol: false,
-        itemStyle: { color: '#ed6c02' },
+        itemStyle: { color: '#f97316' },
         areaStyle: chartType === 'area' ? {
           opacity: 0.15,
-          color: '#ed6c02'
+          color: '#f97316'
         } : undefined,
-        data: data.map((item) => item.compras)
+        data: data.map((item) => Math.max(0, (item.compras_facturado || 0) - item.compras))
       });
     }
 
@@ -219,9 +216,9 @@ export default function SalesPurchasesChart() {
       },
       grid: {
         top: 30,
-        right: 0,
-        bottom: 55,
-        left: 0,
+        right: 5,
+        bottom: 50,
+        left: 5,
         containLabel: true
       },
       xAxis: {
@@ -265,8 +262,8 @@ export default function SalesPurchasesChart() {
           height: 18,
           borderColor: 'transparent',
           backgroundColor: '#f9fafb',
-          fillerColor: 'rgba(0, 84, 131, 0.12)',
-          handleStyle: { color: '#005483', borderColor: '#fff', borderWidth: 1 },
+          fillerColor: 'rgba(2, 132, 199, 0.12)',
+          handleStyle: { color: '#0284c7', borderColor: '#fff', borderWidth: 1 },
           textStyle: { fontSize: 8 }
         }
       ],
@@ -274,7 +271,7 @@ export default function SalesPurchasesChart() {
     };
   };
 
-  const balanceIsPositive = totals.balance >= 0;
+  const netIsPositive = totals.netPending >= 0;
 
   return (
     <Box 
@@ -283,7 +280,7 @@ export default function SalesPurchasesChart() {
         display: 'flex', 
         flexDirection: 'column', 
         height: '100%', 
-        p: 1,
+        p: 2,
         bgcolor: 'background.paper',
         color: 'text.primary',
         position: 'relative',
@@ -296,25 +293,24 @@ export default function SalesPurchasesChart() {
         }
       }}
     >
-      {/* Header Controls */}
+      {/* Header and Controls */}
       <Stack 
-        direction={{ xs: 'column', md: 'row' }} 
+        direction={{ xs: 'column', sm: 'row' }} 
         justifyContent="space-between" 
-        alignItems={{ xs: 'flex-start', md: 'center' }} 
+        alignItems={{ xs: 'flex-start', sm: 'center' }} 
         spacing={1.5}
         sx={{ mb: 2 }}
       >
         <Box>
           <Typography variant="subtitle2" fontWeight={800} className="text-slate-800 dark:text-slate-200 leading-tight">
-            Análisis de Ventas y Compras
+            Análisis de Saldos Pendientes
           </Typography>
           <Typography variant="caption" className="text-slate-400">
-            {selectedYear ? `Año comercial ${selectedYear}` : 'Acumulado últimos 12 meses'}
+            {selectedYear ? `Pendientes del año ${selectedYear}` : 'Pendientes últimos 12 meses'}
           </Typography>
         </Box>
 
-        {/* Chart Configuration Controls */}
-        <Stack direction="row" spacing={2.5} alignItems="center" className="flex-wrap gap-y-1.5 justify-end">
+        <Stack direction="row" spacing={1.5} alignItems="center" className="flex-wrap gap-y-1 justify-end">
           {/* Year selector */}
           <ToggleButtonGroup
             size="small"
@@ -323,22 +319,22 @@ export default function SalesPurchasesChart() {
             onChange={handleYearChange}
             aria-label="año seleccionado"
             sx={{ 
-              height: 26,
+              height: 24,
               bgcolor: 'background.paper',
               '& .MuiToggleButton-root': {
                 borderRadius: '4px',
-                px: 1,
+                px: 0.8,
                 py: 0,
-                fontSize: '10px',
+                fontSize: '9px',
                 textTransform: 'none',
                 fontWeight: 600,
                 border: '1px solid',
                 borderColor: 'divider',
                 '&.Mui-selected': {
                   color: '#ffffff',
-                  bgcolor: '#005483',
+                  bgcolor: '#0284c7',
                   '&:hover': {
-                    bgcolor: '#004369'
+                    bgcolor: '#0270a8'
                   }
                 }
               }
@@ -350,8 +346,6 @@ export default function SalesPurchasesChart() {
             <ToggleButton value={currentYear - 2}>{currentYear - 2}</ToggleButton>
           </ToggleButtonGroup>
 
-          <Divider orientation="vertical" flexItem sx={{ height: 16, alignSelf: 'center', display: { xs: 'none', sm: 'block' } }} />
-
           {/* Series selector */}
           <ToggleButtonGroup
             size="small"
@@ -359,32 +353,30 @@ export default function SalesPurchasesChart() {
             onChange={handleSeriesChange}
             aria-label="visibilidad de series"
             sx={{ 
-              height: 26,
+              height: 24,
               bgcolor: 'background.paper',
               '& .MuiToggleButton-root': {
                 borderRadius: '4px',
-                px: 1.2,
+                px: 0.8,
                 py: 0,
-                fontSize: '10px',
+                fontSize: '9px',
                 textTransform: 'none',
                 fontWeight: 600,
                 border: '1px solid',
                 borderColor: 'divider',
                 '&.Mui-selected': {
                   color: '#ffffff',
-                  bgcolor: '#005483',
+                  bgcolor: '#0284c7',
                   '&:hover': {
-                    bgcolor: '#004369'
+                    bgcolor: '#0270a8'
                   }
                 }
               }
             }}
           >
-            <ToggleButton value="sales" title="Ventas Cobradas">Ventas</ToggleButton>
-            <ToggleButton value="purchases" title="Compras Pagadas">Compras</ToggleButton>
+            <ToggleButton value="sales_pending" title="Pendiente de Cobro">Cobros</ToggleButton>
+            <ToggleButton value="purchases_pending" title="Pendiente de Pago">Pagos</ToggleButton>
           </ToggleButtonGroup>
-
-          <Divider orientation="vertical" flexItem sx={{ height: 16, alignSelf: 'center' }} />
 
           {/* Chart Type selector */}
           <ToggleButtonGroup
@@ -394,28 +386,28 @@ export default function SalesPurchasesChart() {
             onChange={handleChartTypeChange}
             aria-label="tipo de grafico"
             sx={{ 
-              height: 26,
+              height: 24,
               bgcolor: 'background.paper',
               '& .MuiToggleButton-root': {
                 borderRadius: '4px',
-                p: 0.5,
+                p: 0.4,
                 border: '1px solid',
                 borderColor: 'divider',
                 '&.Mui-selected': {
                   color: '#ffffff',
-                  bgcolor: '#005483',
+                  bgcolor: '#0284c7',
                   '&:hover': {
-                    bgcolor: '#004369'
+                    bgcolor: '#0270a8'
                   }
                 }
               }
             }}
           >
             <ToggleButton value="area" title="Área / Línea">
-              <AreaChart size={13} />
+              <AreaChart size={11} />
             </ToggleButton>
             <ToggleButton value="bar" title="Barras">
-              <BarChart2 size={13} />
+              <BarChart2 size={11} />
             </ToggleButton>
           </ToggleButtonGroup>
 
@@ -425,128 +417,87 @@ export default function SalesPurchasesChart() {
             size="small" 
             onClick={toggleFullscreen} 
             title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-            sx={{ color: '#005483', p: 0.5 }}
+            sx={{ color: '#0284c7', p: 0.5 }}
           >
-            {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+            {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
           </IconButton>
         </Stack>
       </Stack>
 
-      {/* Main Content Area with Aside layout */}
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2, flexGrow: 1, minHeight: 0, p: 1 }}>
-        {/* Chart Canvas */}
-        <Box sx={{ flexGrow: 1, minHeight: 180, display: 'flex', flexDirection: 'column' }}>
-          {loading ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexGrow: 1 }}>
-              <CircularProgress size={24} sx={{ color: '#005483' }} />
-            </Box>
-          ) : (
-            <ReactECharts
-              option={getOption()}
-              style={{ height: '100%', width: '100%', flexGrow: 1 }}
-              opts={{ renderer: 'svg' }}
-            />
-          )}
+      {/* KPI Stats Bar */}
+      <Box 
+        className="bg-slate-50 dark:bg-slate-900/40 border border-solid border-slate-200 dark:border-slate-800"
+        sx={{ 
+          borderRadius: '4px', 
+          p: 1.2, 
+          mb: 1.5, 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 1.5
+        }}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="caption" className="text-slate-400 font-semibold block uppercase tracking-wider" sx={{ fontSize: '8px' }}>
+            Pendiente de Cobro
+          </Typography>
+          <Typography variant="subtitle2" fontWeight={700} className="text-[#0284c7] font-mono" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+            {formatCurrency(totals.salesPending)}
+          </Typography>
         </Box>
 
-        {/* Aside: Spreadsheet KPI Panel (Vertical on md+, Horizontal row on mobile) */}
-        <Box 
-          component="aside"
-          className="border border-solid border-slate-200 dark:border-slate-800 overflow-hidden shrink-0"
-          sx={{ 
-            borderRadius: '4px',
-            width: { xs: '100%', md: '210px' },
-            display: 'flex',
-            flexDirection: { xs: 'row', md: 'column' },
-            height: { xs: 'auto', md: '100%' }
-          }}
-        >
-          {/* Cell: Total Ventas */}
-          <Box 
-            sx={{ flex: 1 }} 
-            className="border-r md:border-r-0 md:border-b border-solid border-slate-200 dark:border-slate-800"
-          >
-            <Box className="bg-slate-50 dark:bg-slate-900/50 px-2.5 py-1.5 border-b border-solid border-slate-200 dark:border-slate-800">
-              <Typography variant="caption" className="text-slate-500 dark:text-slate-400 font-semibold block uppercase tracking-wider" sx={{ fontSize: '9px' }}>
-                Ventas (Ingresos)
-              </Typography>
-            </Box>
-            <Box className="p-2 bg-white dark:bg-slate-950/20 flex flex-col gap-1 text-[11px]">
-              <Box className="flex justify-between items-center border-b border-dashed border-slate-100 dark:border-slate-800/80 pb-1">
-                <span className="text-slate-400 font-medium">Cobrado</span>
-                <Typography variant="caption" fontWeight={700} className="text-[#005483] dark:text-blue-400 font-mono" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {formatCurrency(totals.sales)}
-                </Typography>
-              </Box>
-              <Box className="flex justify-between items-center pt-1">
-                <span className="text-slate-400 font-medium">Facturado</span>
-                <Typography variant="caption" className="text-slate-600 dark:text-slate-400 font-mono" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {formatCurrency(totals.salesInvoiced)}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
+        <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
 
-          {/* Cell: Total Compras */}
-          <Box 
-            sx={{ flex: 1 }} 
-            className="border-r md:border-r-0 md:border-b border-solid border-slate-200 dark:border-slate-800"
-          >
-            <Box className="bg-slate-50 dark:bg-slate-900/50 px-2.5 py-1.5 border-b border-solid border-slate-200 dark:border-slate-800">
-              <Typography variant="caption" className="text-slate-500 dark:text-slate-400 font-semibold block uppercase tracking-wider" sx={{ fontSize: '9px' }}>
-                Compras (Egresos)
-              </Typography>
-            </Box>
-            <Box className="p-2 bg-white dark:bg-slate-950/20 flex flex-col gap-1 text-[11px]">
-              <Box className="flex justify-between items-center border-b border-dashed border-slate-100 dark:border-slate-800/80 pb-1">
-                <span className="text-slate-400 font-medium">Pagado</span>
-                <Typography variant="caption" fontWeight={700} className="text-[#ed6c02] font-mono" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {formatCurrency(totals.purchases)}
-                </Typography>
-              </Box>
-              <Box className="flex justify-between items-center pt-1">
-                <span className="text-slate-400 font-medium">Facturado</span>
-                <Typography variant="caption" className="text-slate-600 dark:text-slate-400 font-mono" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {formatCurrency(totals.purchasesInvoiced)}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="caption" className="text-slate-400 font-semibold block uppercase tracking-wider" sx={{ fontSize: '8px' }}>
+            Pendiente de Pago
+          </Typography>
+          <Typography variant="subtitle2" fontWeight={700} className="text-[#f97316] font-mono" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+            {formatCurrency(totals.purchasesPending)}
+          </Typography>
+        </Box>
 
-          {/* Cell: Balance Neto (Pushed to bottom on desktop) */}
-          <Box 
+        <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'flex-start', sm: 'flex-end' } }}>
+          <Stack direction="row" spacing={0.5} alignItems="center">
+            <Typography variant="caption" className="text-slate-400 font-semibold uppercase tracking-wider" sx={{ fontSize: '8px' }}>
+              Saldo Pendiente Neto
+            </Typography>
+            {netIsPositive ? (
+              <TrendingUp size={10} className="text-[#0284c7]" />
+            ) : (
+              <TrendingDown size={10} className="text-[#f97316]" />
+            )}
+          </Stack>
+          <Typography 
+            variant="subtitle2" 
+            fontWeight={800} 
             sx={{ 
-              flex: 1, 
-              mt: { xs: 0, md: 'auto' },
-              width: '100%' 
+              color: netIsPositive ? '#0284c7' : '#f97316',
+              fontVariantNumeric: 'tabular-nums'
             }} 
-            className="border-none md:border-t md:border-solid border-slate-200 dark:border-slate-800"
+            className="font-mono"
           >
-            <Box className="bg-slate-50 dark:bg-slate-900/50 px-2.5 py-1.5 border-b border-solid border-slate-200 dark:border-slate-800 flex items-center justify-between">
-              <Typography variant="caption" className="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider" sx={{ fontSize: '9px' }}>
-                Balance Neto (Caja)
-              </Typography>
-              {balanceIsPositive ? (
-                <TrendingUp size={12} className="text-[#10b981]" />
-              ) : (
-                <TrendingDown size={12} className="text-[#ef4444]" />
-              )}
-            </Box>
-            <Box className="p-2.5 bg-white dark:bg-slate-950/20 text-right">
-              <Typography 
-                variant="subtitle2" 
-                fontWeight={900} 
-                sx={{ 
-                  color: balanceIsPositive ? '#10b981' : '#ef4444',
-                  fontVariantNumeric: 'tabular-nums'
-                }} 
-                className="font-mono"
-              >
-                {formatCurrency(totals.balance)}
-              </Typography>
-            </Box>
-          </Box>
+            {formatCurrency(totals.netPending)}
+          </Typography>
         </Box>
+      </Box>
+
+      {/* Chart Canvas */}
+      <Box sx={{ flexGrow: 1, minHeight: 180, display: 'flex', flexDirection: 'column' }}>
+        {loading ? (
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexGrow: 1 }}>
+            <CircularProgress size={24} sx={{ color: '#0284c7' }} />
+          </Box>
+        ) : (
+          <ReactECharts
+            option={getOption()}
+            style={{ height: '100%', width: '100%', flexGrow: 1 }}
+            opts={{ renderer: 'svg' }}
+          />
+        )}
       </Box>
     </Box>
   );

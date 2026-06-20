@@ -1,6 +1,7 @@
-import { CardContent, Typography, Box, Divider } from "@mui/material";
+import { CardContent, Typography, Box, Divider, IconButton } from "@mui/material";
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
+import { Maximize2, Minimize2 } from "lucide-react";
 import axiosInstance from "@/lib/@axios";
 import ReactECharts from 'echarts-for-react';
 
@@ -23,6 +24,35 @@ export default function PendingInvoicingCard() {
     });
 
     const [monthlyPayments, setMonthlyPayments] = useState<MonthlyPayment[]>([]);
+    
+    // Fullscreen support
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    const toggleFullscreen = () => {
+        if (!containerRef.current) return;
+        if (!document.fullscreenElement) {
+            containerRef.current.requestFullscreen().then(() => {
+                setIsFullscreen(true);
+            }).catch(err => {
+                console.error('Error entering fullscreen:', err);
+            });
+        } else {
+            document.exitFullscreen().then(() => {
+                setIsFullscreen(false);
+            });
+        }
+    };
+
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement && document.fullscreenElement === containerRef.current);
+        };
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => {
+            document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        };
+    }, []);
     
     const [pendingAmount, setPendingAmount] = useState<{pending_amount: number}>({
         pending_amount: 0
@@ -141,6 +171,16 @@ export default function PendingInvoicingCard() {
                 axisPointer: { type: 'line', lineStyle: { color: '#e5e7eb', width: 2 } },
                 valueFormatter: (value: number) => value > 0 ? formatCurrency(value) : '' 
             },
+            toolbox: {
+                show: true,
+                right: 150,
+                top: -2,
+                itemSize: 12,
+                feature: {
+                    restore: { title: 'Restaurar' },
+                    saveAsImage: { title: 'Descargar' }
+                }
+            },
             legend: {
                 data: ['Pagos Consolidados', 'Cuentas por Cobrar', 'Albaranes Pendientes'], 
                 top: 0,
@@ -208,6 +248,7 @@ export default function PendingInvoicingCard() {
 
     return (
         <Box 
+            ref={containerRef}
             sx={{ 
                 borderRadius: 2, 
                 height: '100%', 
@@ -215,7 +256,16 @@ export default function PendingInvoicingCard() {
                 display: 'flex', 
                 flexDirection: 'column',
                 bgcolor: 'background.paper',
-                overflow: 'hidden' 
+                color: 'text.primary',
+                position: 'relative',
+                overflow: 'hidden',
+                '&:fullscreen': {
+                    p: 2,
+                    width: '100vw',
+                    height: '100vh',
+                    overflowY: 'auto',
+                    bgcolor: 'background.paper',
+                }
             }}
         >
             <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', pb: 2 }}>
@@ -234,6 +284,14 @@ export default function PendingInvoicingCard() {
                             </Typography>
                         </Box>
                     </Box>
+                    <IconButton 
+                        size="small" 
+                        onClick={toggleFullscreen} 
+                        title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+                        sx={{ color: 'primary.main', p: 0.5 }}
+                    >
+                        {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                    </IconButton>
                 </Box>
 
                 <Box sx={{ flexGrow: 1, minHeight: 280, width: '100%', mt: 1, mb: 2 }}>

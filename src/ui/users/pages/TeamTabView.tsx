@@ -3,10 +3,10 @@ import { Button, Stack } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 
 import useIndexUser from '@/features/users/hooks/useIndexUsers';
-import TeamTable from '../component/TeamTable';
-import CreateUserButton from '@/ui/users/component/CreateUserButton';
-import UpdateUserModal from '@/ui/users/component/modals/UpdateUserModal';
-import AssociateEmployeesModal from '@/ui/users/component/modals/AssociateEmployeesModal';
+import TeamTable from '../components/TeamTable';
+import CreateUserButton from '@/ui/users/components/CreateUserButton';
+import UpdateUserModal from '@/ui/users/components/modals/UpdateUserModal';
+import AssociateEmployeesModal from '@/ui/users/components/modals/AssociateEmployeesModal';
 import { IUser } from '@/types/user.types';
 
 export default function TeamTabView() {

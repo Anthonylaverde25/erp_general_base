@@ -20,6 +20,7 @@ import CreateItemPageHeader from '../create-item/CreateItemPageHeader';
 import CreateItemPricingSection from '../create-item/CreateItemPricingSection';
 import CreateItemServiceSection from '../create-item/CreateItemServiceSection';
 import CreateItemStockSection from '../create-item/CreateItemStockSection';
+import CreateItemPhysicalSection from '../create-item/CreateItemPhysicalSection';
 import CreateItemTrackingSection from '../create-item/CreateItemTrackingSection';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
@@ -231,6 +232,13 @@ function ItemFormContainer({
 										isLoading={isSubmitting}
 										textFieldProps={textFieldProps}
 										stores={stores}
+									/>
+								)}
+
+								{itemType === 'physical' && (
+									<CreateItemPhysicalSection
+										isLoading={isSubmitting}
+										textFieldProps={textFieldProps}
 									/>
 								)}
 

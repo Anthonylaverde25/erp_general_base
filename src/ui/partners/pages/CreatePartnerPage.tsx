@@ -1,21 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useForm, Controller, useFieldArray, useWatch } from 'react-hook-form';
+import { useForm, FormProvider, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useSearchParams } from 'react-router';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import {
-	TextField,
-	MenuItem,
 	Typography,
-	Box,
 	Button,
 	ToggleButton,
 	ToggleButtonGroup,
-	Checkbox,
 	Chip,
-	useTheme,
-	FormControlLabel,
-	Switch
+	useTheme
 } from '@mui/material';
 
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
@@ -35,6 +29,11 @@ import PageBreadcrumb from '@/components/PageBreadcrumb';
 import PublicOrganismModal, { PublicOrganism } from '../components/modals/PublicOrganismModal';
 import useIndexCurrencies from '@/features/currencies/hooks/useIndexCurrencies';
 
+import { PartnerHeaderSection } from '@/ui/partners/components/forms/sections/PartnerHeaderSection';
+import { PartnerContactSection } from '@/ui/partners/components/forms/sections/PartnerContactSection';
+import { PartnerBankAccountsSection } from '@/ui/partners/components/forms/sections/PartnerBankAccountsSection';
+import { PartnerFinancialSection } from '@/ui/partners/components/forms/sections/PartnerFinancialSection';
+
 function CreatePartnerPage() {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
@@ -48,32 +47,19 @@ function CreatePartnerPage() {
 	const [publicOrganisms, setPublicOrganisms] = useState<PublicOrganism[]>([]);
 	const [organismModalOpen, setOrganismModalOpen] = useState(false);
 
-	const {
-		control,
-		handleSubmit,
-		setValue,
-		formState: { errors, isValid }
-	} = useForm<PartnerFormType>({
+	const methods = useForm<PartnerFormType>({
 		mode: 'onChange',
 		resolver: zodResolver(partnerSchema),
 		defaultValues: { ...defaultCreatePartnerValues, name: searchParams.get('name') || '' }
 	});
 
 	const {
-		fields: bankAccountsFields,
-		append: appendBankAccount,
-		remove: removeBankAccount
-	} = useFieldArray({
 		control,
-		name: 'bank_accounts'
-	});
+		handleSubmit,
+		formState: { isValid }
+	} = methods;
 
-	const bankAccounts = useWatch({ control, name: 'bank_accounts' });
-	const watchedRole = useWatch({ control, name: 'role' });
 	const watchedType = useWatch({ control, name: 'type' });
-
-	const showSaleTaxes = watchedRole === 'client' || watchedRole === 'client_supplier';
-	const showPurchaseTaxes = watchedRole === 'supplier' || watchedRole === 'client_supplier';
 
 	// Auto-open organism modal when switching to public_organism
 	useEffect(() => {
@@ -106,11 +92,6 @@ function CreatePartnerPage() {
 		} catch (error) {
 			console.error(error);
 		}
-	};
-
-	const textFieldProps = {
-		fullWidth: true,
-		variant: 'filled' as const
 	};
 
 	const isLoading = isCreating;
@@ -170,181 +151,30 @@ function CreatePartnerPage() {
 				}
 				content={
 					<div className="mx-auto w-full max-w-5xl p-8">
-						<form className="flex flex-col gap-8">
-							{/* SECTION 1: GENERAL INFO */}
-							<div className="flex flex-col gap-6">
-								<div className="flex items-center justify-between border-b pb-2">
-									<Typography
-										variant="h6"
-										className="text-text-primary text-lg font-semibold"
-									>
-										Información General
-									</Typography>
-									<Chip
-										label="Datos Principales"
-										size="small"
-										variant="outlined"
-										className="text-text-secondary border-divider"
+						<FormProvider {...methods}>
+							<form className="flex flex-col gap-8">
+								{/* SECTION 1: GENERAL INFO */}
+								<div className="flex flex-col gap-6">
+									<div className="flex items-center justify-between border-b pb-2">
+										<Typography
+											variant="h6"
+											className="text-text-primary text-lg font-semibold"
+										>
+											Información General
+										</Typography>
+										<Chip
+											label="Datos Principales"
+											size="small"
+											variant="outlined"
+											className="text-text-secondary border-divider"
+										/>
+									</div>
+
+									<PartnerHeaderSection
+										isLoading={isLoading}
+										publicOrganisms={publicOrganisms}
+										onOpenOrganismModal={() => setOrganismModalOpen(true)}
 									/>
-								</div>
-
-								<div className="grid grid-cols-1 gap-6 sm:grid-cols-12">
-									<div className="col-span-12 sm:col-span-8">
-										<Controller
-											name="name"
-											control={control}
-											render={({ field }) => (
-												<TextField
-													{...field}
-													{...textFieldProps}
-													label="Nombre Fiscal"
-													error={!!errors.name}
-													helperText={errors.name?.message}
-													disabled={isLoading}
-													required
-												/>
-											)}
-										/>
-									</div>
-									<div className="col-span-12 sm:col-span-4">
-										<Controller
-											name="type"
-											control={control}
-											render={({ field }) => (
-												<TextField
-													{...field}
-													{...textFieldProps}
-													select
-													label="Tipo de Socio"
-													error={!!errors.type}
-													helperText={errors.type?.message}
-													disabled={isLoading}
-												>
-													<MenuItem value="person">Persona</MenuItem>
-													<MenuItem value="company">Empresa</MenuItem>
-													<MenuItem value="public_organism">Organismo Público</MenuItem>
-													<MenuItem value="prospect">Prospecto</MenuItem>
-												</TextField>
-											)}
-										/>
-									</div>
-									<div className="col-span-12 sm:col-span-4">
-										<Controller
-											name="comercial_name"
-											control={control}
-											render={({ field }) => (
-												<TextField
-													{...field}
-													{...textFieldProps}
-													label="Nombre Comercial"
-													error={!!errors.comercial_name}
-													helperText={errors.comercial_name?.message}
-													disabled={isLoading}
-												/>
-											)}
-										/>
-									</div>
-									<div className="col-span-12 sm:col-span-4">
-										<Controller
-											name="vat_number"
-											control={control}
-											render={({ field }) => (
-												<TextField
-													{...field}
-													{...textFieldProps}
-													label="NIF / VAT"
-													error={!!errors.vat_number}
-													helperText={errors.vat_number?.message}
-													disabled={isLoading}
-												/>
-											)}
-										/>
-									</div>
-									<div className="col-span-12 sm:col-span-4">
-										<Controller
-											name="cif"
-											control={control}
-											render={({ field }) => (
-												<TextField
-													{...field}
-													{...textFieldProps}
-													label="CIF"
-													error={!!errors.cif}
-													helperText={errors.cif?.message}
-													disabled={isLoading}
-												/>
-											)}
-										/>
-									</div>
-
-									{/* Switches & Organism Buttons */}
-									<div className="col-span-12 flex flex-wrap items-center gap-6 pt-2">
-										{watchedType === 'public_organism' && (
-											<Chip
-												icon={
-													<FuseSvgIcon size={16}>
-														heroicons-outline:building-library
-													</FuseSvgIcon>
-												}
-												label={`${publicOrganisms.length} Organismo${publicOrganisms.length !== 1 ? 's' : ''}`}
-												variant="outlined"
-												color="secondary"
-												onClick={() => setOrganismModalOpen(true)}
-												sx={{ cursor: 'pointer', fontWeight: 500 }}
-											/>
-										)}
-
-										<Controller
-											name="credit_available"
-											control={control}
-											render={({ field }) => (
-												<FormControlLabel
-													control={
-														<Switch
-															checked={field.value ?? false}
-															onChange={(e) => field.onChange(e.target.checked)}
-															disabled={isLoading}
-															color="primary"
-															size="small"
-														/>
-													}
-													label={
-														<Typography
-															variant="body2"
-															fontWeight={500}
-														>
-															Crédito Disponible
-														</Typography>
-													}
-												/>
-											)}
-										/>
-										<Controller
-											name="grouped_billing"
-											control={control}
-											render={({ field }) => (
-												<FormControlLabel
-													control={
-														<Switch
-															checked={field.value ?? false}
-															onChange={(e) => field.onChange(e.target.checked)}
-															disabled={isLoading}
-															color="primary"
-															size="small"
-														/>
-													}
-													label={
-														<Typography
-															variant="body2"
-															fontWeight={500}
-														>
-															Facturación Agrupada
-														</Typography>
-													}
-												/>
-											)}
-										/>
-									</div>
 
 									<div className="col-span-12 pt-2">
 										<Typography
@@ -394,588 +224,36 @@ function CreatePartnerPage() {
 										/>
 									</div>
 								</div>
-							</div>
 
-							{/* SECTION 2: CONTACT & ADDRESS */}
-							<div className="grid grid-cols-1 gap-12 border-t border-dashed pt-6 md:grid-cols-2">
-								{/* Column 1: Contact */}
-								<div className="flex flex-col gap-6">
-									<div className="flex items-center justify-between border-b pb-2">
+								{/* SECTION 2: CONTACT & ADDRESS */}
+								<div className="border-t border-dashed pt-6">
+									<PartnerContactSection isLoading={isLoading} />
+								</div>
+
+								{/* SECTION 3: BANK ACCOUNTS */}
+								<div className="border-t border-dashed pt-6">
+									<PartnerBankAccountsSection isLoading={isLoading} />
+								</div>
+
+								{/* SECTION 4: FINANCIAL & TAXES */}
+								<div className="border-t border-dashed pt-6">
+									<div className="mb-6 flex items-center justify-between border-b pb-2">
 										<Typography
 											variant="h6"
 											className="text-text-primary text-lg font-semibold"
 										>
-											Datos de Contacto
+											Datos Financieros & Impuestos
 										</Typography>
 									</div>
-									<div className="space-y-5">
-										<Controller
-											name="contact_email"
-											control={control}
-											render={({ field }) => (
-												<TextField
-													{...field}
-													{...textFieldProps}
-													label="Email"
-													error={!!errors.contact_email}
-													helperText={errors.contact_email?.message}
-													disabled={isLoading}
-												/>
-											)}
-										/>
-										<Controller
-											name="contact_phone"
-											control={control}
-											render={({ field }) => (
-												<TextField
-													{...field}
-													{...textFieldProps}
-													label="Teléfono"
-													error={!!errors.contact_phone}
-													helperText={errors.contact_phone?.message}
-													disabled={isLoading}
-												/>
-											)}
-										/>
-										<Controller
-											name="website"
-											control={control}
-											render={({ field }) => (
-												<TextField
-													{...field}
-													{...textFieldProps}
-													label="Sitio Web"
-													error={!!errors.website}
-													helperText={errors.website?.message}
-													disabled={isLoading}
-												/>
-											)}
-										/>
-									</div>
+									<PartnerFinancialSection
+										isLoading={isLoading}
+										paymentMethods={paymentMethods || []}
+										currencies={currencies || []}
+										taxRates={taxRates || []}
+									/>
 								</div>
-
-								{/* Column 2: Address */}
-								<div className="flex flex-col gap-6">
-									<div className="flex items-center justify-between border-b pb-2">
-										<Typography
-											variant="h6"
-											className="text-text-primary text-lg font-semibold"
-										>
-											Dirección Fiscal
-										</Typography>
-									</div>
-									<div className="grid grid-cols-1 gap-5 sm:grid-cols-12">
-										<div className="col-span-12">
-											<Controller
-												name="address_street"
-												control={control}
-												render={({ field }) => (
-													<TextField
-														{...field}
-														{...textFieldProps}
-														label="Dirección Completa"
-														error={!!errors.address_street}
-														helperText={errors.address_street?.message}
-														disabled={isLoading}
-													/>
-												)}
-											/>
-										</div>
-										<div className="col-span-12 sm:col-span-6">
-											<Controller
-												name="address_city"
-												control={control}
-												render={({ field }) => (
-													<TextField
-														{...field}
-														{...textFieldProps}
-														label="Ciudad"
-														error={!!errors.address_city}
-														helperText={errors.address_city?.message}
-														disabled={isLoading}
-													/>
-												)}
-											/>
-										</div>
-										<div className="col-span-12 sm:col-span-6">
-											<Controller
-												name="address_postal_code"
-												control={control}
-												render={({ field }) => (
-													<TextField
-														{...field}
-														{...textFieldProps}
-														label="C.P."
-														error={!!errors.address_postal_code}
-														helperText={errors.address_postal_code?.message}
-														disabled={isLoading}
-													/>
-												)}
-											/>
-										</div>
-										<div className="col-span-12 sm:col-span-6">
-											<Controller
-												name="address_state"
-												control={control}
-												render={({ field }) => (
-													<TextField
-														{...field}
-														{...textFieldProps}
-														label="Provincia"
-														error={!!errors.address_state}
-														helperText={errors.address_state?.message}
-														disabled={isLoading}
-													/>
-												)}
-											/>
-										</div>
-										<div className="col-span-12 sm:col-span-6">
-											<Controller
-												name="address_county"
-												control={control}
-												render={({ field }) => (
-													<TextField
-														{...field}
-														{...textFieldProps}
-														label="Partido / Municipio"
-														error={!!errors.address_county}
-														helperText={errors.address_county?.message}
-														disabled={isLoading}
-													/>
-												)}
-											/>
-										</div>
-										<div className="col-span-12 sm:col-span-6">
-											<Controller
-												name="address_country"
-												control={control}
-												render={({ field }) => (
-													<TextField
-														{...field}
-														{...textFieldProps}
-														label="País"
-														error={!!errors.address_country}
-														helperText={errors.address_country?.message}
-														disabled={isLoading}
-													/>
-												)}
-											/>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							{/* SECTION 3: BANK ACCOUNTS */}
-							<div className="border-t border-dashed pt-6">
-								<div className="mb-6 flex items-center justify-between border-b pb-2">
-									<Typography
-										variant="h6"
-										className="text-text-primary text-lg font-semibold"
-									>
-										Cuentas Bancarias
-									</Typography>
-									<Button
-										variant="outlined"
-										color="secondary"
-										size="small"
-										startIcon={<FuseSvgIcon size={16}>heroicons-outline:plus</FuseSvgIcon>}
-										onClick={() =>
-											appendBankAccount({
-												name: '',
-												account_holder: '',
-												account_number: '',
-												swift: ''
-											})
-										}
-										disabled={isLoading}
-										sx={{ textTransform: 'none' }}
-									>
-										Añadir Cuenta
-									</Button>
-								</div>
-
-								<div className="space-y-4">
-									{bankAccountsFields.length === 0 && (
-										<div className="text-text-secondary rounded-lg border border-dashed border-gray-300 bg-gray-50 py-8 text-center italic dark:border-gray-700 dark:bg-gray-800">
-											No hay cuentas bancarias registradas.
-										</div>
-									)}
-									{bankAccountsFields.map((item, index) => {
-										const isDefault = bankAccounts?.[index]?.is_default;
-										return (
-											<div
-												key={item.id}
-												className={`rounded-lg border p-5 transition-all duration-200 ${
-													isDefault
-														? 'border-primary/20 bg-blue-50/30'
-														: 'border-divider bg-transparent'
-												}`}
-											>
-												<div className="mb-4 flex items-center justify-between">
-													<Controller
-														name={`bank_accounts.${index}.is_default`}
-														control={control}
-														render={({ field }) => (
-															<div
-																className="group flex cursor-pointer items-center select-none"
-																onClick={() => {
-																	bankAccountsFields.forEach((_, i) =>
-																		setValue(`bank_accounts.${i}.is_default`, false)
-																	);
-																	setValue(`bank_accounts.${index}.is_default`, true);
-																	field.onChange(true);
-																}}
-															>
-																<div
-																	className={`mr-2 flex h-4 w-4 items-center justify-center rounded-full border transition-colors ${field.value ? 'border-secondary bg-secondary' : 'group-hover:border-secondary border-gray-400 bg-transparent'}`}
-																>
-																	{field.value && (
-																		<div className="h-1.5 w-1.5 rounded-full bg-white" />
-																	)}
-																</div>
-																<span
-																	className={`text-sm font-medium ${field.value ? 'text-secondary' : 'text-text-secondary group-hover:text-secondary'}`}
-																>
-																	{field.value
-																		? 'Principal'
-																		: 'Marcar como Principal'}
-																</span>
-															</div>
-														)}
-													/>
-													<Button
-														size="small"
-														color="error"
-														onClick={() => removeBankAccount(index)}
-														className="min-w-0"
-														disabled={isLoading}
-													>
-														<FuseSvgIcon size={18}>heroicons-outline:trash</FuseSvgIcon>
-													</Button>
-												</div>
-												<div className="grid grid-cols-1 gap-5 sm:grid-cols-12">
-													<div className="col-span-12 sm:col-span-6">
-														<Controller
-															name={`bank_accounts.${index}.name`}
-															control={control}
-															render={({ field }) => (
-																<TextField
-																	{...field}
-																	{...textFieldProps}
-																	label="Banco / Entidad"
-																	error={!!errors.bank_accounts?.[index]?.name}
-																	helperText={
-																		errors.bank_accounts?.[index]?.name?.message
-																	}
-																	disabled={isLoading}
-																/>
-															)}
-														/>
-													</div>
-													<div className="col-span-12 sm:col-span-6">
-														<Controller
-															name={`bank_accounts.${index}.account_holder`}
-															control={control}
-															render={({ field }) => (
-																<TextField
-																	{...field}
-																	{...textFieldProps}
-																	label="Titular de la Cuenta"
-																	error={
-																		!!errors.bank_accounts?.[index]?.account_holder
-																	}
-																	helperText={
-																		errors.bank_accounts?.[index]?.account_holder
-																			?.message
-																	}
-																	disabled={isLoading}
-																/>
-															)}
-														/>
-													</div>
-													<div className="col-span-12 sm:col-span-8">
-														<Controller
-															name={`bank_accounts.${index}.account_number`}
-															control={control}
-															render={({ field }) => (
-																<TextField
-																	{...field}
-																	{...textFieldProps}
-																	label="IBAN / Número de Cuenta"
-																	error={
-																		!!errors.bank_accounts?.[index]?.account_number
-																	}
-																	helperText={
-																		errors.bank_accounts?.[index]?.account_number
-																			?.message
-																	}
-																	disabled={isLoading}
-																/>
-															)}
-														/>
-													</div>
-													<div className="col-span-12 sm:col-span-4">
-														<Controller
-															name={`bank_accounts.${index}.swift`}
-															control={control}
-															render={({ field }) => (
-																<TextField
-																	{...field}
-																	{...textFieldProps}
-																	label="SWIFT / BIC"
-																	error={!!errors.bank_accounts?.[index]?.swift}
-																	helperText={
-																		errors.bank_accounts?.[index]?.swift?.message
-																	}
-																	disabled={isLoading}
-																/>
-															)}
-														/>
-													</div>
-												</div>
-											</div>
-										);
-									})}
-								</div>
-							</div>
-
-							{/* SECTION 4: FINANCIAL & TAXES */}
-							<div className="border-t border-dashed pt-6">
-								<div className="mb-6 flex items-center justify-between border-b pb-2">
-									<Typography
-										variant="h6"
-										className="text-text-primary text-lg font-semibold"
-									>
-										Datos Financieros & Impuestos
-									</Typography>
-								</div>
-
-								<div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-12">
-									<div className="col-span-12 sm:col-span-6">
-										<Controller
-											name="payment_method_id"
-											control={control}
-											render={({ field }) => (
-												<TextField
-													{...field}
-													{...textFieldProps}
-													select
-													label="Método de Pago Predeterminado"
-													error={!!errors.payment_method_id}
-													helperText={errors.payment_method_id?.message}
-													disabled={isLoading}
-												>
-													{paymentMethods?.map((pm: any) => (
-														<MenuItem
-															key={pm.id}
-															value={String(pm.id)}
-														>
-															{pm.name}
-														</MenuItem>
-													))}
-												</TextField>
-											)}
-										/>
-									</div>
-									<div className="col-span-12 sm:col-span-6">
-										<Controller
-											name="currency_id"
-											control={control}
-											render={({ field }) => (
-												<TextField
-													{...field}
-													{...textFieldProps}
-													select
-													label="Moneda"
-													disabled={isLoading}
-												>
-													<MenuItem value="">
-														<em>Sin especificar</em>
-													</MenuItem>
-													{currencies?.map((currency) => (
-														<MenuItem
-															key={currency.id}
-															value={String(currency.id)}
-														>
-															{currency.name} ({currency.symbol})
-														</MenuItem>
-													))}
-												</TextField>
-											)}
-										/>
-									</div>
-								</div>
-
-								{(showSaleTaxes || showPurchaseTaxes) && (
-									<div className="pt-6">
-										<Typography
-											variant="subtitle2"
-											fontWeight={600}
-											className="text-text-primary mb-4 text-xs tracking-wide uppercase"
-										>
-											Configuración de Impuestos Aplicables
-										</Typography>
-										<div
-											className={`grid gap-8 ${showSaleTaxes && showPurchaseTaxes ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}
-										>
-											{showSaleTaxes && (
-												<div>
-													<Typography
-														variant="body2"
-														fontWeight={500}
-														className="text-text-secondary mb-2 flex items-center gap-2"
-													>
-														<FuseSvgIcon size={16}>heroicons-outline:tag</FuseSvgIcon>
-														Ventas
-													</Typography>
-													<Controller
-														name="sale_tax_ids"
-														control={control}
-														render={({ field }) => (
-															<TextField
-																{...textFieldProps}
-																select
-																label="Impuestos de Venta"
-																disabled={isLoading}
-																value={field.value || []}
-																onChange={(e) => {
-																	const val = e.target.value;
-																	field.onChange(
-																		typeof val === 'string'
-																			? val.split(',').map(Number)
-																			: val
-																	);
-																}}
-																SelectProps={{
-																	multiple: true,
-																	renderValue: (selected) => (
-																		<Box
-																			sx={{
-																				display: 'flex',
-																				flexWrap: 'wrap',
-																				gap: 0.5
-																			}}
-																		>
-																			{(selected as number[]).map((id) => {
-																				const tax = (taxRates || []).find(
-																					(t) => t.id === id
-																				);
-																				return tax ? (
-																					<Chip
-																						key={id}
-																						label={`${tax.name} (${tax.percentage}%)`}
-																						size="small"
-																						variant="outlined"
-																						className="bg-white"
-																					/>
-																				) : null;
-																			})}
-																		</Box>
-																	)
-																}}
-															>
-																{(taxRates || []).map((tax) => (
-																	<MenuItem
-																		key={tax.id}
-																		value={tax.id}
-																	>
-																		<Checkbox
-																			checked={(field.value || []).includes(
-																				tax.id
-																			)}
-																			size="small"
-																		/>
-																		{tax.name} ({tax.percentage}%)
-																	</MenuItem>
-																))}
-															</TextField>
-														)}
-													/>
-												</div>
-											)}
-
-											{showPurchaseTaxes && (
-												<div>
-													<Typography
-														variant="body2"
-														fontWeight={500}
-														className="text-text-secondary mb-2 flex items-center gap-2"
-													>
-														<FuseSvgIcon size={16}>
-															heroicons-outline:shopping-cart
-														</FuseSvgIcon>
-														Compras
-													</Typography>
-													<Controller
-														name="purchase_tax_ids"
-														control={control}
-														render={({ field }) => (
-															<TextField
-																{...textFieldProps}
-																select
-																label="Impuestos de Compra"
-																disabled={isLoading}
-																value={field.value || []}
-																onChange={(e) => {
-																	const val = e.target.value;
-																	field.onChange(
-																		typeof val === 'string'
-																			? val.split(',').map(Number)
-																			: val
-																	);
-																}}
-																SelectProps={{
-																	multiple: true,
-																	renderValue: (selected) => (
-																		<Box
-																			sx={{
-																				display: 'flex',
-																				flexWrap: 'wrap',
-																				gap: 0.5
-																			}}
-																		>
-																			{(selected as number[]).map((id) => {
-																				const tax = (taxRates || []).find(
-																					(t) => t.id === id
-																				);
-																				return tax ? (
-																					<Chip
-																						key={id}
-																						label={`${tax.name} (${tax.percentage}%)`}
-																						size="small"
-																						variant="outlined"
-																						className="bg-white"
-																					/>
-																				) : null;
-																			})}
-																		</Box>
-																	)
-																}}
-															>
-																{(taxRates || []).map((tax) => (
-																	<MenuItem
-																		key={tax.id}
-																		value={tax.id}
-																	>
-																		<Checkbox
-																			checked={(field.value || []).includes(
-																				tax.id
-																			)}
-																			size="small"
-																		/>
-																		{tax.name} ({tax.percentage}%)
-																	</MenuItem>
-																))}
-															</TextField>
-														)}
-													/>
-												</div>
-											)}
-										</div>
-									</div>
-								)}
-							</div>
-						</form>
+							</form>
+						</FormProvider>
 					</div>
 				}
 				scroll="content"

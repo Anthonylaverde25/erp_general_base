@@ -25,7 +25,7 @@ function CreateItemStockSection({ mode, isLoading, textFieldProps, stores }: Cre
 			description="Si está activado, el artículo se gestionará por inventario. No obliga a asignar stock ni almacén."
 		>
 			<div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-				<div className="col-span-1 sm:col-span-2">
+				<div className="col-span-1 flex items-center">
 					<Controller
 						name="is_inventoriable"
 						control={control}
@@ -40,6 +40,26 @@ function CreateItemStockSection({ mode, isLoading, textFieldProps, stores }: Cre
 									/>
 								}
 								label="Es Inventariable"
+							/>
+						)}
+					/>
+				</div>
+
+				<div className="col-span-1 flex items-center">
+					<Controller
+						name="has_stock_alert"
+						control={control}
+						render={({ field }) => (
+							<FormControlLabel
+								control={
+									<Switch
+										checked={field.value ?? false}
+										onChange={(event) => field.onChange(event.target.checked)}
+										disabled={!(isInventoriable ?? true) || isLoading}
+										color="secondary"
+									/>
+								}
+								label="Activar Alertas de Stock"
 							/>
 						)}
 					/>
@@ -98,44 +118,27 @@ function CreateItemStockSection({ mode, isLoading, textFieldProps, stores }: Cre
 					)}
 				/>
 
-				<Controller
-					name="stock_min"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							value={field.value ?? ''}
-							{...textFieldProps}
-							label="Stock Mínimo (Opcional)"
-							type="number"
-							error={!!errors.stock_min}
-							helperText={errors.stock_min?.message}
-							disabled={!(isInventoriable ?? true) || isLoading}
-							onChange={(event) =>
-								field.onChange(event.target.value === '' ? null : Number(event.target.value))
-							}
-						/>
-					)}
-				/>
-
-				<Controller
-					name="has_stock_alert"
-					control={control}
-					render={({ field }) => (
-						<FormControlLabel
-							control={
-								<Switch
-									checked={field.value ?? false}
-									onChange={(event) => field.onChange(event.target.checked)}
-									disabled={!(isInventoriable ?? true) || isLoading}
-									color="secondary"
-								/>
-							}
-							label="Activar Alertas de Stock"
-							sx={{ mt: 1 }}
-						/>
-					)}
-				/>
+				<div className="col-span-1 sm:col-span-2">
+					<Controller
+						name="stock_min"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								value={field.value ?? ''}
+								{...textFieldProps}
+								label="Stock Mínimo (Opcional)"
+								type="number"
+								error={!!errors.stock_min}
+								helperText={errors.stock_min?.message}
+								disabled={!(isInventoriable ?? true) || isLoading}
+								onChange={(event) =>
+									field.onChange(event.target.value === '' ? null : Number(event.target.value))
+								}
+							/>
+						)}
+					/>
+				</div>
 			</div>
 		</CreateItemSection>
 	);

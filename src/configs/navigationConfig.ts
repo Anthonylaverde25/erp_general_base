@@ -454,6 +454,14 @@ const navigationConfig: FuseNavItemType[] = [
 				type: 'item',
 				url: '/inventory/batches',
 				icon: 'lucide:layers'
+			},
+			{
+				id: 'inventory.suppliers',
+				title: 'Relación Proveedores',
+				translate: 'INVENTORY_SUPPLIERS_MATRIX',
+				type: 'item',
+				url: '/inventory/suppliers',
+				icon: 'lucide:truck'
 			}
 		]
 	},

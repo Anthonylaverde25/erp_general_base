@@ -3,7 +3,7 @@ import axiosInstance from '@/lib/@axios';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { ItemSearchResult } from '@/ui/documents/components/create-document/types';
 
-export function useSearchItems(type?: string) {
+export function useSearchItems(type?: string, partnerId?: string | number) {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedTerm, setDebouncedTerm] = useState('');
     const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -23,12 +23,13 @@ export function useSearchItems(type?: string) {
     }, []);
 
     const { data, isLoading } = useQuery<ItemSearchResult[]>({
-        queryKey: ['items_search', debouncedTerm, type],
+        queryKey: ['items_search', debouncedTerm, type, partnerId],
         queryFn: async () => {
             const { data } = await axiosInstance.get('items/search', {
                 params: {
                     q: debouncedTerm,
                     type: type === 'item' ? 'physical' : type === 'service' ? 'service' : undefined,
+                    partner_id: partnerId || undefined,
                 },
             });
             return data.items;

@@ -1,8 +1,8 @@
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import EmployeeForm from '@/ui/employees/components/EmployeeForm';
+import EmployeeForm from '@/ui/employees/components/forms/EmployeeForm';
 import { defaultCreateEmployeeValues } from '@/schemas/employee/employee.defaults';
-import { mapEmployeeFormToDTO } from '@/ui/employees/components/EmployeeForm.utils';
+import { mapEmployeeFormToDTO } from '@/ui/employees/components/forms/EmployeeForm.utils';
 import { useCreateEmployee } from '@/features/employees/hooks/useCreateEmployee';
 import useActiveCompany from '@/features/companies/useActiveCompany';
 import { EmployeeFormType } from '@/schemas/employee/employee.schema';

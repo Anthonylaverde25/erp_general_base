@@ -549,8 +549,8 @@ export default function ItemProfileSidebar({ item }: ItemProfileSidebarProps) {
 							const newIds = newValue.map((s) => s.id);
 							setSelectedPartnerIds(newIds);
 
-							// If default was removed, set first as default
-							if (defaultPartnerId && !newIds.includes(defaultPartnerId)) {
+							// If default was removed or is not set, set first as default
+							if (!defaultPartnerId || !newIds.includes(defaultPartnerId)) {
 								setDefaultPartnerId(newIds[0] ?? null);
 							}
 						}}

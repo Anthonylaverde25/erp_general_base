@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import axiosInstance from '@/lib/@axios';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -15,13 +16,14 @@ import DashGridItem from '../DashGridItem';
 import KpiCard from '../cards/KpiCard';
 import BankCtaCard from '../cards/BankCtaCard';
 import SalesPurchasesChart from '../cards/SalesPurchasesChart';
-import PendingPaymentsCard from '../cards/PendingPaymentsCard';
+import PendingBalancesChart from '../cards/PendingBalancesChart';
 import BankFlowCard from '../cards/BankFlowCard';
 import ExpensesSummaryChart from '../cards/ExpensesSummaryChart';
 import ExpenseAccountsCard from '../cards/ExpenseAccountsCard';
 import CriticalStockCard from '../cards/CriticalStockCard';
 import PendingInvoicingCard from '../cards/PendingInvoicingCard';
 import ActiveRoutesCard from '../cards/ActiveRoutesCard';
+import IncompleteBatchesCard from '../cards/IncompleteBatchesCard';
 
 // ─── react-grid-layout setup ─────────────────────────────────────────────────
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -99,41 +101,41 @@ const initialLayouts = {
     { i: 'ventas', x: 0, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
     { i: 'gastos', x: 3, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
     { i: 'beneficio', x: 6, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
-    { i: 'banco', x: 9, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
+    { i: 'incomplete_batches', x: 9, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
     
     { i: 'resumen_ventas_compras', x: 0, y: 3, w: 6, h: 5, minW: 3, minH: 3 },
-    { i: 'pagos_cobros_pendientes', x: 6, y: 3, w: 3, h: 5, minW: 2, minH: 3 },
-    { i: 'entradas_salidas_banco', x: 9, y: 3, w: 3, h: 5, minW: 2, minH: 3 },
+    { i: 'pagos_cobros_pendientes', x: 6, y: 3, w: 6, h: 5, minW: 3, minH: 3 },
     
-    { i: 'resumen_gastos', x: 0, y: 8, w: 6, h: 5, minW: 3, minH: 3 },
-    { i: 'cuentas_gasto', x: 6, y: 8, w: 6, h: 5, minW: 3, minH: 3 },
+    { i: 'pending_invoicing', x: 0, y: 8, w: 6, h: 5, minW: 3, minH: 3 },
+    { i: 'resumen_gastos', x: 6, y: 8, w: 6, h: 5, minW: 3, minH: 3 },
     
-    { i: 'stock_critico', x: 0, y: 13, w: 6, h: 5, minW: 3, minH: 3 },
-    // CORRECCIÓN: Se coloca al lado de stock_critico (x=6) en la misma fila (y=13)
-    // Ocupa 3 columnas de ancho, igual que las tarjetas superiores
-    { i: 'pending_invoicing', x: 6, y: 13, w: 3, h: 5, minW: 2, minH: 3 },
-    { i: 'active_routes_card', x: 9, y: 13, w: 3, h: 5, minW: 2, minH: 3 } 
+    { i: 'banco', x: 0, y: 13, w: 3, h: 3, minW: 2, minH: 2 },
+    { i: 'entradas_salidas_banco', x: 3, y: 13, w: 3, h: 3, minW: 2, minH: 2 },
+    { i: 'cuentas_gasto', x: 6, y: 13, w: 3, h: 3, minW: 2, minH: 2 },
+    { i: 'stock_critico', x: 9, y: 13, w: 3, h: 3, minW: 2, minH: 2 },
+    
+    { i: 'active_routes_card', x: 0, y: 16, w: 3, h: 3, minW: 2, minH: 2 }
   ],
   md: [
     { i: 'ventas', x: 0, y: 0, w: 5, h: 3, minW: 2, minH: 2 },
     { i: 'gastos', x: 5, y: 0, w: 5, h: 3, minW: 2, minH: 2 },
+    
     { i: 'beneficio', x: 0, y: 3, w: 5, h: 3, minW: 2, minH: 2 },
-    { i: 'banco', x: 5, y: 3, w: 5, h: 3, minW: 2, minH: 2 },
+    { i: 'incomplete_batches', x: 5, y: 3, w: 5, h: 3, minW: 2, minH: 2 },
     
     { i: 'resumen_ventas_compras', x: 0, y: 6, w: 10, h: 5, minW: 4, minH: 3 },
+    { i: 'pagos_cobros_pendientes', x: 0, y: 11, w: 10, h: 5, minW: 4, minH: 3 },
     
-    { i: 'pagos_cobros_pendientes', x: 0, y: 11, w: 5, h: 5, minW: 2, minH: 3 },
-    { i: 'entradas_salidas_banco', x: 5, y: 11, w: 5, h: 5, minW: 2, minH: 3 },
+    { i: 'pending_invoicing', x: 0, y: 16, w: 10, h: 5, minW: 4, minH: 3 },
+    { i: 'resumen_gastos', x: 0, y: 21, w: 10, h: 5, minW: 4, minH: 3 },
     
-    { i: 'resumen_gastos', x: 0, y: 16, w: 10, h: 5, minW: 4, minH: 3 },
-    { i: 'cuentas_gasto', x: 0, y: 21, w: 10, h: 5, minW: 4, minH: 3 },
+    { i: 'banco', x: 0, y: 26, w: 5, h: 3, minW: 2, minH: 2 },
+    { i: 'entradas_salidas_banco', x: 5, y: 26, w: 5, h: 3, minW: 2, minH: 2 },
     
-    { i: 'stock_critico', x: 0, y: 26, w: 10, h: 5, minW: 4, minH: 3 },
+    { i: 'cuentas_gasto', x: 0, y: 29, w: 5, h: 3, minW: 2, minH: 2 },
+    { i: 'stock_critico', x: 5, y: 29, w: 5, h: 3, minW: 2, minH: 2 },
     
-    // CORRECCIÓN: Como en md stock_critico ocupa todo el ancho (w=10),
-    // esta nueva tarjeta debe ir en la fila de abajo. y = 26 + 5 (altura) = 31.
-    { i: 'pending_invoicing', x: 0, y: 31, w: 5, h: 5, minW: 3, minH: 3 },
-    { i: 'active_routes_card', x: 5, y: 31, w: 5, h: 5, minW: 3, minH: 3 }
+    { i: 'active_routes_card', x: 0, y: 32, w: 5, h: 3, minW: 2, minH: 2 }
   ]
 };
 
@@ -141,6 +143,15 @@ const GRID_BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
 const GRID_COLS = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
 const GRID_ROW_HEIGHT = 40;
 const GRID_MARGIN: [number, number] = [16, 16];
+
+const currencyFormatter = new Intl.NumberFormat('es-ES', {
+  style: 'currency',
+  currency: 'EUR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+
+const formatCurrency = (value: number) => currencyFormatter.format(value);
 
 // ─── Component ────────────────────────────────────────────────────────────────
 function DashboardView() {
@@ -153,6 +164,35 @@ function DashboardView() {
     }
   });
   const [isEditing, setIsEditing] = useState(false);
+
+  interface KpiData {
+    total: number;
+    target: number;
+    percent: number;
+    subtitle: string;
+  }
+
+  const [kpiData, setKpiData] = useState<{ sales: KpiData; expenses: KpiData } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const fetchKpis = async () => {
+      try {
+        const { data } = await axiosInstance.get('/dashboard/kpis');
+        if (active) {
+          setKpiData(data);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard KPIs:', error);
+      }
+    };
+    fetchKpis();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+
 
   const handleLayoutChange = useCallback((_current: unknown, allLayouts: typeof initialLayouts) => {
     setLayouts(allLayouts);
@@ -195,9 +235,10 @@ function DashboardView() {
                 <DashGridItem isEditing={isEditing}>
                   <KpiCard
                     title="Ventas"
-                    value="0,00€"
-                    progressPercent={0}
-                    targetValue="0,00€"
+                    value={formatCurrency(kpiData?.sales.total ?? 0)}
+                    subtitle={kpiData?.sales.subtitle ?? 'Año actual'}
+                    progressPercent={kpiData?.sales.percent ?? 0}
+                    targetValue={formatCurrency(kpiData?.sales.target ?? 10000)}
                     targetColor="success.main"
                   />
                 </DashGridItem>
@@ -206,9 +247,10 @@ function DashboardView() {
                 <DashGridItem isEditing={isEditing}>
                   <KpiCard
                     title="Gastos"
-                    value="0,00€"
-                    progressPercent={0}
-                    targetValue="0,00€"
+                    value={formatCurrency(kpiData?.expenses.total ?? 0)}
+                    subtitle={kpiData?.expenses.subtitle ?? 'Año actual'}
+                    progressPercent={kpiData?.expenses.percent ?? 0}
+                    targetValue={formatCurrency(kpiData?.expenses.target ?? 5000)}
                     targetColor="error.main"
                   />
                 </DashGridItem>
@@ -217,7 +259,8 @@ function DashboardView() {
                 <DashGridItem isEditing={isEditing}>
                   <KpiCard
                     title="Beneficio"
-                    value="0,00€"
+                    value={formatCurrency((kpiData?.sales.total ?? 0) - (kpiData?.expenses.total ?? 0))}
+                    subtitle={kpiData?.sales.subtitle ?? 'Año actual'}
                   />
                 </DashGridItem>
               </div>
@@ -236,7 +279,7 @@ function DashboardView() {
                   isEditing={isEditing}
                   noPadding
                 >
-                  <PendingPaymentsCard />
+                  <PendingBalancesChart />
                 </DashGridItem>
               </div>
               <div key="entradas_salidas_banco">
@@ -267,6 +310,11 @@ function DashboardView() {
               <div key="active_routes_card">
                 <DashGridItem isEditing={isEditing}>
                   <ActiveRoutesCard />
+                </DashGridItem>
+              </div>
+              <div key="incomplete_batches">
+                <DashGridItem isEditing={isEditing}>
+                  <IncompleteBatchesCard />
                 </DashGridItem>
               </div>
 
