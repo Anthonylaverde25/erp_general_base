@@ -34,6 +34,7 @@ export interface CreateItemWriteData {
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
 		has_batches?: boolean;
+		has_serials?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
 		procurement_type?: 'buy' | 'make';
@@ -66,6 +67,7 @@ export interface UpdateItemWriteData {
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
 		has_batches?: boolean;
+		has_serials?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
 		procurement_type?: 'buy' | 'make';
@@ -104,6 +106,7 @@ export interface Item {
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
 		has_batches?: boolean;
+		has_serials?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
 		procurement_type?: 'buy' | 'make';
@@ -143,6 +146,7 @@ export class ItemEntity implements Item {
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
 		has_batches?: boolean;
+		has_serials?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
 		procurement_type?: 'buy' | 'make';
@@ -183,6 +187,7 @@ export class ItemEntity implements Item {
 			dimensions?: Record<string, unknown>;
 			is_inventoriable?: boolean;
 			has_batches?: boolean;
+			has_serials?: boolean;
 			stock_min?: number;
 			has_stock_alert?: boolean;
 			procurement_type?: 'buy' | 'make';
@@ -295,6 +300,7 @@ export class ItemEntity implements Item {
 				dimensions?: Record<string, unknown>;
 				is_inventoriable?: boolean;
 				has_batches?: boolean;
+				has_serials?: boolean;
 				stock_min?: number;
 				has_stock_alert?: boolean;
 				procurement_type?: 'buy' | 'make';

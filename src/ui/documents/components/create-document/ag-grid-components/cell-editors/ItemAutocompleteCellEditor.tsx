@@ -110,6 +110,10 @@ export const ItemAutocompleteCellEditor = forwardRef(
                 unit_name: item.unit?.name,
                 taxes: item.tax_rates ?? [],
                 subtotal: calculatedSubtotal,
+                has_serials: item.physical_profile?.has_serials ?? false,
+                has_batches: item.physical_profile?.has_batches ?? false,
+                procurement_type: item.physical_profile?.procurement_type,
+                serial_numbers: row.item_id === item.id ? (row.serial_numbers || []) : [],
             };
 
             // Send the updated row to the parent via custom event

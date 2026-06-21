@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Add } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import {
@@ -19,7 +19,9 @@ import { ItemAutocompleteCellEditor } from './ag-grid-components/cell-editors/It
 import { TaxChipsCellRenderer } from './ag-grid-components/cell-renderers/TaxChipsCellRenderer';
 import { DeleteCellRenderer } from './ag-grid-components/cell-renderers/DeleteCellRenderer';
 import { QuantityCellRenderer } from './ag-grid-components/cell-renderers/QuantityCellRenderer';
+import { SerialNumbersCellRenderer } from './ag-grid-components/cell-renderers/SerialNumbersCellRenderer';
 import { useDocumentTableSync } from './ag-grid-components/hooks/useDocumentTableSync';
+import SerialNumbersModal from './SerialNumbersModal';
 
 /* ─── Props ─── */
 interface DocumentCreateLinesTableProps {
@@ -41,7 +43,24 @@ const GRID_THEME_BY_OPTION: Record<DocumentGridTheme, Theme> = {
 ────────────────────────────────────────────────────────────── */
 export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }: DocumentCreateLinesTableProps) {
 	const { rows, handleAddLine } = useDocumentTableSync();
-	const { isReadOnly } = useDocumentCreate();
+	const { isReadOnly, itemType } = useDocumentCreate();
+
+	const [activeLineItemForSerials, setActiveLineItemForSerials] = useState<DocumentLineItem | null>(null);
+	const [serialsModalOpen, setSerialsModalOpen] = useState(false);
+
+	useEffect(() => {
+		const handleOpenSerials = (e: Event) => {
+			const data = (e as CustomEvent).detail as DocumentLineItem;
+			// Find the current live row data from our rows state to ensure it has updated serials/quantities
+			const liveRow = rows.find(r => r.id === data.id) || data;
+			setActiveLineItemForSerials(liveRow);
+			setSerialsModalOpen(true);
+		};
+		document.addEventListener('doc-line-open-serials', handleOpenSerials);
+		return () => {
+			document.removeEventListener('doc-line-open-serials', handleOpenSerials);
+		};
+	}, [rows]);
 
 	// Group rows by source_document_id
 	const sections = useMemo(() => {
@@ -79,6 +98,7 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 					gridTheme={gridTheme}
 					discountEnabled={discountEnabled}
 					isReadOnly={isReadOnly}
+					itemType={itemType}
 				/>
 			))}
 
@@ -101,6 +121,12 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 					Añadir nueva línea
 				</Button>
 			</div>
+
+			<SerialNumbersModal
+				open={serialsModalOpen}
+				onClose={() => setSerialsModalOpen(false)}
+				lineItem={activeLineItemForSerials}
+			/>
 		</section>
 	);
 }
@@ -112,9 +138,10 @@ interface SectionProps {
 	gridTheme: DocumentGridTheme;
 	discountEnabled: boolean;
 	isReadOnly: boolean;
+	itemType: "product" | "service";
 }
 
-const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly }: SectionProps) => {
+const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly, itemType }: SectionProps) => {
 	const {
 		handleCellValueChanged,
 		handleRowDragEnd,
@@ -181,15 +208,26 @@ const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly 
 				cellClass: 'doc-ag-cell doc-ag-cell-center text-[10px] text-gray-500',
 				valueFormatter: (params) => params.value || '-',
 			},
-			{
-				field: 'unitPrice',
-				headerName: 'PRECIO U.',
-				width: 110, minWidth: 100,
-				editable: !isReadOnly,
-				singleClickEdit: true,
-				cellClass: 'doc-ag-cell doc-ag-cell-right',
-			},
 		];
+
+		if (itemType === 'product') {
+			cols.push({
+				field: 'serial_numbers' as any,
+				headerName: 'SERIES',
+				width: 120, minWidth: 100,
+				cellRenderer: SerialNumbersCellRenderer,
+				cellClass: 'doc-ag-cell doc-ag-cell-center',
+			});
+		}
+
+		cols.push({
+			field: 'unitPrice',
+			headerName: 'PRECIO U.',
+			width: 110, minWidth: 100,
+			editable: !isReadOnly,
+			singleClickEdit: true,
+			cellClass: 'doc-ag-cell doc-ag-cell-right',
+		});
 
 		if (discountEnabled) {
 			cols.push({

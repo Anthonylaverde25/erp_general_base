@@ -59,6 +59,8 @@ export const mapItemFormToDTO = (values: ItemFormType): CreateItemDTO => {
 					typeof values.is_inventoriable !== 'undefined' ? Boolean(values.is_inventoriable) : undefined,
 				has_batches:
 					typeof values.has_batches !== 'undefined' ? Boolean(values.has_batches) : undefined,
+				has_serials:
+					typeof values.has_serials !== 'undefined' ? Boolean(values.has_serials) : undefined,
 				stock_min:
 					values.stock_min !== undefined && values.stock_min !== null ? Number(values.stock_min) : undefined,
 				has_stock_alert:
@@ -113,6 +115,7 @@ export const mapItemToFormValues = (item: ItemEntity): ItemFormType => {
 		dimension_unit: dimensions?.unit ?? 'cm',
 		is_inventoriable: item.physical_profile?.is_inventoriable ?? true,
 		has_batches: item.physical_profile?.has_batches ?? false,
+		has_serials: item.physical_profile?.has_serials ?? false,
 		stock_min: item.physical_profile?.stock_min ?? null,
 		has_stock_alert: item.physical_profile?.has_stock_alert ?? false,
 		procurement_type: item.physical_profile?.procurement_type ?? 'buy',

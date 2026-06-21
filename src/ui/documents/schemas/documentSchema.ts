@@ -24,6 +24,10 @@ export const documentLineSchema = z.object({
     subtotal: z.string().optional().default("0.00"),
     source_document_id: z.string().optional(),
     source_document_number: z.string().optional(),
+    has_serials: z.boolean().optional(),
+    has_batches: z.boolean().optional(),
+    procurement_type: z.enum(["buy", "make"]).optional().nullable(),
+    serial_numbers: z.array(z.string()).default([]),
 });
 
 export const documentSchema = z.object({

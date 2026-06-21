@@ -21,6 +21,7 @@ import type { DocumentFormValues } from '../../schemas/documentSchema';
 import { useSearchItems } from '@/features/items/hooks/useSearchItems';
 import { useDocumentCreate } from '../../context/DocumentCreateContext';
 import { TaxMultiSelect } from './TaxMultiSelect';
+import SerialNumbersModal from './SerialNumbersModal';
 
 function makeEmptyLine(): DocumentLineItem {
     return {
@@ -103,6 +104,10 @@ function AutocompleteCell({
             unit_name: selected.unit?.name,
             taxes: selected.tax_rates ?? [],
             subtotal: calculatedSubtotal,
+            has_serials: selected.physical_profile?.has_serials ?? false,
+            has_batches: selected.physical_profile?.has_batches ?? false,
+            procurement_type: selected.physical_profile?.procurement_type,
+            serial_numbers: [],
         });
     };
 
@@ -211,7 +216,16 @@ export default function DocumentCreateLinesTableMui({
     discountEnabled: boolean;
 }) {
     const { control, getValues } = useFormContext<DocumentFormValues>();
-    const { isEditMode, isLoadingDocument, isReadOnly, isRestricted, lineStockWarnings, setStockConflicts } = useDocumentCreate();
+    const { isEditMode, isLoadingDocument, isReadOnly, isRestricted, lineStockWarnings, setStockConflicts, itemType } = useDocumentCreate();
+    const [activeLineItemForSerials, setActiveLineItemForSerials] = useState<DocumentLineItem | null>(null);
+    const [activeLineIndexForSerials, setActiveLineIndexForSerials] = useState<number | null>(null);
+    const [serialsModalOpen, setSerialsModalOpen] = useState(false);
+
+    const handleSaveSerials = (serials: string[]) => {
+        if (activeLineIndexForSerials !== null) {
+            commitLinePatch(activeLineIndexForSerials, { serial_numbers: serials });
+        }
+    };
 
     const { fields, append, remove, update } = useFieldArray({
         control,
@@ -267,6 +281,7 @@ export default function DocumentCreateLinesTableMui({
                             <TableCell width="18%">DESCRIPCIÓN</TableCell>
                             <TableCell width={110} align="right">CANT.</TableCell>
                             <TableCell width={60} align="left">UD.</TableCell>
+                            {itemType === 'product' && <TableCell width={120} align="center">SERIES</TableCell>}
                             <TableCell width={110} align="right">PRECIO U.</TableCell>
                             {discountEnabled && <TableCell width={90} align="right">DTO %</TableCell>}
                             <TableCell width={200}>IMPUESTOS</TableCell>
@@ -407,6 +422,46 @@ export default function DocumentCreateLinesTableMui({
                                                 {item.unit_name || '-'}
                                             </Box>
                                         </TableCell>
+                                        {itemType === 'product' && (
+                                            <TableCell align="center">
+                                                {item.item_id && item.has_serials ? (() => {
+                                                    const qty = Math.max(1, Math.floor(Number(item.quantity) || 1));
+                                                    const entered = item.serial_numbers?.length || 0;
+                                                    const isComplete = entered === qty;
+                                                    return (
+                                                        <Button
+                                                            size="small"
+                                                            variant="outlined"
+                                                            onClick={() => {
+                                                                setActiveLineItemForSerials(item);
+                                                                setActiveLineIndexForSerials(index);
+                                                                setSerialsModalOpen(true);
+                                                            }}
+                                                            sx={{
+                                                                fontSize: '10px',
+                                                                textTransform: 'none',
+                                                                py: '2px',
+                                                                px: '6px',
+                                                                height: '22px',
+                                                                borderRadius: '4px',
+                                                                fontWeight: 700,
+                                                                color: isComplete ? '#16a34a' : '#d97706',
+                                                                borderColor: isComplete ? '#bbf7d0' : '#fef3c7',
+                                                                bgcolor: isComplete ? '#f0fdf4' : '#fffbeb',
+                                                                '&:hover': {
+                                                                    bgcolor: isComplete ? '#dcfce7' : '#fef3c7',
+                                                                    borderColor: isComplete ? '#86efac' : '#fde047',
+                                                                }
+                                                            }}
+                                                        >
+                                                            {entered} / {qty} Series
+                                                        </Button>
+                                                    );
+                                                })() : (
+                                                    <span style={{ color: '#aaa', fontSize: '11px' }}>-</span>
+                                                )}
+                                            </TableCell>
+                                        )}
                                         <TableCell align="right">
                                             <InputBase
                                                 value={item.unitPrice}
@@ -487,6 +542,13 @@ export default function DocumentCreateLinesTableMui({
                     Añadir nueva línea
                 </Button>
             </Box>
+
+            <SerialNumbersModal
+                open={serialsModalOpen}
+                onClose={() => setSerialsModalOpen(false)}
+                lineItem={activeLineItemForSerials}
+                onSave={handleSaveSerials}
+            />
         </Box>
     );
 }

@@ -59,6 +59,7 @@ export interface ItemDTO {
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
 		has_batches?: boolean;
+		has_serials?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
 		procurement_type?: 'buy' | 'make';
@@ -93,6 +94,7 @@ export interface CreateItemDTO {
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
 		has_batches?: boolean;
+		has_serials?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
 		procurement_type?: 'buy' | 'make';
@@ -125,6 +127,7 @@ export interface UpdateItemDTO {
 		dimensions?: Record<string, unknown>;
 		is_inventoriable?: boolean;
 		has_batches?: boolean;
+		has_serials?: boolean;
 		stock_min?: number;
 		has_stock_alert?: boolean;
 		procurement_type?: 'buy' | 'make';

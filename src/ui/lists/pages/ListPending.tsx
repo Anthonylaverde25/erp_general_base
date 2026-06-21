@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { styled, Theme } from '@mui/material/styles';
-import { Box, Typography, Paper, Avatar, Chip, MenuItem, ListItemIcon, TextField, IconButton, Tooltip } from '@mui/material';
+import { Box, Typography, Paper, Avatar, Chip, MenuItem, ListItemIcon, TextField, IconButton, Tooltip, Menu, ListItemText } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { format, parseISO, isValid } from 'date-fns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -11,6 +11,10 @@ import { useIndexDocumentsPaginated } from '@/features/documents/hooks/useIndexD
 import DataTable from '@/components/data-table/DataTable';
 import { RecordPaymentModal } from '@/ui/documents/components/DocumentShow/RecordPayment';
 import { MRT_ColumnDef } from 'material-react-table';
+import { pdf } from '@react-pdf/renderer';
+import PendingPDFDocument from './PendingPDFDocument';
+import axiosInstance from '@/lib/@axios';
+import useActiveCompany from '@/features/companies/useActiveCompany';
 
 const currencyFormatter = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
 
@@ -84,6 +88,134 @@ export default function ListPending() {
 
 	const documents = response?.data || [];
 	const meta = response?.meta;
+
+	const activeCompany = useActiveCompany();
+
+	// Estado para la selección de filas en la tabla
+	const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+
+	// Mapear los índices seleccionados a los objetos de documentos reales
+	const selectedDocuments = useMemo(() => {
+		return Object.keys(rowSelection)
+			.filter((key) => rowSelection[key])
+			.map((index) => documents[Number(index)])
+			.filter(Boolean);
+	}, [rowSelection, documents]);
+
+	// Estado para el anclaje del menú de exportaciones
+	const [exportMenuAnchorEl, setExportMenuAnchorEl] = useState<null | HTMLElement>(null);
+	const isExportMenuOpen = Boolean(exportMenuAnchorEl);
+
+	const handleExportMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+		setExportMenuAnchorEl(event.currentTarget);
+	};
+
+	const handleExportMenuClose = () => {
+		setExportMenuAnchorEl(null);
+	};
+
+	// Función para obtener todos los registros que cumplen con los filtros actuales
+	const fetchAllDocumentsForExport = async () => {
+		try {
+			const { data } = await axiosInstance.get('documents', {
+				params: {
+					operation,
+					document_type_code: type,
+					status: statusKeys,
+					start_date: startDate || undefined,
+					end_date: endDate || undefined,
+					per_page: 9999
+				}
+			});
+			return data?.data || [];
+		} catch (error) {
+			console.error('Error fetching documents for export:', error);
+			return [];
+		}
+	};
+
+	const getXML = (dataToExport: any[]) => {
+		let xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n<pending_list>\n';
+		dataToExport.forEach((doc) => {
+			xmlString += '  <document>\n';
+			xmlString += `    <id>${doc.id}</id>\n`;
+			xmlString += `    <number>${doc.number_serie || ''}</number>\n`;
+			xmlString += `    <partner>${doc.partner_name || ''}</partner>\n`;
+			xmlString += `    <issue_date>${doc.issue_date || ''}</issue_date>\n`;
+			xmlString += `    <due_date>${doc.due_date || ''}</due_date>\n`;
+			xmlString += `    <total>${doc.total || 0}</total>\n`;
+			xmlString += `    <paid>${doc.total_paid || 0}</paid>\n`;
+			xmlString += `    <balance>${doc.balance || 0}</balance>\n`;
+			xmlString += `    <status>${doc.status?.name || ''}</status>\n`;
+			xmlString += '  </document>\n';
+		});
+		xmlString += '</pending_list>';
+		return xmlString;
+	};
+
+	const exportToXML = (dataToExport: any[]) => {
+		const xml = getXML(dataToExport);
+		const blob = new Blob([xml], { type: 'application/xml;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.setAttribute('download', `pendientes_${(type || 'INV').toLowerCase()}_${new Date().toISOString().split('T')[0]}.xml`);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
+
+	const exportToCSV = (dataToExport: any[]) => {
+		const headers = ['Numero', pageConfig.partnerLabel, 'F. Emision', 'F. Vencimiento', 'Total', pageConfig.paidLabel, 'Pendiente', 'Estado'];
+		const rows = dataToExport.map((doc) => {
+			const formattedIssueDate = doc.issue_date ? doc.issue_date.split('-').reverse().join('/') : 'N/A';
+			const formattedDueDate = doc.due_date ? doc.due_date.split('-').reverse().join('/') : 'N/A';
+			const docNumber = doc.number_serie || (doc.operation === 'purchase' && doc.external_reference ? doc.external_reference : '(Borrador)');
+
+			return [
+				docNumber,
+				doc.partner_name || 'N/A',
+				formattedIssueDate,
+				formattedDueDate,
+				currencyFormatter.format(doc.total),
+				currencyFormatter.format(doc.total_paid),
+				currencyFormatter.format(doc.balance),
+				doc.status?.name || 'N/A'
+			];
+		});
+
+		const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((row) => row.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','))].join('\n');
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.setAttribute('download', `pendientes_${(type || 'INV').toLowerCase()}_${new Date().toISOString().split('T')[0]}.csv`);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
+
+	const exportToPDF = async (dataToExport: any[]) => {
+		const docTitle = type === 'INV' ? 'Listado de Cobros Pendientes' : 'Listado de Pagos Pendientes';
+		const docSubtitle = `Filtros - Desde: ${startDate || 'Inicio'} Hasta: ${endDate || 'Fin'}`;
+		const blob = await pdf(
+			<PendingPDFDocument
+				title={docTitle}
+				subtitle={docSubtitle}
+				companyName={activeCompany?.name}
+				partnerHeader={pageConfig.partnerLabel}
+				paidHeader={pageConfig.paidLabel}
+				data={dataToExport}
+			/>
+		).toBlob();
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.setAttribute('download', `pendientes_${(type || 'INV').toLowerCase()}_${new Date().toISOString().split('T')[0]}.pdf`);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
 
 	// Cálculo de métricas sobre la página actual
 	const totals = useMemo(() => {
@@ -341,6 +473,17 @@ export default function ListPending() {
 						<DataTable
 							renderTopToolbarCustomActions={() => (
 								<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 0.5 }}>
+									{/* Botón de 3 puntos a la izquierda */}
+									<Tooltip title="Opciones de exportación">
+										<IconButton
+											onClick={handleExportMenuClick}
+											color="primary"
+											size="small"
+										>
+											<FuseSvgIcon>heroicons-outline:ellipsis-vertical</FuseSvgIcon>
+										</IconButton>
+									</Tooltip>
+
 									<DatePicker
 										label="Fecha Desde"
 										value={startDate ? parseISO(startDate) : null}
@@ -398,12 +541,95 @@ export default function ListPending() {
 											</IconButton>
 										</Tooltip>
 									)}
+
+									<Menu
+										anchorEl={exportMenuAnchorEl}
+										open={isExportMenuOpen}
+										onClose={handleExportMenuClose}
+										anchorOrigin={{
+											vertical: 'bottom',
+											horizontal: 'right',
+										}}
+										transformOrigin={{
+											vertical: 'top',
+											horizontal: 'right',
+										}}
+									>
+										<MenuItem disabled sx={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', color: 'text.secondary', py: 0.5 }}>
+											Exportar Seleccionados ({selectedDocuments.length})
+										</MenuItem>
+										<MenuItem
+											onClick={async () => {
+												handleExportMenuClose();
+												exportToXML(selectedDocuments);
+											}}
+											disabled={selectedDocuments.length === 0}
+										>
+											<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-text</FuseSvgIcon></ListItemIcon>
+											<ListItemText primary="Descargar XML" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+										</MenuItem>
+										<MenuItem
+											onClick={async () => {
+												handleExportMenuClose();
+												exportToCSV(selectedDocuments);
+											}}
+											disabled={selectedDocuments.length === 0}
+										>
+											<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-chart-bar</FuseSvgIcon></ListItemIcon>
+											<ListItemText primary="Descargar CSV" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+										</MenuItem>
+										<MenuItem
+											onClick={async () => {
+												handleExportMenuClose();
+												await exportToPDF(selectedDocuments);
+											}}
+											disabled={selectedDocuments.length === 0}
+										>
+											<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-arrow-down</FuseSvgIcon></ListItemIcon>
+											<ListItemText primary="Descargar PDF" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+										</MenuItem>
+
+										<MenuItem disabled sx={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', color: 'text.secondary', py: 0.5, borderTop: '1px solid', borderColor: 'divider', mt: 1 }}>
+											Exportar Todos
+										</MenuItem>
+										<MenuItem
+											onClick={async () => {
+												handleExportMenuClose();
+												const allDocs = await fetchAllDocumentsForExport();
+												exportToXML(allDocs);
+											}}
+										>
+											<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-text</FuseSvgIcon></ListItemIcon>
+											<ListItemText primary="Descargar XML (Todos)" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+										</MenuItem>
+										<MenuItem
+											onClick={async () => {
+												handleExportMenuClose();
+												const allDocs = await fetchAllDocumentsForExport();
+												exportToCSV(allDocs);
+											}}
+										>
+											<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-chart-bar</FuseSvgIcon></ListItemIcon>
+											<ListItemText primary="Descargar CSV (Todos)" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+										</MenuItem>
+										<MenuItem
+											onClick={async () => {
+												handleExportMenuClose();
+												const allDocs = await fetchAllDocumentsForExport();
+												await exportToPDF(allDocs);
+											}}
+										>
+											<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-arrow-down</FuseSvgIcon></ListItemIcon>
+											<ListItemText primary="Descargar PDF (Todos)" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+										</MenuItem>
+									</Menu>
 								</Box>
 							)}
 							data={documents}
 							columns={columns}
-							state={{ isLoading, pagination }}
+							state={{ isLoading, pagination, rowSelection }}
 							onPaginationChange={setPagination}
+							onRowSelectionChange={setRowSelection}
 							manualPagination
 							rowCount={meta?.total ?? 0}
 							enablePagination
@@ -430,7 +656,12 @@ export default function ListPending() {
 							muiTableBodyRowProps={({ row }) => {
 								const basePath = operation === 'sale' ? '/sales' : '/purchases';
 								return {
-									onClick: () => navigate(`${basePath}/view/${row.original.id}`),
+									onClick: (e) => {
+										const isCheckboxClick = (e.target as HTMLElement).closest('.MuiTableCell-paddingCheckbox') || (e.target as HTMLElement).closest('.MuiCheckbox-root');
+										if (!isCheckboxClick) {
+											navigate(`${basePath}/view/${row.original.id}`);
+										}
+									},
 									sx: {
 										cursor: 'pointer',
 										backgroundColor: (theme: Theme) =>

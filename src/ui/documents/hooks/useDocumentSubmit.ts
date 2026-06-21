@@ -40,6 +40,7 @@ function buildPayload(data: DocumentFormValues, statusKey: string, itemType: str
                 discount_percentage: Number(i.discount),
                 tax_rates: i.taxes.map((t) => t.id),
                 source_document_id: i.source_document_id ? Number(i.source_document_id) : null,
+                serial_numbers: i.serial_numbers || [],
             })),
     };
 }

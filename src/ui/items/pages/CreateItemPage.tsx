@@ -31,7 +31,8 @@ function CreateItemPage() {
 				dimension_unit: undefined,
 				weight: undefined,
 				stock_min: undefined,
-				has_stock_alert: undefined
+				has_stock_alert: undefined,
+				has_serials: undefined
 			} as ItemFormType;
 		}
 

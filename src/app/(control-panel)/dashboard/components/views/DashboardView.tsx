@@ -24,11 +24,12 @@ import CriticalStockCard from '../cards/CriticalStockCard';
 import PendingInvoicingCard from '../cards/PendingInvoicingCard';
 import ActiveRoutesCard from '../cards/ActiveRoutesCard';
 import IncompleteBatchesCard from '../cards/IncompleteBatchesCard';
+import PendingSerializationCard from '../cards/PendingSerializationCard';
 
 // ─── react-grid-layout setup ─────────────────────────────────────────────────
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-const STORAGE_KEY = 'dashboard_layouts_v6';
+const STORAGE_KEY = 'dashboard_layouts_v7';
 
 // ─── Page root ────────────────────────────────────────────────────────────────
 const Root = styled(FusePageSimple)(({ theme }) => ({
@@ -114,7 +115,8 @@ const initialLayouts = {
     { i: 'cuentas_gasto', x: 6, y: 13, w: 3, h: 3, minW: 2, minH: 2 },
     { i: 'stock_critico', x: 9, y: 13, w: 3, h: 3, minW: 2, minH: 2 },
     
-    { i: 'active_routes_card', x: 0, y: 16, w: 3, h: 3, minW: 2, minH: 2 }
+    { i: 'active_routes_card', x: 0, y: 16, w: 3, h: 3, minW: 2, minH: 2 },
+    { i: 'pending_serialization', x: 3, y: 16, w: 3, h: 3, minW: 2, minH: 2 }
   ],
   md: [
     { i: 'ventas', x: 0, y: 0, w: 5, h: 3, minW: 2, minH: 2 },
@@ -135,7 +137,8 @@ const initialLayouts = {
     { i: 'cuentas_gasto', x: 0, y: 29, w: 5, h: 3, minW: 2, minH: 2 },
     { i: 'stock_critico', x: 5, y: 29, w: 5, h: 3, minW: 2, minH: 2 },
     
-    { i: 'active_routes_card', x: 0, y: 32, w: 5, h: 3, minW: 2, minH: 2 }
+    { i: 'active_routes_card', x: 0, y: 32, w: 5, h: 3, minW: 2, minH: 2 },
+    { i: 'pending_serialization', x: 5, y: 32, w: 5, h: 3, minW: 2, minH: 2 }
   ]
 };
 
@@ -270,7 +273,10 @@ function DashboardView() {
                 </DashGridItem>
               </div>
               <div key="resumen_ventas_compras">
-                <DashGridItem isEditing={isEditing}>
+                <DashGridItem
+                  isEditing={isEditing}
+                  noPadding
+                >
                   <SalesPurchasesChart />
                 </DashGridItem>
               </div>
@@ -315,6 +321,11 @@ function DashboardView() {
               <div key="incomplete_batches">
                 <DashGridItem isEditing={isEditing}>
                   <IncompleteBatchesCard />
+                </DashGridItem>
+              </div>
+              <div key="pending_serialization">
+                <DashGridItem isEditing={isEditing}>
+                  <PendingSerializationCard />
                 </DashGridItem>
               </div>
 

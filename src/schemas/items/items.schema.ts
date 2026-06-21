@@ -32,6 +32,7 @@ const physicalItemSchema = baseItemSchema.extend({
 	dimension_unit: z.string().optional(),
 	is_inventoriable: z.boolean().optional(),
 	has_batches: z.boolean().optional(),
+	has_serials: z.boolean().optional(),
 	stock_min: z.number().min(0).nullable().optional(),
 	has_stock_alert: z.boolean().optional(),
 	procurement_type: z.enum(['buy', 'make']).optional()
@@ -45,6 +46,7 @@ const serviceItemSchema = baseItemSchema.extend({
 	barcode: z.undefined().optional(),
 	is_inventoriable: z.undefined().optional(),
 	has_batches: z.undefined().optional(),
+	has_serials: z.undefined().optional(),
 	stock_min: z.undefined().optional(),
 	has_stock_alert: z.undefined().optional(),
 	store_id: z.undefined().optional(),

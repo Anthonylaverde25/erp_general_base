@@ -1,22 +1,23 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
-import { 
-  Box, 
-  Typography, 
-  CircularProgress, 
-  ToggleButtonGroup, 
-  ToggleButton, 
-  Stack, 
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  ToggleButtonGroup,
+  ToggleButton,
+  Stack,
   Divider,
-  IconButton
+  IconButton,
+  Tooltip
 } from '@mui/material';
-import { 
-  AreaChart, 
-  BarChart2, 
-  Eye, 
-  TrendingUp, 
-  TrendingDown,
+import {
+  AreaChart,
+  BarChart2,
   Maximize2,
-  Minimize2
+  Minimize2,
+  ArrowUpRight,
+  ArrowDownRight,
+  Minus
 } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 import axiosInstance from '@/lib/@axios';
@@ -25,43 +26,139 @@ interface MonthlySummary {
   name: string;
   ventas: number;
   compras: number;
+  ventas_facturado?: number;
+  compras_facturado?: number;
 }
 
-const currencyFormatter = new Intl.NumberFormat('es-ES', {
+// ---------------------------------------------------------------------------
+// Design tokens
+// ---------------------------------------------------------------------------
+const palette = {
+  ink: '#0f172a',
+  inkMuted: '#64748b',
+  inkFaint: '#94a3b8',
+  sales: '#1d4ed8',
+  salesSoft: 'rgba(29,78,216,0.08)',
+  purchases: '#b45309',
+  purchasesSoft: 'rgba(180,83,9,0.08)',
+  positive: '#15803d',
+  negative: '#b91c1c',
+  border: '#e2e8f0',
+  borderStrong: '#cbd5e1',
+  surface: '#ffffff',
+  surfaceSunken: '#f8fafc',
+};
+
+const currencyFormatterPrecise = new Intl.NumberFormat('es-ES', {
   style: 'currency',
   currency: 'EUR',
   minimumFractionDigits: 2,
-  maximumFractionDigits: 2
+  maximumFractionDigits: 2,
 });
 
-const formatCurrency = (value: number) => currencyFormatter.format(value);
+const formatCurrency = (value: number) => currencyFormatterPrecise.format(value);
 
+const formatPercent = (value: number) => {
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${value.toFixed(1)}%`;
+};
+
+// ---------------------------------------------------------------------------
+// InlineStat Component
+// ---------------------------------------------------------------------------
+interface InlineStatProps {
+  label: string;
+  value: number;
+  accentColor: string;
+  delta?: number | null;
+  emphasize?: boolean;
+}
+
+function InlineStat({ label, value, accentColor, delta, emphasize }: InlineStatProps) {
+  const showDelta = delta !== null && delta !== undefined && Number.isFinite(delta);
+  const deltaPositive = (delta ?? 0) > 0.05;
+  const deltaNegative = (delta ?? 0) < -0.05;
+
+  return (
+    <Box sx={{ minWidth: 0 }}>
+      <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mb: 0.2 }}>
+        <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: accentColor, flexShrink: 0 }} />
+        <Typography
+          sx={{
+            fontSize: '9.5px',
+            fontWeight: 600,
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+            color: palette.inkFaint,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {label}
+        </Typography>
+      </Stack>
+
+      <Stack direction="row" spacing={0.8} alignItems="baseline">
+        <Typography
+          sx={{
+            fontSize: emphasize ? '16px' : '14px',
+            fontWeight: 700,
+            fontFamily: '"IBM Plex Mono", "Roboto Mono", monospace',
+            letterSpacing: '-0.01em',
+            color: emphasize ? accentColor : palette.ink,
+            lineHeight: 1.1,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {formatCurrency(value)}
+        </Typography>
+
+        {showDelta && (
+          <Stack direction="row" spacing={0.2} alignItems="center">
+            {deltaPositive && <ArrowUpRight size={10} color={palette.positive} strokeWidth={2.5} />}
+            {deltaNegative && <ArrowDownRight size={10} color={palette.negative} strokeWidth={2.5} />}
+            {!deltaPositive && !deltaNegative && <Minus size={10} color={palette.inkFaint} strokeWidth={2.5} />}
+            <Typography
+              sx={{
+                fontSize: '10px',
+                fontWeight: 600,
+                fontFamily: '"IBM Plex Mono", "Roboto Mono", monospace',
+                color: deltaPositive ? palette.positive : deltaNegative ? palette.negative : palette.inkFaint,
+              }}
+            >
+              {formatPercent(delta as number)}
+            </Typography>
+          </Stack>
+        )}
+      </Stack>
+    </Box>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main Component
+// ---------------------------------------------------------------------------
 export default function SalesPurchasesChart() {
   const currentYear = new Date().getFullYear();
-  const [selectedYear, setSelectedYear] = useState<number | null>(currentYear);
+  const selectedYear = currentYear;
   const [data, setData] = useState<MonthlySummary[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
 
-  // Dynamic Chart UI state
   const [chartType, setChartType] = useState<'area' | 'bar'>('area');
   const [activeSeries, setActiveSeries] = useState<string[]>(['sales', 'purchases']);
 
-  // Fullscreen support
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().then(() => {
-        setIsFullscreen(true);
-      }).catch(err => {
-        console.error('Error entering fullscreen:', err);
-      });
+      containerRef.current
+        .requestFullscreen()
+        .then(() => setIsFullscreen(true))
+        .catch((err) => console.error('Error entering fullscreen:', err));
     } else {
-      document.exitFullscreen().then(() => {
-        setIsFullscreen(false);
-      });
+      document.exitFullscreen().then(() => setIsFullscreen(false));
     }
   };
 
@@ -70,9 +167,7 @@ export default function SalesPurchasesChart() {
       setIsFullscreen(!!document.fullscreenElement && document.fullscreenElement === containerRef.current);
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
   useEffect(() => {
@@ -80,17 +175,17 @@ export default function SalesPurchasesChart() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const params = selectedYear ? { year: selectedYear } : {};
+        setError(false);
+        const params = { year: selectedYear };
         const response = await axiosInstance.get('/dashboard/sales-purchases', { params });
         if (active) {
           setData(response.data.summary || []);
         }
-      } catch (error) {
-        console.error('Error fetching sales-purchases summary:', error);
+      } catch (err) {
+        console.error('Error fetching sales-purchases summary:', err);
+        if (active) setError(true);
       } finally {
-        if (active) {
-          setLoading(false);
-        }
+        if (active) setLoading(false);
       }
     };
     fetchData();
@@ -99,7 +194,6 @@ export default function SalesPurchasesChart() {
     };
   }, [selectedYear]);
 
-  // Compute accumulated totals for the header KPIs
   const totals = useMemo(() => {
     let sales = 0;
     let salesInvoiced = 0;
@@ -107,10 +201,20 @@ export default function SalesPurchasesChart() {
     let purchasesInvoiced = 0;
     data.forEach((item) => {
       sales += item.ventas;
-      salesInvoiced += (item as any).ventas_facturado || 0;
+      salesInvoiced += item.ventas_facturado || 0;
       purchases += item.compras;
-      purchasesInvoiced += (item as any).compras_facturado || 0;
+      purchasesInvoiced += item.compras_facturado || 0;
     });
+
+    const lastTwo = data.slice(-2);
+    let salesDelta: number | null = null;
+    let purchasesDelta: number | null = null;
+    if (lastTwo.length === 2) {
+      const [prev, curr] = lastTwo;
+      salesDelta = prev.ventas !== 0 ? ((curr.ventas - prev.ventas) / Math.abs(prev.ventas)) * 100 : null;
+      purchasesDelta = prev.compras !== 0 ? ((curr.compras - prev.compras) / Math.abs(prev.compras)) * 100 : null;
+    }
+
     return {
       sales,
       salesInvoiced,
@@ -118,53 +222,50 @@ export default function SalesPurchasesChart() {
       purchases,
       purchasesInvoiced,
       purchasesPending: Math.max(0, purchasesInvoiced - purchases),
-      balance: sales - purchases
+      balance: sales - purchases,
+      salesDelta,
+      purchasesDelta,
     };
   }, [data]);
 
-  const handleChartTypeChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newType: 'area' | 'bar' | null
-  ) => {
-    if (newType !== null) {
-      setChartType(newType);
-    }
+  const handleChartTypeChange = (_e: React.MouseEvent<HTMLElement>, newType: 'area' | 'bar' | null) => {
+    if (newType !== null) setChartType(newType);
   };
 
-  const handleSeriesChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newSeries: string[]
-  ) => {
-    if (newSeries.length > 0) {
-      setActiveSeries(newSeries);
-    }
-  };
-
-  const handleYearChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newYear: number | null
-  ) => {
-    if (newYear !== null) {
-      setSelectedYear(newYear);
-    }
+  const handleSeriesChange = (_e: React.MouseEvent<HTMLElement>, newSeries: string[]) => {
+    if (newSeries.length > 0) setActiveSeries(newSeries);
   };
 
   const getOption = () => {
     const months = data.map((item) => item.name);
-    const series = [];
+    const series: any[] = [];
 
     if (activeSeries.includes('sales')) {
       series.push({
         name: 'Ventas (Cobrado)',
         type: chartType === 'area' ? 'line' : 'bar',
-        smooth: true,
+        smooth: false,
         showSymbol: false,
-        itemStyle: { color: '#005483' },
+        symbolSize: 5,
+        lineStyle: { width: 2 },
+        itemStyle: {
+          color: palette.sales,
+          borderRadius: chartType === 'bar' ? [2, 2, 0, 0] : 0,
+        },
+        emphasis: { focus: 'series' },
         areaStyle: chartType === 'area' ? {
-          opacity: 0.15,
-          color: '#005483'
+          color: {
+            type: 'linear',
+            x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(29,78,216,0.16)' },
+              { offset: 1, color: 'rgba(29,78,216,0.01)' },
+            ],
+          },
         } : undefined,
-        data: data.map((item) => item.ventas)
+        barGap: '20%',
+        barMaxWidth: 22,
+        data: data.map((item) => item.ventas),
       });
     }
 
@@ -172,381 +273,328 @@ export default function SalesPurchasesChart() {
       series.push({
         name: 'Compras (Pagado)',
         type: chartType === 'area' ? 'line' : 'bar',
-        smooth: true,
+        smooth: false,
         showSymbol: false,
-        itemStyle: { color: '#ed6c02' },
+        symbolSize: 5,
+        lineStyle: { width: 2 },
+        itemStyle: {
+          color: palette.purchases,
+          borderRadius: chartType === 'bar' ? [2, 2, 0, 0] : 0,
+        },
+        emphasis: { focus: 'series' },
         areaStyle: chartType === 'area' ? {
-          opacity: 0.15,
-          color: '#ed6c02'
+          color: {
+            type: 'linear',
+            x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(180,83,9,0.14)' },
+              { offset: 1, color: 'rgba(180,83,9,0.01)' },
+            ],
+          },
         } : undefined,
-        data: data.map((item) => item.compras)
+        barMaxWidth: 22,
+        data: data.map((item) => item.compras),
       });
     }
 
     return {
       tooltip: {
         trigger: 'axis',
-        axisPointer: {
-          type: 'line',
-          lineStyle: {
-            color: '#e5e7eb',
-            width: 1
-          }
-        },
-        valueFormatter: (value: number) => formatCurrency(value)
+        backgroundColor: '#0f172a',
+        borderWidth: 0,
+        padding: [8, 12],
+        textStyle: { color: '#f8fafc', fontSize: 11.5, fontFamily: '"IBM Plex Mono", monospace' },
+        axisPointer: { type: 'line', lineStyle: { color: palette.borderStrong, width: 1 } },
+        valueFormatter: (value: number) => formatCurrency(value),
       },
       legend: {
         show: true,
         top: 0,
-        right: 10,
-        icon: 'roundRect',
-        itemWidth: 12,
-        itemHeight: 8,
-        textStyle: {
-          fontSize: 10,
-          color: '#9e9e9e'
-        }
+        right: 4,
+        icon: 'rect',
+        itemWidth: 10,
+        itemHeight: 3,
+        itemGap: 18,
+        textStyle: { fontSize: 11, color: palette.inkMuted, fontWeight: 500 },
       },
-      toolbox: {
-        show: true,
-        right: 150,
-        top: -2,
-        itemSize: 12,
-        feature: {
-          restore: { title: 'Restaurar' },
-          saveAsImage: { title: 'Descargar' }
-        }
-      },
-      grid: {
-        top: 30,
-        right: 0,
-        bottom: 55,
-        left: 0,
-        containLabel: true
-      },
+      grid: { top: 32, right: 4, bottom: 58, left: 4, containLabel: true },
       xAxis: {
         type: 'category',
         boundaryGap: chartType === 'bar',
         data: months,
         axisLine: { show: false },
         axisTick: { show: false },
-        axisLabel: { color: '#9e9e9e', fontSize: 10 },
+        axisLabel: { color: palette.inkFaint, fontSize: 10.5, fontWeight: 500 },
         splitLine: {
           show: true,
           lineStyle: { type: 'dashed', color: '#f3f4f6' }
-        }
+        },
       },
       yAxis: {
         type: 'value',
-        splitLine: {
-          show: true,
-          lineStyle: { type: 'dashed', color: '#f3f4f6' }
-        },
+        splitLine: { show: true, lineStyle: { type: 'dashed', color: '#f3f4f6' } },
         axisLabel: {
           formatter: (value: number) => {
-            if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
-            if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
-            return value;
+            if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M €`;
+            if (value >= 1000) return `${(value / 1000).toFixed(0)}k €`;
+            return `${value} €`;
           },
-          color: '#9e9e9e',
-          fontSize: 10
-        }
+          color: palette.inkFaint,
+          fontSize: 10.5,
+        },
       },
       dataZoom: [
-        {
-          type: 'inside',
-          start: 0,
-          end: 100
-        },
+        { type: 'inside', start: 0, end: 100 },
         {
           type: 'slider',
           show: true,
-          bottom: 10,
-          height: 18,
+          bottom: 12,
+          height: 16,
           borderColor: 'transparent',
-          backgroundColor: '#f9fafb',
-          fillerColor: 'rgba(0, 84, 131, 0.12)',
-          handleStyle: { color: '#005483', borderColor: '#fff', borderWidth: 1 },
-          textStyle: { fontSize: 8 }
+          backgroundColor: palette.surfaceSunken,
+          fillerColor: 'rgba(29,78,216,0.10)',
+          handleStyle: { color: palette.sales, borderColor: '#fff', borderWidth: 1.5 },
+          textStyle: { fontSize: 9, color: palette.inkFaint },
+          moveHandleStyle: { color: palette.borderStrong },
         }
       ],
-      series
+      series,
     };
   };
 
   const balanceIsPositive = totals.balance >= 0;
 
   return (
-    <Box 
+    <Box
       ref={containerRef}
-      sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        height: '100%', 
-        p: 1,
-        bgcolor: 'background.paper',
-        color: 'text.primary',
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        bgcolor: palette.surface,
+        color: palette.ink,
+        border: '1px solid',
+        borderColor: palette.border,
+        borderRadius: '8px',
+        overflow: 'hidden',
+        fontFamily: '"Inter", "Roboto", -apple-system, sans-serif',
         position: 'relative',
+        gap: 1.5,
         '&:fullscreen': {
-          p: 3,
           width: '100vw',
           height: '100vh',
           overflowY: 'auto',
-          bgcolor: 'background.paper',
-        }
+          bgcolor: palette.surface,
+          borderRadius: 0,
+          gap: 2.5,
+          '& .card-header-section': { px: 3, pt: 2.5 },
+          '& .card-content-section': { px: 3, pb: 3 },
+        },
       }}
     >
-      {/* Header Controls */}
-      <Stack 
-        direction={{ xs: 'column', md: 'row' }} 
-        justifyContent="space-between" 
-        alignItems={{ xs: 'flex-start', md: 'center' }} 
-        spacing={1.5}
-        sx={{ mb: 2 }}
+      {/* ----------------------------------------------------------------- */}
+      {/* Header                                                            */}
+      {/* ----------------------------------------------------------------- */}
+      <Box 
+        className="card-header-section bg-slate-50 dark:bg-slate-900/60"
+        sx={{ 
+          px: 2, 
+          py: 1.5, 
+          borderBottom: '1px solid',
+          borderColor: 'divider'
+        }}
       >
-        <Box>
-          <Typography variant="subtitle2" fontWeight={800} className="text-slate-800 dark:text-slate-200 leading-tight">
-            Análisis de Ventas y Compras
-          </Typography>
-          <Typography variant="caption" className="text-slate-400">
-            {selectedYear ? `Año comercial ${selectedYear}` : 'Acumulado últimos 12 meses'}
-          </Typography>
-        </Box>
-
-        {/* Chart Configuration Controls */}
-        <Stack direction="row" spacing={2.5} alignItems="center" className="flex-wrap gap-y-1.5 justify-end">
-          {/* Year selector */}
-          <ToggleButtonGroup
-            size="small"
-            value={selectedYear}
-            exclusive
-            onChange={handleYearChange}
-            aria-label="año seleccionado"
-            sx={{ 
-              height: 26,
-              bgcolor: 'background.paper',
-              '& .MuiToggleButton-root': {
-                borderRadius: '4px',
-                px: 1,
-                py: 0,
-                fontSize: '10px',
-                textTransform: 'none',
-                fontWeight: 600,
-                border: '1px solid',
-                borderColor: 'divider',
-                '&.Mui-selected': {
-                  color: '#ffffff',
-                  bgcolor: '#005483',
-                  '&:hover': {
-                    bgcolor: '#004369'
-                  }
-                }
-              }
-            }}
-          >
-            <ToggleButton value={null}>Últ. 12m</ToggleButton>
-            <ToggleButton value={currentYear}>{currentYear}</ToggleButton>
-            <ToggleButton value={currentYear - 1}>{currentYear - 1}</ToggleButton>
-            <ToggleButton value={currentYear - 2}>{currentYear - 2}</ToggleButton>
-          </ToggleButtonGroup>
-
-          <Divider orientation="vertical" flexItem sx={{ height: 16, alignSelf: 'center', display: { xs: 'none', sm: 'block' } }} />
-
-          {/* Series selector */}
-          <ToggleButtonGroup
-            size="small"
-            value={activeSeries}
-            onChange={handleSeriesChange}
-            aria-label="visibilidad de series"
-            sx={{ 
-              height: 26,
-              bgcolor: 'background.paper',
-              '& .MuiToggleButton-root': {
-                borderRadius: '4px',
-                px: 1.2,
-                py: 0,
-                fontSize: '10px',
-                textTransform: 'none',
-                fontWeight: 600,
-                border: '1px solid',
-                borderColor: 'divider',
-                '&.Mui-selected': {
-                  color: '#ffffff',
-                  bgcolor: '#005483',
-                  '&:hover': {
-                    bgcolor: '#004369'
-                  }
-                }
-              }
-            }}
-          >
-            <ToggleButton value="sales" title="Ventas Cobradas">Ventas</ToggleButton>
-            <ToggleButton value="purchases" title="Compras Pagadas">Compras</ToggleButton>
-          </ToggleButtonGroup>
-
-          <Divider orientation="vertical" flexItem sx={{ height: 16, alignSelf: 'center' }} />
-
-          {/* Chart Type selector */}
-          <ToggleButtonGroup
-            size="small"
-            value={chartType}
-            exclusive
-            onChange={handleChartTypeChange}
-            aria-label="tipo de grafico"
-            sx={{ 
-              height: 26,
-              bgcolor: 'background.paper',
-              '& .MuiToggleButton-root': {
-                borderRadius: '4px',
-                p: 0.5,
-                border: '1px solid',
-                borderColor: 'divider',
-                '&.Mui-selected': {
-                  color: '#ffffff',
-                  bgcolor: '#005483',
-                  '&:hover': {
-                    bgcolor: '#004369'
-                  }
-                }
-              }
-            }}
-          >
-            <ToggleButton value="area" title="Área / Línea">
-              <AreaChart size={13} />
-            </ToggleButton>
-            <ToggleButton value="bar" title="Barras">
-              <BarChart2 size={13} />
-            </ToggleButton>
-          </ToggleButtonGroup>
-
-          <Divider orientation="vertical" flexItem sx={{ height: 16, alignSelf: 'center' }} />
-
-          <IconButton 
-            size="small" 
-            onClick={toggleFullscreen} 
-            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-            sx={{ color: '#005483', p: 0.5 }}
-          >
-            {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-          </IconButton>
-        </Stack>
-      </Stack>
-
-      {/* Main Content Area with Aside layout */}
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2, flexGrow: 1, minHeight: 0, p: 1 }}>
-        {/* Chart Canvas */}
-        <Box sx={{ flexGrow: 1, minHeight: 180, display: 'flex', flexDirection: 'column' }}>
-          {loading ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexGrow: 1 }}>
-              <CircularProgress size={24} sx={{ color: '#005483' }} />
-            </Box>
-          ) : (
-            <ReactECharts
-              option={getOption()}
-              style={{ height: '100%', width: '100%', flexGrow: 1 }}
-              opts={{ renderer: 'svg' }}
-            />
-          )}
-        </Box>
-
-        {/* Aside: Spreadsheet KPI Panel (Vertical on md+, Horizontal row on mobile) */}
-        <Box 
-          component="aside"
-          className="border border-solid border-slate-200 dark:border-slate-800 overflow-hidden shrink-0"
-          sx={{ 
-            borderRadius: '4px',
-            width: { xs: '100%', md: '210px' },
-            display: 'flex',
-            flexDirection: { xs: 'row', md: 'column' },
-            height: { xs: 'auto', md: '100%' }
-          }}
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          spacing={1.5}
         >
-          {/* Cell: Total Ventas */}
-          <Box 
-            sx={{ flex: 1 }} 
-            className="border-r md:border-r-0 md:border-b border-solid border-slate-200 dark:border-slate-800"
-          >
-            <Box className="bg-slate-50 dark:bg-slate-900/50 px-2.5 py-1.5 border-b border-solid border-slate-200 dark:border-slate-800">
-              <Typography variant="caption" className="text-slate-500 dark:text-slate-400 font-semibold block uppercase tracking-wider" sx={{ fontSize: '9px' }}>
-                Ventas (Ingresos)
-              </Typography>
-            </Box>
-            <Box className="p-2 bg-white dark:bg-slate-950/20 flex flex-col gap-1 text-[11px]">
-              <Box className="flex justify-between items-center border-b border-dashed border-slate-100 dark:border-slate-800/80 pb-1">
-                <span className="text-slate-400 font-medium">Cobrado</span>
-                <Typography variant="caption" fontWeight={700} className="text-[#005483] dark:text-blue-400 font-mono" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {formatCurrency(totals.sales)}
-                </Typography>
-              </Box>
-              <Box className="flex justify-between items-center pt-1">
-                <span className="text-slate-400 font-medium">Facturado</span>
-                <Typography variant="caption" className="text-slate-600 dark:text-slate-400 font-mono" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {formatCurrency(totals.salesInvoiced)}
-                </Typography>
-              </Box>
-            </Box>
+          <Box>
+            <Typography variant="subtitle2" fontWeight={800} className="text-slate-800 dark:text-slate-200 leading-tight">
+              Ventas y Compras
+            </Typography>
+            <Typography variant="caption" className="text-slate-400 block">
+              Ejercicio fiscal {currentYear} · cobros y pagos efectivos
+            </Typography>
           </Box>
 
-          {/* Cell: Total Compras */}
-          <Box 
-            sx={{ flex: 1 }} 
-            className="border-r md:border-r-0 md:border-b border-solid border-slate-200 dark:border-slate-800"
-          >
-            <Box className="bg-slate-50 dark:bg-slate-900/50 px-2.5 py-1.5 border-b border-solid border-slate-200 dark:border-slate-800">
-              <Typography variant="caption" className="text-slate-500 dark:text-slate-400 font-semibold block uppercase tracking-wider" sx={{ fontSize: '9px' }}>
-                Compras (Egresos)
-              </Typography>
-            </Box>
-            <Box className="p-2 bg-white dark:bg-slate-950/20 flex flex-col gap-1 text-[11px]">
-              <Box className="flex justify-between items-center border-b border-dashed border-slate-100 dark:border-slate-800/80 pb-1">
-                <span className="text-slate-400 font-medium">Pagado</span>
-                <Typography variant="caption" fontWeight={700} className="text-[#ed6c02] font-mono" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {formatCurrency(totals.purchases)}
-                </Typography>
-              </Box>
-              <Box className="flex justify-between items-center pt-1">
-                <span className="text-slate-400 font-medium">Facturado</span>
-                <Typography variant="caption" className="text-slate-600 dark:text-slate-400 font-mono" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {formatCurrency(totals.purchasesInvoiced)}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
+          <Stack direction="row" spacing={1.5} alignItems="center" className="flex-wrap gap-y-1 justify-end">
+            <ToggleButtonGroup
+              size="small"
+              value={activeSeries}
+              onChange={handleSeriesChange}
+              aria-label="visibilidad de series"
+              sx={{ 
+                height: 24,
+                bgcolor: 'background.paper',
+                '& .MuiToggleButton-root': {
+                  borderRadius: '4px',
+                  px: 0.8,
+                  py: 0,
+                  fontSize: '9px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  '&.Mui-selected': {
+                    color: '#ffffff',
+                    bgcolor: palette.ink,
+                    '&:hover': {
+                      bgcolor: palette.ink
+                    }
+                  }
+                }
+              }}
+            >
+              <ToggleButton value="sales" title="Ventas Cobradas">Ventas</ToggleButton>
+              <ToggleButton value="purchases" title="Compras Pagadas">Compras</ToggleButton>
+            </ToggleButtonGroup>
 
-          {/* Cell: Balance Neto (Pushed to bottom on desktop) */}
-          <Box 
-            sx={{ 
-              flex: 1, 
-              mt: { xs: 0, md: 'auto' },
-              width: '100%' 
-            }} 
-            className="border-none md:border-t md:border-solid border-slate-200 dark:border-slate-800"
+            <ToggleButtonGroup
+              size="small"
+              value={chartType}
+              exclusive
+              onChange={handleChartTypeChange}
+              aria-label="tipo de grafico"
+              sx={{ 
+                height: 24,
+                bgcolor: 'background.paper',
+                '& .MuiToggleButton-root': {
+                  borderRadius: '4px',
+                  p: 0.4,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  '&.Mui-selected': {
+                    color: '#ffffff',
+                    bgcolor: palette.ink,
+                    '&:hover': {
+                      bgcolor: palette.ink
+                    }
+                  }
+                }
+              }}
+            >
+              <ToggleButton value="area" title="Área / Línea">
+                <AreaChart size={11} />
+              </ToggleButton>
+              <ToggleButton value="bar" title="Barras">
+                <BarChart2 size={11} />
+              </ToggleButton>
+            </ToggleButtonGroup>
+
+            <Divider orientation="vertical" flexItem sx={{ height: 16, alignSelf: 'center' }} />
+
+            <Tooltip title={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}>
+              <IconButton
+                size="small"
+                onClick={toggleFullscreen}
+                sx={{
+                  color: palette.inkMuted,
+                  p: 0.5,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: '4px',
+                  '&:hover': { bgcolor: 'background.paper', color: palette.ink },
+                }}
+              >
+                {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        </Stack>
+      </Box>
+
+      {/* ----------------------------------------------------------------- */}
+      {/* Content                                                           */}
+      {/* ----------------------------------------------------------------- */}
+      <Box
+        className="card-content-section"
+        sx={{ px: 2.5, pb: 2.5, display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: 0 }}
+      >
+        {error ? (
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: palette.inkFaint,
+              gap: 1,
+            }}
           >
-            <Box className="bg-slate-50 dark:bg-slate-900/50 px-2.5 py-1.5 border-b border-solid border-slate-200 dark:border-slate-800 flex items-center justify-between">
-              <Typography variant="caption" className="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider" sx={{ fontSize: '9px' }}>
-                Balance Neto (Caja)
-              </Typography>
-              {balanceIsPositive ? (
-                <TrendingUp size={12} className="text-[#10b981]" />
+            <Typography sx={{ fontSize: '13px', fontWeight: 600, color: palette.ink }}>
+              No se pudieron cargar los datos
+            </Typography>
+            <Typography sx={{ fontSize: '11.5px' }}>
+              Revisa la conexión e inténtalo de nuevo.
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={{ xs: 1.5, sm: 4 }}
+              divider={
+                <Divider
+                  orientation="vertical"
+                  flexItem
+                  sx={{ borderColor: palette.border, display: { xs: 'none', sm: 'block' } }}
+                />
+              }
+              sx={{ mb: 2 }}
+            >
+              <InlineStat
+                label="Ventas Cobradas"
+                value={totals.sales}
+                accentColor={palette.sales}
+                delta={totals.salesDelta}
+              />
+              <InlineStat
+                label="Compras Pagadas"
+                value={totals.purchases}
+                accentColor={palette.purchases}
+                delta={totals.purchasesDelta}
+              />
+              <InlineStat
+                label="Balance Neto de Caja"
+                value={totals.balance}
+                accentColor={balanceIsPositive ? palette.positive : palette.negative}
+                emphasize
+              />
+            </Stack>
+
+            <Divider sx={{ borderColor: palette.border, mb: 2 }} />
+
+            <Box sx={{ flexGrow: 1, minHeight: 200, display: 'flex', flexDirection: 'column' }}>
+              {loading ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexGrow: 1 }}>
+                  <CircularProgress size={22} thickness={4} sx={{ color: palette.sales }} />
+                </Box>
+              ) : data.length === 0 ? (
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: palette.inkFaint,
+                    fontSize: '12.5px',
+                  }}
+                >
+                  Sin movimientos registrados en {currentYear}.
+                </Box>
               ) : (
-                <TrendingDown size={12} className="text-[#ef4444]" />
+                <ReactECharts
+                  option={getOption()}
+                  style={{ height: '100%', width: '100%', flexGrow: 1 }}
+                  opts={{ renderer: 'svg' }}
+                />
               )}
             </Box>
-            <Box className="p-2.5 bg-white dark:bg-slate-950/20 text-right">
-              <Typography 
-                variant="subtitle2" 
-                fontWeight={900} 
-                sx={{ 
-                  color: balanceIsPositive ? '#10b981' : '#ef4444',
-                  fontVariantNumeric: 'tabular-nums'
-                }} 
-                className="font-mono"
-              >
-                {formatCurrency(totals.balance)}
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
+          </>
+        )}
       </Box>
     </Box>
   );

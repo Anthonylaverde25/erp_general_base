@@ -9,13 +9,11 @@ export function QuantityCellRenderer({ data }: ICellRendererParams<DocumentLineI
     const { lineStockWarnings, setStockConflicts } = useDocumentCreate();
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     
-    if (!data) return null;
-
-    const warning = lineStockWarnings[data.id];
+    const warning = data ? lineStockWarnings[data.id] : undefined;
 
     useEffect(() => {
         const btn = buttonRef.current;
-        if (!btn || !warning) return;
+        if (!btn || !warning || !data) return;
 
         const stopPropagation = (e: Event) => {
             e.stopPropagation();
@@ -52,6 +50,8 @@ export function QuantityCellRenderer({ data }: ICellRendererParams<DocumentLineI
             btn.removeEventListener('mousedown', stopPropagation);
         };
     }, [warning, data, setStockConflicts]);
+
+    if (!data) return null;
 
     return (
         <Box display="flex" alignItems="center" justifyContent="flex-end" width="100%" height="100%" gap={0.5}>

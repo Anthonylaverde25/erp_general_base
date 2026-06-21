@@ -33,6 +33,10 @@ export interface DocumentLineItem {
 	subtotal: string;
 	source_document_id?: string;
 	source_document_number?: string;
+	has_serials?: boolean;
+	has_batches?: boolean;
+	procurement_type?: 'buy' | 'make';
+	serial_numbers?: string[];
 }
 
 export interface DocumentFooterTotals {
@@ -64,6 +68,16 @@ export interface ItemSearchResult {
 		name: string;
 	} | null;
 	tax_rates: DocumentLineTaxItem[];
+	physical_profile?: {
+		barcode?: string;
+		weight?: number;
+		is_inventoriable?: boolean;
+		has_batches?: boolean;
+		has_serials?: boolean;
+		stock_min?: number;
+		has_stock_alert?: boolean;
+		procurement_type?: 'buy' | 'make';
+	} | null;
 }
 
 export const CURRENCY_OPTIONS = ['EUR (€) - Euro', 'USD ($) - Dólar', 'GBP (£) - Libra'];

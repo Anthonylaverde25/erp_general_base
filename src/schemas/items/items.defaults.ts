@@ -25,6 +25,7 @@ export const defaultCreateItemValues = {
 	dimension_unit: 'cm',
 	is_inventoriable: true,
 	has_batches: false,
+	has_serials: false,
 	quantity: 0,
 	estimated_time: undefined,
 	req_scheduling: false,

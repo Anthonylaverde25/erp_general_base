@@ -2,13 +2,17 @@ import { useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { styled, Theme } from '@mui/material/styles';
-import { Box, Typography, Paper, Avatar, Chip, MenuItem, ListItemIcon, IconButton, Tooltip } from '@mui/material';
+import { Box, Typography, Paper, Avatar, Chip, MenuItem, ListItemIcon, IconButton, Tooltip, Menu, ListItemText } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { format, parseISO, isValid } from 'date-fns';
 import { useIndexAccountingDocuments } from '@/features/documents/hooks/useIndexAccountingDocuments';
 import DataTable from '@/components/data-table/DataTable';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { MRT_ColumnDef } from 'material-react-table';
+import { pdf } from '@react-pdf/renderer';
+import AccountingPDFDocument from './AccountingPDFDocument';
+import axiosInstance from '@/lib/@axios';
+import useActiveCompany from '@/features/companies/useActiveCompany';
 
 const currencyFormatter = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
 
@@ -74,6 +78,150 @@ export default function ListAccounting() {
 
 	const documents = response?.data || [];
 	const meta = response?.meta;
+
+	const activeCompany = useActiveCompany();
+
+	// Estado para la selección de filas en la tabla
+	const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+
+	// Mapear los índices seleccionados a los objetos de documentos reales
+	const selectedDocuments = useMemo(() => {
+		return Object.keys(rowSelection)
+			.filter((key) => rowSelection[key])
+			.map((index) => documents[Number(index)])
+			.filter(Boolean);
+	}, [rowSelection, documents]);
+
+	// Estado para el anclaje del menú de exportaciones
+	const [exportMenuAnchorEl, setExportMenuAnchorEl] = useState<null | HTMLElement>(null);
+	const isExportMenuOpen = Boolean(exportMenuAnchorEl);
+
+	const handleExportMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+		setExportMenuAnchorEl(event.currentTarget);
+	};
+
+	const handleExportMenuClose = () => {
+		setExportMenuAnchorEl(null);
+	};
+
+	// Función para obtener todos los registros que cumplen con los filtros actuales
+	const fetchAllDocumentsForExport = async () => {
+		try {
+			const { data } = await axiosInstance.get('documents/accounting', {
+				params: {
+					operation,
+					document_type_code: type,
+					start_date: startDate || undefined,
+					end_date: endDate || undefined,
+					per_page: 9999
+				}
+			});
+			return data?.data || [];
+		} catch (error) {
+			console.error('Error fetching documents for export:', error);
+			return [];
+		}
+	};
+
+	const getXML = (dataToExport: any[]) => {
+		let xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n<accounting_list>\n';
+		dataToExport.forEach((doc) => {
+			xmlString += '  <document>\n';
+			xmlString += `    <id>${doc.id}</id>\n`;
+			xmlString += `    <number>${doc.number_serie || ''}</number>\n`;
+			xmlString += `    <partner>${doc.partner_name || ''}</partner>\n`;
+			xmlString += `    <date>${doc.issue_date || ''}</date>\n`;
+			xmlString += `    <subtotal>${doc.subtotal || 0}</subtotal>\n`;
+
+			// Taxes
+			xmlString += '    <taxes>\n';
+			(doc.tax_summaries || []).forEach((s: any) => {
+				xmlString += '      <tax>\n';
+				xmlString += `        <name>${s.name}</name>\n`;
+				xmlString += `        <rate>${s.rate}</rate>\n`;
+				xmlString += `        <type>${s.tax_type_code}</type>\n`;
+				xmlString += `        <amount>${s.tax_amount}</amount>\n`;
+				xmlString += '      </tax>\n';
+			});
+			xmlString += '    </taxes>\n';
+
+			xmlString += `    <discount>${doc.discount_total || 0}</discount>\n`;
+			xmlString += `    <total>${doc.total || 0}</total>\n`;
+			xmlString += `    <payment_method>${doc.payment_method_name || ''}</payment_method>\n`;
+			xmlString += `    <status>${doc.status?.name || ''}</status>\n`;
+			xmlString += '  </document>\n';
+		});
+		xmlString += '</accounting_list>';
+		return xmlString;
+	};
+
+	const exportToXML = (dataToExport: any[]) => {
+		const xml = getXML(dataToExport);
+		const blob = new Blob([xml], { type: 'application/xml;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.setAttribute('download', `listado_contable_${new Date().toISOString().split('T')[0]}.xml`);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
+
+	const exportToCSV = (dataToExport: any[]) => {
+		const headers = ['Numero', 'Cliente/Proveedor', 'Fecha', 'Base Imponible', 'IVA', 'Retenciones', 'Recargo Eq.', 'Descuento', 'Total', 'Metodo de Pago', 'Estado'];
+		const rows = dataToExport.map((doc) => {
+			const formattedDate = doc.issue_date ? doc.issue_date.split('-').reverse().join('/') : 'N/A';
+			const formatTax = (typeCode: string) =>
+				(doc.tax_summaries || [])
+					.filter((s: any) => s.tax_type_code === typeCode)
+					.map((s: any) => `${s.name}: ${currencyFormatter.format(s.tax_amount)}`)
+					.join('; ');
+
+			return [
+				doc.number_serie,
+				doc.partner_name || 'N/A',
+				formattedDate,
+				currencyFormatter.format(doc.subtotal),
+				formatTax('vat') || 'No aplica',
+				formatTax('withholding') || 'No aplica',
+				formatTax('surcharge') || 'No aplica',
+				currencyFormatter.format(doc.discount_total),
+				currencyFormatter.format(doc.total),
+				doc.payment_method_name || 'N/A',
+				doc.status?.name || 'N/A'
+			];
+		});
+
+		const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((row) => row.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','))].join('\n');
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.setAttribute('download', `listado_contable_${new Date().toISOString().split('T')[0]}.csv`);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
+
+	const exportToPDF = async (dataToExport: any[]) => {
+		const docTitle = type === 'INV' ? 'Listado Contable (Ventas)' : 'Listado Contable (Compras)';
+		const docSubtitle = `Filtros - Desde: ${startDate || 'Inicio'} Hasta: ${endDate || 'Fin'}`;
+		const blob = await pdf(
+			<AccountingPDFDocument
+				title={docTitle}
+				subtitle={docSubtitle}
+				companyName={activeCompany?.name}
+				data={dataToExport}
+			/>
+		).toBlob();
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.setAttribute('download', `listado_contable_${new Date().toISOString().split('T')[0]}.pdf`);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
 
 	// Cálculo de métricas sobre la página actual
 	const totals = useMemo(() => {
@@ -183,19 +331,81 @@ export default function ListAccounting() {
 				)
 			},
 			{
-				accessorKey: 'tax_total',
-				header: 'Total IVA',
-				size: 120,
-				Cell: ({ row }) => (
-					<Typography variant="body2" color="warning.main" fontWeight={500}>
-						{currencyFormatter.format(row.original.tax_total)}
-					</Typography>
-				)
+				accessorKey: 'tax_vat',
+				header: 'IVA',
+				size: 160,
+				Cell: ({ row }) => {
+					const doc = row.original;
+					const summaries = (doc.tax_summaries || []).filter((s: any) => s.tax_type_code === 'vat');
+					if (summaries.length === 0) return <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8125rem' }}>No aplica</Typography>;
+					return (
+						<Box className="flex flex-col py-0.5">
+							{summaries.map((summary: any, index: number) => (
+								<Typography key={index} variant="caption" sx={{ fontSize: '0.75rem', lineHeight: 1.2 }}>
+									<span style={{ color: 'var(--mui-palette-text-secondary)' }}>{summary.name}:</span>{' '}
+									<span style={{ fontWeight: 500 }}>{currencyFormatter.format(summary.tax_amount)}</span>
+								</Typography>
+							))}
+						</Box>
+					);
+				}
+			},
+			{
+				accessorKey: 'tax_withholding',
+				header: 'Retenciones',
+				size: 160,
+				Cell: ({ row }) => {
+					const doc = row.original;
+					const summaries = (doc.tax_summaries || []).filter((s: any) => s.tax_type_code === 'withholding');
+					if (summaries.length === 0) return <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8125rem' }}>No aplica</Typography>;
+					return (
+						<Box className="flex flex-col py-0.5">
+							{summaries.map((summary: any, index: number) => (
+								<Typography key={index} variant="caption" color="error.main" sx={{ fontSize: '0.75rem', lineHeight: 1.2 }}>
+									<span style={{ color: 'var(--mui-palette-text-secondary)' }}>{summary.name}:</span>{' '}
+									<span style={{ fontWeight: 500 }}>
+										{currencyFormatter.format(summary.tax_amount)}
+									</span>
+								</Typography>
+							))}
+							{summaries.length > 1 && (
+								<Typography variant="caption" color="error.main" sx={{ fontSize: '0.75rem', fontWeight: 600, borderTop: '1px solid', borderColor: 'divider', mt: 0.5, pt: 0.5 }}>
+									Total: {currencyFormatter.format(summaries.reduce((sum: number, s: any) => sum + s.tax_amount, 0))}
+								</Typography>
+							)}
+						</Box>
+					);
+				}
+			},
+			{
+				accessorKey: 'tax_surcharge',
+				header: 'Recargo Eq.',
+				size: 160,
+				Cell: ({ row }) => {
+					const doc = row.original;
+					const summaries = (doc.tax_summaries || []).filter((s: any) => s.tax_type_code === 'surcharge');
+					if (summaries.length === 0) return <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8125rem' }}>No aplica</Typography>;
+					return (
+						<Box className="flex flex-col py-0.5">
+							{summaries.map((summary: any, index: number) => (
+								<Typography key={index} variant="caption" sx={{ fontSize: '0.75rem', lineHeight: 1.2 }}>
+									<span style={{ color: 'var(--mui-palette-text-secondary)' }}>{summary.name}:</span>{' '}
+									<span style={{ fontWeight: 500 }}>{currencyFormatter.format(summary.tax_amount)}</span>
+								</Typography>
+							))}
+							{summaries.length > 1 && (
+								<Typography variant="caption" sx={{ fontSize: '0.75rem', fontWeight: 600, borderTop: '1px solid', borderColor: 'divider', mt: 0.5, pt: 0.5 }}>
+									Total: {currencyFormatter.format(summaries.reduce((sum: number, s: any) => sum + s.tax_amount, 0))}
+								</Typography>
+							)}
+						</Box>
+					);
+				}
 			},
 			{
 				accessorKey: 'discount_total',
 				header: 'Descuento',
-				size: 120,
+				size: 90,
 				Cell: ({ row }) => (
 					<Typography variant="body2" color="error.main" fontWeight={500}>
 						{currencyFormatter.format(row.original.discount_total)}
@@ -215,7 +425,7 @@ export default function ListAccounting() {
 			{
 				accessorKey: 'payment_method_name',
 				header: 'Método de Pago',
-				size: 150,
+				size: 120,
 				Cell: ({ row }) => (
 					<Chip
 						label={row.original.payment_method_name}
@@ -228,14 +438,14 @@ export default function ListAccounting() {
 			{
 				accessorKey: 'status.name',
 				header: 'Estado',
-				size: 110,
+				size: 90,
 				Cell: ({ row }) => {
 					const status = row.original.status;
 					if (!status) return null;
 					let muiColor: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
 					if (status.key === 'issued') muiColor = 'primary';
 					else if (status.key === 'partially_collected' || status.key === 'partially_paid') muiColor = 'warning';
-					else if (status.key === 'paid') muiColor = 'success';
+					else if (status.key === 'paid' || status.key === 'collected') muiColor = 'success';
 					return (
 						<Chip
 							label={status.name}
@@ -322,6 +532,17 @@ export default function ListAccounting() {
 					<DataTable
 						renderTopToolbarCustomActions={() => (
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 0.5 }}>
+								{/* Botón de 3 puntos a la izquierda */}
+								<Tooltip title="Opciones de exportación">
+									<IconButton
+										onClick={handleExportMenuClick}
+										color="primary"
+										size="small"
+									>
+										<FuseSvgIcon>heroicons-outline:ellipsis-vertical</FuseSvgIcon>
+									</IconButton>
+								</Tooltip>
+
 								<DatePicker
 									label="Fecha Desde"
 									value={startDate ? parseISO(startDate) : null}
@@ -379,12 +600,95 @@ export default function ListAccounting() {
 										</IconButton>
 									</Tooltip>
 								)}
+
+								<Menu
+									anchorEl={exportMenuAnchorEl}
+									open={isExportMenuOpen}
+									onClose={handleExportMenuClose}
+									anchorOrigin={{
+										vertical: 'bottom',
+										horizontal: 'right',
+									}}
+									transformOrigin={{
+										vertical: 'top',
+										horizontal: 'right',
+									}}
+								>
+									<MenuItem disabled sx={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', color: 'text.secondary', py: 0.5 }}>
+										Exportar Seleccionados ({selectedDocuments.length})
+									</MenuItem>
+									<MenuItem
+										onClick={async () => {
+											handleExportMenuClose();
+											exportToXML(selectedDocuments);
+										}}
+										disabled={selectedDocuments.length === 0}
+									>
+										<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-text</FuseSvgIcon></ListItemIcon>
+										<ListItemText primary="Descargar XML" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+									</MenuItem>
+									<MenuItem
+										onClick={async () => {
+											handleExportMenuClose();
+											exportToCSV(selectedDocuments);
+										}}
+										disabled={selectedDocuments.length === 0}
+									>
+										<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-chart-bar</FuseSvgIcon></ListItemIcon>
+										<ListItemText primary="Descargar CSV" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+									</MenuItem>
+									<MenuItem
+										onClick={async () => {
+											handleExportMenuClose();
+											await exportToPDF(selectedDocuments);
+										}}
+										disabled={selectedDocuments.length === 0}
+									>
+										<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-arrow-down</FuseSvgIcon></ListItemIcon>
+										<ListItemText primary="Descargar PDF" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+									</MenuItem>
+
+									<MenuItem disabled sx={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', color: 'text.secondary', py: 0.5, borderTop: '1px solid', borderColor: 'divider', mt: 1 }}>
+										Exportar Todos
+									</MenuItem>
+									<MenuItem
+										onClick={async () => {
+											handleExportMenuClose();
+											const allDocs = await fetchAllDocumentsForExport();
+											exportToXML(allDocs);
+										}}
+									>
+										<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-text</FuseSvgIcon></ListItemIcon>
+										<ListItemText primary="Descargar XML (Todos)" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+									</MenuItem>
+									<MenuItem
+										onClick={async () => {
+											handleExportMenuClose();
+											const allDocs = await fetchAllDocumentsForExport();
+											exportToCSV(allDocs);
+										}}
+									>
+										<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-chart-bar</FuseSvgIcon></ListItemIcon>
+										<ListItemText primary="Descargar CSV (Todos)" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+									</MenuItem>
+									<MenuItem
+										onClick={async () => {
+											handleExportMenuClose();
+											const allDocs = await fetchAllDocumentsForExport();
+											await exportToPDF(allDocs);
+										}}
+									>
+										<ListItemIcon sx={{ minWidth: 28 }}><FuseSvgIcon size={18}>heroicons-outline:document-arrow-down</FuseSvgIcon></ListItemIcon>
+										<ListItemText primary="Descargar PDF (Todos)" primaryTypographyProps={{ fontSize: '0.8125rem' }} />
+									</MenuItem>
+								</Menu>
 							</Box>
 						)}
 						data={documents}
 						columns={columns}
-						state={{ isLoading, pagination }}
+						state={{ isLoading, pagination, rowSelection }}
 						onPaginationChange={setPagination}
+						onRowSelectionChange={setRowSelection}
 						manualPagination
 						rowCount={meta?.total ?? 0}
 						enablePagination
@@ -411,11 +715,13 @@ export default function ListAccounting() {
 						muiTableBodyRowProps={({ row }) => {
 							const basePath = operation === 'sale' ? '/sales' : '/purchases';
 							return {
-								component: Link,
-								to: `${basePath}/view/${row.original.id}`,
+								onClick: (e) => {
+									const isCheckboxClick = (e.target as HTMLElement).closest('.MuiTableCell-paddingCheckbox') || (e.target as HTMLElement).closest('.MuiCheckbox-root');
+									if (!isCheckboxClick) {
+										navigate(`${basePath}/view/${row.original.id}`);
+									}
+								},
 								sx: {
-									textDecoration: 'none',
-									color: 'inherit',
 									cursor: 'pointer',
 									backgroundColor: (theme: Theme) =>
 										row.index % 2 === 0

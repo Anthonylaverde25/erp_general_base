@@ -53,6 +53,25 @@ function CreateItemTrackingSection({ isLoading, textFieldProps, partners }: Crea
 					/>
 				</div>
 
+				<div className="flex items-center">
+					<Controller
+						name="has_serials"
+						control={control}
+						render={({ field }) => (
+							<FormControlLabel
+								control={
+									<Switch
+										checked={Boolean(field.value)}
+										onChange={(event) => field.onChange(event.target.checked)}
+										disabled={isLoading}
+									/>
+								}
+								label="¿Maneja Número de Serie?"
+							/>
+						)}
+					/>
+				</div>
+
 				<Controller
 					name="procurement_type"
 					control={control}
