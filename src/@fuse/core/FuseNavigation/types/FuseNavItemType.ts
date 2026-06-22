@@ -25,6 +25,7 @@ export type FuseNavItemType = {
 	children?: FuseNavItemType[];
 	hasPermission?: boolean;
 	quickCreateUrl?: string;
+	module?: string | string[];
 };
 
 export type FuseFlatNavItemType = Omit<FuseNavItemType, 'children' | 'sx'> & { children?: string[]; order: string };

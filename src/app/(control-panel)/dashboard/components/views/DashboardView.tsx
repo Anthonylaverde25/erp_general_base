@@ -1,9 +1,11 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import axiosInstance from '@/lib/@axios';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Responsive, WidthProvider } from 'react-grid-layout/legacy';
+import useUser from '@auth/useUser';
+import { useTenantModules } from '@/contexts/TenantModulesContext';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -154,19 +156,60 @@ const currencyFormatter = new Intl.NumberFormat('es-ES', {
   maximumFractionDigits: 2
 });
 
+const WIDGET_MODULES: Record<string, string | string[] | null> = {
+  ventas: 'sales',
+  gastos: 'purchases',
+  beneficio: ['sales', 'purchases'],
+  banco: null,
+  resumen_ventas_compras: ['sales', 'purchases'],
+  pagos_cobros_pendientes: ['sales', 'purchases'],
+  entradas_salidas_banco: null,
+  resumen_gastos: 'purchases',
+  cuentas_gasto: 'purchases',
+  stock_critico: ['sales', 'purchases'],
+  pending_invoicing: 'sales',
+  active_routes_card: 'sales',
+  incomplete_batches: ['sales', 'purchases'],
+  pending_serialization: ['sales', 'purchases']
+};
+
 const formatCurrency = (value: number) => currencyFormatter.format(value);
 
 // ─── Component ────────────────────────────────────────────────────────────────
 function DashboardView() {
-  const [layouts, setLayouts] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : initialLayouts;
-    } catch {
-      return initialLayouts;
-    }
-  });
+  const { data: user } = useUser();
+  const activeCompanyId = user?.active_company_id;
+  const { hasModule, hasAnyModule } = useTenantModules();
+
+  const [layouts, setLayouts] = useState(() => initialLayouts);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Load layout when activeCompanyId changes
+  useEffect(() => {
+    try {
+      const key = `${STORAGE_KEY}_company_${activeCompanyId ?? 'default'}`;
+      const saved = localStorage.getItem(key);
+      setLayouts(saved ? JSON.parse(saved) : initialLayouts);
+    } catch {
+      setLayouts(initialLayouts);
+    }
+  }, [activeCompanyId]);
+
+  const isWidgetVisible = useCallback((key: string): boolean => {
+    const mod = WIDGET_MODULES[key];
+    if (mod === null || mod === undefined) return true;
+    if (Array.isArray(mod)) return hasAnyModule(mod);
+    return hasModule(mod);
+  }, [hasModule, hasAnyModule]);
+
+  // Filter layouts dynamically
+  const filteredLayouts = useMemo(() => {
+    const result: Record<string, any[]> = {};
+    for (const [bp, items] of Object.entries(layouts)) {
+      result[bp] = (items as any[]).filter((item) => isWidgetVisible(item.i));
+    }
+    return result;
+  }, [layouts, isWidgetVisible]);
 
   interface KpiData {
     total: number;
@@ -197,15 +240,48 @@ function DashboardView() {
 
 
 
-  const handleLayoutChange = useCallback((_current: unknown, allLayouts: typeof initialLayouts) => {
-    setLayouts(allLayouts);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(allLayouts));
-  }, []);
+  const handleLayoutChange = useCallback((_current: unknown, allLayouts: Record<string, any[]>) => {
+    if (!isEditing) return;
+
+    setLayouts((prevLayouts) => {
+      const updatedLayouts = { ...prevLayouts };
+
+      for (const bp of Object.keys(allLayouts)) {
+        const prevBpLayout = prevLayouts[bp as keyof typeof prevLayouts] || [];
+        const newBpLayout = allLayouts[bp] || [];
+
+        const newLayoutMap = new Map(newBpLayout.map(item => [item.i, item]));
+
+        updatedLayouts[bp as keyof typeof prevLayouts] = prevBpLayout.map((prevItem) => {
+          if (newLayoutMap.has(prevItem.i)) {
+            const newItem = newLayoutMap.get(prevItem.i);
+            return { ...prevItem, ...newItem };
+          }
+          return prevItem;
+        });
+
+        const prevItemIds = new Set(prevBpLayout.map(item => item.i));
+        const addedItems = newBpLayout.filter(item => !prevItemIds.has(item.i));
+        if (addedItems.length > 0) {
+          updatedLayouts[bp as keyof typeof prevLayouts] = [
+            ...updatedLayouts[bp as keyof typeof prevLayouts],
+            ...addedItems
+          ];
+        }
+      }
+
+      const key = `${STORAGE_KEY}_company_${activeCompanyId ?? 'default'}`;
+      localStorage.setItem(key, JSON.stringify(updatedLayouts));
+
+      return updatedLayouts;
+    });
+  }, [activeCompanyId, isEditing]);
 
   const handleResetLayout = useCallback(() => {
     setLayouts(initialLayouts);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(initialLayouts));
-  }, []);
+    const key = `${STORAGE_KEY}_company_${activeCompanyId ?? 'default'}`;
+    localStorage.setItem(key, JSON.stringify(initialLayouts));
+  }, [activeCompanyId]);
 
   const handleToggleEdit = useCallback(() => {
     setIsEditing((prev) => !prev);
@@ -224,7 +300,7 @@ function DashboardView() {
           <GridWrapper isEditing={isEditing}>
             <ResponsiveGridLayout
               className="layout"
-              layouts={layouts}
+              layouts={filteredLayouts}
               breakpoints={GRID_BREAKPOINTS}
               cols={GRID_COLS}
               rowHeight={GRID_ROW_HEIGHT}
@@ -234,100 +310,128 @@ function DashboardView() {
               isDraggable={isEditing}
               isResizable={isEditing}
             >
-              <div key="ventas">
-                <DashGridItem isEditing={isEditing}>
-                  <KpiCard
-                    title="Ventas"
-                    value={formatCurrency(kpiData?.sales.total ?? 0)}
-                    subtitle={kpiData?.sales.subtitle ?? 'Año actual'}
-                    progressPercent={kpiData?.sales.percent ?? 0}
-                    targetValue={formatCurrency(kpiData?.sales.target ?? 10000)}
-                    targetColor="success.main"
-                  />
-                </DashGridItem>
-              </div>
-              <div key="gastos">
-                <DashGridItem isEditing={isEditing}>
-                  <KpiCard
-                    title="Gastos"
-                    value={formatCurrency(kpiData?.expenses.total ?? 0)}
-                    subtitle={kpiData?.expenses.subtitle ?? 'Año actual'}
-                    progressPercent={kpiData?.expenses.percent ?? 0}
-                    targetValue={formatCurrency(kpiData?.expenses.target ?? 5000)}
-                    targetColor="error.main"
-                  />
-                </DashGridItem>
-              </div>
-              <div key="beneficio">
-                <DashGridItem isEditing={isEditing}>
-                  <KpiCard
-                    title="Beneficio"
-                    value={formatCurrency((kpiData?.sales.total ?? 0) - (kpiData?.expenses.total ?? 0))}
-                    subtitle={kpiData?.sales.subtitle ?? 'Año actual'}
-                  />
-                </DashGridItem>
-              </div>
-              <div key="banco">
-                <DashGridItem isEditing={isEditing}>
-                  <BankCtaCard />
-                </DashGridItem>
-              </div>
-              <div key="resumen_ventas_compras">
-                <DashGridItem
-                  isEditing={isEditing}
-                  noPadding
-                >
-                  <SalesPurchasesChart />
-                </DashGridItem>
-              </div>
-              <div key="pagos_cobros_pendientes">
-                <DashGridItem
-                  isEditing={isEditing}
-                  noPadding
-                >
-                  <PendingBalancesChart />
-                </DashGridItem>
-              </div>
-              <div key="entradas_salidas_banco">
-                <DashGridItem isEditing={isEditing}>
-                  <BankFlowCard />
-                </DashGridItem>
-              </div>
-              <div key="resumen_gastos">
-                <DashGridItem isEditing={isEditing}>
-                  <ExpensesSummaryChart />
-                </DashGridItem>
-              </div>
-              <div key="cuentas_gasto">
-                <DashGridItem isEditing={isEditing}>
-                  <ExpenseAccountsCard />
-                </DashGridItem>
-              </div>
-              <div key="stock_critico">
-                <DashGridItem isEditing={isEditing}>
-                  <CriticalStockCard />
-                </DashGridItem>
-              </div>
-              <div key="pending_invoicing">
-                <DashGridItem isEditing={isEditing}>
-                  <PendingInvoicingCard />
-                </DashGridItem>
-              </div>
-              <div key="active_routes_card">
-                <DashGridItem isEditing={isEditing}>
-                  <ActiveRoutesCard />
-                </DashGridItem>
-              </div>
-              <div key="incomplete_batches">
-                <DashGridItem isEditing={isEditing}>
-                  <IncompleteBatchesCard />
-                </DashGridItem>
-              </div>
-              <div key="pending_serialization">
-                <DashGridItem isEditing={isEditing}>
-                  <PendingSerializationCard />
-                </DashGridItem>
-              </div>
+              {isWidgetVisible('ventas') && (
+                <div key="ventas">
+                  <DashGridItem isEditing={isEditing}>
+                    <KpiCard
+                      title="Ventas"
+                      value={formatCurrency(kpiData?.sales.total ?? 0)}
+                      subtitle={kpiData?.sales.subtitle ?? 'Año actual'}
+                      progressPercent={kpiData?.sales.percent ?? 0}
+                      targetValue={formatCurrency(kpiData?.sales.target ?? 10000)}
+                      targetColor="success.main"
+                    />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('gastos') && (
+                <div key="gastos">
+                  <DashGridItem isEditing={isEditing}>
+                    <KpiCard
+                      title="Gastos"
+                      value={formatCurrency(kpiData?.expenses.total ?? 0)}
+                      subtitle={kpiData?.expenses.subtitle ?? 'Año actual'}
+                      progressPercent={kpiData?.expenses.percent ?? 0}
+                      targetValue={formatCurrency(kpiData?.expenses.target ?? 5000)}
+                      targetColor="error.main"
+                    />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('beneficio') && (
+                <div key="beneficio">
+                  <DashGridItem isEditing={isEditing}>
+                    <KpiCard
+                      title="Beneficio"
+                      value={formatCurrency((kpiData?.sales.total ?? 0) - (kpiData?.expenses.total ?? 0))}
+                      subtitle={kpiData?.sales.subtitle ?? 'Año actual'}
+                    />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('banco') && (
+                <div key="banco">
+                  <DashGridItem isEditing={isEditing}>
+                    <BankCtaCard />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('resumen_ventas_compras') && (
+                <div key="resumen_ventas_compras">
+                  <DashGridItem
+                    isEditing={isEditing}
+                    noPadding
+                  >
+                    <SalesPurchasesChart />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('pagos_cobros_pendientes') && (
+                <div key="pagos_cobros_pendientes">
+                  <DashGridItem
+                    isEditing={isEditing}
+                    noPadding
+                  >
+                    <PendingBalancesChart />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('entradas_salidas_banco') && (
+                <div key="entradas_salidas_banco">
+                  <DashGridItem isEditing={isEditing}>
+                    <BankFlowCard />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('resumen_gastos') && (
+                <div key="resumen_gastos">
+                  <DashGridItem isEditing={isEditing}>
+                    <ExpensesSummaryChart />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('cuentas_gasto') && (
+                <div key="cuentas_gasto">
+                  <DashGridItem isEditing={isEditing}>
+                    <ExpenseAccountsCard />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('stock_critico') && (
+                <div key="stock_critico">
+                  <DashGridItem isEditing={isEditing}>
+                    <CriticalStockCard />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('pending_invoicing') && (
+                <div key="pending_invoicing">
+                  <DashGridItem isEditing={isEditing}>
+                    <PendingInvoicingCard />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('active_routes_card') && (
+                <div key="active_routes_card">
+                  <DashGridItem isEditing={isEditing}>
+                    <ActiveRoutesCard />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('incomplete_batches') && (
+                <div key="incomplete_batches">
+                  <DashGridItem isEditing={isEditing}>
+                    <IncompleteBatchesCard />
+                  </DashGridItem>
+                </div>
+              )}
+              {isWidgetVisible('pending_serialization') && (
+                <div key="pending_serialization">
+                  <DashGridItem isEditing={isEditing}>
+                    <PendingSerializationCard />
+                  </DashGridItem>
+                </div>
+              )}
 
             </ResponsiveGridLayout>
           </GridWrapper>

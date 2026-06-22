@@ -1,6 +1,8 @@
 import { lazy } from 'react';
 import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
 
+import ModuleGuard from '@/components/guards/ModuleGuard';
+
 const EmployeesPage = lazy(() => import('@/ui/employees/pages/EmployeesPage'));
 
 /**
@@ -8,7 +10,11 @@ const EmployeesPage = lazy(() => import('@/ui/employees/pages/EmployeesPage'));
  */
 const route: FuseRouteItemType = {
 	path: 'hr/employees',
-	element: <EmployeesPage />
+	element: (
+		<ModuleGuard module="hr">
+			<EmployeesPage />
+		</ModuleGuard>
+	)
 };
 
 export default route;

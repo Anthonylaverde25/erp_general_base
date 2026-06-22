@@ -32,6 +32,7 @@ const navigationConfig: FuseNavItemType[] = [
 		translate: 'DELIVERY',
 		type: 'collapse',
 		icon: 'lucide:truck',
+		module: 'sales',
 		children: [
 			{
 				id: 'delivery.products',
@@ -74,6 +75,7 @@ const navigationConfig: FuseNavItemType[] = [
 		translate: 'HR',
 		type: 'collapse',
 		icon: 'lucide:user',
+		module: 'hr',
 		children: [
 			{
 				id: 'employees',
@@ -142,6 +144,7 @@ const navigationConfig: FuseNavItemType[] = [
 		translate: 'CAJA',
 		type: 'collapse',
 		icon: 'lucide:credit-card',
+		module: 'pos',
 		children: [
 			{
 				id: 'caja.active',
@@ -175,6 +178,7 @@ const navigationConfig: FuseNavItemType[] = [
 				translate: 'SALES',
 				type: 'collapse',
 				icon: 'lucide:trending-up',
+				module: 'sales',
 				children: [
 					{
 						id: 'sales.invoices',
@@ -254,6 +258,7 @@ const navigationConfig: FuseNavItemType[] = [
 				translate: 'PURCHASES',
 				type: 'collapse',
 				icon: 'lucide:trending-down',
+				module: 'purchases',
 				children: [
 					{
 						id: 'purchases.invoices',
@@ -308,6 +313,7 @@ const navigationConfig: FuseNavItemType[] = [
 				translate: 'SALES',
 				type: 'collapse',
 				icon: 'lucide:trending-up',
+				module: 'sales',
 				children: [
 					{
 						id: 'sales.inv.services',
@@ -344,6 +350,7 @@ const navigationConfig: FuseNavItemType[] = [
 				translate: 'PURCHASES',
 				type: 'collapse',
 				icon: 'lucide:trending-down',
+				module: 'purchases',
 				children: [
 					{
 						id: 'purchases.inv.services',
@@ -373,6 +380,7 @@ const navigationConfig: FuseNavItemType[] = [
     translate: 'LISTS',
     type: 'collapse',
     icon: 'lucide:list',
+    module: ['sales', 'purchases'],
     children: [
       {
         id: 'lists.pending_collections',
@@ -414,6 +422,7 @@ const navigationConfig: FuseNavItemType[] = [
 		translate: 'INVENTORY',
 		type: 'collapse',
 		icon: 'lucide:box',
+		module: ['sales', 'purchases'],
 		children: [
 			{
 				id: 'inventory.products',

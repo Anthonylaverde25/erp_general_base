@@ -1,6 +1,8 @@
 import { lazy } from 'react';
 import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
 
+import ModuleGuard from '@/components/guards/ModuleGuard';
+
 const SalesPage = lazy(() => import('@/ui/documents/pages/SalesPage'));
 const CreateSalesDocumentPage = lazy(() => import('@/ui/documents/pages/CreateSalesDocumentPage'));
 const EditSalesDocumentPage = lazy(() => import('@/ui/documents/pages/EditSalesDocumentPage'));
@@ -10,6 +12,7 @@ const GroupedInvoicesPage = lazy(() => import('@/ui/documents/pages/GroupedInvoi
 
 const route: FuseRouteItemType = {
 	path: 'sales',
+	element: <ModuleGuard module="sales" />,
 	children: [
 		{
 			path: 'grouped-invoices',

@@ -3,6 +3,7 @@ import type { DocumentFormValues } from "../schemas/documentSchema";
 import type { DocumentOperation } from "../components/create-document/types";
 import { useCreateDocument } from "@/features/documents/hooks/useCreateDocument";
 import { useUpdateDocument } from "@/features/documents/hooks/useUpdateDocument";
+import { useTenantModules } from "@/contexts/TenantModulesContext";
 
 function buildPayload(data: DocumentFormValues, statusKey: string, itemType: string, typeCode?: string, operation?: DocumentOperation) {
     let finalStatus = statusKey;
@@ -73,10 +74,21 @@ export function useDocumentSubmit({
     const navigate = useNavigate();
     const { mutate: createDocument, isPending: isCreatingNew } = useCreateDocument();
     const { mutate: updateDocument, isPending: isUpdating } = useUpdateDocument();
+    const { hasModule } = useTenantModules();
 
     const basePath = operation === "sale" ? "sales" : "purchases";
 
     const submitWithStatus = (statusKey: "draft" | "issued" | string) => (data: DocumentFormValues) => {
+        // Module validation (defense in depth)
+        if (operation === 'sale' && !hasModule('sales')) {
+            alert('El módulo de Ventas no está habilitado para esta empresa.');
+            return;
+        }
+        if (operation === 'purchase' && !hasModule('purchases')) {
+            alert('El módulo de Compras no está habilitado para esta empresa.');
+            return;
+        }
+
         if (statusKey !== "draft" && operation === "sale" && !data.number_series_id) {
             alert("Debe seleccionar una Serie de Numeración para emitir o validar este documento.");
             return;

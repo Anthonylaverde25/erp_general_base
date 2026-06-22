@@ -1,6 +1,8 @@
 import { lazy } from 'react';
 import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
 
+import ModuleGuard from '@/components/guards/ModuleGuard';
+
 const CashRegisterView = lazy(() => import('@/ui/cash-register/pages/CashRegister'));
 const CashRegisterListView = lazy(() => import('@/ui/cash-register/pages/CashRegistersPage'));
 
@@ -9,6 +11,7 @@ const CashRegisterListView = lazy(() => import('@/ui/cash-register/pages/CashReg
  */
 const route: FuseRouteItemType = {
 	path: 'cash-register',
+	element: <ModuleGuard module="pos" />,
 	children: [
 		{
 			path: '',

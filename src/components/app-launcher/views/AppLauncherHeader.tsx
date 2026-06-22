@@ -8,9 +8,6 @@ interface AppLauncherHeaderProps {
 
 export function AppLauncherHeader({ onClose }: AppLauncherHeaderProps) {
 	const modulesInfo = useTenantModules();
-	console.log('Available Modules:', modulesInfo.available);
-	console.log('Licensed Modules:', modulesInfo.licensed);
-	console.log('Has POS Module?', modulesInfo.hasModule('pos'));
 	return (
 		<Box
 			sx={{
