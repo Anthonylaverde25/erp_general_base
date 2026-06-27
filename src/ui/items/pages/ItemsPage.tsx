@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
@@ -24,7 +24,13 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 
 export default function ItemsPage() {
 	const navigate = useNavigate();
-	const [currentTab, setCurrentTab] = useState('all');
+	const location = useLocation();
+
+	const currentTab = useMemo(() => {
+		if (location.pathname.endsWith('/products')) return 'physical';
+		if (location.pathname.endsWith('/services')) return 'service';
+		return 'all';
+	}, [location.pathname]);
 
 	const handleCreate = () => {
 		if (currentTab === 'physical' || currentTab === 'service') {
@@ -35,7 +41,13 @@ export default function ItemsPage() {
 	};
 
 	const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
-		setCurrentTab(newValue);
+		if (newValue === 'physical') {
+			navigate('/items/products');
+		} else if (newValue === 'service') {
+			navigate('/items/services');
+		} else {
+			navigate('/items');
+		}
 	};
 
 	return (

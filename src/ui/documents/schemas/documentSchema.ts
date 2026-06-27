@@ -28,6 +28,8 @@ export const documentLineSchema = z.object({
     has_batches: z.boolean().optional(),
     procurement_type: z.enum(["buy", "make"]).optional().nullable(),
     serial_numbers: z.array(z.string()).default([]),
+    is_serialization_resolved: z.boolean().optional(),
+    available_serial_numbers: z.array(z.string()).optional(),
 });
 
 export const documentSchema = z.object({

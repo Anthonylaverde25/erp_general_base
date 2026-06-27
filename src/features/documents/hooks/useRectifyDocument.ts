@@ -18,6 +18,7 @@ export function useRectifyDocument() {
         rectification_type_id?: number;
         rectification_modality_id?: number;
         notes?: string;
+        serial_comments?: Record<string, string>;
     } }>({
         mutationFn: ({ id, payload }) => useCase.execute(id, payload),
         onSuccess: (_rectified, variables) => {

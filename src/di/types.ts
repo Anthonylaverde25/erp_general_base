@@ -212,4 +212,14 @@ export const TYPES = {
 	IndexBatchesUseCase: Symbol.for('IndexBatchesUseCase'),
 	ShowBatchUseCase: Symbol.for('ShowBatchUseCase'),
 	UpdateBatchUseCase: Symbol.for('UpdateBatchUseCase'),
+
+	// Serial Returns
+	SerialReturnRepository: Symbol.for('SerialReturnRepository'),
+	IndexSerialReturnsUseCase: Symbol.for('IndexSerialReturnsUseCase'),
+	IndexItemReturnReasonsUseCase: Symbol.for('IndexItemReturnReasonsUseCase'),
+	ProcessSerialReturnUseCase: Symbol.for('ProcessSerialReturnUseCase'),
+
+	// Pending Serialization
+	IndexPendingSerializationUseCase: Symbol.for('IndexPendingSerializationUseCase'),
+	RegisterItemSerialsUseCase: Symbol.for('RegisterItemSerialsUseCase'),
 };

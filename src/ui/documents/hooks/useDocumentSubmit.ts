@@ -94,6 +94,21 @@ export function useDocumentSubmit({
             return;
         }
 
+        // Validate serial numbers for serialized items in sales (stock-affecting statuses)
+        if (statusKey !== "draft" && operation === "sale") {
+            for (let idx = 0; idx < data.lines.length; idx++) {
+                const line = data.lines[idx];
+                if (line.has_serials && line.item_id) {
+                    const requiredQty = Math.max(1, Math.floor(Number(line.quantity) || 1));
+                    const enteredQty = line.serial_numbers?.length || 0;
+                    if (enteredQty !== requiredQty) {
+                        alert(`Debe ingresar exactamente ${requiredQty} números de serie para el artículo "${line.code || line.description}". (Ingresados: ${enteredQty})`);
+                        return;
+                    }
+                }
+            }
+        }
+
         const payload = buildPayload(data, statusKey, itemType, documentTypeCode, operation) as any;
 
         if (isEditMode && documentId) {

@@ -5,15 +5,18 @@ import { UpdateDocumentUseCase } from '@/application/use_cases/documents/UpdateD
 import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 
 export function useUpdateDocument() {
-    const useCase = container.get<UpdateDocumentUseCase>(TYPES.UpdateDocumentUseCase);
-    const queryClient = useQueryClient();
+	const useCase = container.get<UpdateDocumentUseCase>(TYPES.UpdateDocumentUseCase);
+	const queryClient = useQueryClient();
 
-    return useMutation<DocumentEntity, Error, { id: string; data: any }>({
-        mutationFn: async ({ id, data }) => await useCase.execute(id, data),
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['documents'] });
-            queryClient.invalidateQueries({ queryKey: ['document', String(variables.id)] });
-            queryClient.invalidateQueries({ queryKey: ['number_series'] });
-        }
-    });
+	return useMutation<DocumentEntity, Error, { id: string; data: Record<string, unknown> }>({
+		mutationFn: async ({ id, data }) => await useCase.execute(id, data),
+		onSuccess: (_data, variables) => {
+			queryClient.invalidateQueries({ queryKey: ['documents'] });
+			queryClient.invalidateQueries({ queryKey: ['document', String(variables.id)] });
+			queryClient.invalidateQueries({ queryKey: ['number_series'] });
+			queryClient.invalidateQueries({ queryKey: ['items'] });
+			queryClient.invalidateQueries({ queryKey: ['items_search'] });
+			queryClient.invalidateQueries({ queryKey: ['pending-serialization'] });
+		}
+	});
 }

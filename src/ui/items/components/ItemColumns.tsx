@@ -1,6 +1,7 @@
 import { MRT_ColumnDef } from 'material-react-table';
-import { Avatar, Chip, Typography, Box } from '@mui/material';
+import { Avatar, Chip, Typography, Box, Tooltip } from '@mui/material';
 import { ItemEntity } from '@/domain/entities/items/ItemEntity';
+import { Barcode } from 'lucide-react';
 
 export const ItemColumns: MRT_ColumnDef<ItemEntity>[] = [
 	{
@@ -49,13 +50,40 @@ export const ItemColumns: MRT_ColumnDef<ItemEntity>[] = [
 						{getInitials(name)}
 					</Avatar>
 					<Box className="flex flex-col">
-						<Typography
-							variant="body2"
-							fontWeight={600}
-							sx={{ fontSize: '0.8125rem', lineHeight: 1.2 }}
-						>
-							{name}
-						</Typography>
+						<Box className="flex items-center gap-1">
+							<Typography
+								variant="body2"
+								fontWeight={600}
+								sx={{ fontSize: '0.8125rem', lineHeight: 1.2 }}
+							>
+								{name}
+							</Typography>
+							{item.physical_profile?.has_serials && (
+								<Tooltip title="Control de Números de Serie activo" arrow>
+									<Box
+										component="span"
+										sx={{
+											display: 'inline-flex',
+											alignItems: 'center',
+											gap: '2px',
+											bgcolor: '#eff6ff',
+											color: '#1d4ed8',
+											borderRadius: '4px',
+											px: '4px',
+											py: '1px',
+											fontSize: '8px',
+											fontWeight: 800,
+											border: '1px solid #dbeafe',
+											textTransform: 'uppercase',
+											lineHeight: 1.2
+										}}
+									>
+										<Barcode size={10} style={{ strokeWidth: 2.5 }} />
+										SERIAL
+									</Box>
+								</Tooltip>
+							)}
+						</Box>
 						<Typography
 							variant="caption"
 							color="text.secondary"

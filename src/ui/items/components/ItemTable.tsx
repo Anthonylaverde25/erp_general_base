@@ -24,6 +24,8 @@ export default function ItemTable(props: ItemTableProps) {
 		return null;
 	}
 
+	const enableRowNumbers = currentTab !== 'physical';
+
 	return (
 		<DataTable
 			data={items || []}
@@ -37,14 +39,17 @@ export default function ItemTable(props: ItemTableProps) {
 				}
 			}}
 			enablePagination
-			enableRowNumbers
+			enableRowNumbers={enableRowNumbers}
 			rowNumberDisplayMode="static"
 			initialState={{
 				density: 'compact',
 				showColumnFilters: false,
 				pagination: { pageSize: 15, pageIndex: 0 },
 				showGlobalFilter: true,
-				columnPinning: { left: ['mrt-row-numbers'], right: ['mrt-row-actions'] },
+				columnPinning: {
+					left: enableRowNumbers ? ['mrt-row-numbers'] : [],
+					right: ['mrt-row-actions']
+				},
 				columnVisibility: {
 					'physical_profile.barcode': currentTab !== 'service',
 					total_stock: currentTab !== 'service',

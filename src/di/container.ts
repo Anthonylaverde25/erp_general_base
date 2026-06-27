@@ -52,6 +52,8 @@ import { registerFileTypesModule } from './modules/file_types.module';
 import { registerFilesModule } from './modules/files.module';
 import { registerDocumentModule } from './modules/document.module';
 import { registerBatchModule } from './modules/batches.module';
+import { registerSerialReturnsModule } from './modules/serial-returns.module';
+import { registerPendingSerializationModule } from './modules/pending-serialization.module';
 
 UnitTypeModule(container);
 UnitsModule(container);
@@ -60,5 +62,7 @@ registerFileTypesModule(container);
 registerFilesModule(container);
 registerDocumentModule(container);
 registerBatchModule(container);
+registerSerialReturnsModule(container);
+registerPendingSerializationModule(container);
 
 export { container };

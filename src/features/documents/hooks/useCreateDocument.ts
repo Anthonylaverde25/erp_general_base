@@ -5,14 +5,17 @@ import { CreateDocumentUseCase } from '@/application/use_cases/documents/CreateD
 import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 
 export function useCreateDocument() {
-    const useCase = container.get<CreateDocumentUseCase>(TYPES.CreateDocumentUseCase);
-    const queryClient = useQueryClient();
+	const useCase = container.get<CreateDocumentUseCase>(TYPES.CreateDocumentUseCase);
+	const queryClient = useQueryClient();
 
-    return useMutation<DocumentEntity, Error, any>({
-        mutationFn: async (data: any) => await useCase.execute(data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['number_series'] });
-            queryClient.invalidateQueries({ queryKey: ['documents'] });
-        }
-    });
+	return useMutation<DocumentEntity, Error, Record<string, unknown>>({
+		mutationFn: async (data: Record<string, unknown>) => await useCase.execute(data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['number_series'] });
+			queryClient.invalidateQueries({ queryKey: ['documents'] });
+			queryClient.invalidateQueries({ queryKey: ['items'] });
+			queryClient.invalidateQueries({ queryKey: ['items_search'] });
+			queryClient.invalidateQueries({ queryKey: ['pending-serialization'] });
+		}
+	});
 }

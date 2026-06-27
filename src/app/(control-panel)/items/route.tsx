@@ -17,6 +17,14 @@ const route: FuseRouteItemType = {
 			element: <ItemsPage />
 		},
 		{
+			path: 'products',
+			element: <ItemsPage />
+		},
+		{
+			path: 'services',
+			element: <ItemsPage />
+		},
+		{
 			path: 'create',
 			element: <CreateItemPage />
 		},

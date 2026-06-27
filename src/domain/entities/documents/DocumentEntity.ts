@@ -1,261 +1,276 @@
 export interface DocumentStatus {
-    id: number;
-    name: string;
-    key: string;
-    color: string;
-    icon: string;
-    is_final: boolean;
+	id: number;
+	name: string;
+	key: string;
+	color: string;
+	icon: string;
+	is_final: boolean;
 }
 
 export interface DocumentLineTax {
-    id?: number;
-    document_line_id?: number;
-    tax_rate_id?: number;
-    name?: string;
-    percentage?: number;
-    tax_operation?: string;
-    base_amount?: number;
-    tax_amount?: number;
+	id?: number;
+	document_line_id?: number;
+	tax_rate_id?: number;
+	name?: string;
+	percentage?: number;
+	tax_operation?: string;
+	base_amount?: number;
+	tax_amount?: number;
 }
 
 export interface DocumentLine {
-    id?: number;
-    document_id?: number;
-    item_id?: number | null;
-    item_code?: string | null;
-    name: string;
-    unit_name?: string | null;
-    unit_short_name?: string | null;
-    category_name?: string | null;
-    description: string | null;
-    quantity: number;
-    processed_quantity: number;
-    unit_price: number;
-    discount_percent: number;
-    discount_amount: number;
-    tax_base: number; // line_subtotal alias
-    tax_labels?: string | null;
-    tax_amount: number;
-    line_total: number;
-    taxes: DocumentLineTax[];
-    source_line_id?: number | null;
-    source_document_id?: number | null;
-    source_document_number?: string | null;
+	id?: number;
+	document_id?: number;
+	item_id?: number | null;
+	item_code?: string | null;
+	name: string;
+	unit_name?: string | null;
+	unit_short_name?: string | null;
+	category_name?: string | null;
+	description: string | null;
+	quantity: number;
+	processed_quantity: number;
+	unit_price: number;
+	discount_percent: number;
+	discount_amount: number;
+	tax_base: number; // line_subtotal alias
+	tax_labels?: string | null;
+	tax_amount: number;
+	line_total: number;
+	taxes: DocumentLineTax[];
+	source_line_id?: number | null;
+	source_document_id?: number | null;
+	source_document_number?: string | null;
+	has_serials?: boolean;
+	has_batches?: boolean;
+	meta?: {
+		serial_numbers?: string[];
+	} | null;
 }
 
 export interface DocumentTaxSummary {
-    id?: number;
-    document_id?: number;
-    tax_rate_id?: number;
-    name?: string;
-    rate?: number;
-    tax_operation?: string;
-    base_amount: number;
-    tax_amount: number;
+	id?: number;
+	document_id?: number;
+	tax_rate_id?: number;
+	name?: string;
+	rate?: number;
+	tax_operation?: string;
+	base_amount: number;
+	tax_amount: number;
 }
 
 export interface ParentDocumentInfo {
-    id: number;
-    number_serie: string;
-    document_type_name: string | null;
-    document_type_code?: string | null;
-    issue_date?: string | null;
-    total?: number;
-    total_paid?: number;
-    balance?: number;
-    status?: {
-        name: string;
-        color: string;
-    } | null;
+	id: number;
+	number_serie: string;
+	document_type_name: string | null;
+	document_type_code?: string | null;
+	issue_date?: string | null;
+	total?: number;
+	total_paid?: number;
+	balance?: number;
+	status?: {
+		name: string;
+		color: string;
+	} | null;
 }
 
 export class DocumentEntity {
-    constructor(
-        public readonly id: number,
-        public readonly company_id: number,
-        public readonly operation: 'sale' | 'purchase',
-        public readonly status: DocumentStatus,
-        public readonly issue_date: string | null,
-        public readonly due_date: string | null,
-        public readonly number_serie: string | null,
-        public readonly external_reference: string | null,
-        public readonly subtotal: number,
-        public readonly discount_total: number,
-        public readonly tax_total: number,
-        public readonly total: number,
-        public readonly total_paid: number = 0,
-        public readonly invoiced_amount: number = 0,
-        public readonly pending_invoicing_amount: number = 0,
-        public readonly partner_id: number | null,
-        public readonly partner_name: string | null,
-        public readonly partner_email: string | null,
-        public readonly partner_address: string | null,
-        public readonly partner_vat_number: string | null,
-        public readonly partner_cif: string | null,
-        public readonly partner_roles: string[] = [],
-        public readonly document_type_name: string | null,
-        public readonly document_type_code: string | null,
-        public readonly issue_date_raw: string | null,
-        public readonly due_date_raw: string | null,
-        public readonly number_series_id: number | null,
-        public readonly item_type: 'product' | 'service' | null,
-        public readonly notes: string | null,
-        public readonly lines: DocumentLine[],
-        public readonly tax_summaries: DocumentTaxSummary[],
-        public readonly predecessors: ParentDocumentInfo[] = [],
-        public readonly successors: ParentDocumentInfo[] = []
-    ) { }
+	constructor(
+		public readonly id: number,
+		public readonly company_id: number,
+		public readonly operation: 'sale' | 'purchase',
+		public readonly status: DocumentStatus,
+		public readonly issue_date: string | null,
+		public readonly due_date: string | null,
+		public readonly number_serie: string | null,
+		public readonly external_reference: string | null,
+		public readonly subtotal: number,
+		public readonly discount_total: number,
+		public readonly tax_total: number,
+		public readonly total: number,
+		public readonly total_paid = 0,
+		public readonly invoiced_amount = 0,
+		public readonly pending_invoicing_amount = 0,
+		public readonly partner_id: number | null,
+		public readonly partner_name: string | null,
+		public readonly partner_email: string | null,
+		public readonly partner_address: string | null,
+		public readonly partner_vat_number: string | null,
+		public readonly partner_cif: string | null,
+		public readonly partner_roles: string[] = [],
+		public readonly document_type_name: string | null,
+		public readonly document_type_code: string | null,
+		public readonly issue_date_raw: string | null,
+		public readonly due_date_raw: string | null,
+		public readonly number_series_id: number | null,
+		public readonly item_type: 'product' | 'service' | null,
+		public readonly notes: string | null,
+		public readonly lines: DocumentLine[],
+		public readonly tax_summaries: DocumentTaxSummary[],
+		public readonly predecessors: ParentDocumentInfo[] = [],
+		public readonly successors: ParentDocumentInfo[] = []
+	) {}
 
-    get balance(): number {
-        return Number((this.total - this.total_paid).toFixed(2));
-    }
+	get balance(): number {
+		return Number((this.total - this.total_paid).toFixed(2));
+	}
 
-    get is_prospect(): boolean {
-        return this.partner_roles.includes('prospect');
-    }
+	get is_prospect(): boolean {
+		return this.partner_roles.includes('prospect');
+	}
 
-    static fromJson(json: any): DocumentEntity {
-        const contactList = Array.isArray(json.partner?.contact) ? json.partner.contact : [];
-        const defaultContact = contactList.find((contact: any) => contact?.default);
-        const fallbackContact = contactList[0];
+	static fromJson(json: any): DocumentEntity {
+		const contactList = Array.isArray(json.partner?.contact) ? json.partner.contact : [];
+		const defaultContact = contactList.find((contact: any) => contact?.default);
+		const fallbackContact = contactList[0];
 
-        const predecessors: ParentDocumentInfo[] = Array.isArray(json.predecessors)
-            ? json.predecessors.map((p: any) => ({
-                id: Number(p.id),
-                number_serie: p.number_serie,
-                document_type_name: p.document_type_name || null,
-                document_type_code: p.document_type_code || null,
-                issue_date: p.issue_date || null,
-                total: p.total !== undefined ? Number(p.total) : undefined,
-                total_paid: p.total_paid !== undefined ? Number(p.total_paid) : undefined,
-                balance: p.balance !== undefined ? Number(p.balance) : undefined,
-                status: p.status || null
-            }))
-            : [];
+		const predecessors: ParentDocumentInfo[] = Array.isArray(json.predecessors)
+			? json.predecessors.map((p: any) => ({
+					id: Number(p.id),
+					number_serie: p.number_serie,
+					document_type_name: p.document_type_name || null,
+					document_type_code: p.document_type_code || null,
+					issue_date: p.issue_date || null,
+					total: p.total !== undefined ? Number(p.total) : undefined,
+					total_paid: p.total_paid !== undefined ? Number(p.total_paid) : undefined,
+					balance: p.balance !== undefined ? Number(p.balance) : undefined,
+					status: p.status || null
+				}))
+			: [];
 
-        const lines: DocumentLine[] = Array.isArray(json.lines)
-            ? json.lines.map((line: any) => ({
-                id: line.id,
-                document_id: line.document_id,
-                item_id: line.item_id ?? null,
-                item_code: line.item_code ?? null,
-                name: line.name || '',
-                unit_name: line.unit_name ?? null,
-                unit_short_name: line.unit_short_name ?? null,
-                category_name: line.category_name ?? null,
-                description: line.description || null,
-                quantity: Number(line.quantity ?? 0),
-                processed_quantity: Number(line.processed_quantity ?? 0),
-                unit_price: Number(line.unit_price ?? 0),
-                discount_percent: Number(line.discount_percent ?? line.discount_percentage ?? 0),
-                discount_amount: Number(line.discount_amount ?? 0),
-                tax_base: Number(line.tax_base ?? line.line_subtotal ?? 0),
-                tax_labels: line.tax_labels ?? null,
-                tax_amount: Number(line.tax_amount ?? 0),
-                line_total: Number(line.line_total ?? 0),
-                taxes: Array.isArray(line.taxes)
-                    ? line.taxes.map((tax: any) => ({
-                        id: tax.id,
-                        document_line_id: tax.document_line_id,
-                        tax_rate_id: tax.tax_rate_id,
-                        name: tax.name,
-                        percentage: Number(tax.percentage ?? 0),
-                        tax_operation: tax.tax_operation,
-                        base_amount: Number(tax.base_amount ?? 0),
-                        tax_amount: Number(tax.tax_amount ?? 0)
-                    }))
-                    : [],
-                source_line_id: line.source_line_id ? Number(line.source_line_id) : null,
-                source_document_id: line.source_document_id ? Number(line.source_document_id) : null,
-                source_document_number: line.source_document_number || (line.source_document_id ? predecessors.find(p => p.id === Number(line.source_document_id))?.number_serie : null),
-            }))
-            : [];
+		const lines: DocumentLine[] = Array.isArray(json.lines)
+			? json.lines.map((line: any) => ({
+					id: line.id,
+					document_id: line.document_id,
+					item_id: line.item_id ?? null,
+					item_code: line.item_code ?? null,
+					name: line.name || '',
+					unit_name: line.unit_name ?? null,
+					unit_short_name: line.unit_short_name ?? null,
+					category_name: line.category_name ?? null,
+					description: line.description || null,
+					quantity: Number(line.quantity ?? 0),
+					processed_quantity: Number(line.processed_quantity ?? 0),
+					unit_price: Number(line.unit_price ?? 0),
+					discount_percent: Number(line.discount_percent ?? line.discount_percentage ?? 0),
+					discount_amount: Number(line.discount_amount ?? 0),
+					tax_base: Number(line.tax_base ?? line.line_subtotal ?? 0),
+					tax_labels: line.tax_labels ?? null,
+					tax_amount: Number(line.tax_amount ?? 0),
+					line_total: Number(line.line_total ?? 0),
+					taxes: Array.isArray(line.taxes)
+						? line.taxes.map((tax: any) => ({
+								id: tax.id,
+								document_line_id: tax.document_line_id,
+								tax_rate_id: tax.tax_rate_id,
+								name: tax.name,
+								percentage: Number(tax.percentage ?? 0),
+								tax_operation: tax.tax_operation,
+								base_amount: Number(tax.base_amount ?? 0),
+								tax_amount: Number(tax.tax_amount ?? 0)
+							}))
+						: [],
+					source_line_id: line.source_line_id ? Number(line.source_line_id) : null,
+					source_document_id: line.source_document_id ? Number(line.source_document_id) : null,
+					source_document_number:
+						line.source_document_number ||
+						(line.source_document_id
+							? predecessors.find((p) => p.id === Number(line.source_document_id))?.number_serie
+							: null),
+					has_serials: line.has_serials ?? false,
+					has_batches: line.has_batches ?? false,
+					meta: line.meta ?? null
+				}))
+			: [];
 
-        const tax_summaries: DocumentTaxSummary[] = Array.isArray(json.tax_summaries)
-            ? json.tax_summaries.map((summary: any) => ({
-                id: summary.id,
-                document_id: summary.document_id,
-                tax_rate_id: summary.tax_rate_id,
-                name: summary.name,
-                rate: Number(summary.rate ?? 0),
-                tax_operation: summary.tax_operation,
-                base_amount: Number(summary.base_amount ?? 0),
-                tax_amount: Number(summary.tax_amount ?? 0)
-            }))
-            : [];
+		const tax_summaries: DocumentTaxSummary[] = Array.isArray(json.tax_summaries)
+			? json.tax_summaries.map((summary: any) => ({
+					id: summary.id,
+					document_id: summary.document_id,
+					tax_rate_id: summary.tax_rate_id,
+					name: summary.name,
+					rate: Number(summary.rate ?? 0),
+					tax_operation: summary.tax_operation,
+					base_amount: Number(summary.base_amount ?? 0),
+					tax_amount: Number(summary.tax_amount ?? 0)
+				}))
+			: [];
 
-        const successors: ParentDocumentInfo[] = Array.isArray(json.successors)
-            ? json.successors.map((s: any) => ({
-                id: Number(s.id),
-                number_serie: s.number_serie,
-                document_type_name: s.document_type_name || null,
-                document_type_code: s.document_type_code || null,
-                issue_date: s.issue_date || null,
-                total: s.total !== undefined ? Number(s.total) : undefined,
-                total_paid: s.total_paid !== undefined ? Number(s.total_paid) : undefined,
-                balance: s.balance !== undefined ? Number(s.balance) : undefined,
-                status: s.status || null
-            }))
-            : [];
+		const successors: ParentDocumentInfo[] = Array.isArray(json.successors)
+			? json.successors.map((s: any) => ({
+					id: Number(s.id),
+					number_serie: s.number_serie,
+					document_type_name: s.document_type_name || null,
+					document_type_code: s.document_type_code || null,
+					issue_date: s.issue_date || null,
+					total: s.total !== undefined ? Number(s.total) : undefined,
+					total_paid: s.total_paid !== undefined ? Number(s.total_paid) : undefined,
+					balance: s.balance !== undefined ? Number(s.balance) : undefined,
+					status: s.status || null
+				}))
+			: [];
 
-        const partner_roles = Array.isArray(json.partner?.roles)
-            ? json.partner.roles.map((r: any) => r.role)
-            : (Array.isArray(json.partner_roles) ? json.partner_roles : []);
+		const partner_roles = Array.isArray(json.partner?.roles)
+			? json.partner.roles.map((r: any) => r.role)
+			: Array.isArray(json.partner_roles)
+				? json.partner_roles
+				: [];
 
-        return new DocumentEntity(
-            Number(json.id),
-            Number(json.company_id),
-            json.operation,
-            json.status,
-            json.issue_date,
-            json.due_date,
-            json.number_serie,
-            json.external_reference || null,
-            Number(json.subtotal ?? 0),
-            Number(json.discount_total ?? 0),
-            Number(json.tax_total ?? 0),
-            Number(json.total ?? 0),
-            Number(json.total_paid ?? 0),
-            Number(json.invoiced_amount ?? 0),
-            Number(json.pending_invoicing_amount ?? 0),
-            json.partner_id ? Number(json.partner_id) : null,
-            json.partner?.name || json.partner_name || json.partner_snapshot?.name || null,
-            defaultContact?.email || fallbackContact?.email || json.partner_snapshot?.email || null,
-            json.partner?.address || json.partner_address || json.partner_snapshot?.address || null,
-            json.partner?.vat_number || json.partner_vat_number || json.partner_snapshot?.vat_number || null,
-            json.partner?.cif || json.partner_cif || json.partner_snapshot?.cif || null,
-            partner_roles,
-            json.document_type?.name || json.document_type_name || null,
-            json.document_type?.code || json.document_type_code || null,
-            json.issue_date || null,
-            json.due_date || null,
-            json.number_series_id ? Number(json.number_series_id) : null,
-            json.item_type || null,
-            json.notes || null,
-            lines,
-            tax_summaries,
-            predecessors,
-            successors
-        );
-    }
+		return new DocumentEntity(
+			Number(json.id),
+			Number(json.company_id),
+			json.operation,
+			json.status,
+			json.issue_date,
+			json.due_date,
+			json.number_serie,
+			json.external_reference || null,
+			Number(json.subtotal ?? 0),
+			Number(json.discount_total ?? 0),
+			Number(json.tax_total ?? 0),
+			Number(json.total ?? 0),
+			Number(json.total_paid ?? 0),
+			Number(json.invoiced_amount ?? 0),
+			Number(json.pending_invoicing_amount ?? 0),
+			json.partner_id ? Number(json.partner_id) : null,
+			json.partner?.name || json.partner_name || json.partner_snapshot?.name || null,
+			defaultContact?.email || fallbackContact?.email || json.partner_snapshot?.email || null,
+			json.partner?.address || json.partner_address || json.partner_snapshot?.address || null,
+			json.partner?.vat_number || json.partner_vat_number || json.partner_snapshot?.vat_number || null,
+			json.partner?.cif || json.partner_cif || json.partner_snapshot?.cif || null,
+			partner_roles,
+			json.document_type?.name || json.document_type_name || null,
+			json.document_type?.code || json.document_type_code || null,
+			json.issue_date || null,
+			json.due_date || null,
+			json.number_series_id ? Number(json.number_series_id) : null,
+			json.item_type || null,
+			json.notes || null,
+			lines,
+			tax_summaries,
+			predecessors,
+			successors
+		);
+	}
 
-    public canReceivePayments(): boolean {
-        if (this.document_type_code === 'DLV' && this.status.key === 'invoiced') {
-            return false;
-        }
-        return true;
-    }
+	public canReceivePayments(): boolean {
+		if (this.document_type_code === 'DLV' && this.status.key === 'invoiced') {
+			return false;
+		}
 
-    static getDocumentLink(id: number | string, operation: 'sale' | 'purchase'): string {
-        const module = operation === 'sale' ? 'sales' : 'purchases';
-        return `/${module}/view/${id}`;
-    }
+		return true;
+	}
 
-    get viewLink(): string {
-        return DocumentEntity.getDocumentLink(this.id, this.operation);
-    }
+	static getDocumentLink(id: number | string, operation: 'sale' | 'purchase'): string {
+		const module = operation === 'sale' ? 'sales' : 'purchases';
+		return `/${module}/view/${id}`;
+	}
 
-    get documentStatus() {
-        return this.status?.key;
-    }
+	get viewLink(): string {
+		return DocumentEntity.getDocumentLink(this.id, this.operation);
+	}
+
+	get documentStatus() {
+		return this.status?.key;
+	}
 }

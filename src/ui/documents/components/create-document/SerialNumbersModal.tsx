@@ -13,6 +13,7 @@ import {
     List,
     ListItem,
     ListItemText,
+    Chip,
 } from '@mui/material';
 import { Plus, Trash2, X, ClipboardList } from 'lucide-react';
 import type { DocumentLineItem } from './types';
@@ -136,25 +137,17 @@ export default function SerialNumbersModal({ open, onClose, lineItem, onSave }: 
                 </IconButton>
             </DialogTitle>
 
-            <DialogContent sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box
-                    p={1.5}
-                    border="1px solid #e2e8f0"
-                    borderLeft="4px solid #005483"
-                    bgcolor="#f8fafc"
-                    sx={{ borderRadius: '4px' }}
-                >
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                        {lineItem.code || 'Artículo'}
+            <DialogContent sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                {/* Header Information (No Card) */}
+                <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.875rem' }}>
+                        {lineItem.code || 'Artículo'} - {lineItem.description || 'Sin descripción'}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" display="block">
-                        {lineItem.description || 'Sin descripción'}
-                    </Typography>
-                    <Box display="flex" justifyContent="space-between" mt={1} pt={1} sx={{ borderTop: '1px dashed #e2e8f0' }}>
-                        <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                            Cantidad Requerida:
+                    <Box display="flex" alignItems="center" gap={1} mt={0.5}>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                            Cantidad requerida:
                         </Typography>
-                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#005483' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#005483', fontSize: '0.75rem' }}>
                             {requiredQty} Uds.
                         </Typography>
                     </Box>
@@ -166,102 +159,142 @@ export default function SerialNumbersModal({ open, onClose, lineItem, onSave }: 
                     </Alert>
                 )}
 
+                {/* Available Serials Picker */}
+                {lineItem.available_serial_numbers && lineItem.available_serial_numbers.length > 0 && (
+                    <Box display="flex" flexDirection="column" gap={1}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            Series Disponibles en Almacén ({lineItem.available_serial_numbers.length})
+                        </Typography>
+                        <Box display="flex" flexWrap="wrap" gap={1}>
+                            {lineItem.available_serial_numbers.map((serial) => {
+                                const isSelected = serials.includes(serial);
+                                return (
+                                    <Chip
+                                        key={serial}
+                                        label={serial}
+                                        variant={isSelected ? "filled" : "outlined"}
+                                        onClick={() => {
+                                            if (isSelected) {
+                                                setSerials(prev => prev.filter(s => s !== serial));
+                                                setError(null);
+                                            } else {
+                                                if (serials.length >= requiredQty) {
+                                                    setError(`Ya has ingresado la cantidad necesaria de series (${requiredQty}).`);
+                                                    return;
+                                                }
+                                                setSerials(prev => [...prev, serial]);
+                                                setError(null);
+                                            }
+                                        }}
+                                        sx={{
+                                            borderRadius: '4px',
+                                            fontFamily: 'monospace',
+                                            fontWeight: 600,
+                                            fontSize: '11px',
+                                            cursor: 'pointer',
+                                            bgcolor: isSelected ? '#005483' : 'transparent',
+                                            color: isSelected ? '#ffffff' : 'text.primary',
+                                            borderColor: isSelected ? '#005483' : '#cbd5e1',
+                                            '&:hover': {
+                                                bgcolor: isSelected ? '#004066' : '#f1f5f9',
+                                                borderColor: isSelected ? '#004066' : '#94a3b8',
+                                            },
+                                            transition: 'all 0.2s ease',
+                                        }}
+                                    />
+                                );
+                            })}
+                        </Box>
+                    </Box>
+                )}
+
                 {/* Input Area */}
-                <Box display="flex" gap={1} alignItems="flex-start">
-                    <TextField
-                        inputRef={inputRef}
-                        label="Escanear o escribir número de serie..."
-                        variant="filled"
-                        size="small"
-                        fullWidth
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        disabled={serials.length >= requiredQty}
-                        placeholder={serials.length >= requiredQty ? "Completado" : "Presione Enter para agregar"}
-                        sx={{
-                            '& .MuiFilledInput-root': {
-                                borderRadius: '4px 4px 0 0',
-                            }
-                        }}
-                    />
-                    <Button
-                        variant="contained"
-                        onClick={() => handleAddSerial(inputValue)}
-                        disabled={!inputValue.trim() || serials.length >= requiredQty}
-                        sx={{
-                            minWidth: 42,
-                            height: 40,
-                            borderRadius: '4px',
-                            bgcolor: '#005483',
-                            '&:hover': { bgcolor: '#004066' }
-                        }}
-                    >
-                        <Plus size={20} />
-                    </Button>
+                <Box display="flex" flexDirection="column" gap={1}>
+                    {lineItem.available_serial_numbers && lineItem.available_serial_numbers.length > 0 && (
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            O agregar manualmente
+                        </Typography>
+                    )}
+                    <Box display="flex" gap={1} alignItems="flex-start">
+                        <TextField
+                            inputRef={inputRef}
+                            label="Escanear o escribir número de serie..."
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            disabled={serials.length >= requiredQty}
+                            placeholder={serials.length >= requiredQty ? "Completado" : "Presione Enter para agregar"}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '4px',
+                                }
+                            }}
+                        />
+                        <Button
+                            variant="contained"
+                            onClick={() => handleAddSerial(inputValue)}
+                            disabled={!inputValue.trim() || serials.length >= requiredQty}
+                            sx={{
+                                minWidth: 40,
+                                height: 40,
+                                borderRadius: '4px',
+                                bgcolor: '#005483',
+                                '&:hover': { bgcolor: '#004066' }
+                            }}
+                        >
+                            <Plus size={18} />
+                        </Button>
+                    </Box>
                 </Box>
 
-                {/* Serials List */}
+                {/* Selected Serials List */}
                 <Box>
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                            Series Ingresadas ({serials.length} de {requiredQty})
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            Series Seleccionadas ({serials.length} de {requiredQty})
                         </Typography>
                         {isComplete ? (
                             <Typography variant="caption" sx={{ color: '#16a34a', fontWeight: 800 }}>
                                 ✓ Completado
                             </Typography>
                         ) : (
-                            <Typography variant="caption" sx={{ color: '#e11d48', fontWeight: 800 }}>
-                                ⚠️ Faltan {requiredQty - serials.length}
+                            <Typography variant="caption" sx={{ color: '#d97706', fontWeight: 800 }}>
+                                Faltan {requiredQty - serials.length}
                             </Typography>
                         )}
                     </Box>
 
-                    <Box
-                        border="1px solid #e2e8f0"
-                        sx={{
-                            maxHeight: 180,
-                            overflowY: 'auto',
-                            bgcolor: '#ffffff',
-                            borderRadius: '4px',
-                        }}
-                    >
-                        {serials.length === 0 ? (
-                            <Box py={3} textAlign="center" color="text.secondary">
-                                <Typography variant="caption">No se han registrado series aún.</Typography>
-                            </Box>
-                        ) : (
-                            <List dense disablePadding>
-                                {serials.map((serial, index) => (
-                                    <ListItem
-                                        key={index}
-                                        divider={index < serials.length - 1}
-                                        secondaryAction={
-                                            <IconButton
-                                                edge="end"
-                                                size="small"
-                                                onClick={() => handleRemoveSerial(index)}
-                                                sx={{ color: '#e11d48' }}
-                                            >
-                                                <Trash2 size={14} />
-                                            </IconButton>
+                    {serials.length === 0 ? (
+                        <Box py={2.5} textAlign="center" color="text.secondary" border="1px dashed #e2e8f0" sx={{ borderRadius: '4px' }}>
+                            <Typography variant="caption" sx={{ fontStyle: 'italic' }}>Ninguna serie seleccionada aún</Typography>
+                        </Box>
+                    ) : (
+                        <Box display="flex" flexWrap="wrap" gap={1}>
+                            {serials.map((serial, index) => (
+                                <Chip
+                                    key={serial}
+                                    label={serial}
+                                    onDelete={() => handleRemoveSerial(index)}
+                                    sx={{
+                                        borderRadius: '4px',
+                                        fontFamily: 'monospace',
+                                        fontWeight: 600,
+                                        fontSize: '11px',
+                                        bgcolor: '#f1f5f9',
+                                        color: '#334155',
+                                        border: '1px solid #e2e8f0',
+                                        '& .MuiChip-deleteIcon': {
+                                            color: '#ef4444',
+                                            '&:hover': { color: '#dc2626' }
                                         }
-                                        sx={{ py: 0.5, px: 2 }}
-                                    >
-                                        <ListItemText
-                                            primary={serial}
-                                            primaryTypographyProps={{
-                                                fontSize: '12px',
-                                                fontFamily: 'monospace',
-                                                fontWeight: 600,
-                                            }}
-                                        />
-                                    </ListItem>
-                                ))}
-                            </List>
-                        )}
-                    </Box>
+                                    }}
+                                />
+                            ))}
+                        </Box>
+                    )}
                 </Box>
             </DialogContent>
 

@@ -16,6 +16,7 @@ export class RectifyDocumentUseCase {
         rectification_type_id?: number;
         rectification_modality_id?: number;
         notes?: string;
+        serial_comments?: Record<string, string>;
     }): Promise<DocumentEntity> {
         return await this.repository.rectify(id, payload);
     }

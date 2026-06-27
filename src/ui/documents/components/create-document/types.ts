@@ -37,6 +37,8 @@ export interface DocumentLineItem {
 	has_batches?: boolean;
 	procurement_type?: 'buy' | 'make';
 	serial_numbers?: string[];
+	is_serialization_resolved?: boolean;
+	available_serial_numbers?: string[];
 }
 
 export interface DocumentFooterTotals {

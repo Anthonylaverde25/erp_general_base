@@ -6,6 +6,7 @@ import {
 	AdjustStockEntryDTO,
 	PaginatedStockMovements
 } from '@/domain/entities/items/repositories/item.action.repository';
+import type { PendingSerializationItem, RegisterSerialsPayload } from '@/types/pending-serialization.types';
 import { ItemEntity } from '@/domain/entities/items/ItemEntity';
 import { ItemMapper } from '@/infrastructure/mappers/items/ItemMapper';
 import { ItemDTO } from '@/domain/entities/items/DTOs/ItemDTOs';
@@ -62,6 +63,21 @@ export class ItemRepositoryAction implements IItemActionRepository {
 				...filters
 			}
 		});
+		return data;
+	}
+
+	async indexPendingSerialization(): Promise<PendingSerializationItem[]> {
+		const { data } = await axiosInstance.get<{ pending_items: PendingSerializationItem[] }>(
+			`${this.baseUrl}/pending-serialization`
+		);
+		return data.pending_items;
+	}
+
+	async registerItemSerials(id: number, payload: RegisterSerialsPayload): Promise<{ message: string }> {
+		const { data } = await axiosInstance.post<{ message: string }>(
+			`${this.baseUrl}/${id}/register-serials`,
+			payload
+		);
 		return data;
 	}
 }

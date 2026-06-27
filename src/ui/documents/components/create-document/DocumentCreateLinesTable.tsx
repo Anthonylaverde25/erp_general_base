@@ -52,7 +52,7 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 		const handleOpenSerials = (e: Event) => {
 			const data = (e as CustomEvent).detail as DocumentLineItem;
 			// Find the current live row data from our rows state to ensure it has updated serials/quantities
-			const liveRow = rows.find(r => r.id === data.id) || data;
+			const liveRow = rows.find((r) => r.id === data.id) || data;
 			setActiveLineItemForSerials(liveRow);
 			setSerialsModalOpen(true);
 		};
@@ -64,10 +64,10 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 
 	// Group rows by source_document_id
 	const sections = useMemo(() => {
-		const groups: Record<string, { id: string, number: string, items: DocumentLineItem[] }> = {};
+		const groups: Record<string, { id: string; number: string; items: DocumentLineItem[] }> = {};
 		const noSource: DocumentLineItem[] = [];
 
-		rows.forEach(row => {
+		rows.forEach((row) => {
 			if (row.source_document_id) {
 				if (!groups[row.source_document_id]) {
 					groups[row.source_document_id] = {
@@ -76,6 +76,7 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 						items: []
 					};
 				}
+
 				groups[row.source_document_id].items.push(row);
 			} else {
 				noSource.push(row);
@@ -83,9 +84,11 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 		});
 
 		const result = Object.values(groups);
+
 		if (noSource.length > 0 || result.length === 0) {
 			result.push({ id: 'default', number: '', items: noSource });
 		}
+
 		return result;
 	}, [rows]);
 
@@ -102,20 +105,20 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 				/>
 			))}
 
-			<div className="flex items-center p-2 border px-4">
+			<div className="flex items-center border p-2 px-4">
 				<Button
 					size="small"
 					disabled={isReadOnly}
 					startIcon={<Add />}
 					onClick={handleAddLine}
-					variant='contained'
+					variant="contained"
 					sx={{
 						fontSize: '12px',
 						textTransform: 'none',
 						borderRadius: '6px',
 						border: '1px solid',
 						borderColor: 'primary.main',
-						px: 2,
+						px: 2
 					}}
 				>
 					Añadir nueva línea
@@ -134,42 +137,45 @@ export default function DocumentCreateLinesTable({ gridTheme, discountEnabled }:
 /* ─── Sub-component for each section ─── */
 interface SectionProps {
 	key?: string;
-	section: { id: string, number: string, items: DocumentLineItem[] };
+	section: { id: string; number: string; items: DocumentLineItem[] };
 	gridTheme: DocumentGridTheme;
 	discountEnabled: boolean;
 	isReadOnly: boolean;
-	itemType: "product" | "service";
+	itemType: 'product' | 'service';
 }
 
 const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly, itemType }: SectionProps) => {
-	const {
-		handleCellValueChanged,
-		handleRowDragEnd,
-		onGridReady
-	} = useDocumentTableSync();
+	const { handleCellValueChanged, handleRowDragEnd, onGridReady } = useDocumentTableSync();
+	const { currentDocumentType } = useDocumentCreate();
 
-	const defaultColDef = useMemo<ColDef<DocumentLineItem>>(() => ({
-		sortable: false,
-		filter: false,
-		resizable: false,
-		editable: false,
-		cellClass: 'doc-ag-cell',
-	}), []);
+	const defaultColDef = useMemo<ColDef<DocumentLineItem>>(
+		() => ({
+			sortable: false,
+			filter: false,
+			resizable: false,
+			editable: false,
+			cellClass: 'doc-ag-cell'
+		}),
+		[]
+	);
 
 	const columnDefs = useMemo<ColDef<DocumentLineItem>[]>(() => {
 		const cols: ColDef<DocumentLineItem>[] = [
 			{
 				field: 'id',
 				headerName: '#',
-				width: 46, minWidth: 46, maxWidth: 46,
+				width: 46,
+				minWidth: 46,
+				maxWidth: 46,
 				pinned: 'left',
 				rowDrag: !isReadOnly,
-				cellClass: 'doc-ag-cell doc-ag-cell-center doc-ag-cell-id',
+				cellClass: 'doc-ag-cell doc-ag-cell-center doc-ag-cell-id'
 			},
 			{
 				field: 'code',
 				headerName: 'ARTÍCULO / CONCEPTO',
-				flex: 1, minWidth: 144,
+				flex: 1,
+				minWidth: 144,
 				editable: !isReadOnly,
 				singleClickEdit: true,
 				cellClass: 'doc-ag-cell',
@@ -177,66 +183,78 @@ const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly,
 				cellEditorPopup: false,
 				valueSetter: (params) => {
 					if (!params.data) return false;
+
 					if (params.data.code === params.newValue) return false;
+
 					params.data.code = params.newValue;
 					params.data.item_id = undefined;
 					params.data.unit_name = undefined;
 					return true;
-				},
+				}
 			},
 			{
 				field: 'description',
 				headerName: 'DESCRIPCIÓN',
-				flex: 1, minWidth: 144,
+				flex: 1,
+				minWidth: 144,
 				editable: !isReadOnly,
-				singleClickEdit: true,
+				singleClickEdit: true
 			},
 			{
 				field: 'quantity',
 				headerName: 'CANT.',
-				width: 80, minWidth: 80,
+				width: 80,
+				minWidth: 80,
 				editable: !isReadOnly,
 				singleClickEdit: true,
 				cellRenderer: QuantityCellRenderer,
-				cellClass: 'doc-ag-cell doc-ag-cell-right',
+				cellClass: 'doc-ag-cell doc-ag-cell-right'
 			},
 			{
-				field: 'unit_name' as any,
+				field: 'unit_name',
 				headerName: 'UD.',
-				width: 60, minWidth: 60,
+				width: 60,
+				minWidth: 60,
 				editable: false,
 				cellClass: 'doc-ag-cell doc-ag-cell-center text-[10px] text-gray-500',
-				valueFormatter: (params) => params.value || '-',
-			},
+				valueFormatter: (params) => params.value || '-'
+			}
 		];
 
 		if (itemType === 'product') {
 			cols.push({
-				field: 'serial_numbers' as any,
+				field: 'serial_numbers',
 				headerName: 'SERIES',
-				width: 120, minWidth: 100,
+				width: 120,
+				minWidth: 100,
 				cellRenderer: SerialNumbersCellRenderer,
 				cellClass: 'doc-ag-cell doc-ag-cell-center',
+				cellRendererParams: {
+					isReadOnly,
+					documentTypeCode: currentDocumentType?.code
+				}
 			});
 		}
 
 		cols.push({
 			field: 'unitPrice',
 			headerName: 'PRECIO U.',
-			width: 110, minWidth: 100,
+			width: 110,
+			minWidth: 100,
 			editable: !isReadOnly,
 			singleClickEdit: true,
-			cellClass: 'doc-ag-cell doc-ag-cell-right',
+			cellClass: 'doc-ag-cell doc-ag-cell-right'
 		});
 
 		if (discountEnabled) {
 			cols.push({
 				field: 'discount',
 				headerName: 'DTO %',
-				width: 90, minWidth: 80,
+				width: 90,
+				minWidth: 80,
 				editable: !isReadOnly,
 				singleClickEdit: true,
-				cellClass: 'doc-ag-cell doc-ag-cell-right',
+				cellClass: 'doc-ag-cell doc-ag-cell-right'
 			});
 		}
 
@@ -245,53 +263,64 @@ const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly,
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				field: 'taxes' as any,
 				headerName: 'IMPUESTOS',
-				width: 240, minWidth: 200,
+				width: 240,
+				minWidth: 200,
 				cellRenderer: TaxChipsCellRenderer,
 				cellClass: 'doc-ag-cell doc-ag-cell-taxes',
-				autoHeight: true,
+				autoHeight: true
 			},
 			{
 				field: 'subtotal',
 				headerName: 'SUBTOTAL',
-				width: 110, minWidth: 100,
+				width: 110,
+				minWidth: 100,
 				cellClass: 'doc-ag-cell doc-ag-cell-right doc-ag-cell-subtotal',
 				valueGetter: (params) => {
 					if (!params.data) return '0.00';
+
 					const qty = Number(params.data.quantity) || 0;
 					const price = Number(params.data.unitPrice) || 0;
-					const disc = discountEnabled ? (Number(params.data.discount) || 0) : 0;
+					const disc = discountEnabled ? Number(params.data.discount) || 0 : 0;
 					const net = qty * price * (1 - disc / 100);
 					let taxAmount = 0;
-					(params.data.taxes || []).forEach(t => {
+					(params.data.taxes || []).forEach((t) => {
 						const amount = net * (t.rate / 100);
 						taxAmount += t.operation === 'subtract' ? -amount : amount;
 					});
 					return (net + taxAmount).toFixed(2);
-				},
+				}
 			},
 			{
 				colId: 'actions',
 				headerName: '',
-				width: 40, minWidth: 40, maxWidth: 40,
+				width: 40,
+				minWidth: 40,
+				maxWidth: 40,
 				pinned: 'right',
 				cellRenderer: DeleteCellRenderer,
 				cellClass: 'doc-ag-cell',
-				hide: isReadOnly,
-			},
+				hide: isReadOnly
+			}
 		);
 
 		return cols;
-	}, [discountEnabled, isReadOnly]);
+	}, [discountEnabled, isReadOnly, itemType, currentDocumentType?.code]);
 
 	return (
-		<div className="doc-section-container  h-[100%]" style={{ marginBottom: '1.5rem' }}>
+		<div
+			className="doc-section-container h-[100%]"
+			style={{ marginBottom: '1.5rem' }}
+		>
 			{section.number && (
 				<div className="doc-section-header">
 					<span className="doc-section-label">ALBARÁN:</span>
 					<span className="doc-section-value">{section.number}</span>
 				</div>
 			)}
-			<div className="doc-lines-grid" style={{ height: 'auto', minHeight: '100px' }}>
+			<div
+				className="doc-lines-grid"
+				style={{ height: 'auto', minHeight: '100px' }}
+			>
 				<AgGridReact<DocumentLineItem>
 					theme={GRID_THEME_BY_OPTION[gridTheme]}
 					loadThemeGoogleFonts={false}
@@ -310,12 +339,10 @@ const DocumentTableSection = ({ section, gridTheme, discountEnabled, isReadOnly,
 					onCellValueChanged={handleCellValueChanged}
 					onRowDragEnd={handleRowDragEnd}
 					getRowClass={(params) => {
-						return params.data?.code || params.data?.description
-							? 'doc-row-active'
-							: 'doc-row-empty';
+						return params.data?.code || params.data?.description ? 'doc-row-active' : 'doc-row-empty';
 					}}
 				/>
 			</div>
 		</div>
 	);
-}
+};

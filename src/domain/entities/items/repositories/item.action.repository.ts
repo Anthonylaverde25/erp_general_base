@@ -1,4 +1,5 @@
 import { ItemEntity } from '../ItemEntity';
+import type { PendingSerializationItem, RegisterSerialsPayload } from '@/types/pending-serialization.types';
 
 export interface RegisterStockMovementDTO {
 	item_id: number;
@@ -74,5 +75,9 @@ export interface IItemActionRepository {
 		perPage?: number,
 		filters?: { partner_id?: number | null; start_date?: string | null; end_date?: string | null }
 	): Promise<PaginatedStockMovements>;
+
+	indexPendingSerialization(): Promise<PendingSerializationItem[]>;
+
+	registerItemSerials(id: number, data: RegisterSerialsPayload): Promise<{ message: string }>;
 }
 

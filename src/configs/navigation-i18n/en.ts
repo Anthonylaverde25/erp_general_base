@@ -48,6 +48,8 @@ const locale = {
 	STOCK_MOVEMENTS: 'Stock Movements',
 	BATCHES: 'Batches',
 	INVENTORY_SUPPLIERS_MATRIX: 'Supplier Relations',
+	SERIAL_RETURNS: 'Serial Inspection',
+	PENDING_SERIALIZATION: 'Pending Serials',
 
 	// Accounting
 	ACCOUNTING: 'Accounting',

@@ -120,12 +120,20 @@ const navigationConfig: FuseNavItemType[] = [
 				url: '/partners'
 			},
 			{
-				id: 'items',
-				title: 'Items',
+				id: 'items.products',
+				title: 'Artículos',
 				translate: 'ITEMS',
 				type: 'item',
 				icon: 'heroicons-outline:cube',
-				url: '/items'
+				url: '/items/products'
+			},
+			{
+				id: 'items.services',
+				title: 'Servicios',
+				translate: 'SERVICES_GROUP',
+				type: 'item',
+				icon: 'lucide:briefcase',
+				url: '/items/services'
 			},
 			{
 				id: 'departments',
@@ -471,6 +479,22 @@ const navigationConfig: FuseNavItemType[] = [
 				type: 'item',
 				url: '/inventory/suppliers',
 				icon: 'lucide:truck'
+			},
+			{
+				id: 'inventory.serial-returns',
+				title: 'Inspección de Seriales',
+				translate: 'SERIAL_RETURNS',
+				type: 'item',
+				url: '/inventory/serial-returns',
+				icon: 'lucide:clipboard-check'
+			},
+			{
+				id: 'inventory.pending-serialization',
+				title: 'Seriales Pendientes',
+				translate: 'PENDING_SERIALIZATION',
+				type: 'item',
+				url: '/inventory/pending-serialization',
+				icon: 'lucide:scan-line'
 			}
 		]
 	},

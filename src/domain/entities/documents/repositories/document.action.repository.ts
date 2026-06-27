@@ -16,5 +16,6 @@ export interface IDocumentActionRepository {
         rectification_type_id?: number;
         rectification_modality_id?: number;
         notes?: string;
+        serial_comments?: Record<string, string>;
     }): Promise<DocumentEntity>;
 }

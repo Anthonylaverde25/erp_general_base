@@ -57,6 +57,13 @@ interface DocumentCreateContextValue {
         is_resolved?: boolean;
     }>;
     setLineStockWarnings: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+    lineSerializationInfo: Record<string, {
+        is_resolved: boolean;
+        available_serials: string[];
+        available_count: number;
+        physical_stock: number;
+    }>;
+    setLineSerializationInfo: React.Dispatch<React.SetStateAction<Record<string, any>>>;
 }
 
 const DocumentCreateContext = createContext<DocumentCreateContextValue | undefined>(undefined);
@@ -128,6 +135,13 @@ export function DocumentCreateProvider({
         is_resolved?: boolean;
     }>>({});
 
+    const [lineSerializationInfo, setLineSerializationInfo] = useState<Record<string, {
+        is_resolved: boolean;
+        available_serials: string[];
+        available_count: number;
+        physical_stock: number;
+    }>>({});
+
     const checkLineStock = async (lineId: string, itemId: number, storeId: number, quantity: number) => {
         try {
             const response = await axiosInstance.get(`/items/${itemId}/stock-availability`, {
@@ -153,6 +167,38 @@ export function DocumentCreateProvider({
                 }
                 return updated;
             });
+
+            // Process serialization info
+            if (data.serialization) {
+                setLineSerializationInfo(prev => ({
+                    ...prev,
+                    [lineId]: {
+                        is_resolved: data.serialization.is_fully_serialized,
+                        available_serials: data.serialization.available_serial_numbers || [],
+                        available_count: data.serialization.available_serials_count || 0,
+                        physical_stock: data.serialization.physical_stock || 0,
+                    }
+                }));
+
+                const lines = watch("lines") || [];
+                const lineIndex = lines.findIndex((l: any) => l.id === lineId);
+                if (lineIndex !== -1) {
+                    setValue(`lines.${lineIndex}.is_serialization_resolved`, data.serialization.is_fully_serialized);
+                    setValue(`lines.${lineIndex}.available_serial_numbers`, data.serialization.available_serial_numbers || []);
+                }
+            } else {
+                setLineSerializationInfo(prev => {
+                    const updated = { ...prev };
+                    delete updated[lineId];
+                    return updated;
+                });
+                const lines = watch("lines") || [];
+                const lineIndex = lines.findIndex((l: any) => l.id === lineId);
+                if (lineIndex !== -1) {
+                    setValue(`lines.${lineIndex}.is_serialization_resolved`, undefined);
+                    setValue(`lines.${lineIndex}.available_serial_numbers`, undefined);
+                }
+            }
         } catch (error) {
             console.error("Failed to check line stock:", error);
         }
@@ -160,6 +206,14 @@ export function DocumentCreateProvider({
 
     const removeLineStockWarning = (lineId: string) => {
         setLineStockWarnings(prev => {
+            const updated = { ...prev };
+            if (updated[lineId]) {
+                delete updated[lineId];
+                return updated;
+            }
+            return prev;
+        });
+        setLineSerializationInfo(prev => {
             const updated = { ...prev };
             if (updated[lineId]) {
                 delete updated[lineId];
@@ -177,9 +231,21 @@ export function DocumentCreateProvider({
         const timer = setTimeout(() => {
             if (!formLines || formLines.length === 0) return;
 
-            // Clean up warnings for deleted lines
+            // Clean up warnings and serialization for deleted lines
             const currentLineIds = new Set(formLines.map((l: any) => l.id));
             setLineStockWarnings(prev => {
+                const updated = { ...prev };
+                let changed = false;
+                Object.keys(updated).forEach(id => {
+                    if (!currentLineIds.has(id)) {
+                        delete updated[id];
+                        changed = true;
+                    }
+                });
+                return changed ? updated : prev;
+            });
+
+            setLineSerializationInfo(prev => {
                 const updated = { ...prev };
                 let changed = false;
                 Object.keys(updated).forEach(id => {
@@ -326,6 +392,8 @@ export function DocumentCreateProvider({
         setStockConflicts,
         lineStockWarnings,
         setLineStockWarnings,
+        lineSerializationInfo,
+        setLineSerializationInfo,
     };
 
     return (

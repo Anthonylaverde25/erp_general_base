@@ -168,6 +168,7 @@ export function useDocumentFloatingActions({ document }: UseDocumentFloatingActi
     rectification_type_id: number;
     rectification_modality_id: number;
     notes?: string;
+    serial_comments?: Record<string, string>;
   }) => {
     rectifyDocument(
       { id: String(document.id), payload },
