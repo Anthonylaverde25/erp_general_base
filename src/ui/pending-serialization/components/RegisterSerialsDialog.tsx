@@ -9,14 +9,11 @@ import {
 	IconButton,
 	Button,
 	TextField,
-	List,
-	ListItem,
-	ListItemText,
 	CircularProgress,
 	Divider,
 	Alert
 } from '@mui/material';
-import { Close, Add, Delete, BarcodeReader } from '@mui/icons-material';
+import { X, Trash2, Barcode, Save } from 'lucide-react';
 import { PendingSerializationItem } from '@/types/pending-serialization.types';
 import { useRegisterItemSerials } from '@/features/pending-serialization/hooks/useRegisterItemSerials';
 
@@ -36,9 +33,6 @@ export default function RegisterSerialsDialog({ open, onClose, item }: RegisterS
 
 	useEffect(() => {
 		if (open && item) {
-			setSerials([]);
-			setInputValue('');
-			setError(null);
 			// Focus input field after dialog transitions open
 			setTimeout(() => {
 				inputRef.current?.focus();
@@ -64,7 +58,7 @@ export default function RegisterSerialsDialog({ open, onClose, item }: RegisterS
 
 		// Limit count to required quantity
 		if (serials.length >= requiredQty) {
-			setError(`Ya has ingresado la cantidad necesaria de series (${requiredQty}).`);
+			setError(`Ya has ingresado la cantidad máxima de series pendientes (${requiredQty}).`);
 			return;
 		}
 
@@ -90,8 +84,12 @@ export default function RegisterSerialsDialog({ open, onClose, item }: RegisterS
 	};
 
 	const handleSave = async () => {
-		if (serials.length !== requiredQty) {
-			setError(`Debe ingresar exactamente ${requiredQty} números de serie para continuar.`);
+		if (serials.length === 0) {
+			setError('Debe ingresar al menos un número de serie para registrar.');
+			return;
+		}
+		if (serials.length > requiredQty) {
+			setError(`No puede registrar más de ${requiredQty} números de serie.`);
 			return;
 		}
 
@@ -109,7 +107,7 @@ export default function RegisterSerialsDialog({ open, onClose, item }: RegisterS
 		}
 	};
 
-	const isComplete = serials.length === requiredQty;
+	const isComplete = serials.length >= requiredQty;
 
 	return (
 		<Dialog
@@ -120,8 +118,8 @@ export default function RegisterSerialsDialog({ open, onClose, item }: RegisterS
 			PaperProps={{
 				sx: {
 					borderRadius: 0,
-					borderTop: '4px solid #005483',
-					bgcolor: 'background.paper'
+					bgcolor: 'background.paper',
+					boxShadow: '0 24px 48px -12px rgba(0,0,0,0.18)'
 				}
 			}}
 		>
@@ -129,82 +127,87 @@ export default function RegisterSerialsDialog({ open, onClose, item }: RegisterS
 			<DialogTitle
 				sx={{
 					p: 3,
-					borderBottom: '1px solid',
-					borderColor: 'divider',
+					pb: 2,
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between'
 				}}
 			>
-				<Box>
-					<Typography variant="subtitle1" fontWeight={800} sx={{ fontSize: '1rem', color: 'text.primary' }}>
-						Registrar Números de Serie
-					</Typography>
-					<Typography variant="caption" color="text.secondary">
-						Ingreso manual diferido de series
-					</Typography>
-				</Box>
-				<IconButton onClick={onClose} size="small" disabled={isSaving}>
-					<Close fontSize="small" />
+				<Typography variant="subtitle1" fontWeight={750} sx={{ fontSize: '1.15rem', color: 'text.primary' }}>
+					Registrar Números de Serie
+				</Typography>
+				<IconButton onClick={onClose} size="small" disabled={isSaving} sx={{ color: '#4b5563' }}>
+					<X size={20} />
 				</IconButton>
 			</DialogTitle>
+			<Divider />
 
 			{/* Body */}
 			<DialogContent
 				sx={{
 					p: 3,
-					pt: 3,
 					display: 'flex',
 					flexDirection: 'column',
 					gap: 2.5
 				}}
 			>
-				{/* Info Card */}
-				<Box
-					sx={{
-						p: 2,
-						border: '1px solid',
-						borderColor: 'divider',
-						bgcolor: 'background.default',
-						borderRadius: 0,
-						borderLeft: '4px solid #005483',
-						display: 'flex',
-						flexDirection: 'column',
-						gap: 1,
-						mt: 1
-					}}
-				>
-					<Typography variant="caption" color="text.secondary" fontWeight={600}>
-						ARTÍCULO / PRODUCTO
-					</Typography>
-					<Typography variant="body2" fontWeight={750}>
-						{item.name}
-					</Typography>
-					<Typography variant="caption" color="text.secondary" display="block">
-						SKU: <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{item.sku}</span>
-					</Typography>
-
-					<Divider sx={{ my: 0.5 }} />
-
-					<Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-						<Box>
-							<Typography variant="caption" color="text.secondary" display="block">
-								ALMACÉN / BODEGA
-							</Typography>
-							<Typography variant="body2" fontWeight={600}>
-								{item.store_name}
-							</Typography>
-						</Box>
-						<Box sx={{ textAlign: 'right' }}>
-							<Typography variant="caption" color="text.secondary" display="block">
-								SERIES PENDIENTES
-							</Typography>
-							<Typography variant="body2" fontWeight={800} color="#005483">
-								{requiredQty} Uds.
-							</Typography>
-						</Box>
+				{/* Item and Status Section */}
+				<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+					<Box sx={{ flex: 1, pr: 2 }}>
+						<Typography
+							variant="caption"
+							sx={{
+								color: '#6b7280',
+								fontWeight: 700,
+								fontSize: '0.6875rem',
+								letterSpacing: '0.5px',
+								textTransform: 'uppercase',
+								display: 'block',
+								mb: 0.5
+							}}
+						>
+							Íten en Registro
+						</Typography>
+						<Typography
+							variant="body2"
+							fontWeight={750}
+							sx={{
+								color: 'text.primary',
+								fontSize: '1rem',
+								lineHeight: 1.3
+							}}
+						>
+							{item.name}
+						</Typography>
+					</Box>
+					<Box sx={{ textAlign: 'right', minWidth: '100px' }}>
+						<Typography
+							variant="caption"
+							sx={{
+								color: '#6b7280',
+								fontWeight: 700,
+								fontSize: '0.6875rem',
+								letterSpacing: '0.5px',
+								display: 'block',
+								mb: 0.5
+							}}
+						>
+							Series Pendientes
+						</Typography>
+						<Typography
+							variant="body1"
+							fontWeight={800}
+							sx={{
+								fontSize: '1.25rem',
+								color: 'text.primary'
+							}}
+						>
+							{item.serials_count + serials.length} / {item.physical_stock}
+						</Typography>
 					</Box>
 				</Box>
+
+				<Divider />
 
 				{error && (
 					<Alert severity="error" sx={{ borderRadius: 0, py: 0.2 }}>
@@ -213,10 +216,19 @@ export default function RegisterSerialsDialog({ open, onClose, item }: RegisterS
 				)}
 
 				{/* Input field */}
-				<Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+					<Typography
+						variant="caption"
+						sx={{
+							color: '#374151',
+							fontWeight: 600,
+							fontSize: '0.75rem'
+						}}
+					>
+						Escanear o escribir número de serie
+					</Typography>
 					<TextField
 						inputRef={inputRef}
-						label="Escanear o escribir número de serie..."
 						variant="outlined"
 						size="small"
 						fullWidth
@@ -224,88 +236,121 @@ export default function RegisterSerialsDialog({ open, onClose, item }: RegisterS
 						onChange={(e) => setInputValue(e.target.value)}
 						onKeyDown={handleKeyDown}
 						disabled={isComplete || isSaving}
-						placeholder={isComplete ? 'Completado' : 'Presione Enter para agregar'}
+						placeholder="SN-XXXX-XXXX"
 						InputProps={{
-							sx: { borderRadius: 0 }
+							sx: {
+								borderRadius: 0,
+								bgcolor: 'background.paper',
+								'& .MuiOutlinedInput-notchedOutline': {
+									borderColor: '#d1d5db'
+								}
+							},
+							endAdornment: (
+								<Barcode size={20} style={{ color: '#9ca3af', marginRight: '4px' }} />
+							)
 						}}
 					/>
-					<Button
-						variant="contained"
-						onClick={() => handleAddSerial(inputValue)}
-						disabled={!inputValue.trim() || isComplete || isSaving}
-						sx={{
-							minWidth: 40,
-							height: 40,
-							borderRadius: 0,
-							bgcolor: '#005483',
-							'&:hover': { bgcolor: '#004064' }
-						}}
-					>
-						<Add />
-					</Button>
 				</Box>
 
-				{/* List */}
-				<Box>
-					<Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-						<Typography variant="caption" fontWeight={700} color="text.secondary">
-							Series ingresadas ({serials.length} de {requiredQty})
+				{/* Table list */}
+				<Box
+					sx={{
+						border: '1px solid',
+						borderColor: '#e5e7eb',
+						borderRadius: 0,
+						overflow: 'hidden',
+						mt: 0.5
+					}}
+				>
+					{/* Table Header */}
+					<Box
+						sx={{
+							display: 'flex',
+							bgcolor: '#d1d5db',
+							py: 0.75,
+							px: 2,
+							borderBottom: '1px solid',
+							borderColor: '#e5e7eb'
+						}}
+					>
+						<Typography variant="caption" sx={{ width: '15%', fontWeight: 700, color: '#4b5563', fontSize: '0.75rem' }}>
+							#
 						</Typography>
-						{isComplete ? (
-							<Typography variant="caption" color="success.main" fontWeight={800}>
-								✓ Listo
-							</Typography>
-						) : (
-							<Typography variant="caption" color="warning.main" fontWeight={800}>
-								Faltan {requiredQty - serials.length}
-							</Typography>
-						)}
+						<Typography variant="caption" sx={{ width: '70%', fontWeight: 700, color: '#4b5563', fontSize: '0.75rem' }}>
+							Número de Serie
+						</Typography>
+						<Typography variant="caption" sx={{ width: '15%', fontWeight: 700, color: '#4b5563', fontSize: '0.75rem', textAlign: 'right' }}>
+							Acción
+						</Typography>
 					</Box>
 
+					{/* Table Rows */}
 					<Box
 						sx={{
 							maxHeight: 180,
 							overflowY: 'auto',
-							border: '1px solid',
-							borderColor: 'divider',
-							bgcolor: 'background.paper',
-							minHeight: '60px'
+							minHeight: '60px',
+							bgcolor: 'background.paper'
 						}}
 					>
 						{serials.length === 0 ? (
 							<Box sx={{ py: 3, textAlign: 'center', color: 'text.secondary' }}>
-								<Typography variant="caption">No se han registrado series aún.</Typography>
+								<Typography variant="caption" sx={{ fontSize: '0.75rem' }}>
+									No se han registrado series aún.
+								</Typography>
 							</Box>
 						) : (
-							<List dense disablePadding>
-								{serials.map((serial, index) => (
-									<ListItem
-										key={index}
-										divider={index < serials.length - 1}
-										secondaryAction={
+							serials.map((serial, index) => {
+								const isEven = index % 2 === 1;
+								return (
+									<Box
+										key={serial}
+										sx={{
+											display: 'flex',
+											alignItems: 'center',
+											py: 0.75,
+											px: 2,
+											bgcolor: isEven ? '#f3f4f6' : '#ffffff',
+											borderBottom: index < serials.length - 1 ? '1px solid' : 'none',
+											borderColor: '#e5e7eb'
+										}}
+									>
+										<Typography
+											variant="body2"
+											sx={{
+												width: '15%',
+												color: '#6b7280',
+												fontWeight: 500,
+												fontSize: '0.75rem'
+											}}
+										>
+											{String(index + 1).padStart(2, '0')}
+										</Typography>
+										<Typography
+											variant="body2"
+											sx={{
+												width: '70%',
+												fontFamily: 'monospace',
+												fontWeight: 600,
+												color: '#1f2937',
+												fontSize: '0.8rem'
+											}}
+										>
+											{serial}
+										</Typography>
+										<Box sx={{ width: '15%', display: 'flex', justifyContent: 'flex-end' }}>
 											<IconButton
-												edge="end"
 												size="small"
 												onClick={() => handleRemoveSerial(index)}
-												sx={{ color: 'error.main' }}
+												sx={{ color: '#dc2626', p: 0.25 }}
 												disabled={isSaving}
 											>
-												<Delete fontSize="small" />
+												<Trash2 size={16} />
 											</IconButton>
-										}
-										sx={{ py: 0.5, px: 2 }}
-									>
-										<ListItemText
-											primary={serial}
-											primaryTypographyProps={{
-												fontSize: '12px',
-												fontFamily: 'monospace',
-												fontWeight: 600
-											}}
-										/>
-									</ListItem>
-								))}
-							</List>
+										</Box>
+									</Box>
+								);
+							})
 						)}
 					</Box>
 				</Box>
@@ -315,31 +360,56 @@ export default function RegisterSerialsDialog({ open, onClose, item }: RegisterS
 			<DialogActions
 				sx={{
 					p: 3,
+					bgcolor: '#f3f4f6',
 					borderTop: '1px solid',
-					borderColor: 'divider',
+					borderColor: '#e5e7eb',
 					display: 'flex',
 					justifyContent: 'end',
 					gap: 2
 				}}
 			>
-				<Button variant="outlined" size="small" onClick={onClose} disabled={isSaving} sx={{ borderRadius: 0 }}>
+				<Button
+					variant="outlined"
+					size="small"
+					onClick={onClose}
+					disabled={isSaving}
+					sx={{
+						borderRadius: 0,
+						bgcolor: '#ffffff',
+						color: '#374151',
+						borderColor: '#d1d5db',
+						px: 3,
+						py: 0.75,
+						textTransform: 'none',
+						fontWeight: 600,
+						fontSize: '0.8125rem',
+						'&:hover': {
+							bgcolor: '#f9fafb',
+							borderColor: '#c5c9d1'
+						}
+					}}
+				>
 					Cancelar
 				</Button>
 				<Button
 					variant="contained"
-					color="primary"
 					size="small"
 					onClick={handleSave}
-					disabled={isSaving || !isComplete}
+					disabled={isSaving || serials.length === 0}
 					sx={{
 						borderRadius: 0,
-						minWidth: 120,
-						bgcolor: '#005483',
+						bgcolor: '#000000',
+						color: '#ffffff',
+						px: 3,
+						py: 0.75,
+						textTransform: 'none',
+						fontWeight: 600,
+						fontSize: '0.8125rem',
 						'&:hover': {
-							bgcolor: '#004064'
+							bgcolor: '#1f2937'
 						}
 					}}
-					startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : null}
+					startIcon={isSaving ? <CircularProgress size={14} color="inherit" /> : <Save size={14} />}
 				>
 					Registrar Series
 				</Button>

@@ -193,6 +193,7 @@ export default function PendingSerializationPage() {
 
 			{/* Modal for registering serials */}
 			<RegisterSerialsDialog
+				key={selectedItem ? `${selectedItem.id}-${selectedItem.store_id}` : 'closed'}
 				open={modalOpen}
 				onClose={handleCloseModal}
 				item={selectedItem}

@@ -495,6 +495,14 @@ const navigationConfig: FuseNavItemType[] = [
 				type: 'item',
 				url: '/inventory/pending-serialization',
 				icon: 'lucide:scan-line'
+			},
+			{
+				id: 'inventory.item-serials',
+				title: 'Trazabilidad de Seriales',
+				translate: 'ITEM_SERIALS_TRACKING',
+				type: 'item',
+				url: '/inventory/serials',
+				icon: 'lucide:barcode'
 			}
 		]
 	},

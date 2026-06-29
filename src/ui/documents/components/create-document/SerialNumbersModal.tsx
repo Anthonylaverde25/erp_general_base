@@ -10,12 +10,10 @@ import {
     Typography,
     IconButton,
     Alert,
-    List,
-    ListItem,
-    ListItemText,
     Chip,
+    Divider
 } from '@mui/material';
-import { Plus, Trash2, X, ClipboardList } from 'lucide-react';
+import { X, Trash2, Barcode, Save } from 'lucide-react';
 import type { DocumentLineItem } from './types';
 
 interface SerialNumbersModalProps {
@@ -66,7 +64,7 @@ export default function SerialNumbersModal({ open, onClose, lineItem, onSave }: 
             return;
         }
 
-        setSerials(prev => [...prev, cleanSerial]);
+        setSerials((prev) => [...prev, cleanSerial]);
         setInputValue('');
         
         // Re-focus input for continuous scanning
@@ -83,7 +81,7 @@ export default function SerialNumbersModal({ open, onClose, lineItem, onSave }: 
     };
 
     const handleRemoveSerial = (index: number) => {
-        setSerials(prev => prev.filter((_, i) => i !== index));
+        setSerials((prev) => prev.filter((_, i) => i !== index));
         setError(null);
     };
 
@@ -101,60 +99,103 @@ export default function SerialNumbersModal({ open, onClose, lineItem, onSave }: 
         onClose();
     };
 
-    const isComplete = serials.length === requiredQty;
+    const isComplete = serials.length >= requiredQty;
 
     return (
         <Dialog
             open={open}
             onClose={onClose}
+            maxWidth="xs"
+            fullWidth
             PaperProps={{
                 sx: {
-                    width: '100%',
-                    maxWidth: 480,
-                    borderRadius: '4px', // Sharp Edges: as per AGENTS.md
+                    borderRadius: 0,
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 24px 48px -12px rgba(0,0,0,0.18)'
                 },
             }}
         >
+            {/* Header */}
             <DialogTitle
                 sx={{
-                    fontWeight: 800,
-                    bgcolor: '#f8fafc',
-                    borderBottom: '1px solid #e2e8f0',
-                    py: 2,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    p: 3,
+                    pb: 2,
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
                 }}
             >
-                <Box display="flex" alignItems="center" gap={1}>
-                    <ClipboardList size={18} color="#005483" />
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
-                        Registrar Números de Serie
-                    </Typography>
-                </Box>
-                <IconButton onClick={onClose} size="small" sx={{ color: 'text.secondary' }}>
-                    <X size={18} />
+                <Typography variant="subtitle1" fontWeight={750} sx={{ fontSize: '1.15rem', color: 'text.primary' }}>
+                    Despachar Números de Serie
+                </Typography>
+                <IconButton onClick={onClose} size="small" sx={{ color: '#4b5563' }}>
+                    <X size={20} />
                 </IconButton>
             </DialogTitle>
+            <Divider />
 
-            <DialogContent sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                {/* Header Information (No Card) */}
-                <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.875rem' }}>
-                        {lineItem.code || 'Artículo'} - {lineItem.description || 'Sin descripción'}
-                    </Typography>
-                    <Box display="flex" alignItems="center" gap={1} mt={0.5}>
-                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            Cantidad requerida:
+            {/* Body */}
+            <DialogContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                {/* Item and Status Section */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <Box sx={{ flex: 1, pr: 2 }}>
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                color: '#6b7280',
+                                fontWeight: 700,
+                                fontSize: '0.6875rem',
+                                letterSpacing: '0.5px',
+                                textTransform: 'uppercase',
+                                display: 'block',
+                                mb: 0.5
+                            }}
+                        >
+                            Ítem en Despacho
                         </Typography>
-                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#005483', fontSize: '0.75rem' }}>
-                            {requiredQty} Uds.
+                        <Typography
+                            variant="body2"
+							fontWeight={750}
+                            sx={{
+                                color: 'text.primary',
+                                fontSize: '1rem',
+                                lineHeight: 1.3
+                            }}
+                        >
+                            {lineItem.code || 'Artículo'} - {lineItem.description || 'Sin descripción'}
+                        </Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'right', minWidth: '100px' }}>
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                color: '#6b7280',
+                                fontWeight: 700,
+                                fontSize: '0.6875rem',
+                                letterSpacing: '0.5px',
+                                display: 'block',
+                                mb: 0.5
+                            }}
+                        >
+                            Series Requeridas
+                        </Typography>
+                        <Typography
+                            variant="body1"
+                            fontWeight={800}
+                            sx={{
+                                fontSize: '1.25rem',
+                                color: 'text.primary'
+                            }}
+                        >
+                            {serials.length} / {requiredQty}
                         </Typography>
                     </Box>
                 </Box>
 
+                <Divider />
+
                 {error && (
-                    <Alert severity="error" variant="standard" sx={{ borderRadius: '4px', py: 0.5 }}>
+                    <Alert severity="error" sx={{ borderRadius: 0, py: 0.2 }}>
                         {error}
                     </Alert>
                 )}
@@ -162,7 +203,16 @@ export default function SerialNumbersModal({ open, onClose, lineItem, onSave }: 
                 {/* Available Serials Picker */}
                 {lineItem.available_serial_numbers && lineItem.available_serial_numbers.length > 0 && (
                     <Box display="flex" flexDirection="column" gap={1}>
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                color: '#6b7280',
+                                fontWeight: 700,
+                                fontSize: '0.6875rem',
+                                letterSpacing: '0.5px',
+                                textTransform: 'uppercase'
+                            }}
+                        >
                             Series Disponibles en Almacén ({lineItem.available_serial_numbers.length})
                         </Typography>
                         <Box display="flex" flexWrap="wrap" gap={1}>
@@ -187,123 +237,199 @@ export default function SerialNumbersModal({ open, onClose, lineItem, onSave }: 
                                             }
                                         }}
                                         sx={{
-                                            borderRadius: '4px',
+                                            borderRadius: 0,
                                             fontFamily: 'monospace',
                                             fontWeight: 600,
                                             fontSize: '11px',
                                             cursor: 'pointer',
-                                            bgcolor: isSelected ? '#005483' : 'transparent',
+                                            bgcolor: isSelected ? '#000000' : 'transparent',
                                             color: isSelected ? '#ffffff' : 'text.primary',
-                                            borderColor: isSelected ? '#005483' : '#cbd5e1',
+                                            borderColor: isSelected ? '#000000' : '#d1d5db',
                                             '&:hover': {
-                                                bgcolor: isSelected ? '#004066' : '#f1f5f9',
-                                                borderColor: isSelected ? '#004066' : '#94a3b8',
+                                                bgcolor: isSelected ? '#1f2937' : '#f3f4f6',
+                                                borderColor: isSelected ? '#1f2937' : '#9ca3af',
                                             },
                                             transition: 'all 0.2s ease',
                                         }}
                                     />
                                 );
-                            })}
+							})}
                         </Box>
                     </Box>
                 )}
 
                 {/* Input Area */}
                 <Box display="flex" flexDirection="column" gap={1}>
-                    {lineItem.available_serial_numbers && lineItem.available_serial_numbers.length > 0 && (
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            O agregar manualmente
-                        </Typography>
-                    )}
-                    <Box display="flex" gap={1} alignItems="flex-start">
-                        <TextField
-                            inputRef={inputRef}
-                            label="Escanear o escribir número de serie..."
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            disabled={serials.length >= requiredQty}
-                            placeholder={serials.length >= requiredQty ? "Completado" : "Presione Enter para agregar"}
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '4px',
+                    <Typography
+                        variant="caption"
+                        sx={{
+                            color: '#374151',
+                            fontWeight: 600,
+                            fontSize: '0.75rem'
+                        }}
+                    >
+                        {lineItem.available_serial_numbers && lineItem.available_serial_numbers.length > 0
+                            ? "O agregar manualmente"
+                            : "Escanear o escribir número de serie"}
+                    </Typography>
+                    <TextField
+                        inputRef={inputRef}
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        disabled={isComplete}
+                        placeholder="SN-XXXX-XXXX"
+                        InputProps={{
+                            sx: {
+                                borderRadius: 0,
+                                bgcolor: 'background.paper',
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: '#d1d5db'
                                 }
-                            }}
-                        />
-                        <Button
-                            variant="contained"
-                            onClick={() => handleAddSerial(inputValue)}
-                            disabled={!inputValue.trim() || serials.length >= requiredQty}
-                            sx={{
-                                minWidth: 40,
-                                height: 40,
-                                borderRadius: '4px',
-                                bgcolor: '#005483',
-                                '&:hover': { bgcolor: '#004066' }
-                            }}
-                        >
-                            <Plus size={18} />
-                        </Button>
-                    </Box>
+                            },
+                            endAdornment: (
+                                <Barcode size={20} style={{ color: '#9ca3af', marginRight: '4px' }} />
+                            )
+                        }}
+                    />
                 </Box>
 
-                {/* Selected Serials List */}
-                <Box>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            Series Seleccionadas ({serials.length} de {requiredQty})
+                {/* Table list of selected serials */}
+                <Box
+                    sx={{
+                        border: '1px solid',
+                        borderColor: '#e5e7eb',
+                        borderRadius: 0,
+                        overflow: 'hidden',
+                        mt: 0.5
+                    }}
+                >
+                    {/* Table Header */}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            bgcolor: '#d1d5db',
+                            py: 0.75,
+                            px: 2,
+                            borderBottom: '1px solid',
+                            borderColor: '#e5e7eb'
+                        }}
+                    >
+                        <Typography variant="caption" sx={{ width: '15%', fontWeight: 700, color: '#4b5563', fontSize: '0.75rem' }}>
+                            #
                         </Typography>
-                        {isComplete ? (
-                            <Typography variant="caption" sx={{ color: '#16a34a', fontWeight: 800 }}>
-                                ✓ Completado
-                            </Typography>
-                        ) : (
-                            <Typography variant="caption" sx={{ color: '#d97706', fontWeight: 800 }}>
-                                Faltan {requiredQty - serials.length}
-                            </Typography>
-                        )}
+                        <Typography variant="caption" sx={{ width: '70%', fontWeight: 700, color: '#4b5563', fontSize: '0.75rem' }}>
+							Número de Serie
+                        </Typography>
+                        <Typography variant="caption" sx={{ width: '15%', fontWeight: 700, color: '#4b5563', fontSize: '0.75rem', textAlign: 'right' }}>
+                            Acción
+                        </Typography>
                     </Box>
 
-                    {serials.length === 0 ? (
-                        <Box py={2.5} textAlign="center" color="text.secondary" border="1px dashed #e2e8f0" sx={{ borderRadius: '4px' }}>
-                            <Typography variant="caption" sx={{ fontStyle: 'italic' }}>Ninguna serie seleccionada aún</Typography>
-                        </Box>
-                    ) : (
-                        <Box display="flex" flexWrap="wrap" gap={1}>
-                            {serials.map((serial, index) => (
-                                <Chip
-                                    key={serial}
-                                    label={serial}
-                                    onDelete={() => handleRemoveSerial(index)}
-                                    sx={{
-                                        borderRadius: '4px',
-                                        fontFamily: 'monospace',
-                                        fontWeight: 600,
-                                        fontSize: '11px',
-                                        bgcolor: '#f1f5f9',
-                                        color: '#334155',
-                                        border: '1px solid #e2e8f0',
-                                        '& .MuiChip-deleteIcon': {
-                                            color: '#ef4444',
-                                            '&:hover': { color: '#dc2626' }
-                                        }
-                                    }}
-                                />
-                            ))}
-                        </Box>
-                    )}
+                    {/* Table Rows */}
+                    <Box
+                        sx={{
+                            maxHeight: 180,
+                            overflowY: 'auto',
+                            minHeight: '60px',
+                            bgcolor: 'background.paper'
+                        }}
+                    >
+                        {serials.length === 0 ? (
+                            <Box sx={{ py: 3, textAlign: 'center', color: 'text.secondary' }}>
+                                <Typography variant="caption" sx={{ fontSize: '0.75rem' }}>
+                                    Ninguna serie seleccionada aún.
+                                </Typography>
+                            </Box>
+                        ) : (
+                            serials.map((serial, index) => {
+                                const isEven = index % 2 === 1;
+                                return (
+                                    <Box
+                                        key={serial}
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            py: 0.75,
+                                            px: 2,
+                                            bgcolor: isEven ? '#f3f4f6' : '#ffffff',
+                                            borderBottom: index < serials.length - 1 ? '1px solid' : 'none',
+                                            borderColor: '#e5e7eb'
+                                        }}
+                                    >
+                                        <Typography
+                                            variant="body2"
+                                            sx={{
+                                                width: '15%',
+                                                color: '#6b7280',
+                                                fontWeight: 500,
+                                                fontSize: '0.75rem'
+                                            }}
+                                        >
+                                            {String(index + 1).padStart(2, '0')}
+                                        </Typography>
+                                        <Typography
+                                            variant="body2"
+                                            sx={{
+                                                width: '70%',
+                                                fontFamily: 'monospace',
+                                                fontWeight: 600,
+                                                color: '#1f2937',
+                                                fontSize: '0.8rem'
+                                            }}
+                                        >
+                                            {serial}
+                                        </Typography>
+                                        <Box sx={{ width: '15%', display: 'flex', justifyContent: 'flex-end' }}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => handleRemoveSerial(index)}
+                                                sx={{ color: '#dc2626', p: 0.25 }}
+                                            >
+                                                <Trash2 size={16} />
+                                            </IconButton>
+                                        </Box>
+                                    </Box>
+                                );
+                            })
+                        )}
+                    </Box>
                 </Box>
             </DialogContent>
 
-            <DialogActions sx={{ p: 2, gap: 1, borderTop: '1px solid #e2e8f0', bgcolor: '#f8fafc' }}>
+            {/* Footer */}
+            <DialogActions
+                sx={{
+                    p: 3,
+                    bgcolor: '#f3f4f6',
+                    borderTop: '1px solid',
+                    borderColor: '#e5e7eb',
+                    display: 'flex',
+                    justifyContent: 'end',
+                    gap: 2
+                }}
+            >
                 <Button
                     onClick={onClose}
                     variant="outlined"
-                    color="inherit"
-                    sx={{ textTransform: 'none', px: 3, fontSize: '13px', borderRadius: '4px' }}
+                    sx={{
+                        borderRadius: 0,
+                        bgcolor: '#ffffff',
+						color: '#374151',
+						borderColor: '#d1d5db',
+                        px: 3,
+                        py: 0.75,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.8125rem',
+						'&:hover': {
+							bgcolor: '#f9fafb',
+							borderColor: '#c5c9d1'
+						}
+                    }}
                 >
                     Cancelar
                 </Button>
@@ -311,16 +437,21 @@ export default function SerialNumbersModal({ open, onClose, lineItem, onSave }: 
                     onClick={handleSave}
                     variant="contained"
                     sx={{
-                        textTransform: 'none',
+                        borderRadius: 0,
+                        bgcolor: '#000000',
+                        color: '#ffffff',
                         px: 3,
-                        fontSize: '13px',
+                        py: 0.75,
+                        textTransform: 'none',
                         fontWeight: 600,
-                        borderRadius: '4px',
-                        bgcolor: '#005483',
-                        '&:hover': { bgcolor: '#004066' }
+                        fontSize: '0.8125rem',
+                        '&:hover': {
+                            bgcolor: '#1f2937'
+                        }
                     }}
+                    startIcon={<Save size={14} />}
                 >
-                    Guardar
+                    Despachar Series
                 </Button>
             </DialogActions>
         </Dialog>

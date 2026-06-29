@@ -222,4 +222,5 @@ export const TYPES = {
 	// Pending Serialization
 	IndexPendingSerializationUseCase: Symbol.for('IndexPendingSerializationUseCase'),
 	RegisterItemSerialsUseCase: Symbol.for('RegisterItemSerialsUseCase'),
+	IndexItemSerialsUseCase: Symbol.for('IndexItemSerialsUseCase'),
 };

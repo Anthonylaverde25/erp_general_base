@@ -8,9 +8,11 @@ import {
 	Typography,
 	IconButton,
 	Divider,
-	DialogProps
+	DialogProps,
+	SxProps,
+	Theme
 } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { X } from 'lucide-react';
 
 interface AppFormModalProps extends Omit<DialogProps, 'open' | 'onClose' | 'title'> {
 	isOpen: boolean;
@@ -26,6 +28,7 @@ interface AppFormModalProps extends Omit<DialogProps, 'open' | 'onClose' | 'titl
 	isConfirmDisabled?: boolean;
 	confirmColor?: 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
 	hideCancel?: boolean;
+	actionsSx?: SxProps<Theme>;
 }
 
 export function AppFormModal({
@@ -43,6 +46,7 @@ export function AppFormModal({
 	hideCancel = false,
 	maxWidth = 'sm',
 	fullWidth = true,
+	actionsSx,
 	...dialogProps
 }: AppFormModalProps) {
 	return (
@@ -85,7 +89,7 @@ export function AppFormModal({
 					size="small"
 					tabIndex={-1}
 				>
-					<Close fontSize="small" />
+					<X size={18} />
 				</IconButton>
 			</DialogTitle>
 
@@ -96,7 +100,7 @@ export function AppFormModal({
 			<Divider />
 
 			{(actions || onConfirm || !hideCancel) && (
-				<DialogActions sx={{ px: 3, py: 2 }}>
+				<DialogActions sx={{ px: 3, py: 2, ...actionsSx }}>
 					{actions ? (
 						actions
 					) : (

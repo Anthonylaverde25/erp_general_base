@@ -7,6 +7,7 @@ import {
 	PaginatedStockMovements
 } from '@/domain/entities/items/repositories/item.action.repository';
 import type { PendingSerializationItem, RegisterSerialsPayload } from '@/types/pending-serialization.types';
+import type { ItemSerialDTO, PaginatedItemSerials } from '@/types/item-serials.types';
 import { ItemEntity } from '@/domain/entities/items/ItemEntity';
 import { ItemMapper } from '@/infrastructure/mappers/items/ItemMapper';
 import { ItemDTO } from '@/domain/entities/items/DTOs/ItemDTOs';
@@ -77,6 +78,30 @@ export class ItemRepositoryAction implements IItemActionRepository {
 		const { data } = await axiosInstance.post<{ message: string }>(
 			`${this.baseUrl}/${id}/register-serials`,
 			payload
+		);
+		return data;
+	}
+
+	async indexItemSerials(
+		page = 1,
+		perPage = 15,
+		filters?: {
+			search?: string;
+			status?: string;
+			start_date?: string;
+			end_date?: string;
+			document_type?: string;
+		}
+	): Promise<PaginatedItemSerials> {
+		const { data } = await axiosInstance.get<PaginatedItemSerials>(
+			`${this.baseUrl}/serials`,
+			{
+				params: {
+					page,
+					per_page: perPage,
+					...filters
+				}
+			}
 		);
 		return data;
 	}

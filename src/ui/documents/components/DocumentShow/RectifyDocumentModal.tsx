@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, MenuItem, CircularProgress, TextField, Typography } from '@mui/material';
+import { Box, MenuItem, CircularProgress, TextField, Typography, Button, Divider } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Save, FileText } from 'lucide-react';
 
 import { AppFormModal } from '@/components/modals/AppFormModal';
 import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
@@ -39,7 +39,11 @@ const numberSeriesRepository = new NumberSeriesRepositoryCrud();
 
 // --- Estilos Comunes (DRY) ---
 const labelSx = { fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', mb: 1, display: 'block', letterSpacing: '0.5px' };
-const inputSx = { '& .MuiInputBase-input': { fontSize: '13px', fontWeight: 600 } };
+const inputSx = { 
+    '& .MuiInputBase-input': { fontSize: '13px', fontWeight: 600 },
+    '& .MuiFilledInput-root': { borderRadius: 0 },
+    '& .MuiOutlinedInput-root': { borderRadius: 0 }
+};
 
 export function RectifyDocumentModal({
     open,
@@ -82,6 +86,7 @@ export function RectifyDocumentModal({
         handleSubmit,
         watch,
         reset,
+        setValue,
         formState: { errors, isValid }
     } = useForm<RectifyFormValues>({
         resolver: zodResolver(rectifySchema),
@@ -105,6 +110,13 @@ export function RectifyDocumentModal({
         enabled: open,
     });
 
+    // Smart Default: Si solo hay una serie rectificativa disponible, seleccionarla automáticamente
+    useEffect(() => {
+        if (numberSeries && numberSeries.length === 1) {
+            setValue('number_series_id', numberSeries[0].id, { shouldValidate: true });
+        }
+    }, [numberSeries, setValue]);
+
     const watchedSeriesId = watch('number_series_id');
 
     const previewNumber = useMemo(() => {
@@ -120,31 +132,87 @@ export function RectifyDocumentModal({
 
     const hasSerializedItems = serializedLines.length > 0;
 
+    // UX: Copia masiva del primer comentario al resto en la misma línea
+    const handleApplyCommentToAll = (line: any, firstSn: string) => {
+        const commentToCopy = serialComments[firstSn] || '';
+        const updatedComments = { ...serialComments };
+        line.meta.serial_numbers.forEach((sn: string) => {
+            updatedComments[sn] = commentToCopy;
+        });
+        setSerialComments(updatedComments);
+    };
+
     return (
         <AppFormModal
             isOpen={open}
             onClose={onClose}
             title={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box sx={{
-                        width: 32, height: 32, borderRadius: '6px',
-                        bgcolor: 'error.50', color: 'error.700',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                        <AlertTriangle size={18} />
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.1rem', color: 'error.700' }}>
+                    <AlertTriangle size={20} style={{ color: '#dc2626' }} />
+                    <Typography variant="subtitle1" sx={{ fontWeight: 750, fontSize: '1.15rem', color: '#dc2626' }}>
                         Rectificar Factura de Venta
                     </Typography>
                 </Box>
             }
-            onConfirm={handleSubmit((values) => onRectify({ ...values, serial_comments: serialComments }))}
-            confirmText={isRectifying ? "Procesando..." : "Confirmar Anulación"}
-            isConfirmDisabled={!isValid || isRectifying}
+            actions={
+                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', width: '100%' }}>
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={onClose}
+                        disabled={isRectifying}
+                        sx={{
+                            borderRadius: 0,
+                            bgcolor: '#ffffff',
+                            color: '#374151',
+                            borderColor: '#d1d5db',
+                            px: 3,
+                            py: 0.75,
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            fontSize: '0.8125rem',
+                            '&:hover': {
+                                bgcolor: '#f9fafb',
+                                borderColor: '#c5c9d1'
+                            }
+                        }}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        variant="contained"
+                        size="small"
+                        onClick={handleSubmit((values) => onRectify({ ...values, serial_comments: serialComments }))}
+                        disabled={!isValid || isRectifying}
+                        sx={{
+                            borderRadius: 0,
+                            bgcolor: '#000000',
+                            color: '#ffffff',
+                            px: 3,
+                            py: 0.75,
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            fontSize: '0.8125rem',
+                            '&:hover': {
+                                bgcolor: '#1f2937'
+                            }
+                        }}
+                        startIcon={isRectifying ? <CircularProgress size={14} color="inherit" /> : <Save size={14} />}
+                    >
+                        {isRectifying ? "Procesando..." : "Confirmar Anulación"}
+                    </Button>
+                </Box>
+            }
+            actionsSx={{
+                bgcolor: '#f3f4f6',
+                borderTop: '1px solid',
+                borderColor: '#e5e7eb',
+                p: 3
+            }}
             maxWidth={hasSerializedItems ? "md" : "sm"}
             PaperProps={{
                 sx: {
-                    width: hasSerializedItems ? '850px' : '450px', maxWidth: '95vw', borderRadius: '4px',
+                    width: hasSerializedItems ? '850px' : '450px', maxWidth: '95vw', borderRadius: 0,
                     bgcolor: '#ffffff', boxShadow: '0 24px 48px -12px rgba(0,0,0,0.18)',
                     overflow: 'hidden'
                 }
@@ -152,19 +220,20 @@ export function RectifyDocumentModal({
         >
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 {/* Encabezado Optimizado */}
-                <Box sx={{ px: 3, py: 2, bgcolor: '#fdf2f2', borderBottom: '1px solid #fde8e8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#9b1c1c' }}>
-                                Documento a Anular
-                            </Typography>
-                            <Typography>
-                                Se emitirá una <strong>Factura Rectificativa (CRN)</strong> para anular el cargo. El documento de origen ({document.number_serie}) pasará a estado <strong>Anulado</strong>.
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: '#c81e1e', fontWeight: 600 }}>
-                                {document.number_serie} • {document.partner_name}
-                            </Typography>
-                        </Box>
+                <Box sx={{ px: 3, py: 2, bgcolor: '#fdf2f2', borderBottom: '1px solid #fde8e8', borderLeft: '4px solid #c81e1e', borderRadius: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#9b1c1c' }}>
+                        Documento a Anular
+                    </Typography>
+                    <Typography sx={{ fontSize: '13px', color: '#7f1d1d', lineHeight: 1.4 }}>
+                        Se emitirá una <strong>Factura Rectificativa (CRN)</strong> para anular el cargo. El documento de origen pasará a estado <strong>Anulado</strong> y las unidades serializadas devueltas retornarán al inventario disponible.
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2.5, flexWrap: 'wrap', mt: 0.5 }}>
+                        <Typography variant="caption" sx={{ color: '#b91c1c', fontWeight: 700 }}>
+                            <span style={{ fontWeight: 500, color: '#991b1b' }}>Nº Origen:</span> {document.number_serie}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#b91c1c', fontWeight: 700 }}>
+                            <span style={{ fontWeight: 500, color: '#991b1b' }}>Cliente:</span> {document.partner_name}
+                        </Typography>
                     </Box>
                 </Box>
 
@@ -187,6 +256,10 @@ export function RectifyDocumentModal({
                         }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                 
+                                <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', letterSpacing: '1px', mb: -0.5 }}>
+                                    1. Datos Fiscales y Serie Legal
+                                </Typography>
+
                                 <Box sx={{ width: '100%' }}>
                                     <Typography variant="caption" sx={labelSx}>Serie Rectificativa (CRN) *</Typography>
                                     <Controller
@@ -197,23 +270,6 @@ export function RectifyDocumentModal({
                                                 {numberSeries?.map((ns) => (
                                                     <MenuItem key={ns.id} value={ns.id} sx={{ fontSize: '13px' }}>
                                                         Serie {ns.serie} (Próximo: {ns.current_number + 1})
-                                                    </MenuItem>
-                                                ))}
-                                            </TextField>
-                                        )}
-                                    />
-                                </Box>
-
-                                <Box sx={{ width: '100%' }}>
-                                    <Typography variant="caption" sx={labelSx}>Motivo de Anulación *</Typography>
-                                    <Controller
-                                        name="reason_id"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <TextField {...field} select fullWidth variant="filled" label="Seleccione el motivo principal" size="small" error={!!errors.reason_id} helperText={errors.reason_id?.message} sx={inputSx}>
-                                                {reasons?.map((reason) => (
-                                                    <MenuItem key={reason.id} value={reason.id} sx={{ fontSize: '13px' }}>
-                                                        {reason.code} - {reason.label} ({reason.reason})
                                                     </MenuItem>
                                                 ))}
                                             </TextField>
@@ -255,25 +311,63 @@ export function RectifyDocumentModal({
                                     />
                                 </Box>
 
+                                <Divider sx={{ my: 0.5 }} />
+
+                                <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', letterSpacing: '1px', mb: -0.5 }}>
+                                    2. Justificación y Motivos
+                                </Typography>
+
+                                <Box sx={{ width: '100%' }}>
+                                    <Typography variant="caption" sx={labelSx}>Motivo de Anulación *</Typography>
+                                    <Controller
+                                        name="reason_id"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <TextField {...field} select fullWidth variant="filled" label="Seleccione el motivo principal" size="small" error={!!errors.reason_id} helperText={errors.reason_id?.message} sx={inputSx}>
+                                                {reasons?.map((reason) => (
+                                                    <MenuItem key={reason.id} value={reason.id} sx={{ fontSize: '13px' }}>
+                                                        {reason.code} - {reason.label} ({reason.reason})
+                                                    </MenuItem>
+                                                ))}
+                                            </TextField>
+                                        )}
+                                    />
+                                </Box>
+
                                 <Box sx={{ width: '100%' }}>
                                     <Typography variant="caption" sx={labelSx}>Notas Adicionales (Opcional)</Typography>
                                     <Controller
                                         name="notes"
                                         control={control}
                                         render={({ field }) => (
-                                            <TextField {...field} fullWidth variant="filled" label="Describa detalles adicionales..." multiline rows={2} size="small" error={!!errors.notes} helperText={errors.notes?.message} inputProps={{ style: { fontSize: '13px', fontWeight: 500 } }} />
+                                            <TextField {...field} fullWidth variant="filled" label="Describa detalles adicionales..." multiline rows={2} size="small" error={!!errors.notes} helperText={errors.notes?.message} InputProps={{ sx: { borderRadius: 0 } }} inputProps={{ style: { fontSize: '13px', fontWeight: 500 } }} />
                                         )}
                                     />
                                 </Box>
 
                                 {previewNumber && (
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', mt: 1, px: 2, py: 1.5, bgcolor: '#fdf2f2', border: '1px solid #fde8e8', borderLeft: '4px solid #c81e1e', borderRadius: '4px' }}>
-                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#c81e1e', textTransform: 'uppercase', fontSize: '10px', mb: 0.5, letterSpacing: '0.5px' }}>
-                                            Nº Rectificativa a Generar
-                                        </Typography>
-                                        <Typography variant="body1" sx={{ fontWeight: 900, color: '#9b1c1c', letterSpacing: '1px', fontSize: '16px' }}>
-                                            {previewNumber}
-                                        </Typography>
+                                    <Box sx={{ 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        gap: 2, 
+                                        width: '100%', 
+                                        mt: 1.5, 
+                                        px: 2, 
+                                        py: 1.5, 
+                                        bgcolor: '#f8fafc', 
+                                        border: '1px solid #e2e8f0', 
+                                        borderLeft: '4px solid #475569', 
+                                        borderRadius: 0 
+                                    }}>
+                                        <FileText size={20} style={{ color: '#475569' }} />
+                                        <Box>
+                                            <Typography variant="caption" sx={{ fontWeight: 800, color: '#475569', textTransform: 'uppercase', fontSize: '9px', mb: 0.2, letterSpacing: '0.5px', display: 'block' }}>
+                                                Nº Rectificativa a Generar (Borrador)
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ fontWeight: 750, fontFamily: 'monospace', color: '#0f172a', letterSpacing: '0.5px' }}>
+                                                {previewNumber}
+                                            </Typography>
+                                        </Box>
                                     </Box>
                                 )}
                             </Box>
@@ -295,40 +389,60 @@ export function RectifyDocumentModal({
                                 <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.5px', mb: 0.5 }}>
                                     Comentarios por Serie
                                 </Typography>
-                                <Typography variant="caption" sx={{ color: 'text.secondary', mb: 2 }}>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', mb: 1 }}>
                                     Ingrese comentarios individuales para cada número de serie devuelto.
                                 </Typography>
 
                                 {serializedLines.map((line, lineIdx) => (
-                                    <Box key={line.id || lineIdx} sx={{ mb: 2.5 }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                                            <Box sx={{ px: 1, py: 0.5, bgcolor: 'secondary.50', color: 'secondary.700', borderRadius: '4px', fontSize: '11px', fontWeight: 700 }}>
-                                                {line.item_code || 'PROD'}
+                                    <Box key={line.id || lineIdx} sx={{ mb: 2.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Box sx={{ px: 1, py: 0.25, bgcolor: '#e5e7eb', color: '#374151', borderRadius: 0, fontSize: '10px', fontWeight: 700, fontFamily: 'monospace' }}>
+                                                    {line.item_code || 'PROD'}
+                                                </Box>
+                                                <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.85rem' }}>
+                                                    {line.name}
+                                                </Typography>
                                             </Box>
-                                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                                                {line.name}
-                                            </Typography>
+                                            {line.meta?.serial_numbers?.length > 1 && (
+                                                <Button 
+                                                    size="small" 
+                                                    variant="text" 
+                                                    onClick={() => handleApplyCommentToAll(line, line.meta.serial_numbers[0])}
+                                                    sx={{ 
+                                                        fontSize: '11px', 
+                                                        textTransform: 'none', 
+                                                        color: '#005483', 
+                                                        p: 0,
+                                                        minWidth: 0,
+                                                        fontWeight: 700,
+                                                        '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' }
+                                                    }}
+                                                >
+                                                    Copiar primer comentario al resto
+                                                </Button>
+                                            )}
                                         </Box>
-                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pl: 1 }}>
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, pl: 0.5 }}>
                                             {line.meta?.serial_numbers?.map((sn) => (
-                                                <Box key={sn}>
-                                                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                                                        Nº Serie: {sn}
+                                                <Box key={sn} sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block' }}>
+                                                        Nº Serie: <span style={{ fontFamily: 'monospace', fontWeight: 800 }}>{sn}</span>
                                                     </Typography>
                                                     <TextField
                                                         fullWidth
                                                         variant="outlined"
-                                                        placeholder="Motivo de la devolución..."
-                                                        multiline
-                                                        rows={2}
+                                                        placeholder="Escribir motivo de la devolución..."
                                                         size="small"
                                                         value={serialComments[sn] || ''}
                                                         onChange={(e) => setSerialComments(prev => ({ ...prev, [sn]: e.target.value }))}
+                                                        InputProps={{ sx: { borderRadius: 0 } }}
                                                         inputProps={{ style: { fontSize: '13px', fontWeight: 500 } }}
                                                     />
                                                 </Box>
                                             ))}
                                         </Box>
+                                        {lineIdx < serializedLines.length - 1 && <Divider sx={{ mt: 1 }} />}
                                     </Box>
                                 ))}
                             </Box>
