@@ -9,8 +9,8 @@ import TextField from '@mui/material/TextField';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import _ from 'lodash';
 import { useEffect } from 'react';
-import { useAccountSettings } from '../../api/hooks/account/useAccountSettings';
-import { useUpdateAccountSettings } from '../../api/hooks/account/useUpdateAccountSettings';
+import { useAccountSettings } from '@/features/settings/api/hooks/account/useAccountSettings';
+import { useUpdateAccountSettings } from '@/features/settings/api/hooks/account/useUpdateAccountSettings';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 

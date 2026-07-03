@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import PartnersHeader from '../components/PartnersHeader';
 import { useSearchParams } from 'react-router';
-import { CreatePartnerModal } from '@/app/(control-panel)/partners/CreatePartnerModal';
+import { CreatePartnerModal } from '@/ui/partners/components/modals/CreatePartnerModal';
 
 const PartnersTabView = lazy(() => import('../components/PartnersTabView'));
 

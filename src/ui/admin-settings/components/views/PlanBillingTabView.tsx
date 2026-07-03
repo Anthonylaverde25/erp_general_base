@@ -11,8 +11,8 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
 import { useEffect } from 'react';
-import { usePlanBillingSettings } from '../../api/hooks/billing/usePlanBillingSettings';
-import { useUpdatePlanBillingSettings } from '../../api/hooks/billing/useUpdatePlanBillingSettings';
+import { usePlanBillingSettings } from '@/features/settings/api/hooks/billing/usePlanBillingSettings';
+import { useUpdatePlanBillingSettings } from '@/features/settings/api/hooks/billing/useUpdatePlanBillingSettings';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 

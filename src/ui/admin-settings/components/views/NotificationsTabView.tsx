@@ -9,9 +9,8 @@ import Switch from '@mui/material/Switch';
 import FormHelperText from '@mui/material/FormHelperText';
 import _ from 'lodash';
 import { useEffect } from 'react';
-import { useNotificationSettings } from '../../api/hooks/notifications/useNotificationSettings';
-import { useUpdateNotificationSettings } from '../../api/hooks/notifications/useUpdateNotificationSettings';
-
+import { useNotificationSettings } from '@/features/settings/api/hooks/notifications/useNotificationSettings';
+import { useUpdateNotificationSettings } from '@/features/settings/api/hooks/notifications/useUpdateNotificationSettings';
 const defaultValues: FormType = {
 	id: '',
 	communication: false,

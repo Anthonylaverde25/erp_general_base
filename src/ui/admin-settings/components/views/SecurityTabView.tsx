@@ -11,8 +11,8 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import _ from 'lodash';
 import { useEffect } from 'react';
-import { useSecuritySettings } from '../../api/hooks/security/useSecuritySettings';
-import { useUpdateSecuritySettings } from '../../api/hooks/security/useUpdateSecuritySettings';
+import { useSecuritySettings } from '@/features/settings/api/hooks/security/useSecuritySettings';
+import { useUpdateSecuritySettings } from '@/features/settings/api/hooks/security/useUpdateSecuritySettings';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 
