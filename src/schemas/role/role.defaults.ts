@@ -4,7 +4,8 @@ export const defaultCreateRoleValues: CreateRoleFormType = {
 	name: '',
 	code: '',
 	description: '',
-	active: true
+	active: true,
+	permissions: []
 };
 
 export const defaultUpdateRoleValues = (role?: any): UpdateRoleFormType => ({
@@ -12,5 +13,6 @@ export const defaultUpdateRoleValues = (role?: any): UpdateRoleFormType => ({
 	name: role?.name || '',
 	code: role?.code || '',
 	description: role?.description || '',
-	active: role?.active !== undefined ? role.active : true
+	active: role?.active !== undefined ? role.active : true,
+	permissions: role?.permissions || []
 });

@@ -60,7 +60,11 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 			if (isTokenValid(accessToken)) {
 				try {
 					const userDataRaw = await authSignInWithToken(accessToken);
-					const userData = { ...userDataRaw, role: userDataRaw.role?.code } as unknown as IUser;
+					const userPermissions = (userDataRaw as any).permissions || [];
+					const userRole = userDataRaw.role?.code
+						? [userDataRaw.role.code, ...userPermissions]
+						: userPermissions;
+					const userData = { ...userDataRaw, role: userRole } as unknown as IUser;
 					setGlobalHeaders({ Authorization: `Bearer ${accessToken}` });
 					return userData;
 				} catch (error) {
@@ -106,11 +110,15 @@ function JwtAuthProvider(props: FuseAuthProviderComponentProps) {
 		async (credentials) => {
 			try {
 				const { user, access_token } = await authSignIn(credentials);
+				const userPermissions = (user as any).permissions || [];
+				const userRole = user.role?.code
+					? [user.role.code, ...userPermissions]
+					: userPermissions;
 
 				setAuthState({
 					authStatus: 'authenticated',
 					isAuthenticated: true,
-					user: { ...user, role: user.role?.code } as unknown as IUser
+					user: { ...user, role: userRole } as unknown as IUser
 				});
 
 				setTokenStorageValue(access_token);

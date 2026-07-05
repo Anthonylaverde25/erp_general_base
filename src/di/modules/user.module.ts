@@ -7,6 +7,7 @@ import { CreateUserUseCase } from '@/application/use_cases/users/CreateUserUseCa
 import { UpdateUserUseCase } from '@/application/use_cases/users/UpdateUserUseCase';
 import { ShowUserUseCase } from '@/application/use_cases/users/ShowUserUseCase';
 import { AssociateEmployeesUseCase } from '@/application/use_cases/users/AssociateEmployeesUseCase';
+import { UpdateUserPermissionsUseCase } from '@/application/use_cases/users/UpdateUserPermissionsUseCase';
 
 export const registerUserModule = (container: Container) => {
 	// //Repositories
@@ -19,4 +20,5 @@ export const registerUserModule = (container: Container) => {
 	container.bind<UpdateUserUseCase>(TYPES.UpdateUserUseCase).to(UpdateUserUseCase);
 	container.bind<ShowUserUseCase>(TYPES.ShowUserUseCase).to(ShowUserUseCase);
 	container.bind<AssociateEmployeesUseCase>(TYPES.AssociateEmployeesUseCase).to(AssociateEmployeesUseCase);
+	container.bind<UpdateUserPermissionsUseCase>(TYPES.UpdateUserPermissionsUseCase).to(UpdateUserPermissionsUseCase);
 };

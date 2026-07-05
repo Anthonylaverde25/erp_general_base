@@ -7,11 +7,11 @@ import { DocumentEntity } from '@/domain/entities/documents/DocumentEntity';
 // Mock del repositorio
 vi.mock('@/infrastructure/repositories/number_series/NumberSeriesRepositoryCrud', () => {
     return {
-        NumberSeriesRepositoryCrud: vi.fn().mockImplementation(() => ({
-            index: vi.fn().mockResolvedValue([
+        NumberSeriesRepositoryCrud: class {
+            index = vi.fn().mockResolvedValue([
                 { id: 1, serie: 'F2024', current_number: 100 }
-            ])
-        }))
+            ]);
+        }
     };
 });
 
@@ -54,12 +54,12 @@ describe('ConversionSeriesModal', () => {
         );
 
         // Verificar que aparezca el producto con pendiente
-        expect(screen.getByText('Product A')).toBeInTheDocument();
+        expect(await screen.findByText('Product A')).toBeInTheDocument();
         expect(screen.getByText('6.00')).toBeInTheDocument(); // Cantidad pendiente
 
         // Verificar que el producto facturado aparezca como tal
         expect(screen.getByText('Product B')).toBeInTheDocument();
-        expect(screen.getByText('FACTURADO')).toBeInTheDocument();
+        expect(screen.getByText('COMPLETO')).toBeInTheDocument();
     });
 
     it('should disable confirm button until a series is selected', async () => {
@@ -76,7 +76,7 @@ describe('ConversionSeriesModal', () => {
             </QueryClientProvider>
         );
 
-        const confirmButton = screen.getByRole('button', { name: /Emitir Factura/i });
+        const confirmButton = screen.getByRole('button', { name: /Confirmar Emisión/i });
         expect(confirmButton).toBeDisabled();
     });
 
@@ -109,7 +109,7 @@ describe('ConversionSeriesModal', () => {
         fireEvent.change(qtyInput, { target: { value: '3' } });
 
         // 3. Confirmar
-        const confirmButton = screen.getByRole('button', { name: /Emitir Factura/i });
+        const confirmButton = screen.getByRole('button', { name: /Confirmar Emisión/i });
         fireEvent.click(confirmButton);
 
         expect(onConvert).toHaveBeenCalledWith(expect.objectContaining({

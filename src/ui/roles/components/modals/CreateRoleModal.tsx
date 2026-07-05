@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from '@mui/material';
+import { Dialog } from '@mui/material';
 import CreateRoleForm from '../forms/CreateRoleForm';
 
 interface CreateRoleDialogProps {
@@ -11,13 +11,21 @@ export default function CreateRoleDialog({ open, onClose }: CreateRoleDialogProp
 		<Dialog
 			open={open}
 			onClose={onClose}
+			maxWidth="sm"
+			fullWidth
+			PaperProps={{
+				sx: {
+					borderRadius: 0,
+					bgcolor: 'background.paper',
+					boxShadow: '0 24px 48px -12px rgba(0,0,0,0.18)',
+					width: '100%'
+				}
+			}}
 		>
-			<DialogContent>
-				<CreateRoleForm
-					onCancel={onClose}
-					onSuccess={onClose}
-				/>
-			</DialogContent>
+			<CreateRoleForm
+				onCancel={onClose}
+				onSuccess={onClose}
+			/>
 		</Dialog>
 	);
 }

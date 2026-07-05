@@ -1,14 +1,26 @@
-import React, { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { TextField, Button, Box, Typography, Divider, Stack, Fade, Switch, FormControlLabel } from '@mui/material';
-import { Shield, Save, Close } from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { 
+	Box, 
+	Typography, 
+	Divider, 
+	Fade, 
+	IconButton,
+	Button
+} from '@mui/material';
+import { Close, Security, Save } from '@mui/icons-material';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQuery } from '@tanstack/react-query';
 
 import useUpdateRole from '@/features/roles/hooks/useUpdateRole';
 import { UpdateRoleFormType, updateRoleSchema } from '@/schemas/role/role.schema';
 import { defaultUpdateRoleValues } from '@/schemas/role/role.defaults';
-import { IUpdateRole } from '@/types/role.types';
-import { IRole } from '@/types/role.types';
+import { IUpdateRole, IRole } from '@/types/role.types';
+import axiosInstance from '@/lib/@axios';
+
+// Importar subcomponentes modularizados
+import RoleInfoStep from './components/RoleInfoStep';
+import SelectPermissionsDialog from './components/SelectPermissionsDialog';
 
 interface UpdateRoleFormProps {
 	role: IRole;
@@ -17,21 +29,57 @@ interface UpdateRoleFormProps {
 }
 
 export default function UpdateRoleForm({ role, onCancel, onSuccess }: UpdateRoleFormProps) {
+	const [isPermissionsOpen, setIsPermissionsOpen] = useState(false);
+	const [allPermissions, setAllPermissions] = useState(false);
 	const { handleUpdateRole, isLoading } = useUpdateRole();
 
-	const { control, formState, handleSubmit, reset } = useForm<UpdateRoleFormType>({
+	// Consultar catálogo de permisos reales
+	const { data: modulesCatalog, isLoading: isLoadingCatalog } = useQuery({
+		queryKey: ['permissions-catalog'],
+		queryFn: async () => {
+			const { data } = await axiosInstance.get('/permissions/catalog');
+			return data.data;
+		}
+	});
+
+	const { control, formState, handleSubmit, reset, setValue, watch } = useForm<UpdateRoleFormType>({
 		mode: 'onChange',
 		resolver: zodResolver(updateRoleSchema),
 		defaultValues: defaultUpdateRoleValues(role)
 	});
 
 	const { errors, isValid } = formState;
+	const selectedPermissions = watch('permissions') || [];
+
+	const totalPermsCount = modulesCatalog 
+		? modulesCatalog.flatMap((m: any) => m.permissions || []).length 
+		: 0;
+
+	// Sincronizar el estado del switch "Permisos totales"
+	useEffect(() => {
+		if (modulesCatalog && totalPermsCount > 0) {
+			const isAllSelected = selectedPermissions.length === totalPermsCount;
+			setAllPermissions(isAllSelected);
+		}
+	}, [selectedPermissions, modulesCatalog, totalPermsCount]);
 
 	useEffect(() => {
 		if (role) {
 			reset(defaultUpdateRoleValues(role));
 		}
 	}, [role, reset]);
+
+	const handleToggleAllPermissions = (checked: boolean) => {
+		setAllPermissions(checked);
+		if (checked && modulesCatalog) {
+			const allIds = modulesCatalog.flatMap((module: any) => 
+				(module.permissions || []).map((p: any) => p.id)
+			);
+			setValue('permissions', allIds, { shouldValidate: true });
+		} else {
+			setValue('permissions', [], { shouldValidate: true });
+		}
+	};
 
 	const onSubmit = async (data: UpdateRoleFormType) => {
 		try {
@@ -40,7 +88,8 @@ export default function UpdateRoleForm({ role, onCancel, onSuccess }: UpdateRole
 				name: data.name,
 				code: data.code,
 				description: data.description,
-				active: data.active
+				active: data.active,
+				permissions: data.permissions
 			};
 
 			await handleUpdateRole(data.id, payload);
@@ -51,196 +100,191 @@ export default function UpdateRoleForm({ role, onCancel, onSuccess }: UpdateRole
 		}
 	};
 
-	const SectionTitle = ({ icon: Icon, title }: { icon: React.ElementType; title: string }) => (
-		<Stack
-			direction="row"
-			spacing={1}
-			alignItems="center"
-			sx={{ mb: 2 }}
-		>
-			<Icon
-				fontSize="small"
-				color="primary"
-			/>
-			<Typography
-				variant="subtitle1"
-				fontWeight={600}
-				color="text.primary"
-			>
-				{title}
-			</Typography>
-		</Stack>
-	);
-
 	return (
 		<Fade
 			in
 			timeout={400}
 		>
-			<Box>
-				<form onSubmit={handleSubmit(onSubmit)}>
-					<Stack spacing={4}>
-						{/* Header */}
-						<Box>
-							<Typography
-								variant="h5"
-								fontWeight={700}
-								gutterBottom
-							>
-								Actualizar rol
-							</Typography>
-							<Typography
-								variant="body2"
-								color="text.secondary"
-							>
-								Modifique la información del rol {role.name}
-							</Typography>
-						</Box>
-
-						<Divider />
-
-						{/* Información del rol */}
-						<Box>
-							<SectionTitle
-								icon={Shield}
-								title="Información del rol"
-							/>
-
-							<Stack spacing={3}>
-								<Controller
-									name="name"
-									control={control}
-									render={({ field }) => (
-										<TextField
-											{...field}
-											label="Nombre del rol"
-											placeholder="Ej: Administrador, Editor, Usuario"
-											error={!!errors.name}
-											helperText={errors.name?.message}
-											fullWidth
-											variant="filled"
-										/>
-									)}
-								/>
-
-								<Controller
-									name="code"
-									control={control}
-									render={({ field }) => (
-										<TextField
-											{...field}
-											label="Código"
-											placeholder="Ej: ADMIN, EDITOR, USER"
-											error={!!errors.code}
-											helperText={errors.code?.message || 'Código único para identificar el rol'}
-											fullWidth
-											variant="filled"
-											inputProps={{
-												style: { textTransform: 'uppercase' }
-											}}
-											onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-										/>
-									)}
-								/>
-
-								<Controller
-									name="description"
-									control={control}
-									render={({ field }) => (
-										<TextField
-											{...field}
-											label="Descripción"
-											placeholder="Describe las responsabilidades y permisos del rol"
-											error={!!errors.description}
-											helperText={errors.description?.message}
-											fullWidth
-											multiline
-											rows={3}
-											variant="filled"
-										/>
-									)}
-								/>
-
-								<Controller
-									name="active"
-									control={control}
-									render={({ field }) => (
-										<FormControlLabel
-											control={
-												<Switch
-													checked={field.value}
-													onChange={field.onChange}
-													color="primary"
-												/>
-											}
-											label={
-												<Box>
-													<Typography
-														variant="body2"
-														fontWeight={500}
-													>
-														Rol activo
-													</Typography>
-													<Typography
-														variant="caption"
-														color="text.secondary"
-													>
-														Los roles inactivos no pueden ser asignados a usuarios
-													</Typography>
-												</Box>
-											}
-										/>
-									)}
-								/>
-							</Stack>
-						</Box>
-
-						{/* Actions */}
-						<Divider />
-
-						<Stack
-							direction="row"
-							justifyContent="flex-end"
-							spacing={2}
-							sx={{ pt: 1 }}
+			<Box sx={{ width: '100%' }}>
+				{/* Fixed Header */}
+				<Box
+					sx={{
+						p: 3,
+						pb: 2,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'space-between'
+					}}
+				>
+					<Box>
+						<Typography
+							variant="subtitle1"
+							fontWeight={750}
+							sx={{ fontSize: '1.15rem', color: 'text.primary' }}
 						>
-							<Button
-								className="btn-secondary"
-								onClick={onCancel}
-								disabled={isLoading}
-								startIcon={<Close />}
-								sx={{
-									px: 3,
-									textTransform: 'none',
-									fontWeight: 600,
-									borderRadius: 1.5
-								}}
-							>
-								Cancelar
-							</Button>
+							Actualizar rol
+						</Typography>
+						<Typography
+							variant="body2"
+							color="text.secondary"
+							sx={{ mt: 0.5, fontSize: '0.875rem' }}
+						>
+							Modifique la información y configure los accesos
+						</Typography>
+					</Box>
+					<IconButton 
+						onClick={onCancel} 
+						size="small" 
+						disabled={isLoading} 
+						sx={{ color: '#4b5563', borderRadius: 0 }}
+					>
+						<Close sx={{ fontSize: 20 }} />
+					</IconButton>
+				</Box>
+				
+				<Divider />
 
-							<Button
-								className="btn-primary"
-								type="submit"
-								variant="contained"
-								disabled={!isValid || isLoading}
-								startIcon={<Save />}
-								sx={{
-									px: 4,
-									textTransform: 'none',
-									fontWeight: 600,
-									borderRadius: 1.5,
-									boxShadow: 2,
+				<form onSubmit={handleSubmit(onSubmit)}>
+					{/* Scrollable Body */}
+					<Box
+						sx={{
+							p: 3,
+							display: 'flex',
+							flexDirection: 'column',
+							gap: 2.5,
+							maxHeight: '65vh',
+							overflowY: 'auto'
+						}}
+					>
+						<RoleInfoStep
+							control={control}
+							errors={errors}
+							isLoading={isLoading}
+							isLoadingCatalog={isLoadingCatalog}
+							allPermissions={allPermissions}
+							onToggleAllPermissions={handleToggleAllPermissions}
+						/>
+
+						{/* Panel de Configuración de Accesos */}
+						<Box 
+							sx={{ 
+								border: '1px solid', 
+								borderColor: 'divider', 
+								p: 2, 
+								mt: 1,
+								display: 'flex',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+								bgcolor: 'action.hover',
+								borderRadius: 0
+							}}
+						>
+							<Box>
+								<Typography variant="body2" fontWeight={700} color="text.primary">
+									Accesos y Permisos
+								</Typography>
+								<Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.2 }}>
+									{selectedPermissions.length} permisos seleccionados actualmente
+								</Typography>
+							</Box>
+							<Button 
+								type="button" 
+								variant="outlined" 
+								onClick={() => setIsPermissionsOpen(true)}
+								startIcon={<Security fontSize="small" />}
+								sx={{ 
+									borderRadius: 0, 
+									textTransform: 'none', 
+									fontWeight: 600, 
+									fontSize: '0.8125rem',
+									bgcolor: '#ffffff',
+									color: '#374151',
+									borderColor: '#d1d5db',
+									border: '1px solid',
 									'&:hover': {
-										boxShadow: 4
+										bgcolor: '#f9fafb',
+										borderColor: '#c5c9d1'
 									}
 								}}
 							>
-								{isLoading ? 'Guardando...' : 'Actualizar rol'}
+								Configurar Permisos
 							</Button>
-						</Stack>
-					</Stack>
+						</Box>
+					</Box>
+
+					{/* Fixed Actions Footer */}
+					<Divider />
+
+					<Box
+						sx={{
+							p: 3,
+							bgcolor: '#f3f4f6',
+							display: 'flex',
+							justifyContent: 'space-between',
+							alignItems: 'center'
+						}}
+					>
+						<Button
+							key="cancel-btn"
+							type="button"
+							onClick={onCancel}
+							disabled={isLoading}
+							sx={{
+								borderRadius: 0,
+								bgcolor: '#ffffff',
+								color: '#374151',
+								borderColor: '#d1d5db',
+								px: 3,
+								py: 0.75,
+								textTransform: 'none',
+								fontWeight: 600,
+								fontSize: '0.8125rem',
+								border: '1px solid',
+								'&:hover': {
+									bgcolor: '#f9fafb',
+									borderColor: '#c5c9d1'
+								}
+							}}
+						>
+							Cancelar
+						</Button>
+
+						<Button
+							key="submit-btn"
+							type="submit"
+							variant="contained"
+							color="primary"
+							disabled={!isValid || isLoading}
+							startIcon={<Save fontSize="small" />}
+							sx={{
+								borderRadius: 0,
+								px: 4,
+								py: 0.75,
+								textTransform: 'none',
+								fontWeight: 600,
+								fontSize: '0.8125rem'
+							}}
+						>
+							{isLoading ? 'Guardando...' : 'Actualizar rol'}
+						</Button>
+					</Box>
 				</form>
+
+				{/* Modal de Configuración Detallada de Permisos */}
+				<SelectPermissionsDialog
+					open={isPermissionsOpen}
+					onClose={() => setIsPermissionsOpen(false)}
+					selectedPermissions={selectedPermissions}
+					onSave={(perms) => setValue('permissions', perms, { shouldValidate: true })}
+					roleDetails={{
+						name: watch('name'),
+						code: watch('code'),
+						active: watch('active'),
+						description: watch('description')
+					}}
+					modulesCatalog={modulesCatalog || []}
+					isLoadingCatalog={isLoadingCatalog}
+				/>
 			</Box>
 		</Fade>
 	);

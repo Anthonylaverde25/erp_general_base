@@ -7,6 +7,7 @@ import TeamTable from '../components/TeamTable';
 import CreateUserButton from '@/ui/users/components/CreateUserButton';
 import UpdateUserModal from '@/ui/users/components/modals/UpdateUserModal';
 import AssociateEmployeesModal from '@/ui/users/components/modals/AssociateEmployeesModal';
+import UserPermissionsDrawer from '../components/drawers/UserPermissionsDrawer';
 import { IUser } from '@/types/user.types';
 
 export default function TeamTabView() {
@@ -18,6 +19,9 @@ export default function TeamTabView() {
 	const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 	const [associateModalOpen, setAssociateModalOpen] = useState(false);
 
+	const [selectedPermissionsUser, setSelectedPermissionsUser] = useState<IUser | null>(null);
+	const [permissionsDrawerOpen, setPermissionsDrawerOpen] = useState(false);
+
 	const handleEditUser = (id: IUser['id']) => {
 		setSelectedId(id);
 		setUpdateModalOpen(true);
@@ -26,6 +30,11 @@ export default function TeamTabView() {
 	const handleAssociateEmployees = (user: IUser) => {
 		setSelectedUser(user);
 		setAssociateModalOpen(true);
+	};
+
+	const handleManagePermissions = (user: IUser) => {
+		setSelectedPermissionsUser(user);
+		setPermissionsDrawerOpen(true);
 	};
 
 	return (
@@ -60,6 +69,7 @@ export default function TeamTabView() {
 				users={users}
 				onEdit={handleEditUser}
 				onAssociateEmployees={handleAssociateEmployees}
+				onManagePermissions={handleManagePermissions}
 			/>
 
 			{selectedId && (
@@ -83,6 +93,15 @@ export default function TeamTabView() {
 					user={selectedUser}
 				/>
 			)}
+
+			<UserPermissionsDrawer
+				open={permissionsDrawerOpen}
+				onClose={() => {
+					setPermissionsDrawerOpen(false);
+					setSelectedPermissionsUser(null);
+				}}
+				userId={selectedPermissionsUser?.id || null}
+			/>
 		</div>
 	);
 }

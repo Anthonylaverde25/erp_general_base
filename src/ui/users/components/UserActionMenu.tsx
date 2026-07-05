@@ -6,9 +6,10 @@ interface UserActionMenuProps {
 	row: any;
 	onEdit: () => void;
 	onAssociateEmployees: () => void;
+	onManagePermissions: () => void;
 }
 
-export default function UserActionMenu({ row, onEdit, onAssociateEmployees }: UserActionMenuProps) {
+export default function UserActionMenu({ row, onEdit, onAssociateEmployees, onManagePermissions }: UserActionMenuProps) {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const open = Boolean(anchorEl);
 
@@ -94,6 +95,17 @@ export default function UserActionMenu({ row, onEdit, onAssociateEmployees }: Us
 						<FuseSvgIcon size={16}>heroicons-outline:user-group</FuseSvgIcon>
 					</ListItemIcon>
 					Asociar empleado
+				</MenuItem>
+				<MenuItem
+					onClick={(e) => {
+						handleClose(e);
+						onManagePermissions();
+					}}
+				>
+					<ListItemIcon>
+						<FuseSvgIcon size={16}>heroicons-outline:shield-check</FuseSvgIcon>
+					</ListItemIcon>
+					Permisos especiales
 				</MenuItem>
 				<MenuItem
 					onClick={(e) => {

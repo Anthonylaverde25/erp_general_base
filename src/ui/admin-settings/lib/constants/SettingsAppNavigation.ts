@@ -6,6 +6,7 @@ const SettingsAppNavigation: FuseNavItemType = {
 	type: 'collapse',
 	icon: 'lucide:settings',
 	url: '/apps/settings',
+	auth: ['settings.general.manage', 'settings.team.manage', 'settings.roles.manage'],
 	children: [
 		{
 			id: 'apps.settings.account',
@@ -13,18 +14,17 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Cuenta',
 			type: 'item',
 			url: '/apps/settings/account',
-			subtitle: 'Administra tu perfil público e información privada'
+			subtitle: 'Administra tu perfil público e información privada',
+			auth: ['settings.general.manage']
 		},
-
-
-
 		{
 			id: 'apps.settings.team',
 			icon: 'lucide:users',
 			title: 'Equipo',
 			type: 'item',
 			url: '/apps/settings/team',
-			subtitle: 'Administra tu equipo y permisos'
+			subtitle: 'Administra tu equipo y permisos',
+			auth: ['settings.team.manage']
 		},
 		{
 			id: 'apps.settings.roles',
@@ -32,7 +32,8 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Roles',
 			type: 'item',
 			url: '/apps/settings/roles',
-			subtitle: 'Gestiona roles y permisos del sistema'
+			subtitle: 'Gestiona roles y permisos del sistema',
+			auth: ['settings.roles.manage']
 		},
 		{
 			id: 'apps.settings.bankAccounts',
@@ -40,7 +41,8 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Cuentas Bancarias',
 			type: 'item',
 			url: '/apps/settings/bank-accounts',
-			subtitle: 'Administra tus cuentas bancarias'
+			subtitle: 'Administra tus cuentas bancarias',
+			auth: ['settings.general.manage']
 		},
 		{
 			id: 'apps.settings.paymentMethods',
@@ -48,7 +50,8 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Métodos de Pago',
 			type: 'item',
 			url: '/apps/settings/payment-methods',
-			subtitle: 'Gestiona tus métodos de pago disponibles'
+			subtitle: 'Gestiona tus métodos de pago disponibles',
+			auth: ['settings.general.manage']
 		},
 		{
 			id: 'apps.settings.stores',
@@ -56,7 +59,8 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Tiendas',
 			type: 'item',
 			url: '/apps/settings/stores',
-			subtitle: 'Administra tus tiendas y sucursales'
+			subtitle: 'Administra tus tiendas y sucursales',
+			auth: ['settings.general.manage']
 		},
 		{
 			id: 'apps.settings.number_serie',
@@ -64,7 +68,8 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Series Numéricas',
 			type: 'item',
 			url: '/apps/settings/number-serie',
-			subtitle: 'Gestiona las series de numeración'
+			subtitle: 'Gestiona las series de numeración',
+			auth: ['settings.general.manage']
 		},
 		{
 			id: 'apps.settings.tax_types',
@@ -72,7 +77,8 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Tipos de Impuestos',
 			type: 'item',
 			url: '/apps/settings/tax-types',
-			subtitle: 'Administra tipos de impuestos y operaciones'
+			subtitle: 'Administra tipos de impuestos y operaciones',
+			auth: ['settings.general.manage']
 		},
 		{
 			id: 'apps.settings.taxRate',
@@ -80,7 +86,8 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Tasas de Impuestos',
 			type: 'item',
 			url: '/apps/settings/tax-rate',
-			subtitle: 'Gestiona los porcentajes de impuestos aplicables'
+			subtitle: 'Gestiona los porcentajes de impuestos aplicables',
+			auth: ['settings.general.manage']
 		},
 		{
 			id: 'apps.settings.families',
@@ -88,7 +95,8 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Familias',
 			type: 'item',
 			url: '/apps/settings/families',
-			subtitle: 'Organiza tus productos en familias'
+			subtitle: 'Organiza tus productos en familias',
+			auth: ['settings.general.manage']
 		},
 		{
 			id: 'apps.settings.categories',
@@ -96,7 +104,8 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Categorías',
 			type: 'item',
 			url: '/apps/settings/categories',
-			subtitle: 'Gestiona las categorías de tus productos'
+			subtitle: 'Gestiona las categorías de tus productos',
+			auth: ['settings.general.manage']
 		},
 		{
 			id: 'apps.settings.subcategories',
@@ -104,16 +113,17 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Subcategorías',
 			type: 'item',
 			url: '/apps/settings/subcategories',
-			subtitle: 'Gestiona las subcategorías de tus productos'
+			subtitle: 'Gestiona las subcategorías de tus productos',
+			auth: ['settings.general.manage']
 		},
-
 		{
 			id: 'apps.settings.unitTypes',
 			icon: 'lucide:ruler',
 			title: 'Tipos de Unidad',
 			type: 'item',
 			url: '/apps/settings/unit-types',
-			subtitle: 'Gestiona los tipos de unidades de medida'
+			subtitle: 'Gestiona los tipos de unidades de medida',
+			auth: ['settings.general.manage']
 		},
 		{
 			id: 'apps.settings.units',
@@ -121,7 +131,8 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Unidades',
 			type: 'item',
 			url: '/apps/settings/units',
-			subtitle: 'Gestiona las unidades de medida'
+			subtitle: 'Gestiona las unidades de medida',
+			auth: ['settings.general.manage']
 		},
 		{
 			id: 'apps.settings.fileTypes',
@@ -129,7 +140,8 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Tipos de Archivos',
 			type: 'item',
 			url: '/apps/settings/file-types',
-			subtitle: 'Administra los tipos de documentos adjuntos'
+			subtitle: 'Administra los tipos de documentos adjuntos',
+			auth: ['settings.general.manage']
 		}
 	]
 };

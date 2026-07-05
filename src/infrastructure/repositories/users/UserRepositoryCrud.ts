@@ -60,4 +60,15 @@ export class UserRepositoryCrud implements IUserCrudRepository {
 			message: message || 'Empleados asociados correctamente'
 		};
 	}
+
+	async updatePermissions(id: number, permissions: { id: number; allowed: boolean | null }[]): Promise<{ user: UserEntity; message: string }> {
+		const {
+			data: { user, message }
+		} = await axiosInstance.post(`users/${id}/permissions`, { permissions });
+
+		return {
+			user: UserMapper.fromDetailDTO(user),
+			message: message || 'Permisos actualizados correctamente'
+		};
+	}
 }

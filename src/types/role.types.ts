@@ -7,6 +7,7 @@ export interface IRole {
 	code: string;
 	description: string;
 	active: boolean;
+	permissions?: number[];
 	created_at?: string;
 	updated_at?: string;
 }
@@ -19,6 +20,7 @@ export interface ICreateRole {
 	code: string;
 	description: string;
 	active: boolean;
+	permissions?: number[];
 }
 
 /**
@@ -30,4 +32,5 @@ export interface IUpdateRole {
 	code: string;
 	description: string;
 	active: boolean;
+	permissions?: number[];
 }

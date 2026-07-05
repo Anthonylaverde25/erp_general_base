@@ -371,6 +371,13 @@ class FuseUtils {
 			return true;
 		}
 
+		if (Array.isArray(authArr) && authArr.includes('*')) {
+			return !!userRole && (Array.isArray(userRole) ? userRole.length > 0 : true);
+		}
+		if (authArr === '*') {
+			return !!userRole && (Array.isArray(userRole) ? userRole.length > 0 : true);
+		}
+
 		if (Array.isArray(authArr) && authArr?.length === 0) {
 			/**
 			 * if auth array is empty means,

@@ -1,12 +1,14 @@
 import { type ReactNode } from 'react';
-import { Box, alpha } from '@mui/material';
+import { Box, alpha, IconButton } from '@mui/material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import CloseIcon from '@mui/icons-material/Close';
 
 type DashGridItemProps = {
 	children: ReactNode;
 	isEditing: boolean;
 	/** If true, the card content has no padding (e.g. PendingPaymentsCard manages its own). */
 	noPadding?: boolean;
+	onRemove?: () => void;
 };
 
 /**
@@ -17,7 +19,7 @@ type DashGridItemProps = {
  *   and the card border turns dashed with a subtle primary color shadow.
  * - When isEditing is false, it renders normal borders with no drag handle.
  */
-function DashGridItem({ children, isEditing, noPadding = false }: DashGridItemProps) {
+function DashGridItem({ children, isEditing, noPadding = false, onRemove }: DashGridItemProps) {
 	return (
 		<Box
 			sx={{
@@ -44,7 +46,8 @@ function DashGridItem({ children, isEditing, noPadding = false }: DashGridItemPr
 						width: '100%',
 						display: 'flex',
 						alignItems: 'center',
-						justifyContent: 'center',
+						justifyContent: 'space-between',
+						px: 1,
 						bgcolor: (theme) => alpha(theme.palette.primary.main, 0.06),
 						borderBottom: '1px solid',
 						borderColor: (theme) => alpha(theme.palette.primary.main, 0.12),
@@ -60,7 +63,26 @@ function DashGridItem({ children, isEditing, noPadding = false }: DashGridItemPr
 						}
 					}}
 				>
+					<Box sx={{ width: 20 }} /> {/* Spacer to center the drag handle icon */}
 					<DragIndicatorIcon sx={{ fontSize: 18 }} />
+					{onRemove ? (
+						<IconButton
+							size="small"
+							onClick={(e) => {
+								e.stopPropagation();
+								onRemove();
+							}}
+							sx={{ 
+								p: '2px', 
+								color: 'text.secondary',
+								'&:hover': { color: 'error.main' }
+							}}
+						>
+							<CloseIcon sx={{ fontSize: 14 }} />
+						</IconButton>
+					) : (
+						<Box sx={{ width: 20 }} />
+					)}
 				</Box>
 			)}
 

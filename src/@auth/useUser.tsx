@@ -10,12 +10,26 @@ type useUser = {
 	updateUser: (updates: Partial<User>) => Promise<User | undefined>;
 	updateUserSettings: (newSettings: User['settings']) => Promise<User['settings'] | undefined>;
 	signOut: () => void;
+	hasPermission: (permission: string) => boolean;
 };
 
 function useUser(): useUser {
 	const { authState, signOut, updateUser } = useAuth();
 	const user = authState?.user as User;
 	const isGuest = useMemo(() => !user?.role || user?.role?.length === 0, [user]);
+
+	/**
+	 * Check if user has specific permission
+	 */
+	function hasPermission(permission: string): boolean {
+		if (!user || !user.role) {
+			return false;
+		}
+		if (Array.isArray(user.role)) {
+			return user.role.includes(permission);
+		}
+		return user.role === permission;
+	}
 
 	/**
 	 * Update user
@@ -61,7 +75,8 @@ function useUser(): useUser {
 		isGuest,
 		signOut: handleSignOut,
 		updateUser: handleUpdateUser,
-		updateUserSettings: handleUpdateUserSettings
+		updateUserSettings: handleUpdateUserSettings,
+		hasPermission
 	};
 }
 

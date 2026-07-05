@@ -19,19 +19,23 @@ const route: FuseRouteItemType = {
 		},
 		{
 			path: 'view/:documentId',
-			element: <DocumentShowPage />
+			element: <DocumentShowPage />,
+			auth: ['purchases.invoice.read']
 		},
 		{
 			path: 'edit/:code/:documentId',
-			element: <EditPurchaseDocumentPage />
+			element: <EditPurchaseDocumentPage />,
+			auth: ['purchases.invoice.edit']
 		},
 		{
 			path: ':code?',
-			element: <PurchasesPage />
+			element: <PurchasesPage />,
+			auth: ['purchases.invoice.read']
 		},
 		{
 			path: 'create/:code?',
-			element: <CreatePurchaseDocumentPage />
+			element: <CreatePurchaseDocumentPage />,
+			auth: ['purchases.invoice.create']
 		}
 	]
 };

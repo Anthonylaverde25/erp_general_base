@@ -5,6 +5,7 @@ import { styled } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import DocumentsHeader from '../components/DocumentsHeader';
 import { useNavigate, useParams, useLocation } from 'react-router';
+import useUser from '@auth/useUser';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
 	'& .FusePageSimple-header': {
@@ -28,6 +29,8 @@ export default function SalesPage() {
 	const location = useLocation();
 	const searchParams = new URLSearchParams(location.search);
 	const item_type = searchParams.get('item_type') || 'product';
+	const { hasPermission } = useUser();
+	const canCreate = hasPermission('sales.invoice.create');
 
 	const { data: documents, isLoading, refetch } = useIndexDocuments({
 		operation: 'sale',
@@ -53,8 +56,8 @@ export default function SalesPage() {
 				<DocumentsHeader
 					operation="sale"
 					title={title}
-					onCreate={handleCreate}
-					onCreateDraft={handleCreateDraft}
+					onCreate={canCreate ? handleCreate : undefined}
+					onCreateDraft={canCreate ? handleCreateDraft : undefined}
 				/>
 			}
 			content={

@@ -33,86 +33,102 @@ const Route: FuseRouteItemType = {
 			<Outlet />
 		</SettingsAppView>
 	),
+	auth: ['settings.general.manage', 'settings.team.manage', 'settings.roles.manage'],
 	children: [
 		{
 			path: 'account',
-			element: <SettingPage />
+			element: <SettingPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'security',
-			element: <SecurityTabView />
+			element: <SecurityTabView />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'plan-billing',
-			element: <PlanBillingTabView />
-		},
-		{
-			path: 'security',
-			element: <SecurityTabView />
+			element: <PlanBillingTabView />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'notifications',
-			element: <NotificationsTabView />
+			element: <NotificationsTabView />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'team',
-			element: <TeamTabView />
+			element: <TeamTabView />,
+			auth: ['settings.team.manage']
 		},
 		{
 			path: 'roles',
-			element: <RolesTabView />
+			element: <RolesTabView />,
+			auth: ['settings.roles.manage']
 		},
 		{
 			path: 'bank-accounts',
-			element: <BankAccountTabView />
+			element: <BankAccountTabView />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'payment-methods',
-			element: <PaymentMethodsPage />
+			element: <PaymentMethodsPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'stores',
-			element: <StoresPage />
+			element: <StoresPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'number-serie',
-			element: <NumberSeriesPage />
+			element: <NumberSeriesPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'tax-types',
-			element: <TaxTypesPage />
+			element: <TaxTypesPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'tax-rate',
-			element: <TaxRatesPage />
+			element: <TaxRatesPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'families',
-			element: <FamiliesPage />
+			element: <FamiliesPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'partners',
-			element: <PartnersPage />
+			element: <PartnersPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'categories',
-			element: <CategoriesPage />
+			element: <CategoriesPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'subcategories',
-			element: <SubcategoriesPage />
+			element: <SubcategoriesPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'unit-types',
-			element: <UnitTypesPage />
+			element: <UnitTypesPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'units',
-			element: <UnitsPage />
+			element: <UnitsPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: 'file-types',
-			element: <FileTypesPage />
+			element: <FileTypesPage />,
+			auth: ['settings.general.manage']
 		},
 		{
 			path: '',

@@ -3,7 +3,20 @@ import { RoleEntity } from '../Role';
 
 export class RoleMapper {
 	static fromDetailDTO(dto: RoleListDTO): RoleEntity {
-		return new RoleEntity(dto.id, dto.name, dto.code, dto.description, dto.active, dto.created_at, dto.updated_at);
+		const permissions = dto.permissions 
+			? dto.permissions.map((p: any) => typeof p === 'object' ? p.id : p) 
+			: [];
+
+		return new RoleEntity(
+			dto.id, 
+			dto.name, 
+			dto.code, 
+			dto.description, 
+			dto.active, 
+			dto.created_at, 
+			dto.updated_at,
+			permissions
+		);
 	}
 
 	static fromDetailDTOList(dtos: RoleListDTO[]): RoleEntity[] {

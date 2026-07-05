@@ -1,18 +1,29 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import axiosInstance from '@/lib/@axios';
 import FusePageSimple from '@fuse/core/FusePageSimple';
-import { Box } from '@mui/material';
+import { Box, CircularProgress, Typography, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Responsive, WidthProvider } from 'react-grid-layout/legacy';
-import useUser from '@auth/useUser';
-import { useTenantModules } from '@/contexts/TenantModulesContext';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
+// Hooks & Types
+import {
+  useDashboards,
+  useCreateDashboard,
+  useUpdateDashboard,
+  useDeleteDashboard,
+  useAddWidget,
+  useRemoveWidget,
+  useUpdateLayouts,
+} from '../../hooks/useDashboards';
+import { DashboardWidget } from '../../types/dashboard.types';
+
 // Components
 import DashboardToolbar from '../DashboardToolbar';
 import DashGridItem from '../DashGridItem';
+import AddWidgetModal from '../modals/AddWidgetModal';
 
 // Card components
 import KpiCard from '../cards/KpiCard';
@@ -31,9 +42,63 @@ import PendingSerializationCard from '../cards/PendingSerializationCard';
 // ─── react-grid-layout setup ─────────────────────────────────────────────────
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-const STORAGE_KEY = 'dashboard_layouts_v7';
+const GRID_BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
+const GRID_COLS = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
+const GRID_ROW_HEIGHT = 40;
+const GRID_MARGIN: [number, number] = [16, 16];
 
-// ─── Page root ────────────────────────────────────────────────────────────────
+const currencyFormatter = new Intl.NumberFormat('es-ES', {
+  style: 'currency',
+  currency: 'EUR',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+
+const formatCurrency = (value: number) => currencyFormatter.format(value);
+
+// ─── Component Map ───────────────────────────────────────────────────────────
+const WIDGET_COMPONENT_MAP: Record<string, React.ComponentType<any>> = {
+  ventas: ({ kpiData }) => (
+    <KpiCard
+      title="Ventas"
+      value={formatCurrency(kpiData?.sales.total ?? 0)}
+      subtitle={kpiData?.sales.subtitle ?? 'Año actual'}
+      progressPercent={kpiData?.sales.percent ?? 0}
+      targetValue={formatCurrency(kpiData?.sales.target ?? 10000)}
+      targetColor="success.main"
+    />
+  ),
+  gastos: ({ kpiData }) => (
+    <KpiCard
+      title="Gastos"
+      value={formatCurrency(kpiData?.expenses.total ?? 0)}
+      subtitle={kpiData?.expenses.subtitle ?? 'Año actual'}
+      progressPercent={kpiData?.expenses.percent ?? 0}
+      targetValue={formatCurrency(kpiData?.expenses.target ?? 5000)}
+      targetColor="error.main"
+    />
+  ),
+  beneficio: ({ kpiData }) => (
+    <KpiCard
+      title="Beneficio"
+      value={formatCurrency((kpiData?.sales.total ?? 0) - (kpiData?.expenses.total ?? 0))}
+      subtitle={kpiData?.sales.subtitle ?? 'Año actual'}
+    />
+  ),
+  banco: () => <BankCtaCard />,
+  resumen_ventas_compras: () => <SalesPurchasesChart />,
+  pagos_cobros_pendientes: () => <PendingBalancesChart />,
+  entradas_salidas_banco: () => <BankFlowCard />,
+  resumen_gastos: () => <ExpensesSummaryChart />,
+  cuentas_gasto: () => <ExpenseAccountsCard />,
+  stock_critico: () => <CriticalStockCard />,
+  pending_invoicing: () => <PendingInvoicingCard />,
+  active_routes_card: () => <ActiveRoutesCard />,
+  incomplete_batches: () => <IncompleteBatchesCard />,
+  pending_serialization: () => <PendingSerializationCard />
+};
+
+// ─── Styled page wrapper ─────────────────────────────────────────────────────
 const Root = styled(FusePageSimple)(({ theme }) => ({
   '& .FusePageSimple-header': {
     backgroundColor: theme.vars.palette.background.paper,
@@ -46,7 +111,6 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 
 // ─── Grid wrapper ─────────────────────────────────────────────────────────────
 const GridWrapper = styled('div')<{ isEditing: boolean }>(({ theme }) => ({
-  // ── Card container ──
   '& .react-grid-item': {
     userSelect: 'text',
     pointerEvents: 'auto'
@@ -54,8 +118,6 @@ const GridWrapper = styled('div')<{ isEditing: boolean }>(({ theme }) => ({
   '& .react-grid-item.react-draggable-dragging': {
     userSelect: 'none'
   },
-
-  // ── Drag placeholder ──
   '& .react-grid-item.react-grid-placeholder': {
     backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
     border: `2px dashed ${theme.palette.primary.main}`,
@@ -66,8 +128,6 @@ const GridWrapper = styled('div')<{ isEditing: boolean }>(({ theme }) => ({
     padding: 0,
     boxShadow: 'none'
   },
-
-  // ── Resize handle ──
   '& .react-grid-item > .react-resizable-handle': {
     position: 'absolute',
     width: 20,
@@ -91,135 +151,41 @@ const GridWrapper = styled('div')<{ isEditing: boolean }>(({ theme }) => ({
       borderColor: theme.palette.primary.main
     }
   },
-
-  // ── Drag handle ──
   '& .drag-handle': {
     touchAction: 'none'
   }
 }));
 
-// ─── Layout definitions ──────────────────────────────────────────────────────
-const initialLayouts = {
-  lg: [
-    { i: 'ventas', x: 0, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
-    { i: 'gastos', x: 3, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
-    { i: 'beneficio', x: 6, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
-    { i: 'incomplete_batches', x: 9, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
-    
-    { i: 'resumen_ventas_compras', x: 0, y: 3, w: 6, h: 5, minW: 3, minH: 3 },
-    { i: 'pagos_cobros_pendientes', x: 6, y: 3, w: 6, h: 5, minW: 3, minH: 3 },
-    
-    { i: 'pending_invoicing', x: 0, y: 8, w: 6, h: 5, minW: 3, minH: 3 },
-    { i: 'resumen_gastos', x: 6, y: 8, w: 6, h: 5, minW: 3, minH: 3 },
-    
-    { i: 'banco', x: 0, y: 13, w: 3, h: 3, minW: 2, minH: 2 },
-    { i: 'entradas_salidas_banco', x: 3, y: 13, w: 3, h: 3, minW: 2, minH: 2 },
-    { i: 'cuentas_gasto', x: 6, y: 13, w: 3, h: 3, minW: 2, minH: 2 },
-    { i: 'stock_critico', x: 9, y: 13, w: 3, h: 3, minW: 2, minH: 2 },
-    
-    { i: 'active_routes_card', x: 0, y: 16, w: 3, h: 3, minW: 2, minH: 2 },
-    { i: 'pending_serialization', x: 3, y: 16, w: 3, h: 3, minW: 2, minH: 2 }
-  ],
-  md: [
-    { i: 'ventas', x: 0, y: 0, w: 5, h: 3, minW: 2, minH: 2 },
-    { i: 'gastos', x: 5, y: 0, w: 5, h: 3, minW: 2, minH: 2 },
-    
-    { i: 'beneficio', x: 0, y: 3, w: 5, h: 3, minW: 2, minH: 2 },
-    { i: 'incomplete_batches', x: 5, y: 3, w: 5, h: 3, minW: 2, minH: 2 },
-    
-    { i: 'resumen_ventas_compras', x: 0, y: 6, w: 10, h: 5, minW: 4, minH: 3 },
-    { i: 'pagos_cobros_pendientes', x: 0, y: 11, w: 10, h: 5, minW: 4, minH: 3 },
-    
-    { i: 'pending_invoicing', x: 0, y: 16, w: 10, h: 5, minW: 4, minH: 3 },
-    { i: 'resumen_gastos', x: 0, y: 21, w: 10, h: 5, minW: 4, minH: 3 },
-    
-    { i: 'banco', x: 0, y: 26, w: 5, h: 3, minW: 2, minH: 2 },
-    { i: 'entradas_salidas_banco', x: 5, y: 26, w: 5, h: 3, minW: 2, minH: 2 },
-    
-    { i: 'cuentas_gasto', x: 0, y: 29, w: 5, h: 3, minW: 2, minH: 2 },
-    { i: 'stock_critico', x: 5, y: 29, w: 5, h: 3, minW: 2, minH: 2 },
-    
-    { i: 'active_routes_card', x: 0, y: 32, w: 5, h: 3, minW: 2, minH: 2 },
-    { i: 'pending_serialization', x: 5, y: 32, w: 5, h: 3, minW: 2, minH: 2 }
-  ]
-};
+interface KpiData {
+  total: number;
+  target: number;
+  percent: number;
+  subtitle: string;
+}
 
-const GRID_BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
-const GRID_COLS = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
-const GRID_ROW_HEIGHT = 40;
-const GRID_MARGIN: [number, number] = [16, 16];
+export default function DashboardView() {
+  const { data: dashboards, isLoading: boardsLoading } = useDashboards();
+  const createDashboard = useCreateDashboard();
+  const updateDashboard = useUpdateDashboard();
+  const deleteDashboard = useDeleteDashboard();
+  const addWidget = useAddWidget();
+  const removeWidget = useRemoveWidget();
+  const updateLayouts = useUpdateLayouts();
 
-const currencyFormatter = new Intl.NumberFormat('es-ES', {
-  style: 'currency',
-  currency: 'EUR',
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2
-});
-
-const WIDGET_MODULES: Record<string, string | string[] | null> = {
-  ventas: 'sales',
-  gastos: 'purchases',
-  beneficio: ['sales', 'purchases'],
-  banco: null,
-  resumen_ventas_compras: ['sales', 'purchases'],
-  pagos_cobros_pendientes: ['sales', 'purchases'],
-  entradas_salidas_banco: null,
-  resumen_gastos: 'purchases',
-  cuentas_gasto: 'purchases',
-  stock_critico: ['sales', 'purchases'],
-  pending_invoicing: 'sales',
-  active_routes_card: 'sales',
-  incomplete_batches: ['sales', 'purchases'],
-  pending_serialization: ['sales', 'purchases']
-};
-
-const formatCurrency = (value: number) => currencyFormatter.format(value);
-
-// ─── Component ────────────────────────────────────────────────────────────────
-function DashboardView() {
-  const { data: user } = useUser();
-  const activeCompanyId = user?.active_company_id;
-  const { hasModule, hasAnyModule } = useTenantModules();
-
-  const [layouts, setLayouts] = useState(() => initialLayouts);
+  const [activeDashboardId, setActiveDashboardId] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-
-  // Load layout when activeCompanyId changes
-  useEffect(() => {
-    try {
-      const key = `${STORAGE_KEY}_company_${activeCompanyId ?? 'default'}`;
-      const saved = localStorage.getItem(key);
-      setLayouts(saved ? JSON.parse(saved) : initialLayouts);
-    } catch {
-      setLayouts(initialLayouts);
-    }
-  }, [activeCompanyId]);
-
-  const isWidgetVisible = useCallback((key: string): boolean => {
-    const mod = WIDGET_MODULES[key];
-    if (mod === null || mod === undefined) return true;
-    if (Array.isArray(mod)) return hasAnyModule(mod);
-    return hasModule(mod);
-  }, [hasModule, hasAnyModule]);
-
-  // Filter layouts dynamically
-  const filteredLayouts = useMemo(() => {
-    const result: Record<string, any[]> = {};
-    for (const [bp, items] of Object.entries(layouts)) {
-      result[bp] = (items as any[]).filter((item) => isWidgetVisible(item.i));
-    }
-    return result;
-  }, [layouts, isWidgetVisible]);
-
-  interface KpiData {
-    total: number;
-    target: number;
-    percent: number;
-    subtitle: string;
-  }
-
+  const [addWidgetOpen, setAddWidgetOpen] = useState(false);
   const [kpiData, setKpiData] = useState<{ sales: KpiData; expenses: KpiData } | null>(null);
 
+  // Initialize active dashboard
+  useEffect(() => {
+    if (dashboards && dashboards.length > 0) {
+      const defaultBoard = dashboards.find((d) => d.is_default) || dashboards[0];
+      setActiveDashboardId(defaultBoard.id);
+    }
+  }, [dashboards]);
+
+  // Fetch KPI Data
   useEffect(() => {
     let active = true;
     const fetchKpis = async () => {
@@ -238,54 +204,131 @@ function DashboardView() {
     };
   }, []);
 
+  // Retrieve current active dashboard object
+  const activeDashboard = useMemo(() => {
+    return dashboards?.find((d) => d.id === activeDashboardId) || null;
+  }, [dashboards, activeDashboardId]);
 
+  // Map backend widgets to react-grid-layout items
+  const filteredLayouts = useMemo(() => {
+    if (!activeDashboard?.widgets) return { lg: [], md: [] };
 
-  const handleLayoutChange = useCallback((_current: unknown, allLayouts: Record<string, any[]>) => {
-    if (!isEditing) return;
+    const items = activeDashboard.widgets.map((widget) => ({
+      i: String(widget.id),
+      x: widget.layout.x,
+      y: widget.layout.y,
+      w: widget.layout.w,
+      h: widget.layout.h,
+      minW: widget.layout.minW ?? 2,
+      minH: widget.layout.minH ?? 2
+    }));
 
-    setLayouts((prevLayouts) => {
-      const updatedLayouts = { ...prevLayouts };
+    return {
+      lg: items,
+      md: items
+    };
+  }, [activeDashboard]);
 
-      for (const bp of Object.keys(allLayouts)) {
-        const prevBpLayout = prevLayouts[bp as keyof typeof prevLayouts] || [];
-        const newBpLayout = allLayouts[bp] || [];
+  const handleLayoutChange = useCallback((currentLayout: any[], allLayouts: Record<string, any[]>) => {
+    if (!isEditing || !activeDashboardId) return;
 
-        const newLayoutMap = new Map(newBpLayout.map(item => [item.i, item]));
+    // Use currentLayout which contains the positions of the active breakpoint
+    const layoutsToSend = currentLayout.map((item) => ({
+      id: Number(item.i),
+      layout: {
+        x: item.x,
+        y: item.y,
+        w: item.w,
+        h: item.h
+      }
+    }));
 
-        updatedLayouts[bp as keyof typeof prevLayouts] = prevBpLayout.map((prevItem) => {
-          if (newLayoutMap.has(prevItem.i)) {
-            const newItem = newLayoutMap.get(prevItem.i);
-            return { ...prevItem, ...newItem };
+    updateLayouts.mutate({
+      dashboardId: activeDashboardId,
+      layouts: layoutsToSend
+    });
+  }, [activeDashboardId, isEditing, updateLayouts]);
+
+  const handleCreateDashboard = async (name: string) => {
+    createDashboard.mutate({ name }, {
+      onSuccess: (newBoard) => {
+        setActiveDashboardId(newBoard.id);
+      }
+    });
+  };
+
+  const handleUpdateDashboard = (id: number, payload: { name?: string; is_default?: boolean }) => {
+    updateDashboard.mutate({ id, payload });
+  };
+
+  const handleDeleteDashboard = (id: number) => {
+    deleteDashboard.mutate(id, {
+      onSuccess: () => {
+        if (dashboards && dashboards.length > 0) {
+          const remaining = dashboards.filter((d) => d.id !== id);
+          if (remaining.length > 0) {
+            const defaultBoard = remaining.find((d) => d.is_default) || remaining[0];
+            setActiveDashboardId(defaultBoard.id);
+          } else {
+            setActiveDashboardId(null);
           }
-          return prevItem;
-        });
-
-        const prevItemIds = new Set(prevBpLayout.map(item => item.i));
-        const addedItems = newBpLayout.filter(item => !prevItemIds.has(item.i));
-        if (addedItems.length > 0) {
-          updatedLayouts[bp as keyof typeof prevLayouts] = [
-            ...updatedLayouts[bp as keyof typeof prevLayouts],
-            ...addedItems
-          ];
         }
       }
-
-      const key = `${STORAGE_KEY}_company_${activeCompanyId ?? 'default'}`;
-      localStorage.setItem(key, JSON.stringify(updatedLayouts));
-
-      return updatedLayouts;
     });
-  }, [activeCompanyId, isEditing]);
+  };
 
-  const handleResetLayout = useCallback(() => {
-    setLayouts(initialLayouts);
-    const key = `${STORAGE_KEY}_company_${activeCompanyId ?? 'default'}`;
-    localStorage.setItem(key, JSON.stringify(initialLayouts));
-  }, [activeCompanyId]);
+  const handleSelectWidget = (widgetType: string, defaultLayout: { w: number; h: number; minW: number; minH: number }) => {
+    if (!activeDashboardId || !activeDashboard) return;
 
-  const handleToggleEdit = useCallback(() => {
-    setIsEditing((prev) => !prev);
-  }, []);
+    // Calculate free Y coordinate at the bottom of the grid
+    const maxY = activeDashboard.widgets.reduce((acc, w) => Math.max(acc, w.layout.y + w.layout.h), 0);
+
+    const payload = {
+      widget_type: widgetType,
+      title: null,
+      layout: {
+        x: 0,
+        y: maxY,
+        w: defaultLayout.w,
+        h: defaultLayout.h,
+        minW: defaultLayout.minW,
+        minH: defaultLayout.minH
+      },
+      settings: null
+    };
+
+    addWidget.mutate({
+      dashboardId: activeDashboardId,
+      payload
+    }, {
+      onSuccess: () => {
+        setAddWidgetOpen(false);
+      }
+    });
+  };
+
+  const handleRemoveWidget = (widgetId: number) => {
+    if (!activeDashboardId) return;
+
+    if (confirm('¿Está seguro de que desea quitar este widget del tablero?')) {
+      removeWidget.mutate({
+        dashboardId: activeDashboardId,
+        widgetId
+      });
+    }
+  };
+
+  const alreadyAddedTypes = useMemo(() => {
+    return activeDashboard?.widgets.map((w) => w.widget_type) || [];
+  }, [activeDashboard]);
+
+  if (boardsLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', bgcolor: 'background.default' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Root
@@ -293,152 +336,97 @@ function DashboardView() {
         <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100%' }}>
           <DashboardToolbar
             isEditing={isEditing}
-            onToggleEdit={handleToggleEdit}
-            onResetLayout={handleResetLayout}
+            onToggleEdit={() => setIsEditing((prev) => !prev)}
+            dashboards={dashboards || []}
+            activeDashboardId={activeDashboardId}
+            onSelectDashboard={setActiveDashboardId}
+            onCreateDashboard={handleCreateDashboard}
+            onDeleteDashboard={handleDeleteDashboard}
+            onUpdateDashboard={handleUpdateDashboard}
+            onOpenAddWidget={() => setAddWidgetOpen(true)}
           />
 
-          <GridWrapper isEditing={isEditing}>
-            <ResponsiveGridLayout
-              className="layout"
-              layouts={filteredLayouts}
-              breakpoints={GRID_BREAKPOINTS}
-              cols={GRID_COLS}
-              rowHeight={GRID_ROW_HEIGHT}
-              margin={GRID_MARGIN}
-              onLayoutChange={handleLayoutChange}
-              draggableHandle=".drag-handle"
-              isDraggable={isEditing}
-              isResizable={isEditing}
+          {!activeDashboard || activeDashboard.widgets.length === 0 ? (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                py: 12,
+                px: 3,
+                border: '2px dashed',
+                borderColor: 'divider',
+                borderRadius: 2,
+                bgcolor: 'background.paper',
+                textAlign: 'center',
+                mt: 2
+              }}
             >
-              {isWidgetVisible('ventas') && (
-                <div key="ventas">
-                  <DashGridItem isEditing={isEditing}>
-                    <KpiCard
-                      title="Ventas"
-                      value={formatCurrency(kpiData?.sales.total ?? 0)}
-                      subtitle={kpiData?.sales.subtitle ?? 'Año actual'}
-                      progressPercent={kpiData?.sales.percent ?? 0}
-                      targetValue={formatCurrency(kpiData?.sales.target ?? 10000)}
-                      targetColor="success.main"
-                    />
-                  </DashGridItem>
-                </div>
+              <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 700, mb: 1 }}>
+                {!activeDashboard ? 'No tienes ningún tablero creado' : 'Este tablero está vacío'}
+              </Typography>
+              <Typography variant="body2" color="text.disabled" sx={{ mb: 3, maxWidth: 400 }}>
+                {!activeDashboard 
+                  ? 'Crea un tablero de control arriba para comenzar a estructurar tus métricas.' 
+                  : 'Edita el diseño de este tablero y añade widgets desde la biblioteca para visualizar tus KPIs.'}
+              </Typography>
+              {activeDashboard && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setIsEditing(true)}
+                  sx={{ textTransform: 'none', fontWeight: 600 }}
+                >
+                  Editar y Añadir Widgets
+                </Button>
               )}
-              {isWidgetVisible('gastos') && (
-                <div key="gastos">
-                  <DashGridItem isEditing={isEditing}>
-                    <KpiCard
-                      title="Gastos"
-                      value={formatCurrency(kpiData?.expenses.total ?? 0)}
-                      subtitle={kpiData?.expenses.subtitle ?? 'Año actual'}
-                      progressPercent={kpiData?.expenses.percent ?? 0}
-                      targetValue={formatCurrency(kpiData?.expenses.target ?? 5000)}
-                      targetColor="error.main"
-                    />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('beneficio') && (
-                <div key="beneficio">
-                  <DashGridItem isEditing={isEditing}>
-                    <KpiCard
-                      title="Beneficio"
-                      value={formatCurrency((kpiData?.sales.total ?? 0) - (kpiData?.expenses.total ?? 0))}
-                      subtitle={kpiData?.sales.subtitle ?? 'Año actual'}
-                    />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('banco') && (
-                <div key="banco">
-                  <DashGridItem isEditing={isEditing}>
-                    <BankCtaCard />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('resumen_ventas_compras') && (
-                <div key="resumen_ventas_compras">
-                  <DashGridItem
-                    isEditing={isEditing}
-                    noPadding
-                  >
-                    <SalesPurchasesChart />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('pagos_cobros_pendientes') && (
-                <div key="pagos_cobros_pendientes">
-                  <DashGridItem
-                    isEditing={isEditing}
-                    noPadding
-                  >
-                    <PendingBalancesChart />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('entradas_salidas_banco') && (
-                <div key="entradas_salidas_banco">
-                  <DashGridItem isEditing={isEditing}>
-                    <BankFlowCard />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('resumen_gastos') && (
-                <div key="resumen_gastos">
-                  <DashGridItem isEditing={isEditing}>
-                    <ExpensesSummaryChart />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('cuentas_gasto') && (
-                <div key="cuentas_gasto">
-                  <DashGridItem isEditing={isEditing}>
-                    <ExpenseAccountsCard />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('stock_critico') && (
-                <div key="stock_critico">
-                  <DashGridItem isEditing={isEditing}>
-                    <CriticalStockCard />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('pending_invoicing') && (
-                <div key="pending_invoicing">
-                  <DashGridItem isEditing={isEditing}>
-                    <PendingInvoicingCard />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('active_routes_card') && (
-                <div key="active_routes_card">
-                  <DashGridItem isEditing={isEditing}>
-                    <ActiveRoutesCard />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('incomplete_batches') && (
-                <div key="incomplete_batches">
-                  <DashGridItem isEditing={isEditing}>
-                    <IncompleteBatchesCard />
-                  </DashGridItem>
-                </div>
-              )}
-              {isWidgetVisible('pending_serialization') && (
-                <div key="pending_serialization">
-                  <DashGridItem isEditing={isEditing}>
-                    <PendingSerializationCard />
-                  </DashGridItem>
-                </div>
-              )}
+            </Box>
+          ) : (
+            <GridWrapper isEditing={isEditing}>
+              <ResponsiveGridLayout
+                className="layout"
+                layouts={filteredLayouts}
+                breakpoints={GRID_BREAKPOINTS}
+                cols={GRID_COLS}
+                rowHeight={GRID_ROW_HEIGHT}
+                margin={GRID_MARGIN}
+                onLayoutChange={handleLayoutChange}
+                draggableHandle=".drag-handle"
+                isDraggable={isEditing}
+                isResizable={isEditing}
+              >
+                {activeDashboard.widgets.map((widget) => {
+                  const Component = WIDGET_COMPONENT_MAP[widget.widget_type];
+                  if (!Component) return null;
 
-            </ResponsiveGridLayout>
-          </GridWrapper>
+                  const noPadding = ['resumen_ventas_compras', 'pagos_cobros_pendientes'].includes(widget.widget_type);
+
+                  return (
+                    <div key={String(widget.id)}>
+                      <DashGridItem
+                        isEditing={isEditing}
+                        noPadding={noPadding}
+                        onRemove={() => handleRemoveWidget(widget.id)}
+                      >
+                        <Component kpiData={kpiData} />
+                      </DashGridItem>
+                    </div>
+                  );
+                })}
+              </ResponsiveGridLayout>
+            </GridWrapper>
+          )}
+
+          {/* Catalog Dialog for Adding Widgets */}
+          <AddWidgetModal
+            open={addWidgetOpen}
+            onClose={() => setAddWidgetOpen(false)}
+            onSelectWidget={handleSelectWidget}
+            alreadyAddedTypes={alreadyAddedTypes}
+          />
         </Box>
       }
     />
   );
 }
-
-export default DashboardView;

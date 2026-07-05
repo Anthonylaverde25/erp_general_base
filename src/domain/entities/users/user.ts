@@ -16,6 +16,8 @@ export class UserEntity implements IUser {
 	private _document_type?: string;
 	private _document_number?: string;
 	private _last_name?: string;
+	private _exceptions: { id: number; allowed: boolean }[];
+	private _permissions: string[];
 
 	constructor(
 		Props: Omit<IUser, 'role'> &
@@ -47,6 +49,8 @@ export class UserEntity implements IUser {
 		this._job_position_id = Props.job_position_id;
 		this._document_type = Props.document_type;
 		this._document_number = Props.document_number;
+		this._exceptions = Props.exceptions ?? [];
+		this._permissions = Props.permissions ?? [];
 	}
 
 	get id(): number | null {
@@ -55,6 +59,10 @@ export class UserEntity implements IUser {
 
 	get name(): string {
 		return this._name;
+	}
+
+	get last_name(): string | undefined {
+		return this._last_name;
 	}
 
 	get email(): string {
@@ -77,6 +85,14 @@ export class UserEntity implements IUser {
 		return this._authorized_employees;
 	}
 
+	get exceptions(): { id: number; allowed: boolean }[] {
+		return this._exceptions;
+	}
+
+	get permissions(): string[] {
+		return this._permissions;
+	}
+
 	toPlainObject(): IUser & Partial<ICreateUser> {
 		return {
 			id: this._id,
@@ -92,7 +108,9 @@ export class UserEntity implements IUser {
 			department_id: this._department_id,
 			job_position_id: this._job_position_id,
 			document_type: this._document_type,
-			document_number: this._document_number
+			document_number: this._document_number,
+			exceptions: this._exceptions,
+			permissions: this._permissions
 		};
 	}
 

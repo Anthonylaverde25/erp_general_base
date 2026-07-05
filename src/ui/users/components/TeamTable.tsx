@@ -7,10 +7,11 @@ interface TeamTableProps {
 	users: IUser[] | undefined;
 	onEdit: (id: number) => void;
 	onAssociateEmployees: (user: IUser) => void;
+	onManagePermissions: (user: IUser) => void;
 }
 
 export default function TeamTable(props: TeamTableProps) {
-	const { users, onEdit, onAssociateEmployees } = props;
+	const { users, onEdit, onAssociateEmployees, onManagePermissions } = props;
 
 	return (
 		<UserDataTable
@@ -23,6 +24,7 @@ export default function TeamTable(props: TeamTableProps) {
 					row={row}
 					onEdit={() => onEdit(row.original.id)}
 					onAssociateEmployees={() => onAssociateEmployees(row.original)}
+					onManagePermissions={() => onManagePermissions(row.original)}
 				/>
 			)}
 			enableRowSelection

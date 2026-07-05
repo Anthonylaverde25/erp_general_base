@@ -23,6 +23,8 @@ export interface IUser {
 	observations?: string;
 	active_company_id?: number;
 	authorized_employees?: { id: number; full_name: string }[];
+	exceptions?: { id: number; allowed: boolean }[];
+	permissions?: string[];
 }
 
 /**

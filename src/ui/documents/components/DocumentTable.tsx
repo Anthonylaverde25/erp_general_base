@@ -10,6 +10,7 @@ import DocumentStatusModal from './status-modal';
 import BatchBillingModal from './BatchBillingModal';
 import FloatingSelectionBar from './FloatingSelectionBar';
 import DocumentEmptyState from './common/DocumentEmptyState';
+import useUser from '@auth/useUser';
 
 interface DocumentTableProps {
     documents: DocumentEntity[] | undefined;
@@ -21,6 +22,11 @@ interface DocumentTableProps {
 export default function DocumentTable(props: DocumentTableProps) {
     const { documents, isLoading, operation, onStatusUpdated } = props;
     const navigate = useNavigate();
+    const { hasPermission } = useUser();
+
+    const module = operation === 'sale' ? 'sales' : 'purchases';
+    const canEdit = hasPermission(`${module}.invoice.edit`);
+    const canDelete = hasPermission(`${module}.invoice.delete`);
     const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
     const [statusModalOpen, setStatusModalOpen] = useState(false);
     const [selectedDocument, setSelectedDocument] = useState<DocumentEntity | null>(null);
@@ -104,43 +110,57 @@ export default function DocumentTable(props: DocumentTableProps) {
                         boxShadow: 'none',
                     }
                 })}
-                renderRowActionMenuItems={({ closeMenu, row }) => [
-                    <MenuItem
-                        key="view"
-                        onClick={() => {
-                            navigate(`${basePath}/view/${row.original.id}`);
-                            closeMenu();
-                        }}
-                    >
-                        <ListItemIcon>
-                            <FuseSvgIcon>heroicons-outline:eye</FuseSvgIcon>
-                        </ListItemIcon>
-                        Ver detalle
-                    </MenuItem>,
-                    <MenuItem
-                        key="edit"
-                        onClick={() => {
-                            navigate(`${basePath}/${row.original.id}/edit`);
-                            closeMenu();
-                        }}
-                    >
-                        <ListItemIcon>
-                            <FuseSvgIcon>heroicons-outline:pencil-square</FuseSvgIcon>
-                        </ListItemIcon>
-                        Editar
-                    </MenuItem>,
-                    <MenuItem
-                        key="delete"
-                        onClick={() => {
-                            closeMenu();
-                        }}
-                    >
-                        <ListItemIcon>
-                            <FuseSvgIcon color="error">heroicons-outline:trash</FuseSvgIcon>
-                        </ListItemIcon>
-                        Eliminar
-                    </MenuItem>
-                ]}
+                renderRowActionMenuItems={({ closeMenu, row }) => {
+                    const items = [
+                        <MenuItem
+                            key="view"
+                            onClick={() => {
+                                navigate(`${basePath}/view/${row.original.id}`);
+                                closeMenu();
+                            }}
+                        >
+                            <ListItemIcon>
+                                <FuseSvgIcon>heroicons-outline:eye</FuseSvgIcon>
+                            </ListItemIcon>
+                            Ver detalle
+                        </MenuItem>
+                    ];
+
+                    if (canEdit) {
+                        items.push(
+                            <MenuItem
+                                key="edit"
+                                onClick={() => {
+                                    navigate(`${basePath}/${row.original.id}/edit`);
+                                    closeMenu();
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <FuseSvgIcon>heroicons-outline:pencil-square</FuseSvgIcon>
+                                </ListItemIcon>
+                                Editar
+                            </MenuItem>
+                        );
+                    }
+
+                    if (canDelete) {
+                        items.push(
+                            <MenuItem
+                                key="delete"
+                                onClick={() => {
+                                    closeMenu();
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <FuseSvgIcon color="error">heroicons-outline:trash</FuseSvgIcon>
+                                </ListItemIcon>
+                                Eliminar
+                            </MenuItem>
+                        );
+                    }
+
+                    return items;
+                }}
             />
 
             <DocumentStatusModal

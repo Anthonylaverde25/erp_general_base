@@ -149,7 +149,7 @@ export default function StockResolutionModal({ open, onClose }: StockResolutionM
                 sx: {
                     width: '100%',
                     maxWidth: 550,
-                    borderRadius: '4px', // Sharp Edges: as per erpViteReact/AGENTS.md
+                    borderRadius: '4px', // Sharp Edges: as per erp_generico_base/AGENTS.md
                 },
             }}
         >

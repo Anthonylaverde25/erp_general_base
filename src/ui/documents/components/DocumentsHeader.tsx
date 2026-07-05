@@ -49,7 +49,9 @@ function DocumentsHeader({ operation, onCreate, onCreateInvoice, onCreateDraft, 
 		handleMenuClose();
 	};
 
-	const actions = operation === 'sale' ? (
+	const hasAction = Boolean(onCreate || onCreateInvoice || onCreateDraft);
+
+	const actions = !hasAction ? null : (operation === 'sale' ? (
 		<>
 			<ButtonGroup
 				variant="contained"
@@ -98,7 +100,7 @@ function DocumentsHeader({ operation, onCreate, onCreateInvoice, onCreateDraft, 
 		>
 			Nuevo Documento
 		</Button>
-	);
+	));
 
 	return (
 		<PageHeader

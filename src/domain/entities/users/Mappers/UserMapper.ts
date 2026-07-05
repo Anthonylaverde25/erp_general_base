@@ -11,7 +11,9 @@ export class UserMapper {
 			role: dto.role,
 			phone: dto.phone || '', // Keep original logic for phone default
 			role_id: dto.role?.id || (dto.role_ids?.[0] ?? 0), // Keep original logic for role_id
-			authorized_employees: dto.authorized_employees || []
+			authorized_employees: dto.authorized_employees || [],
+			exceptions: (dto as any).exceptions || [],
+			permissions: (dto as any).permissions || []
 		});
 	}
 
@@ -31,7 +33,9 @@ export class UserMapper {
 			phone: user.phone,
 			role: user.role,
 			role_id: user.role_id,
-			authorized_employees: user.authorized_employees
+			authorized_employees: user.authorized_employees,
+			exceptions: user.exceptions,
+			permissions: user.permissions
 		};
 	}
 }
